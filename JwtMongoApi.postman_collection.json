@@ -1,0 +1,351 @@
+{
+  "info": {
+    "_postman_id": "jwt-mongoapi-collection",
+    "name": "JwtMongoApi Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Test API",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5149/authapi/test",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5149",
+              "path": ["authapi", "test"]
+            }
+          }
+        },
+        {
+          "name": "Sign Up",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"Password123\",\n  \"roleId\": \"{{roleId}}\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5149/authapi/signup",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5149",
+              "path": ["authapi", "signup"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"Password123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5149/authapi/login",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5149",
+              "path": ["authapi", "login"]
+            }
+          }
+        },
+        {
+          "name": "Change User Role",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"roleId\": \"{{roleId}}\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5149/authapi/change-role",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5149",
+              "path": ["authapi", "change-role"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "RoleApi Management",
+      "item": [
+        {
+          "name": "Get All Roles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5149/api/roleapi",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5149",
+              "path": ["api", "roleapi"]
+            }
+          }
+        },
+        {
+          "name": "Get Active Roles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5149/api/roleapi/active",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5149",
+              "path": ["api", "roleapi", "active"]
+            }
+          }
+        },
+        {
+          "name": "Get Role by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5149/api/roleapi/{{roleId}}",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5149",
+              "path": ["api", "roleapi", "{{roleId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Role by Name",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5149/api/roleapi/name/{{roleName}}",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5149",
+              "path": ["api", "roleapi", "name", "{{roleName}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Role",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Admin\",\n  \"description\": \"Administrator role with full access\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5149/api/roleapi",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5149",
+              "path": ["api", "roleapi"]
+            }
+          }
+        },
+        {
+          "name": "Update Role",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"SuperAdmin\",\n  \"description\": \"Super administrator role with enhanced privileges\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5149/api/roleapi/{{roleId}}",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5149",
+              "path": ["api", "roleapi", "{{roleId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Role",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5149/api/roleapi/{{roleId}}",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5149",
+              "path": ["api", "roleapi", "{{roleId}}"]
+            }
+          }
+        },
+        {
+          "name": "Activate Role",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5149/api/roleapi/{{roleId}}/activate",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5149",
+              "path": ["api", "roleapi", "{{roleId}}", "activate"]
+            }
+          }
+        },
+        {
+          "name": "Deactivate Role",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5149/api/roleapi/{{roleId}}/deactivate",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5149",
+              "path": ["api", "roleapi", "{{roleId}}", "deactivate"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ResumeBuilder",
+      "item": [
+        {
+          "name": "Create Resume",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"personal\": {\n    \"fullName\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"+1 123 456 7890\",\n    \"location\": \"St. Louis, MO\",\n    \"linkedIn\": \"https://linkedin.com/in/johndoe\",\n    \"website\": \"https://johndoe.com\"\n  },\n  \"summary\": \"Experienced Salesforce Admin...\",\n  \"skills\": {\n    \"skills\": {\n      \"Programming Languages\": [\"C#\", \"JavaScript\"],\n      \"Frameworks\": [\"React\", \"ASP.NET\"],\n      \"Soft Skills\": [\"Leadership\", \"Teamwork\"]\n    }\n  },\n  \"experience\": [\n    {\n      \"company\": \"Qualcomm\",\n      \"location\": \"USA\",\n      \"title\": \"Salesforce Admin\",\n      \"startDate\": \"Aug 2024\",\n      \"endDate\": \"Present\",\n      \"descriptions\": [\"Configured and maintained...\"]\n    }\n  ],\n  \"education\": [\n    {\n      \"degree\": \"Masters in Information Systems\",\n      \"institution\": \"Saint Louis University\",\n      \"location\": \"St. Louis, MO\",\n      \"startDate\": \"Aug 2023\",\n      \"endDate\": \"May 2025\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5149/api/resume",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5149",
+              "path": ["api", "resume"]
+            }
+          }
+        },
+        {
+          "name": "Update Resume",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"personal\": {\n    \"fullName\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"+1 123 456 7890\",\n    \"location\": \"St. Louis, MO\",\n    \"linkedIn\": \"https://linkedin.com/in/johndoe\",\n    \"website\": \"https://johndoe.com\"\n  },\n  \"summary\": \"Updated summary...\",\n  \"skills\": {\n    \"skills\": {\n      \"Programming Languages\": [\"C#\", \"JavaScript\"],\n      \"Frameworks\": [\"React\", \"ASP.NET\"],\n      \"Soft Skills\": [\"Leadership\", \"Teamwork\"]\n    }\n  },\n  \"experience\": [\n    {\n      \"company\": \"Qualcomm\",\n      \"location\": \"USA\",\n      \"title\": \"Salesforce Admin\",\n      \"startDate\": \"Aug 2024\",\n      \"endDate\": \"Present\",\n      \"descriptions\": [\"Configured and maintained...\"]\n    }\n  ],\n  \"education\": [\n    {\n      \"degree\": \"Masters in Information Systems\",\n      \"institution\": \"Saint Louis University\",\n      \"location\": \"St. Louis, MO\",\n      \"startDate\": \"Aug 2023\",\n      \"endDate\": \"May 2025\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5149/api/resume/{{resumeId}}",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5149",
+              "path": ["api", "resume", "{{resumeId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get All Resumes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5149/api/resume",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5149",
+              "path": ["api", "resume"]
+            }
+          }
+        },
+        {
+          "name": "Get Resume By Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5149/api/resume/{{resumeId}}",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5149",
+              "path": ["api", "resume", "{{resumeId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Resume",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5149/api/resume/{{resumeId}}",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5149",
+              "path": ["api", "resume", "{{resumeId}}"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "roleId",
+      "value": "your-role-id-here",
+      "description": "Replace with actual role ID for testing"
+    },
+    {
+      "key": "roleName",
+      "value": "Admin",
+      "description": "Replace with actual role name for testing"
+    },
+    {
+      "key": "userId",
+      "value": "your-user-id-here",
+      "description": "Replace with actual user ID for testing"
+    },
+    {
+      "key": "resumeId",
+      "value": "your-resume-id-here",
+      "description": "Replace with actual resume ID for testing"
+    }
+  ]
+}

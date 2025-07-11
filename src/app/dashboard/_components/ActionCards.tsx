@@ -1,0 +1,60 @@
+import { motion } from 'motion/react';
+import { dashboardData } from './data';
+import { cn } from '@/lib/utils';
+import Link from 'next/link';
+
+interface ActionCardsProps {
+  className?: string;
+}
+
+export function ActionCards({ className }: ActionCardsProps) {
+  const { actionCards } = dashboardData;
+
+  return (
+    <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4", className)}>
+      {actionCards.map((card, index) => (
+        <motion.div
+          key={card.id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.1 }}
+          className="bg-white rounded-lg border border-gray-200 p-4 relative"
+        >
+          {/* Badge */}
+          {card.badge && (
+            <div className="absolute -top-2 -right-2">
+              <span className="bg-purple-600 text-white text-xs px-2 py-1 rounded-full font-medium">
+                {card.badge}
+              </span>
+            </div>
+          )}
+
+          {/* Icon */}
+          <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-3">
+            <span className="text-2xl">{card.icon}</span>
+          </div>
+
+          {/* Content */}
+          <div className="mb-4">
+            <h3 className="font-semibold text-gray-900 mb-1">{card.title}</h3>
+            <p className="text-sm text-gray-500">{card.subtitle}</p>
+          </div>
+
+          {/* Action Button */}
+          <Link href={card.link}>
+            <button
+              className={cn(
+                "w-full py-2 px-3 rounded-md text-sm font-medium transition-colors",
+                card.variant === 'primary'
+                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              )}
+            >
+              {card.action}
+            </button>
+          </Link>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
