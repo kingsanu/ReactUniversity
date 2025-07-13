@@ -3,7 +3,53 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useGlobalStore } from '@/store/useGlobalStore';
 import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
-import { Loader2, FileText } from 'lucide-react';
+import { Loader2, FileText, X } from 'lucide-react';
+
+// PDF Error Boundary Component for LivePreview
+class LivePreviewErrorBoundary extends React.Component<
+  { children: React.ReactNode; onError?: () => void },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode; onError?: () => void }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('LivePreview PDF Error:', error, errorInfo);
+    this.props.onError?.();
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center">
+            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <X size={24} className="text-red-600" />
+            </div>
+            <h3 className="text-sm font-medium text-gray-900 mb-2">Preview Error</h3>
+            <p className="text-xs text-gray-600 mb-3">
+              There was an issue with the live preview.
+            </p>
+            <button
+              onClick={() => this.setState({ hasError: false })}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 // Custom hook for debouncing values
 function useDebounce<T>(value: T, delay: number): T {
@@ -69,8 +115,9 @@ export function LivePreview() {
   // Create PDF document matching the reference style - memoized to prevent unnecessary re-renders
   const renderPDFTemplate = useMemo(() => {
     if (!pdfComponents) return null;
-    
-    const { Document, Page, Text, View, StyleSheet } = pdfComponents;
+
+    try {
+      const { Document, Page, Text, View, StyleSheet } = pdfComponents;
     
     const styles = StyleSheet.create({
       page: {
@@ -266,13 +313,13 @@ export function LivePreview() {
           )}
 
           {/* Skills */}
-          {skills.length > 0 && (
+          {skills && skills.length > 0 && (
             <View>
               <Text style={styles.sectionTitle}>Skills</Text>
               <View style={styles.skillsContainer}>
                 {skills.map((skill, index) => (
-                  <Text key={index} style={styles.skill}>
-                    {skill.name}
+                  <Text key={skill.id || `skill-${index}`} style={styles.skill}>
+                    {skill.name || ''}
                   </Text>
                 ))}
               </View>
@@ -281,6 +328,10 @@ export function LivePreview() {
         </Page>
       </Document>
     );
+    } catch (error) {
+      console.error('Error rendering LivePreview PDF template:', error);
+      return null;
+    }
   }, [pdfComponents, personalInfo, experience, education, skills]); // Dependencies for memoization
 
   return (
@@ -317,12 +368,15 @@ export function LivePreview() {
               </div>
             )}
             
-            <pdfComponents.PDFViewer
-              style={{ width: '100%', height: '100%', border: 'none' ,position:'sticky',top:'0'}}
-              showToolbar={false}
-            >
-              {renderPDFTemplate}
-            </pdfComponents.PDFViewer>
+            <LivePreviewErrorBoundary>
+              <pdfComponents.PDFViewer
+                key={`live-pdf-${skills.length}-${experience.length}-${education.length}`}
+                style={{ width: '100%', height: '100%', border: 'none' ,position:'sticky',top:'0'}}
+                showToolbar={false}
+              >
+                {renderPDFTemplate}
+              </pdfComponents.PDFViewer>
+            </LivePreviewErrorBoundary>
           </div>
         ) : (
           <div className="flex items-center justify-center h-96">

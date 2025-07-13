@@ -62,6 +62,7 @@ interface GlobalState {
   };
   setUser: (user: Partial<GlobalState['user']>) => void;
   logout: () => void;
+  initializeAuth: () => Promise<void>;
 
   // Resume Builder State
   resumeBuilder: {
@@ -234,7 +235,12 @@ export const useGlobalStore = create<GlobalState>()(
           set((state) => ({
             user: { ...state.user, ...userData, isAuthenticated: true },
           })),
-        logout: () =>
+        logout: () => {
+          // Clear localStorage token
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('token');
+          }
+          // Reset user state
           set({
             user: {
               id: null,
@@ -242,7 +248,37 @@ export const useGlobalStore = create<GlobalState>()(
               name: null,
               isAuthenticated: false,
             },
-          }),
+          });
+        },
+
+        // Initialize authentication state from localStorage
+        initializeAuth: async () => {
+          if (typeof window !== 'undefined') {
+            const token = localStorage.getItem('token');
+            const currentUser = get().user;
+
+            if (token && currentUser.email) {
+              // We have both token and persisted user data, restore authenticated state
+              set((state) => ({
+                user: { ...state.user, isAuthenticated: true },
+              }));
+            } else {
+              // No token or no user data, ensure we're in unauthenticated state
+              if (token && !currentUser.email) {
+                // Token exists but no user data, clear the token
+                localStorage.removeItem('token');
+              }
+              set({
+                user: {
+                  id: null,
+                  email: null,
+                  name: null,
+                  isAuthenticated: false,
+                },
+              });
+            }
+          }
+        },
 
         // Resume Builder
         resumeBuilder: {
@@ -371,16 +407,21 @@ export const useGlobalStore = create<GlobalState>()(
           })),
 
         removeSkill: (id) =>
-          set((state) => ({
-            resumeBuilder: {
-              ...state.resumeBuilder,
-              data: {
-                ...state.resumeBuilder.data,
-                skills: state.resumeBuilder.data.skills.filter((skill) => skill.id !== id),
+          set((state) => {
+            const currentSkills = state.resumeBuilder.data.skills || [];
+            const filteredSkills = currentSkills.filter((skill) => skill && skill.id !== id);
+
+            return {
+              resumeBuilder: {
+                ...state.resumeBuilder,
+                data: {
+                  ...state.resumeBuilder.data,
+                  skills: filteredSkills,
+                },
+                isDirty: true,
               },
-              isDirty: true,
-            },
-          })),
+            };
+          }),
 
         setResumeTemplate: (template) =>
           set((state) => ({
@@ -397,7 +438,7 @@ export const useGlobalStore = create<GlobalState>()(
           })),
 
         resetResumeBuilder: () =>
-          set((state) => ({
+          set(() => ({
             resumeBuilder: {
               currentStep: 1,
               data: initialResumeData,

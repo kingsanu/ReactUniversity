@@ -5,6 +5,52 @@ import { useGlobalStore } from '@/store/useGlobalStore';
 import { Download, Eye, X, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
+// PDF Error Boundary Component
+class PDFErrorBoundary extends React.Component<
+  { children: React.ReactNode; onError?: () => void },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode; onError?: () => void }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('PDF Error:', error, errorInfo);
+    this.props.onError?.();
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <X size={32} className="text-red-600" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">PDF Preview Error</h3>
+            <p className="text-gray-600 mb-4">
+              There was an issue rendering the PDF preview. Your data is safe.
+            </p>
+            <button
+              onClick={() => this.setState({ hasError: false })}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 // Custom hook for debouncing values
 function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
@@ -66,8 +112,9 @@ export function ResumePreview() {
   // Create PDF document matching the reference style - memoized to prevent unnecessary re-renders
   const renderPDFTemplate = useMemo(() => {
     if (!pdfComponents) return null;
-    
-    const { Document, Page, Text, View, StyleSheet } = pdfComponents;
+
+    try {
+      const { Document, Page, Text, View, StyleSheet } = pdfComponents;
     
     const styles = StyleSheet.create({
       page: {
@@ -257,13 +304,13 @@ export function ResumePreview() {
           )}
 
           {/* Skills */}
-          {skills.length > 0 && (
+          {skills && skills.length > 0 && (
             <View>
               <Text style={styles.sectionTitle}>Skills</Text>
               <View style={styles.skillsContainer}>
                 {skills.map((skill, index) => (
-                  <Text key={index} style={styles.skill}>
-                    {skill.name}
+                  <Text key={skill.id || `skill-${index}`} style={styles.skill}>
+                    {skill.name || ''}
                   </Text>
                 ))}
               </View>
@@ -272,6 +319,10 @@ export function ResumePreview() {
         </Page>
       </Document>
     );
+    } catch (error) {
+      console.error('Error rendering PDF template:', error);
+      return null;
+    }
   }, [pdfComponents, personalInfo, experience, education, skills]); // Dependencies for memoization
 
   const handleDownload = async () => {
@@ -348,18 +399,23 @@ export function ResumePreview() {
               
               {/* PDF Viewer Container */}
               <div className="flex-1 bg-gray-50">
-                {pdfComponents ? (
-                  <pdfComponents.PDFViewer
-                    style={{ 
-                      width: '100%', 
-                      height: '100%', 
-                      border: 'none',
-                      backgroundColor: '#f9fafb'
-                    }}
-                    showToolbar={true}
-                  >
-                    {renderPDFTemplate}
-                  </pdfComponents.PDFViewer>
+                {pdfComponents && renderPDFTemplate ? (
+                  <PDFErrorBoundary>
+                    <div className="w-full h-full">
+                      <pdfComponents.PDFViewer
+                        key={`pdf-${skills.length}-${experience.length}-${education.length}`}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          border: 'none',
+                          backgroundColor: '#f9fafb'
+                        }}
+                        showToolbar={true}
+                      >
+                        {renderPDFTemplate}
+                      </pdfComponents.PDFViewer>
+                    </div>
+                  </PDFErrorBoundary>
                 ) : (
                   <div className="flex items-center justify-center h-full">
                     <div className="text-center">

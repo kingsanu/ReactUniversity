@@ -7,35 +7,56 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { useGlobalStore } from "@/store/useGlobalStore";
+import { signUp as signUpApi, login as loginApi } from '@/services/authService';
+import { getRoleByName } from '@/services/roleService';
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+
+const signupSchema = z.object({
+  firstName: z.string().min(1, "First name is required").min(2, "First name must be at least 2 characters"),
+  lastName: z.string().min(1, "Last name is required").min(2, "Last name must be at least 2 characters"),
+  email: z.string().min(1, "Email is required").email("Please enter a valid email address"),
+  password: z.string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number"),
+  confirmPassword: z.string().min(1, "Please confirm your password"),
+  acceptTerms: z.boolean().refine(val => val === true, "You must accept the terms and conditions"),
+  acceptMarketing: z.boolean().optional()
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"]
+});
+
+type SignupFormData = z.infer<typeof signupSchema>;
 
 export default function SignupPage() {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const form = useForm<SignupFormData>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      acceptTerms: false,
+      acceptMarketing: false
+    }
+  });
+
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [acceptTerms, setAcceptTerms] = useState(false);
-  const [acceptMarketing, setAcceptMarketing] = useState(false);
-  const [errors, setErrors] = useState<{
-    firstName?: string;
-    lastName?: string;
-    email?: string;
-    password?: string;
-    confirmPassword?: string;
-    terms?: string;
-  }>({});
   
   const { setUser } = useGlobalStore();
+  const { handleSubmit, control, watch, formState: { errors, isValid } } = form;
   const router = useRouter();
 
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+  const password = watch("password");
 
   const validatePassword = (password: string) => {
     return {
@@ -49,10 +70,11 @@ export default function SignupPage() {
 
   const getPasswordStrength = (password: string) => {
     if (!password) return { strength: 0, label: "", color: "" };
-    
+
     const validation = validatePassword(password);
-    const score = Object.values(validation).filter(Boolean).length;
-    
+    const { length, uppercase, lowercase, number, special } = validation;
+
+    // Define strength levels
     const levels = [
       { strength: 0, label: "", color: "" },
       { strength: 1, label: "Very Weak", color: "bg-red-500" },
@@ -61,77 +83,95 @@ export default function SignupPage() {
       { strength: 4, label: "Good", color: "bg-blue-500" },
       { strength: 5, label: "Strong", color: "bg-green-500" }
     ];
-    
-    return levels[score];
-  };
 
-  const validateForm = () => {
-    const newErrors: typeof errors = {};
-    
-    if (!firstName.trim()) {
-      newErrors.firstName = "First name is required";
-    }
-    
-    if (!lastName.trim()) {
-      newErrors.lastName = "Last name is required";
-    }
-    
-    if (!email) {
-      newErrors.email = "Email is required";
-    } else if (!validateEmail(email)) {
-      newErrors.email = "Please enter a valid email address";
-    }
-    
-    if (!password) {
-      newErrors.password = "Password is required";
+    let score = 0;
+    if (!length) {
+      score = 0;
+    } else if (!(uppercase && lowercase && number)) {
+      // If missing core criteria (uppercase, lowercase, number), only consider length and special character
+      score = 1 + (special ? 1 : 0);
     } else {
-      const validation = validatePassword(password);
-      if (!validation.length) {
-        newErrors.password = "Password must be at least 8 characters";
-      } else if (Object.values(validation).filter(Boolean).length < 3) {
-        newErrors.password = "Password must include uppercase, lowercase, and numbers";
-      }
+      // Core criteria met (length + uppercase + lowercase + number) = score 4
+      // Special character adds +1 for score 5
+      score = 4 + (special ? 1 : 0);
     }
-    
-    if (!confirmPassword) {
-      newErrors.confirmPassword = "Please confirm your password";
-    } else if (password !== confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-    }
-    
-    if (!acceptTerms) {
-      newErrors.terms = "You must accept the Terms of Service";
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+
+    // Ensure score is within levels range
+    const index = Math.min(score, levels.length - 1);
+    return levels[index];
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-    
+  const handleSubmitForm = async (data: SignupFormData) => {
     setIsLoading(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Mock signup - in real app, create account with backend
-    setUser({
-      id: "1",
-      email,
-      name: `${firstName} ${lastName}`,
-      isAuthenticated: true
-    });
-    
-    router.push("/dashboard");
+    try {
+      // Get the default user role
+      let userRoleId = '686cc04c1237a82fc74b4a6a'; // fallback roleId
+      try {
+        const userRole = await getRoleByName('User');
+        userRoleId = userRole._id;
+      } catch (roleError) {
+        // If 'User' role doesn't exist, try 'Student'
+        try {
+          const studentRole = await getRoleByName('Student');
+          userRoleId = studentRole._id;
+        } catch {
+          // Use fallback roleId if both fail
+          console.warn('Could not fetch default role, using fallback');
+        }
+      }
+
+      await signUpApi({
+        name: `${data.firstName} ${data.lastName}`,
+        email: data.email,
+        password: data.password,
+        roleId: userRoleId
+      });
+      
+      // on signup success, call login to get token
+      const loginRes = await loginApi({ email: data.email, password: data.password });
+      localStorage.setItem('token', loginRes.token);
+      setUser({ id: '', email: data.email, name: `${data.firstName} ${data.lastName}`, isAuthenticated: true });
+      router.push('/dashboard');
+    } catch (err: any) {
+      // Handle API errors based on the response structure
+      if (err.response?.data?.errors) {
+        const apiErrors = err.response.data.errors;
+        // Map API field errors to form fields
+        Object.keys(apiErrors).forEach(field => {
+          const messages = Array.isArray(apiErrors[field]) ? apiErrors[field] : [apiErrors[field]];
+          const message = messages[0]; // Use first error message
+          
+          switch (field.toLowerCase()) {
+            case 'email':
+              form.setError('email', { message });
+              break;
+            case 'password':
+              form.setError('password', { message });
+              break;
+            case 'name':
+              form.setError('firstName', { message });
+              break;
+            case 'roleid':
+              // If roleId error, show a general message
+              form.setError('email', { message: 'Registration failed. Please try again.' });
+              break;
+            default:
+              form.setError('email', { message });
+          }
+        });
+      } else if (err.response?.data?.message) {
+        // Handle single error message
+        form.setError('email', { message: err.response.data.message });
+      } else {
+        // Handle generic errors
+        form.setError('email', { message: err.message || 'An error occurred during signup. Please try again.' });
+      }
+    }
     setIsLoading(false);
   };
 
-  const passwordStrength = getPasswordStrength(password);
+  const passwordStrength = getPasswordStrength(password || "");
 
   return (
     <div className="min-h-screen flex relative overflow-hidden">
@@ -240,244 +280,251 @@ export default function SignupPage() {
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-5">
-                {/* Name Fields */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">
-                      First name
-                    </Label>
-                    <Input
-                      id="firstName"
-                      type="text"
-                      value={firstName}
-                      onChange={(e) => {
-                        setFirstName(e.target.value);
-                        if (errors.firstName) setErrors(prev => ({ ...prev, firstName: undefined }));
-                      }}
-                      placeholder="John"
-                      className={cn(
-                        "h-11 text-base bg-white/50 backdrop-blur-sm border-gray-200/50 focus:border-purple-500 focus:ring-purple-500/20",
-                        errors.firstName && "border-red-300 focus:border-red-500 focus:ring-red-500/20"
+              <Form {...form}>
+                <form onSubmit={handleSubmit(handleSubmitForm)} className="space-y-5">
+                  {/* Name Fields */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={control}
+                      name="firstName"
+                      render={({ field }) => (
+                        <FormItem className="space-y-2">
+                          <FormLabel htmlFor="firstName" className="text-sm font-medium text-gray-700">
+                            First name
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              id="firstName"
+                              type="text"
+                              {...field}
+                              placeholder="John"
+                              className={cn(
+                                "h-11 text-base bg-white/50 backdrop-blur-sm border-gray-200/50 focus:border-purple-500 focus:ring-purple-500/20",
+                                errors.firstName && "border-red-300 focus:border-red-500 focus:ring-red-500/20"
+                              )}
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs text-red-600" />
+                        </FormItem>
                       )}
                     />
-                    {errors.firstName && (
-                      <p className="text-xs text-red-600">{errors.firstName}</p>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName" className="text-sm font-medium text-gray-700">
-                      Last name
-                    </Label>
-                    <Input
-                      id="lastName"
-                      type="text"
-                      value={lastName}
-                      onChange={(e) => {
-                        setLastName(e.target.value);
-                        if (errors.lastName) setErrors(prev => ({ ...prev, lastName: undefined }));
-                      }}
-                      placeholder="Doe"
-                      className={cn(
-                        "h-11 text-base bg-white/50 backdrop-blur-sm border-gray-200/50 focus:border-purple-500 focus:ring-purple-500/20",
-                        errors.lastName && "border-red-300 focus:border-red-500 focus:ring-red-500/20"
+                    <FormField
+                      control={control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem className="space-y-2">
+                          <FormLabel htmlFor="lastName" className="text-sm font-medium text-gray-700">
+                            Last name
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              id="lastName"
+                              type="text"
+                              {...field}
+                              placeholder="Doe"
+                              className={cn(
+                                "h-11 text-base bg-white/50 backdrop-blur-sm border-gray-200/50 focus:border-purple-500 focus:ring-purple-500/20",
+                                errors.lastName && "border-red-300 focus:border-red-500 focus:ring-red-500/20"
+                              )}
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs text-red-600" />
+                        </FormItem>
                       )}
                     />
-                    {errors.lastName && (
-                      <p className="text-xs text-red-600">{errors.lastName}</p>
-                    )}
                   </div>
-                </div>
 
-                {/* Email */}
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-                    Email address
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value);
-                      if (errors.email) setErrors(prev => ({ ...prev, email: undefined }));
-                    }}
-                    placeholder="john@example.com"
-                    className={cn(
-                      "h-11 text-base bg-white/50 backdrop-blur-sm border-gray-200/50 focus:border-purple-500 focus:ring-purple-500/20",
-                      errors.email && "border-red-300 focus:border-red-500 focus:ring-red-500/20"
-                    )}
-                  />
-                  {errors.email && (
-                    <p className="text-xs text-red-600">{errors.email}</p>
-                  )}
-                </div>
-
-                {/* Password */}
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="text-sm font-medium text-gray-700">
-                    Password
-                  </Label>
-                  <div className="relative">
-                    <Input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      value={password}
-                      onChange={(e) => {
-                        setPassword(e.target.value);
-                        if (errors.password) setErrors(prev => ({ ...prev, password: undefined }));
-                      }}
-                      placeholder="Create a strong password"
-                      className={cn(
-                        "h-11 text-base bg-white/50 backdrop-blur-sm border-gray-200/50 focus:border-purple-500 focus:ring-purple-500/20 pr-12",
-                        errors.password && "border-red-300 focus:border-red-500 focus:ring-red-500/20"
-                      )}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                    >
-                      {showPassword ? (
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                      ) : (
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-                        </svg>
-                      )}
-                    </button>
-                  </div>
-                  
-                  {/* Password Strength Indicator */}
-                  {password && (
-                    <div className="space-y-2">
-                      <div className="flex space-x-1">
-                        {[1, 2, 3, 4, 5].map((level) => (
-                          <div
-                            key={level}
+                  {/* Email */}
+                  <FormField
+                    control={control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem className="space-y-2">
+                        <FormLabel htmlFor="email" className="text-sm font-medium text-gray-700">
+                          Email address
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            id="email"
+                            type="email"
+                            {...field}
+                            placeholder="john@example.com"
                             className={cn(
-                              "h-1 flex-1 rounded-full transition-colors",
-                              level <= passwordStrength.strength
-                                ? passwordStrength.color
-                                : "bg-gray-200"
+                              "h-11 text-base bg-white/50 backdrop-blur-sm border-gray-200/50 focus:border-purple-500 focus:ring-purple-500/20",
+                              errors.email && "border-red-300 focus:border-red-500 focus:ring-red-500/20"
                             )}
                           />
-                        ))}
+                        </FormControl>
+                        <FormMessage className="text-xs text-red-600" />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Password */}
+                  <FormField
+                    control={control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem className="space-y-2">
+                        <FormLabel htmlFor="password" className="text-sm font-medium text-gray-700">
+                          Password
+                        </FormLabel>
+                        <div className="relative">
+                          <FormControl>
+                            <Input
+                              id="password"
+                              type={showPassword ? "text" : "password"}
+                              {...field}
+                              placeholder="Create a strong password"
+                              className={cn(
+                                "h-11 text-base bg-white/50 backdrop-blur-sm border-gray-200/50 focus:border-purple-500 focus:ring-purple-500/20 pr-12",
+                                errors.password && "border-red-300 focus:border-red-500 focus:ring-red-500/20"
+                              )}
+                            />
+                          </FormControl>
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                          >
+                            {showPassword ? (
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                            ) : (
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                              </svg>
+                            )}
+                          </button>
+                        </div>
+                        
+                        {/* Password Strength Indicator */}
+                        {form.getValues("password") && (
+                          <div className="space-y-2">
+                            <div className="flex space-x-1">
+                              {[1, 2, 3, 4, 5].map((level) => (
+                                <div
+                                  key={level}
+                                  className={cn(
+                                    "h-1 flex-1 rounded-full transition-colors",
+                                    level <= passwordStrength.strength
+                                      ? passwordStrength.color
+                                      : "bg-gray-200"
+                                  )}
+                                />
+                              ))}
+                            </div>
+                            {passwordStrength.label && (
+                              <p className="text-xs text-gray-600">
+                                Password strength: <span className="font-medium">{passwordStrength.label}</span>
+                              </p>
+                            )}
+                          </div>
+                        )}
+                        <FormMessage className="text-xs text-red-600" />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Confirm Password */}
+                  <FormField
+                    control={control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem className="space-y-2">
+                        <FormLabel htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
+                          Confirm password
+                        </FormLabel>
+                        <div className="relative">
+                          <FormControl>
+                            <Input
+                              id="confirmPassword"
+                              type={showConfirmPassword ? "text" : "password"}
+                              {...field}
+                              placeholder="Confirm your password"
+                              className={cn(
+                                "h-11 text-base bg-white/50 backdrop-blur-sm border-gray-200/50 focus:border-purple-500 focus:ring-purple-500/20 pr-12",
+                                errors.confirmPassword && "border-red-300 focus:border-red-500 focus:ring-red-500/20"
+                              )}
+                            />
+                          </FormControl>
+                          <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                          >
+                            {showConfirmPassword ? (
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                            ) : (
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                              </svg>
+                            )}
+                          </button>
+                        </div>
+                        <FormMessage className="text-xs text-red-600" />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Terms and Marketing */}
+                  <div className="space-y-3">
+                    <div className="flex items-start space-x-2">
+                      <input
+                        id="terms"
+                        type="checkbox"
+                        {...form.register("acceptTerms")}
+                        className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 mt-0.5"
+                      />
+                      <Label htmlFor="terms" className="text-sm text-gray-700 leading-5">
+                        I agree to the{' '}
+                        <Link href="/terms" className="text-purple-600 hover:text-purple-500 font-medium">
+                          Terms of Service
+                        </Link>{' '}
+                        and{' '}
+                        <Link href="/privacy" className="text-purple-600 hover:text-purple-500 font-medium">
+                          Privacy Policy
+                        </Link>
+                      </Label>
+                    </div>
+                    {errors.acceptTerms && (
+                      <p className="text-xs text-red-600 ml-6">{errors.acceptTerms.message}</p>
+                    )}
+                    
+                    <div className="flex items-start space-x-2">
+                      <input
+                        id="marketing"
+                        type="checkbox"
+                        {...form.register("acceptMarketing")}
+                        className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 mt-0.5"
+                      />
+                      <Label htmlFor="marketing" className="text-sm text-gray-700 leading-5">
+                        I'd like to receive career tips and product updates via email
+                      </Label>
+                    </div>
+                  </div>
+
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full h-12 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium rounded-xl shadow-lg disabled:opacity-50 transition-all duration-200"
+                  >
+                    {isLoading ? (
+                      <div className="flex items-center space-x-2">
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <span>Creating account...</span>
                       </div>
-                      {passwordStrength.label && (
-                        <p className="text-xs text-gray-600">
-                          Password strength: <span className="font-medium">{passwordStrength.label}</span>
-                        </p>
-                      )}
-                    </div>
-                  )}
-                  {errors.password && (
-                    <p className="text-xs text-red-600">{errors.password}</p>
-                  )}
-                </div>
-
-                {/* Confirm Password */}
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
-                    Confirm password
-                  </Label>
-                  <div className="relative">
-                    <Input
-                      id="confirmPassword"
-                      type={showConfirmPassword ? "text" : "password"}
-                      value={confirmPassword}
-                      onChange={(e) => {
-                        setConfirmPassword(e.target.value);
-                        if (errors.confirmPassword) setErrors(prev => ({ ...prev, confirmPassword: undefined }));
-                      }}
-                      placeholder="Confirm your password"
-                      className={cn(
-                        "h-11 text-base bg-white/50 backdrop-blur-sm border-gray-200/50 focus:border-purple-500 focus:ring-purple-500/20 pr-12",
-                        errors.confirmPassword && "border-red-300 focus:border-red-500 focus:ring-red-500/20"
-                      )}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                    >
-                      {showConfirmPassword ? (
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                      ) : (
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-                        </svg>
-                      )}
-                    </button>
-                  </div>
-                  {errors.confirmPassword && (
-                    <p className="text-xs text-red-600">{errors.confirmPassword}</p>
-                  )}
-                </div>
-
-                {/* Terms and Marketing */}
-                <div className="space-y-3">
-                  <div className="flex items-start space-x-2">
-                    <input
-                      id="terms"
-                      type="checkbox"
-                      checked={acceptTerms}
-                      onChange={(e) => {
-                        setAcceptTerms(e.target.checked);
-                        if (errors.terms) setErrors(prev => ({ ...prev, terms: undefined }));
-                      }}
-                      className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 mt-0.5"
-                    />
-                    <Label htmlFor="terms" className="text-sm text-gray-700 leading-5">
-                      I agree to the{' '}
-                      <Link href="/terms" className="text-purple-600 hover:text-purple-500 font-medium">
-                        Terms of Service
-                      </Link>{' '}
-                      and{' '}
-                      <Link href="/privacy" className="text-purple-600 hover:text-purple-500 font-medium">
-                        Privacy Policy
-                      </Link>
-                    </Label>
-                  </div>
-                  {errors.terms && (
-                    <p className="text-xs text-red-600 ml-6">{errors.terms}</p>
-                  )}
-                  
-                  <div className="flex items-start space-x-2">
-                    <input
-                      id="marketing"
-                      type="checkbox"
-                      checked={acceptMarketing}
-                      onChange={(e) => setAcceptMarketing(e.target.checked)}
-                      className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 mt-0.5"
-                    />
-                    <Label htmlFor="marketing" className="text-sm text-gray-700 leading-5">
-                      I'd like to receive career tips and product updates via email
-                    </Label>
-                  </div>
-                </div>
-
-                <Button
-                  type="submit"
-                  disabled={isLoading || !acceptTerms}
-                  className="w-full h-12 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium rounded-xl shadow-lg disabled:opacity-50 transition-all duration-200"
-                >
-                  {isLoading ? (
-                    <div className="flex items-center space-x-2">
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      <span>Creating account...</span>
-                    </div>
-                  ) : (
-                    "Create account"
-                  )}
-                </Button>
-              </form>
+                    ) : (
+                      "Create account"
+                    )}
+                  </Button>
+                </form>
+              </Form>
 
               <p className="mt-6 text-center text-sm text-gray-600">
                 Already have an account?{' '}

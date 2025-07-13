@@ -107,7 +107,10 @@ export function SkillsStep() {
                   {skill.level}
                 </span>
                 <button
-                  onClick={() => removeSkill(skill.id)}
+                  onClick={() => {
+                    // Add a small delay to prevent rapid state changes that might cause PDF rendering issues
+                    setTimeout(() => removeSkill(skill.id), 10);
+                  }}
                   className="text-red-500 hover:text-red-700 text-sm"
                 >
                   ✕

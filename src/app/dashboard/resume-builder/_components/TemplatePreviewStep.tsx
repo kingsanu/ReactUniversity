@@ -39,50 +39,7 @@ export function TemplatePreviewStep() {
   const completedSections = Object.values(sectionStatus).filter(section => section.isComplete).length;
   const completionPercentage = overallProgress;
 
-  const [isSaving, setIsSaving] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
 
-  const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      const payload = {
-        personal: {
-          fullName: data.personalInfo.fullName,
-          email: data.personalInfo.email,
-          phone: data.personalInfo.phone,
-          location: data.personalInfo.location,
-          linkedIn: data.personalInfo.linkedin || '',
-          website: data.personalInfo.website || ''
-        },
-        summary: data.personalInfo.summary,
-        skills: { skills: data.skills.reduce((acc, s) => {
-          acc[s.category] = [...(acc[s.category]||[]), s.name];
-          return acc;
-        }, {} as Record<string, string[]>) },
-        experience: data.experience.map(e => ({
-          company: e.company,
-          location: e.location,
-          title: e.jobTitle,
-          startDate: e.startDate,
-          endDate: e.endDate,
-          descriptions: e.description
-        })),
-        education: data.education.map(ed => ({
-          degree: ed.degree,
-          institution: ed.institution,
-          location: ed.location,
-          startDate: '',
-          endDate: ed.graduationDate
-        }))
-      };
-      await resumeService.createResume(payload);
-      setIsSaved(true);
-    } catch (err) {
-      console.error('Error saving resume', err);
-    } finally {
-      setIsSaving(false);
-    }
-  };
 
   return (
     <motion.div
@@ -217,11 +174,6 @@ export function TemplatePreviewStep() {
         </div>
       </div>
 
-      <div className="pt-4">
-        <Button onClick={handleSave} disabled={isSaving || isSaved}>
-          {isSaved ? 'Saved' : isSaving ? 'Saving...' : 'Save Resume'}
-        </Button>
-      </div>
     </motion.div>
   );
 }

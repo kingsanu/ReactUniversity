@@ -1,8 +1,10 @@
 "use client";
 import Link from 'next/link';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { sidebarData } from './data';
 import { cn } from '@/lib/utils';
+import { useGlobalStore } from '@/store/useGlobalStore';
 
 // Icon mapping - in a real app, use proper icon library
 const IconMap = {
@@ -19,13 +21,20 @@ interface SidebarProps {
 
 export function Sidebar({ className }: SidebarProps) {
   const [expandedItems, setExpandedItems] = useState<string[]>(['analytics']);
+  const { logout } = useGlobalStore();
+  const router = useRouter();
 
   const toggleExpanded = (itemId: string) => {
-    setExpandedItems(prev => 
-      prev.includes(itemId) 
+    setExpandedItems(prev =>
+      prev.includes(itemId)
         ? prev.filter(id => id !== itemId)
         : [...prev, itemId]
     );
+  };
+
+  const handleLogout = () => {
+    logout();
+    router.push('/login');
   };
 
   return (
@@ -95,7 +104,10 @@ export function Sidebar({ className }: SidebarProps) {
 
       {/* Logout */}
       <div className="p-4">
-        <button className="flex items-center w-full px-3 py-2.5 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+        <button
+          onClick={handleLogout}
+          className="flex items-center w-full px-3 py-2.5 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+        >
           <span className="mr-3">🚪</span>
           <span>Logout</span>
         </button>
