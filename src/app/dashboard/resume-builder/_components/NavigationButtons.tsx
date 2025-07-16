@@ -1,10 +1,10 @@
 "use client";
-import { useGlobalStore } from '@/store/useGlobalStore';
-import { resumeSteps } from './resumeData';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { validateAllSteps } from './validation';
-import { ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
+import { useGlobalStore } from "@/store/useGlobalStore";
+import { resumeSteps } from "./resumeData";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { validateAllSteps } from "./validation";
+import { ChevronLeft, ChevronRight, AlertTriangle } from "lucide-react";
 
 export function NavigationButtons() {
   const { resumeBuilder, setResumeStep } = useGlobalStore();
@@ -13,9 +13,14 @@ export function NavigationButtons() {
   const isLastStep = currentStep === resumeSteps.length;
 
   // Get validation for current step
-  const validation = validateAllSteps(resumeBuilder.data);
+  const validation = validateAllSteps(
+    resumeBuilder.data,
+    resumeBuilder.userProfile
+  );
   const currentStepValidation = validation[currentStep];
-  const hasWarnings = !currentStepValidation.isValid && currentStepValidation.missingFields.length > 0;
+  const hasWarnings =
+    !currentStepValidation.isValid &&
+    currentStepValidation.missingFields.length > 0;
 
   const handlePrevious = () => {
     if (!isFirstStep) {
@@ -30,17 +35,28 @@ export function NavigationButtons() {
   };
 
   const isNextDisabled = () => {
-    const { data } = resumeBuilder;
+    const { data, userProfile } = resumeBuilder;
 
     switch (currentStep) {
-      case 1: // Personal Info - Only require name and email
+      case 1: // Profile Assessment - Require basic profile info
+        return (
+          !userProfile ||
+          !userProfile.careerLevel ||
+          !userProfile.employmentStatus ||
+          !userProfile.industry
+        );
+      case 2: // Template Selection - Require template selection
+        return !data.template;
+      case 3: // Personal Info - Only require name and email
         return !data.personalInfo.fullName || !data.personalInfo.email;
-      case 2: // Experience - Optional for freshers
+      case 4: // Experience - Optional for freshers
         return false; // Allow skipping experience
-      case 3: // Education - Require at least one
+      case 5: // Education - Require at least one
         return data.education.length === 0;
-      case 4: // Skills - Require at least one
-        return data.skills.length === 0;
+      case 6: // Skills - More flexible for entry-level
+        // Allow progression if user has at least some skills or is entry-level
+        const isEntryLevel = userProfile?.careerLevel === 'entry-level' || userProfile?.employmentStatus === 'student';
+        return data.skills.length === 0 && !isEntryLevel;
       default:
         return false;
     }
@@ -55,7 +71,7 @@ export function NavigationButtons() {
           <div className="text-sm">
             <p className="text-amber-800 font-medium">Missing information:</p>
             <p className="text-amber-700">
-              {currentStepValidation.missingFields.join(', ')}
+              {currentStepValidation.missingFields.join(", ")}
             </p>
             <p className="text-amber-600 text-xs mt-1">
               You can continue and come back to complete this later.
@@ -108,7 +124,7 @@ export function NavigationButtons() {
             (isLastStep || isNextDisabled()) && "opacity-50 cursor-not-allowed"
           )}
         >
-          <span>{isLastStep ? 'Complete' : 'Next'}</span>
+          <span>{isLastStep ? "Complete" : "Next"}</span>
           {!isLastStep && <ChevronRight className="w-4 h-4" />}
         </Button>
       </div>

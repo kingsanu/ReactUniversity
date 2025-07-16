@@ -8,11 +8,11 @@ interface TemplateProps {
   pdfComponents: any;
 }
 
-export function ModernTemplate({ personalInfo, experience, education, skills, pdfComponents }: TemplateProps) {
+export function CreativeTemplate({ personalInfo, experience, education, skills, pdfComponents }: TemplateProps) {
   const { Document, Page, Text, View, StyleSheet } = pdfComponents;
 
-  // Define styles for the Modern template
-  const modernStyles = StyleSheet.create({
+  // Define styles for the Creative template
+  const creativeStyles = StyleSheet.create({
     page: {
       flexDirection: 'column',
       backgroundColor: '#ffffff',
@@ -22,32 +22,35 @@ export function ModernTemplate({ personalInfo, experience, education, skills, pd
       lineHeight: 1.1,
     },
     header: {
-      textAlign: 'center',
+      backgroundColor: '#8b5cf6',
+      color: '#ffffff',
+      padding: 20,
       marginBottom: 12,
-      paddingBottom: 6,
+      borderRadius: 8,
     },
     name: {
-      fontSize: 16,
+      fontSize: 18,
       fontWeight: 'bold',
       marginBottom: 4,
-      color: '#000000',
-      textTransform: 'uppercase',
+      color: '#ffffff',
+      textAlign: 'center',
     },
     contact: {
       fontSize: 11,
-      color: '#000000',
+      color: '#ffffff',
       marginBottom: 2,
       lineHeight: 1.1,
+      textAlign: 'center',
     },
     sectionTitle: {
       fontSize: 12,
       fontWeight: 'bold',
       marginTop: 12,
       marginBottom: 6,
-      color: '#000000',
+      color: '#8b5cf6',
       textTransform: 'uppercase',
       letterSpacing: 0.5,
-      borderBottom: '1pt solid #3b82f6',
+      borderBottom: '2pt solid #8b5cf6',
       paddingBottom: 3,
     },
     text: {
@@ -72,7 +75,7 @@ export function ModernTemplate({ personalInfo, experience, education, skills, pd
     jobTitle: {
       fontSize: 12,
       fontWeight: 'bold',
-      color: '#000000',
+      color: '#8b5cf6',
       marginBottom: 1,
     },
     company: {
@@ -82,13 +85,13 @@ export function ModernTemplate({ personalInfo, experience, education, skills, pd
     },
     date: {
       fontSize: 11,
-      color: '#000000',
+      color: '#666666',
       textAlign: 'right',
       fontWeight: 'normal',
     },
     location: {
       fontSize: 11,
-      color: '#000000',
+      color: '#666666',
       textAlign: 'right',
       marginTop: 1,
     },
@@ -98,10 +101,13 @@ export function ModernTemplate({ personalInfo, experience, education, skills, pd
       gap: 8,
     },
     skill: {
-      fontSize: 11,
-      color: '#000000',
-      marginRight: 14,
-      marginBottom: 2,
+      fontSize: 10,
+      color: '#ffffff',
+      backgroundColor: '#8b5cf6',
+      padding: '4 8',
+      borderRadius: 12,
+      marginRight: 8,
+      marginBottom: 4,
     },
     educationHeader: {
       flexDirection: 'row',
@@ -112,7 +118,7 @@ export function ModernTemplate({ personalInfo, experience, education, skills, pd
     degree: {
       fontSize: 12,
       fontWeight: 'bold',
-      color: '#000000',
+      color: '#8b5cf6',
       marginBottom: 1,
     },
     institution: {
@@ -123,50 +129,50 @@ export function ModernTemplate({ personalInfo, experience, education, skills, pd
 
   return (
     <Document>
-      <Page size="A4" style={modernStyles.page}>
+      <Page size="A4" style={creativeStyles.page}>
         {/* Header */}
-        <View style={modernStyles.header}>
-          <Text style={modernStyles.name}>
+        <View style={creativeStyles.header}>
+          <Text style={creativeStyles.name}>
             {personalInfo.fullName || 'Your Name'}
           </Text>
-          <Text style={modernStyles.contact}>
+          <Text style={creativeStyles.contact}>
             {personalInfo.phone && `${personalInfo.phone} | `}
             {personalInfo.email && `${personalInfo.email} | `}
             {personalInfo.location && personalInfo.location}
           </Text>
           {personalInfo.linkedin && (
-            <Text style={modernStyles.contact}>{personalInfo.linkedin}</Text>
+            <Text style={creativeStyles.contact}>{personalInfo.linkedin}</Text>
           )}
         </View>
 
         {/* Summary */}
         {personalInfo.summary && (
           <View>
-            <Text style={modernStyles.sectionTitle}>Summary</Text>
-            <Text style={modernStyles.text}>{personalInfo.summary}</Text>
+            <Text style={creativeStyles.sectionTitle}>About Me</Text>
+            <Text style={creativeStyles.text}>{personalInfo.summary}</Text>
           </View>
         )}
 
         {/* Experience */}
         {experience && experience.length > 0 && (
           <View>
-            <Text style={modernStyles.sectionTitle}>Experience</Text>
+            <Text style={creativeStyles.sectionTitle}>Experience</Text>
             {experience.map((exp, index) => (
               <View key={index} style={{ marginBottom: 8 }}>
-                <View style={modernStyles.experienceHeader}>
+                <View style={creativeStyles.experienceHeader}>
                   <View style={{ flex: 1 }}>
-                    <Text style={modernStyles.jobTitle}>{exp.jobTitle}</Text>
-                    <Text style={modernStyles.company}>{exp.company}</Text>
+                    <Text style={creativeStyles.jobTitle}>{exp.jobTitle}</Text>
+                    <Text style={creativeStyles.company}>{exp.company}</Text>
                   </View>
                   <View>
-                    <Text style={modernStyles.date}>
+                    <Text style={creativeStyles.date}>
                       {exp.startDate} - {exp.current ? 'Present' : exp.endDate}
                     </Text>
-                    <Text style={modernStyles.location}>{exp.location}</Text>
+                    <Text style={creativeStyles.location}>{exp.location}</Text>
                   </View>
                 </View>
-                {exp.description && exp.description.map((desc, descIndex) => (
-                  <Text key={descIndex} style={modernStyles.bulletPoint}>
+                {exp.description && exp.description.map((desc: string, descIndex: number) => (
+                  <Text key={descIndex} style={creativeStyles.bulletPoint}>
                     • {desc}
                   </Text>
                 ))}
@@ -178,21 +184,21 @@ export function ModernTemplate({ personalInfo, experience, education, skills, pd
         {/* Education */}
         {education && education.length > 0 && (
           <View>
-            <Text style={modernStyles.sectionTitle}>Education</Text>
+            <Text style={creativeStyles.sectionTitle}>Education</Text>
             {education.map((edu, index) => (
               <View key={index} style={{ marginBottom: 6 }}>
-                <View style={modernStyles.educationHeader}>
+                <View style={creativeStyles.educationHeader}>
                   <View style={{ flex: 1 }}>
-                    <Text style={modernStyles.degree}>{edu.degree}</Text>
-                    <Text style={modernStyles.institution}>{edu.institution}</Text>
+                    <Text style={creativeStyles.degree}>{edu.degree}</Text>
+                    <Text style={creativeStyles.institution}>{edu.institution}</Text>
                   </View>
                   <View>
-                    <Text style={modernStyles.date}>{edu.graduationDate}</Text>
-                    <Text style={modernStyles.location}>{edu.location}</Text>
+                    <Text style={creativeStyles.date}>{edu.graduationDate}</Text>
+                    <Text style={creativeStyles.location}>{edu.location}</Text>
                   </View>
                 </View>
                 {edu.gpa && (
-                  <Text style={modernStyles.text}>GPA: {edu.gpa}</Text>
+                  <Text style={creativeStyles.text}>GPA: {edu.gpa}</Text>
                 )}
               </View>
             ))}
@@ -202,10 +208,10 @@ export function ModernTemplate({ personalInfo, experience, education, skills, pd
         {/* Skills */}
         {skills && skills.length > 0 && (
           <View>
-            <Text style={modernStyles.sectionTitle}>Skills</Text>
-            <View style={modernStyles.skillsContainer}>
+            <Text style={creativeStyles.sectionTitle}>Skills</Text>
+            <View style={creativeStyles.skillsContainer}>
               {skills.map((skill, index) => (
-                <Text key={skill.id || `skill-${index}`} style={modernStyles.skill}>
+                <Text key={skill.id || `skill-${index}`} style={creativeStyles.skill}>
                   {skill.name || ''}
                 </Text>
               ))}

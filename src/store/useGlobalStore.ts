@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { devtools, persist } from "zustand/middleware";
 
 // Resume Builder Types
 interface PersonalInfo {
@@ -35,8 +35,8 @@ interface Education {
 interface Skill {
   id: string;
   name: string;
-  category: 'technical' | 'soft' | 'language';
-  level: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  category: "technical" | "soft" | "language";
+  level: "beginner" | "intermediate" | "advanced" | "expert";
 }
 
 export interface ResumeData {
@@ -44,13 +44,134 @@ export interface ResumeData {
   experience: Experience[];
   education: Education[];
   skills: Skill[];
-  template: 'modern' | 'classic' | 'creative' | 'minimal';
+  template: "modern" | "classic" | "creative" | "minimal";
+}
+
+// Enhanced Multi-Step Resume Builder Types
+export interface UserProfile {
+  careerLevel: "entry-level" | "mid-career" | "senior" | "executive";
+  employmentStatus: "student" | "employed" | "unemployed" | "career-change";
+  industry: string;
+  targetRole?: string;
+  yearsOfExperience: number;
+  hasWorkExperience: boolean;
+  profileScore: number; // 0-100 for template matching
+}
+
+export interface TemplateRecommendation {
+  templateId: string;
+  suitabilityScore: number; // 0-100
+  reasoning: string[];
+  isCurrentDesign: boolean;
+  isRecommended?: boolean; // Added to fix template recommendation display
+  preview: {
+    thumbnailUrl: string;
+    sampleContent: Partial<ResumeData>;
+  };
+}
+
+export interface OptimizationSuggestion {
+  type: "condense" | "expand" | "prioritize" | "remove";
+  section: string;
+  description: string;
+  impact: "low" | "medium" | "high";
+  autoApplicable: boolean;
+}
+
+export interface ContentOptimizationState {
+  currentPageCount: number;
+  contentDensity: "sparse" | "optimal" | "dense" | "overflow";
+  suggestions: OptimizationSuggestion[];
+  autoAppliedOptimizations: string[];
+}
+
+export interface LayoutSettings {
+  margins: {
+    top: number;
+    bottom: number;
+    left: number;
+    right: number;
+  };
+  spacing: {
+    section: number;
+    paragraph: number;
+    line: number;
+  };
+  fontSize: {
+    heading: number;
+    body: number;
+    small: number;
+  };
+}
+
+export interface DesignCustomizationState {
+  selectedTemplate: string;
+  colorScheme?: string;
+  fontFamily?: string;
+  layoutSettings?: LayoutSettings;
+  customizations: Record<string, any>;
+}
+
+interface ResumeBuilderError {
+  type: "validation" | "template" | "optimization" | "save" | "network";
+  severity: "error" | "warning" | "info";
+  message: string;
+  field?: string;
+  step?: number;
+  recoverable: boolean;
+  autoRetry?: boolean;
+}
+
+// Enhanced Template Interface
+interface EnhancedTemplate {
+  id: string;
+  name: string;
+  description: string;
+  category: "traditional" | "modern" | "creative" | "minimal";
+  suitableFor: {
+    careerLevels: UserProfile["careerLevel"][];
+    industries: string[];
+    employmentStatuses: UserProfile["employmentStatus"][];
+  };
+  features: {
+    atsOptimized: boolean;
+    colorCustomizable: boolean;
+    layoutFlexible: boolean;
+    singlePageOptimized: boolean;
+  };
+  preview: {
+    thumbnailUrl: string;
+    fullPreviewUrl: string;
+  };
+  color: string;
+}
+
+// Extended Resume Data Interface
+export interface EnhancedResumeData extends ResumeData {
+  userProfile: UserProfile;
+  selectedTemplate: string;
+  customizations: {
+    colorScheme?: string;
+    fontFamily?: string;
+    layoutSettings?: LayoutSettings;
+  };
+  optimizationSettings: {
+    prioritizedSections: string[];
+    condensationLevel: "minimal" | "moderate" | "aggressive";
+    autoOptimizationsEnabled: boolean;
+  };
+  metadata: {
+    createdAt: Date;
+    lastModified: Date;
+    version: number;
+    isCompleted: boolean;
+  };
 }
 
 // Global State Interface
 interface GlobalState {
   // Theme
-  theme: 'light' | 'dark';
+  theme: "light" | "dark";
   toggleTheme: () => void;
 
   // User Authentication
@@ -60,7 +181,7 @@ interface GlobalState {
     name: string | null;
     isAuthenticated: boolean;
   };
-  setUser: (user: Partial<GlobalState['user']>) => void;
+  setUser: (user: Partial<GlobalState["user"]>) => void;
   logout: () => void;
   initializeAuth: () => Promise<void>;
 
@@ -70,20 +191,40 @@ interface GlobalState {
     data: ResumeData;
     isLoading: boolean;
     isDirty: boolean;
+    userProfile: UserProfile | null;
+    recommendedTemplates: TemplateRecommendation[];
+    contentOptimization: ContentOptimizationState | null;
+    designCustomization: DesignCustomizationState | null;
+    lastSaved: Date | null;
   };
   setResumeStep: (step: number) => void;
   updatePersonalInfo: (info: Partial<PersonalInfo>) => void;
-  addExperience: (experience: Omit<Experience, 'id'>) => void;
+  addExperience: (experience: Omit<Experience, "id">) => void;
   updateExperience: (id: string, experience: Partial<Experience>) => void;
   removeExperience: (id: string) => void;
-  addEducation: (education: Omit<Education, 'id'>) => void;
+  addEducation: (education: Omit<Education, "id">) => void;
   updateEducation: (id: string, education: Partial<Education>) => void;
   removeEducation: (id: string) => void;
-  addSkill: (skill: Omit<Skill, 'id'>) => void;
+  addSkill: (skill: Omit<Skill, "id">) => void;
   removeSkill: (id: string) => void;
-  setResumeTemplate: (template: ResumeData['template']) => void;
+  setResumeTemplate: (template: ResumeData["template"]) => void;
+  populateWithSampleData: (sampleData: ResumeData) => void;
   setResumeLoading: (loading: boolean) => void;
   resetResumeBuilder: () => void;
+
+  // New profile and optimization actions
+  setUserProfile: (profile: UserProfile) => void;
+  updateUserProfile: (profile: Partial<UserProfile>) => void;
+  setRecommendedTemplates: (templates: TemplateRecommendation[]) => void;
+  setContentOptimization: (optimization: ContentOptimizationState) => void;
+  updateContentOptimization: (
+    optimization: Partial<ContentOptimizationState>
+  ) => void;
+  setDesignCustomization: (customization: DesignCustomizationState) => void;
+  updateDesignCustomization: (
+    customization: Partial<DesignCustomizationState>
+  ) => void;
+  saveResumeProgress: () => void;
 
   // Navigation
   sidebarCollapsed: boolean;
@@ -93,125 +234,65 @@ interface GlobalState {
 // Initial Resume Data
 const initialResumeData: ResumeData = {
   personalInfo: {
-    fullName: 'Maithili Pathak',
-    email: 'maithili391@gmail.com',
-    phone: '+1 (914) 727 6370',
-    location: 'Texas',
-    linkedin: '',
-    website: '',
-    summary: `A seasoned Project Manager with over 4 years of experience leading cross-functional teams and driving successful delivery of projects within scope, time, and budget across Agile, Waterfall, and hybrid environments.
-Skilled in developing comprehensive project charters, Gantt charts, WBS, and critical path schedules using tools like Microsoft Project, Jira, and Smartsheet to ensure smooth planning and execution.
-Expertise includes managing RAID logs, RACI matrices, status reports, and change requests to support informed decision-making and risk mitigation.
-Proficiency in using Power BI, Tableau, and advanced Excel for data-driven reporting and executive presentations.
-Familiarity with cloud platforms, MS Visio, Lucidchart, and basic SQL enhances technical understanding and facilitates seamless coordination with development teams.`,
+    fullName: "Maithili Pathak",
+    email: "maithili391@gmail.com",
+    phone: "+1 (914) 727 6370",
+    location: "Texas",
+    linkedin: "",
+    website: "",
+    summary: `Experienced Project Manager with 4+ years leading cross-functional teams and delivering projects on time and within budget. Skilled in Agile, Waterfall methodologies, and project management tools including Microsoft Project, Jira, and Smartsheet. Proven track record in risk management, stakeholder communication, and data-driven reporting.`,
   },
   experience: [
     {
-      id: '1',
-      jobTitle: 'Project Manager',
-      company: 'Freddie Mac',
-      location: 'USA',
-      startDate: 'Jan 2024',
-      endDate: 'Present',
+      id: "1",
+      jobTitle: "Project Manager",
+      company: "Freddie Mac",
+      location: "USA",
+      startDate: "Jan 2024",
+      endDate: "Present",
       current: true,
       description: [
-        'Managed multi-million-dollar projects using Microsoft Project, Smartsheet, and Jira, enabling real-time tracking of schedules, milestones, and deliverables while improving on-time delivery rates by 30%.',
-        'Created comprehensive project documentation, including RACI matrices, detailed project plans, and weekly status reports, improving stakeholder communication and visibility across teams and project phases.',
-        'Led risk assessments and implemented mitigation strategies, resulting in a 40% reduction in project delays and issue escalations.',
-        'Coordinated cross-functional collaboration with MS Teams, Slack, and Zoom, enhancing team engagement and accelerating resolution timelines by 25%.',
-        'Maintained QA/QC processes, ensuring smooth transition from testing to deployment while maintaining regulatory and quality standards.',
-        'Twisted process flows and technical diagrams with MS Visio and Lucidchart, streamlining communication between business analysts, developers, and QA teams.'
-      ]
+        "Managed multi-million-dollar projects using Microsoft Project, Smartsheet, and Jira, improving on-time delivery rates by 30%",
+        "Created comprehensive project documentation including RACI matrices and status reports, improving stakeholder communication",
+        "Led risk assessments and mitigation strategies, reducing project delays by 40%",
+        "Coordinated cross-functional teams using MS Teams and Slack, accelerating resolution timelines by 25%"
+      ],
     },
     {
-      id: '2',
-      jobTitle: 'Project Manager',
-      company: 'Qualcomm',
-      location: 'USA',
-      startDate: 'Jan 2021',
-      endDate: 'Dec 2023',
+      id: "2",
+      jobTitle: "Project Manager",
+      company: "Qualcomm",
+      location: "USA",
+      startDate: "Jan 2021",
+      endDate: "Dec 2023",
       current: false,
       description: [
-        'Planned and monitored complex project schedules using Gantt Charts and Critical Path Method (CPM), ensuring efficient resource allocation and on-time delivery of key milestones.',
-        'Managed cross-functional initiatives across platforms like Asana, Trello, Basecamp, ClickUp, and Confluence to streamline task assignment, progress tracking, and documentation.',
-        'Maintained RAID logs, meeting minutes, statements of work, and change requests, improving audit readiness and strengthening project governance.',
-        'Conducted detailed cost-benefit analysis and implemented earned value management (EVM) techniques to control project budgets and track financial performance.',
-        'Developed visually compelling presentations in PowerPoint and delivered executive-level reports and insights using Tableau to enhance decision-making.',
-        'Drove stakeholder engagement and buy-in through structured communication plans and training coordination, increasing adoption rates of new work processes by 40%.',
-        'Supported technical deployments and infrastructure-related projects on AWS, aligning cloud strategies with business goals to enhance scalability and operational efficiency.'
-      ]
-    }
+        "Planned and monitored complex project schedules using Gantt Charts and Critical Path Method (CPM)",
+        "Managed cross-functional initiatives across multiple platforms including Asana, Trello, and Confluence",
+        "Maintained RAID logs and project documentation, improving audit readiness and governance",
+        "Conducted cost-benefit analysis and implemented EVM techniques for budget control"
+      ],
+    },
   ],
   education: [
     {
-      id: '1',
-      degree: 'Master of Science in Project Management',
-      institution: 'University of Texas',
-      location: 'Texas',
-      graduationDate: 'May 2020',
-      gpa: '3.8'
-    }
+      id: "1",
+      degree: "Master of Science in Project Management",
+      institution: "University of Texas",
+      location: "Texas",
+      graduationDate: "May 2020",
+      gpa: "3.8",
+    },
   ],
   skills: [
-    { id: '1', name: 'SDLC', category: 'technical', level: 'advanced' },
-    { id: '2', name: 'Agile', category: 'technical', level: 'expert' },
-    { id: '3', name: 'Waterfall', category: 'technical', level: 'advanced' },
-    { id: '4', name: 'Lean', category: 'technical', level: 'intermediate' },
-    { id: '5', name: 'Six Sigma Basics', category: 'technical', level: 'intermediate' },
-    { id: '6', name: 'Project Charter', category: 'technical', level: 'expert' },
-    { id: '7', name: 'Work Breakdown Structure', category: 'technical', level: 'expert' },
-    { id: '8', name: 'Gantt Charts', category: 'technical', level: 'expert' },
-    { id: '9', name: 'Critical Path Method', category: 'technical', level: 'advanced' },
-    { id: '10', name: 'Microsoft Project', category: 'technical', level: 'expert' },
-    { id: '11', name: 'Smartsheet', category: 'technical', level: 'advanced' },
-    { id: '12', name: 'Jira', category: 'technical', level: 'advanced' },
-    { id: '13', name: 'Asana', category: 'technical', level: 'intermediate' },
-    { id: '14', name: 'Trello', category: 'technical', level: 'intermediate' },
-    { id: '15', name: 'Basecamp', category: 'technical', level: 'intermediate' },
-    { id: '16', name: 'ClickUp', category: 'technical', level: 'intermediate' },
-    { id: '17', name: 'Confluence', category: 'technical', level: 'intermediate' },
-    { id: '18', name: 'Project Plans', category: 'technical', level: 'expert' },
-    { id: '19', name: 'RACI Matrix', category: 'technical', level: 'expert' },
-    { id: '20', name: 'Status Reports', category: 'technical', level: 'expert' },
-    { id: '21', name: 'RAID Logs', category: 'technical', level: 'expert' },
-    { id: '22', name: 'Meeting Minutes', category: 'technical', level: 'advanced' },
-    { id: '23', name: 'SOW', category: 'technical', level: 'advanced' },
-    { id: '24', name: 'Change Requests', category: 'technical', level: 'advanced' },
-    { id: '25', name: 'Collaboration', category: 'technical', level: 'expert' },
-    { id: '26', name: 'MS Teams', category: 'technical', level: 'expert' },
-    { id: '27', name: 'Slack', category: 'technical', level: 'advanced' },
-    { id: '28', name: 'Zoom', category: 'technical', level: 'advanced' },
-    { id: '29', name: 'Google Workspace', category: 'technical', level: 'advanced' },
-    { id: '30', name: 'SharePoint', category: 'technical', level: 'intermediate' },
-    { id: '31', name: 'Risk Analysis', category: 'technical', level: 'expert' },
-    { id: '32', name: 'Mitigation Planning', category: 'technical', level: 'expert' },
-    { id: '33', name: 'Issue Tracking', category: 'technical', level: 'expert' },
-    { id: '34', name: 'Escalation Management', category: 'technical', level: 'advanced' },
-    { id: '35', name: 'Budget Tracking', category: 'technical', level: 'advanced' },
-    { id: '36', name: 'Forecasting', category: 'technical', level: 'advanced' },
-    { id: '37', name: 'Cost-Benefit Analysis', category: 'technical', level: 'advanced' },
-    { id: '38', name: 'Earned Value Management', category: 'technical', level: 'advanced' },
-    { id: '39', name: 'Excel (Pivot Tables, VLOOKUP)', category: 'technical', level: 'expert' },
-    { id: '40', name: 'PowerPoint', category: 'technical', level: 'expert' },
-    { id: '41', name: 'Tableau', category: 'technical', level: 'advanced' },
-    { id: '42', name: 'Power BI', category: 'technical', level: 'advanced' },
-    { id: '43', name: 'OUAT Compliance Awareness', category: 'technical', level: 'intermediate' },
-    { id: '44', name: 'Data Privacy Documentation', category: 'technical', level: 'intermediate' },
-    { id: '45', name: 'Regulatory Compliance Awareness', category: 'technical', level: 'intermediate' },
-    { id: '46', name: 'Change Control', category: 'technical', level: 'expert' },
-    { id: '47', name: 'Impact Analysis', category: 'technical', level: 'advanced' },
-    { id: '48', name: 'Stakeholder Buy-in', category: 'technical', level: 'expert' },
-    { id: '49', name: 'Training Coordination', category: 'technical', level: 'advanced' },
-    { id: '50', name: 'Basic SQL', category: 'technical', level: 'beginner' },
-    { id: '51', name: 'MS Visio', category: 'technical', level: 'advanced' },
-    { id: '52', name: 'Lucidchart', category: 'technical', level: 'advanced' },
-    { id: '53', name: 'Risk Registers', category: 'technical', level: 'expert' },
-    { id: '54', name: 'Cloud Environments (AWS/Azure)', category: 'technical', level: 'intermediate' },
-    { id: '55', name: 'Windows', category: 'technical', level: 'expert' },
-    { id: '56', name: 'Linux', category: 'technical', level: 'intermediate' },
-    { id: '57', name: 'Mac', category: 'technical', level: 'intermediate' },
+    { id: "1", name: "Agile & Waterfall Methodologies", category: "technical", level: "expert" },
+    { id: "2", name: "Microsoft Project", category: "technical", level: "expert" },
+    { id: "3", name: "Jira & Smartsheet", category: "technical", level: "advanced" },
+    { id: "4", name: "Risk Management", category: "technical", level: "expert" },
+    { id: "5", name: "Stakeholder Communication", category: "soft", level: "expert" },
+    { id: "6", name: "Data Analysis & Reporting", category: "technical", level: "advanced" },
   ],
-  template: 'modern',
+  template: "modern",
 };
 
 // Create the store
@@ -220,9 +301,11 @@ export const useGlobalStore = create<GlobalState>()(
     persist(
       (set, get) => ({
         // Theme
-        theme: 'light',
+        theme: "light",
         toggleTheme: () =>
-          set((state) => ({ theme: state.theme === 'light' ? 'dark' : 'light' })),
+          set((state) => ({
+            theme: state.theme === "light" ? "dark" : "light",
+          })),
 
         // User
         user: {
@@ -237,8 +320,8 @@ export const useGlobalStore = create<GlobalState>()(
           })),
         logout: () => {
           // Clear localStorage token
-          if (typeof window !== 'undefined') {
-            localStorage.removeItem('token');
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("token");
           }
           // Reset user state
           set({
@@ -253,8 +336,8 @@ export const useGlobalStore = create<GlobalState>()(
 
         // Initialize authentication state from localStorage
         initializeAuth: async () => {
-          if (typeof window !== 'undefined') {
-            const token = localStorage.getItem('token');
+          if (typeof window !== "undefined") {
+            const token = localStorage.getItem("token");
             const currentUser = get().user;
 
             if (token && currentUser.email) {
@@ -266,7 +349,7 @@ export const useGlobalStore = create<GlobalState>()(
               // No token or no user data, ensure we're in unauthenticated state
               if (token && !currentUser.email) {
                 // Token exists but no user data, clear the token
-                localStorage.removeItem('token');
+                localStorage.removeItem("token");
               }
               set({
                 user: {
@@ -286,6 +369,11 @@ export const useGlobalStore = create<GlobalState>()(
           data: initialResumeData,
           isLoading: false,
           isDirty: false,
+          userProfile: null,
+          recommendedTemplates: [],
+          contentOptimization: null,
+          designCustomization: null,
+          lastSaved: null,
         },
 
         setResumeStep: (step) =>
@@ -299,7 +387,10 @@ export const useGlobalStore = create<GlobalState>()(
               ...state.resumeBuilder,
               data: {
                 ...state.resumeBuilder.data,
-                personalInfo: { ...state.resumeBuilder.data.personalInfo, ...info },
+                personalInfo: {
+                  ...state.resumeBuilder.data.personalInfo,
+                  ...info,
+                },
               },
               isDirty: true,
             },
@@ -409,7 +500,9 @@ export const useGlobalStore = create<GlobalState>()(
         removeSkill: (id) =>
           set((state) => {
             const currentSkills = state.resumeBuilder.data.skills || [];
-            const filteredSkills = currentSkills.filter((skill) => skill && skill.id !== id);
+            const filteredSkills = currentSkills.filter(
+              (skill) => skill && skill.id !== id
+            );
 
             return {
               resumeBuilder: {
@@ -432,6 +525,19 @@ export const useGlobalStore = create<GlobalState>()(
             },
           })),
 
+        // Populate resume with sample data based on career field
+        populateWithSampleData: (sampleData) =>
+          set((state) => ({
+            resumeBuilder: {
+              ...state.resumeBuilder,
+              data: {
+                ...sampleData,
+                template: state.resumeBuilder.data.template, // Keep current template
+              },
+              isDirty: true,
+            },
+          })),
+
         setResumeLoading: (loading) =>
           set((state) => ({
             resumeBuilder: { ...state.resumeBuilder, isLoading: loading },
@@ -444,6 +550,91 @@ export const useGlobalStore = create<GlobalState>()(
               data: initialResumeData,
               isLoading: false,
               isDirty: false,
+              userProfile: null,
+              recommendedTemplates: [],
+              contentOptimization: null,
+              designCustomization: null,
+              lastSaved: null,
+            },
+          })),
+
+        // New profile and optimization actions
+        setUserProfile: (profile) =>
+          set((state) => ({
+            resumeBuilder: {
+              ...state.resumeBuilder,
+              userProfile: profile,
+              isDirty: true,
+            },
+          })),
+
+        updateUserProfile: (profile) =>
+          set((state) => ({
+            resumeBuilder: {
+              ...state.resumeBuilder,
+              userProfile: state.resumeBuilder.userProfile
+                ? { ...state.resumeBuilder.userProfile, ...profile }
+                : null,
+              isDirty: true,
+            },
+          })),
+
+        setRecommendedTemplates: (templates) =>
+          set((state) => ({
+            resumeBuilder: {
+              ...state.resumeBuilder,
+              recommendedTemplates: templates,
+            },
+          })),
+
+        setContentOptimization: (optimization) =>
+          set((state) => ({
+            resumeBuilder: {
+              ...state.resumeBuilder,
+              contentOptimization: optimization,
+            },
+          })),
+
+        updateContentOptimization: (optimization) =>
+          set((state) => ({
+            resumeBuilder: {
+              ...state.resumeBuilder,
+              contentOptimization: state.resumeBuilder.contentOptimization
+                ? {
+                    ...state.resumeBuilder.contentOptimization,
+                    ...optimization,
+                  }
+                : null,
+            },
+          })),
+
+        setDesignCustomization: (customization) =>
+          set((state) => ({
+            resumeBuilder: {
+              ...state.resumeBuilder,
+              designCustomization: customization,
+            },
+          })),
+
+        updateDesignCustomization: (customization) =>
+          set((state) => ({
+            resumeBuilder: {
+              ...state.resumeBuilder,
+              designCustomization: state.resumeBuilder.designCustomization
+                ? {
+                    ...state.resumeBuilder.designCustomization,
+                    ...customization,
+                  }
+                : null,
+            },
+          })),
+
+        saveResumeProgress: () =>
+          set((state) => ({
+            resumeBuilder: {
+              ...state.resumeBuilder,
+              lastSaved: new Date(),
+              isDirty: false,
             },
           })),
 
@@ -453,7 +644,7 @@ export const useGlobalStore = create<GlobalState>()(
           set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
       }),
       {
-        name: 'timcare-global-store',
+        name: "timcare-global-store",
         partialize: (state) => ({
           theme: state.theme,
           user: state.user,
@@ -464,6 +655,6 @@ export const useGlobalStore = create<GlobalState>()(
         }),
       }
     ),
-    { name: 'TimCareGlobalStore' }
+    { name: "TimCareGlobalStore" }
   )
 );
