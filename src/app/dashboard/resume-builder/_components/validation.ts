@@ -12,32 +12,68 @@ export interface StepValidation {
 
 // Required fields for each step
 const requiredFields = {
-  1: { // Personal Information
+  1: { // Career Field
+    required: ['careerField'],
+    optional: []
+  },
+  2: { // Template Selection
+    required: ['template'],
+    optional: []
+  },
+  3: { // Personal Information
     required: ['fullName', 'email', 'phone'],
     optional: ['location', 'linkedin', 'website', 'summary']
   },
-  2: { // Work Experience - Optional for freshers
+  4: { // Work Experience - Optional for freshers
     required: [],
     optional: ['experience'],
     minItems: 0
   },
-  3: { // Education
+  5: { // Education
     required: ['education'],
     minItems: 1
   },
-  4: { // Skills
+  6: { // Skills
     required: ['skills'],
     minItems: 3
   },
-  5: { // Summary - Review step
+  7: { // Summary - Review step
     required: [],
     optional: []
   }
 };
 
+export function validateCareerField(careerField: string): ValidationResult {
+  const missing: string[] = [];
+
+  if (!careerField || careerField.trim() === '') {
+    missing.push('career field');
+  }
+
+  return {
+    isValid: missing.length === 0,
+    missingFields: missing,
+    completionPercentage: careerField ? 100 : 0
+  };
+}
+
+export function validateTemplate(template: string): ValidationResult {
+  const missing: string[] = [];
+
+  if (!template || template.trim() === '') {
+    missing.push('template selection');
+  }
+
+  return {
+    isValid: missing.length === 0,
+    missingFields: missing,
+    completionPercentage: template ? 100 : 0
+  };
+}
+
 export function validatePersonalInfo(personalInfo: any): ValidationResult {
   const missing: string[] = [];
-  const required = requiredFields[1].required;
+  const required = requiredFields[2].required;
   
   required.forEach(field => {
     if (!personalInfo[field] || personalInfo[field].trim() === '') {
@@ -50,7 +86,7 @@ export function validatePersonalInfo(personalInfo: any): ValidationResult {
     missing.push('valid email');
   }
 
-  const totalFields = required.length + requiredFields[1].optional.length;
+  const totalFields = required.length + requiredFields[2].optional.length;
   const filledFields = Object.keys(personalInfo).filter(key => 
     personalInfo[key] && personalInfo[key].toString().trim() !== ''
   ).length;
@@ -114,11 +150,11 @@ export function validateEducation(education: any[]): ValidationResult {
     });
   }
 
-  const completionPercentage = education.length >= requiredFields[3].minItems ? 100 : 
-    (education.length / requiredFields[3].minItems) * 100;
+  const completionPercentage = education.length >= requiredFields[4].minItems ? 100 :
+    (education.length / requiredFields[4].minItems) * 100;
 
   return {
-    isValid: missing.length === 0 && education.length >= requiredFields[3].minItems,
+    isValid: missing.length === 0 && education.length >= requiredFields[4].minItems,
     missingFields: missing,
     completionPercentage
   };
@@ -127,15 +163,15 @@ export function validateEducation(education: any[]): ValidationResult {
 export function validateSkills(skills: any[]): ValidationResult {
   const missing: string[] = [];
   
-  if (!skills || skills.length < requiredFields[4].minItems) {
-    missing.push(`at least ${requiredFields[4].minItems} skills`);
+  if (!skills || skills.length < requiredFields[5].minItems) {
+    missing.push(`at least ${requiredFields[5].minItems} skills`);
   }
 
-  const completionPercentage = skills.length >= requiredFields[4].minItems ? 100 : 
-    (skills.length / requiredFields[4].minItems) * 100;
+  const completionPercentage = skills.length >= requiredFields[5].minItems ? 100 :
+    (skills.length / requiredFields[5].minItems) * 100;
 
   return {
-    isValid: skills.length >= requiredFields[4].minItems,
+    isValid: skills.length >= requiredFields[5].minItems,
     missingFields: missing,
     completionPercentage
   };
@@ -143,11 +179,13 @@ export function validateSkills(skills: any[]): ValidationResult {
 
 export function validateAllSteps(data: ResumeData): StepValidation {
   return {
-    1: validatePersonalInfo(data.personalInfo),
-    2: validateExperience(data.experience),
-    3: validateEducation(data.education),
-    4: validateSkills(data.skills),
-    5: { isValid: true, missingFields: [], completionPercentage: 100 } // Summary step
+    1: validateCareerField(data.careerField),
+    2: validateTemplate(data.template),
+    3: validatePersonalInfo(data.personalInfo),
+    4: validateExperience(data.experience),
+    5: validateEducation(data.education),
+    6: validateSkills(data.skills),
+    7: { isValid: true, missingFields: [], completionPercentage: 100 } // Summary step
   };
 }
 

@@ -1,11 +1,13 @@
 "use client";
 import { motion } from 'motion/react';
-import { CheckCircle, AlertCircle, User, Briefcase, GraduationCap, Zap } from 'lucide-react';
+import { CheckCircle, AlertCircle, User, Briefcase, GraduationCap, Zap, Target } from 'lucide-react';
 import { validateAllSteps, getOverallProgress } from './validation';
 import { Button } from '@/components/ui/button';
 import * as resumeService from '@/services/resumeService';
 import { useState } from 'react';
 import { useGlobalStore } from '@/store/useGlobalStore';
+import { SmartTemplateSelector } from './SmartTemplateSelector';
+import { careerFields } from './resumeData';
 
 export function TemplatePreviewStep() {
   const { resumeBuilder } = useGlobalStore();
@@ -17,20 +19,24 @@ export function TemplatePreviewStep() {
 
   // Use validation system for completion status
   const sectionStatus = {
-    personalInfo: {
+    careerField: {
       isComplete: validation[1].isValid,
+      count: data.careerField ? 1 : 0
+    },
+    personalInfo: {
+      isComplete: validation[2].isValid,
       count: data.personalInfo.fullName ? 1 : 0
     },
     experience: {
-      isComplete: validation[2].isValid,
+      isComplete: validation[3].isValid,
       count: data.experience.length
     },
     education: {
-      isComplete: validation[3].isValid,
+      isComplete: validation[4].isValid,
       count: data.education.length
     },
     skills: {
-      isComplete: validation[4].isValid,
+      isComplete: validation[5].isValid,
       count: data.skills.length
     }
   };
@@ -48,10 +54,15 @@ export function TemplatePreviewStep() {
       className="space-y-6"
     >
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Review Your Resume</h2>
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">Choose Template & Review</h2>
         <p className="text-sm text-gray-600">
-          Review all sections of your resume and make sure everything looks perfect before downloading.
+          Select your preferred template and review all sections of your resume.
         </p>
+      </div>
+
+      {/* Smart Template Selector */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+        <SmartTemplateSelector />
       </div>
 
       {/* Completion Progress */}
@@ -74,7 +85,30 @@ export function TemplatePreviewStep() {
       {/* Section Details */}
       <div className="space-y-4">
         <h3 className="font-medium text-gray-900">Section Details</h3>
-        
+
+        {/* Career Field */}
+        <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
+          <div className="flex items-center space-x-3">
+            <Target className="w-5 h-5 text-blue-600" />
+            <div>
+              <h4 className="font-medium text-gray-900">Career Field</h4>
+              <p className="text-sm text-gray-600">
+                {data.careerField ?
+                  careerFields.find(f => f.id === data.careerField)?.name || 'Unknown field' :
+                  'No career field selected'
+                }
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center">
+            {sectionStatus.careerField.isComplete ? (
+              <CheckCircle className="w-5 h-5 text-green-600" />
+            ) : (
+              <AlertCircle className="w-5 h-5 text-amber-500" />
+            )}
+          </div>
+        </div>
+
         {/* Personal Information */}
         <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
           <div className="flex items-center space-x-3">

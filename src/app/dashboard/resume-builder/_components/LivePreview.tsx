@@ -4,9 +4,11 @@ import { useGlobalStore } from '@/store/useGlobalStore';
 import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
 import { Loader2, FileText, X } from 'lucide-react';
+import { LivePreviewPDF } from './LivePreviewPDF';
+import { TemplateRenderer } from './TemplateRenderer';
 
 // PDF Error Boundary Component for LivePreview
-class LivePreviewErrorBoundary extends React.Component<
+class PDFErrorBoundary extends React.Component<
   { children: React.ReactNode; onError?: () => void },
   { hasError: boolean }
 > {
@@ -20,7 +22,7 @@ class LivePreviewErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('LivePreview PDF Error:', error, errorInfo);
+    console.error('PDF Error:', error, errorInfo);
     this.props.onError?.();
   }
 
@@ -32,15 +34,15 @@ class LivePreviewErrorBoundary extends React.Component<
             <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
               <X size={24} className="text-red-600" />
             </div>
-            <h3 className="text-sm font-medium text-gray-900 mb-2">Preview Error</h3>
+            <h3 className="text-sm font-medium text-gray-900 mb-2">PDF Preview Error</h3>
             <p className="text-xs text-gray-600 mb-3">
-              There was an issue with the live preview.
+              There was an issue rendering the PDF preview. Your data is safe.
             </p>
             <button
               onClick={() => this.setState({ hasError: false })}
               className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
             >
-              Retry
+              Try Again
             </button>
           </div>
         </div>
@@ -112,11 +114,23 @@ export function LivePreview() {
     }
   }, [pdfComponents, isClient]);
 
-  // Create PDF document matching the reference style - memoized to prevent unnecessary re-renders
+  // Create PDF document based on selected template - memoized to prevent unnecessary re-renders
   const renderPDFTemplate = useMemo(() => {
     if (!pdfComponents) return null;
 
     try {
+      // Use preview components for the selected template
+      const templateComponents = {
+        modern: () => import('./templates/ModernTemplate').then(m => m.ModernTemplatePDF),
+        classic: () => import('./templates/ClassicTemplate').then(m => m.ClassicTemplatePDF),
+        creative: () => import('./templates/CreativeTemplate').then(m => m.CreativeTemplatePDF),
+        minimal: () => import('./templates/MinimalTemplate').then(m => m.MinimalTemplatePDF),
+        executive: () => import('./templates/ExecutiveTemplate').then(m => m.ExecutiveTemplatePDF),
+        tech: () => import('./templates/TechTemplate').then(m => m.TechTemplatePDF),
+      };
+
+      // For now, use a simple preview since dynamic imports in useMemo are complex
+      // We'll create a simplified preview that matches the template style
       const { Document, Page, Text, View, StyleSheet } = pdfComponents;
     
     const styles = StyleSheet.create({
@@ -356,35 +370,36 @@ export function LivePreview() {
               <p className="text-gray-600">Loading preview...</p>
             </div>
           </div>
-        ) : pdfComponents ? (
-          <div style={{ height: '480px',position:"relative" }} className="relative">
+        ) : (
+          <div style={{ height: '480px' }} className="relative bg-gray-50">
             {/* Updating Loader Overlay */}
             {isDataChanging && (
-              <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex items-center justify-center">
+              <motion.div
+                className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex items-center justify-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
                 <div className="text-center">
                   <Loader2 size={32} className="animate-spin text-blue-600 mx-auto mb-2" />
                   <p className="text-sm text-gray-600">Updating preview...</p>
                 </div>
-              </div>
+              </motion.div>
             )}
-            
-            <LivePreviewErrorBoundary>
-              <pdfComponents.PDFViewer
-                key={`live-pdf-${skills.length}-${experience.length}-${education.length}`}
-                style={{ width: '100%', height: '100%', border: 'none' ,position:'sticky',top:'0'}}
-                showToolbar={false}
-              >
-                {renderPDFTemplate}
-              </pdfComponents.PDFViewer>
-            </LivePreviewErrorBoundary>
-          </div>
-        ) : (
-          <div className="flex items-center justify-center h-96">
-            <div className="text-center">
-              <FileText size={48} className="text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">Preview unavailable</p>
-              <p className="text-sm text-gray-500 mt-2">Please try refreshing the page</p>
-            </div>
+
+            {/* Template Preview */}
+            <motion.div
+              className="w-full h-full"
+              key={`template-${resumeBuilder.data.template}-${skills.length}-${experience.length}-${education.length}`}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <LivePreviewPDF
+                className="w-full h-full shadow-sm"
+              />
+             
+            </motion.div>
           </div>
         )}
       </div>

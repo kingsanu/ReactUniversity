@@ -11,7 +11,7 @@ const compat = new FlatCompat({
 
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
-,  {
+  , {
     // Temporarily disable these rules to clear build errors
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',

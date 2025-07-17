@@ -1,38 +1,152 @@
-import { User, Briefcase, GraduationCap, Zap, ClipboardCheck } from 'lucide-react';
+import { User, Briefcase, GraduationCap, Zap, ClipboardCheck, Target, Code, Palette, TrendingUp, Heart, Gavel, Wrench, Users } from 'lucide-react';
+
+// Career field definitions with associated templates and content
+export const careerFields = [
+  {
+    id: 'technology',
+    name: 'Technology & Software',
+    description: 'Software development, IT, cybersecurity, data science',
+    icon: Code,
+    color: '#3b82f6',
+    templates: ['modern', 'minimal'],
+    skills: {
+      technical: ['JavaScript', 'Python', 'React', 'Node.js', 'SQL', 'Git', 'AWS', 'Docker'],
+      soft: ['Problem Solving', 'Team Collaboration', 'Agile Methodology', 'Code Review']
+    }
+  },
+  {
+    id: 'design',
+    name: 'Design & Creative',
+    description: 'UI/UX design, graphic design, creative direction',
+    icon: Palette,
+    color: '#8b5cf6',
+    templates: ['creative', 'modern'],
+    skills: {
+      technical: ['Figma', 'Adobe Creative Suite', 'Sketch', 'Prototyping', 'HTML/CSS', 'Design Systems'],
+      soft: ['Creative Thinking', 'User Empathy', 'Visual Communication', 'Attention to Detail']
+    }
+  },
+  {
+    id: 'business',
+    name: 'Business & Management',
+    description: 'Project management, business analysis, consulting',
+    icon: TrendingUp,
+    color: '#10b981',
+    templates: ['classic', 'modern'],
+    skills: {
+      technical: ['Microsoft Project', 'Salesforce', 'Data Analysis', 'Financial Modeling', 'Agile/Scrum'],
+      soft: ['Leadership', 'Strategic Planning', 'Communication', 'Problem Solving', 'Team Management']
+    }
+  },
+  {
+    id: 'healthcare',
+    name: 'Healthcare & Medical',
+    description: 'Medical professionals, healthcare administration',
+    icon: Heart,
+    color: '#ef4444',
+    templates: ['classic', 'minimal'],
+    skills: {
+      technical: ['Electronic Health Records', 'Medical Terminology', 'HIPAA Compliance', 'Clinical Research'],
+      soft: ['Patient Care', 'Empathy', 'Attention to Detail', 'Critical Thinking', 'Communication']
+    }
+  },
+  {
+    id: 'legal',
+    name: 'Legal & Law',
+    description: 'Attorneys, paralegals, legal assistants',
+    icon: Gavel,
+    color: '#374151',
+    templates: ['classic', 'modern'],
+    skills: {
+      technical: ['Legal Research', 'Case Management Software', 'Document Review', 'Contract Analysis'],
+      soft: ['Analytical Thinking', 'Attention to Detail', 'Written Communication', 'Client Relations']
+    }
+  },
+  {
+    id: 'engineering',
+    name: 'Engineering & Technical',
+    description: 'Mechanical, electrical, civil engineering',
+    icon: Wrench,
+    color: '#f59e0b',
+    templates: ['modern', 'classic'],
+    skills: {
+      technical: ['AutoCAD', 'SolidWorks', 'MATLAB', 'Project Management', 'Quality Assurance'],
+      soft: ['Problem Solving', 'Analytical Thinking', 'Attention to Detail', 'Team Collaboration']
+    }
+  },
+  {
+    id: 'marketing',
+    name: 'Marketing & Sales',
+    description: 'Digital marketing, sales, brand management',
+    icon: Users,
+    color: '#ec4899',
+    templates: ['creative', 'modern'],
+    skills: {
+      technical: ['Google Analytics', 'Social Media Marketing', 'SEO/SEM', 'CRM Software', 'Content Management'],
+      soft: ['Communication', 'Creativity', 'Relationship Building', 'Strategic Thinking', 'Adaptability']
+    }
+  },
+  {
+    id: 'general',
+    name: 'General / Other',
+    description: 'Other fields or multiple career paths',
+    icon: Target,
+    color: '#6b7280',
+    templates: ['modern', 'classic', 'minimal', 'creative'],
+    skills: {
+      technical: ['Microsoft Office', 'Data Entry', 'Customer Service Software', 'Basic Computer Skills'],
+      soft: ['Communication', 'Time Management', 'Adaptability', 'Problem Solving', 'Team Work']
+    }
+  }
+];
 
 // Resume builder step configuration
 export const resumeSteps = [
   {
     id: 1,
+    title: "Career Field",
+    description: "Select your career field for personalized templates and content",
+    icon: Target,
+    fields: ["careerField"]
+  },
+  {
+    id: 2,
+    title: "Choose Template",
+    description: "Select a professional template that matches your style",
+    icon: Palette,
+    fields: ["template"]
+  },
+  {
+    id: 3,
     title: "Personal Information",
     description: "Add your contact details and professional summary",
     icon: User,
     fields: ["fullName", "email", "phone", "location", "linkedin", "website", "summary"]
   },
   {
-    id: 2,
+    id: 4,
     title: "Work Experience",
     description: "Add your professional experience and achievements (optional for freshers)",
     icon: Briefcase,
     fields: ["experience"]
   },
   {
-    id: 3,
+    id: 5,
     title: "Education",
     description: "Add your educational background",
     icon: GraduationCap,
     fields: ["education"]
   },
   {
-    id: 4,
+    id: 6,
     title: "Skills",
     description: "Highlight your technical and soft skills",
     icon: Zap,
     fields: ["skills"]
   },
   {
-    id: 5,
-    title: "Summary",
+    id: 7,
+    title: "Review & Finalize",
     description: "Review and finalize your resume",
     icon: ClipboardCheck,
     fields: ["summary"]
@@ -43,31 +157,57 @@ export const resumeSteps = [
 export const resumeTemplates = [
   {
     id: "modern",
-    name: "Modern",
-    description: "Clean, professional design with modern typography",
+    name: "Modern Professional",
+    description: "Clean, professional design with modern typography and subtle colors",
     preview: "/templates/modern-preview.jpg",
-    color: "#3b82f6"
+    color: "#3b82f6",
+    category: "professional",
+    suitableFor: ["technology", "business", "engineering", "general"]
   },
   {
     id: "classic",
-    name: "Classic",
-    description: "Traditional format preferred by recruiters",
-    preview: "/templates/classic-preview.jpg", 
-    color: "#374151"
+    name: "Classic Traditional",
+    description: "Traditional format preferred by recruiters and conservative industries",
+    preview: "/templates/classic-preview.jpg",
+    color: "#374151",
+    category: "traditional",
+    suitableFor: ["legal", "healthcare", "business", "general"]
   },
   {
     id: "creative",
-    name: "Creative",
-    description: "Stand out with a unique, creative layout",
+    name: "Creative Bold",
+    description: "Stand out with a unique, creative layout perfect for design roles",
     preview: "/templates/creative-preview.jpg",
-    color: "#8b5cf6"
+    color: "#8b5cf6",
+    category: "creative",
+    suitableFor: ["design", "marketing", "general"]
   },
   {
     id: "minimal",
-    name: "Minimal",
-    description: "Simple, clean design that focuses on content",
+    name: "Minimal Clean",
+    description: "Simple, clean design that focuses on content with maximum readability",
     preview: "/templates/minimal-preview.jpg",
-    color: "#10b981"
+    color: "#10b981",
+    category: "minimal",
+    suitableFor: ["technology", "healthcare", "engineering", "general"]
+  },
+  {
+    id: "executive",
+    name: "Executive Elite",
+    description: "Sophisticated design for senior-level positions and executives",
+    preview: "/templates/executive-preview.jpg",
+    color: "#1f2937",
+    category: "executive",
+    suitableFor: ["business", "legal", "general"]
+  },
+  {
+    id: "tech",
+    name: "Tech Focused",
+    description: "Modern layout optimized for technical roles with skill emphasis",
+    preview: "/templates/tech-preview.jpg",
+    color: "#0ea5e9",
+    category: "technical",
+    suitableFor: ["technology", "engineering", "general"]
   }
 ];
 

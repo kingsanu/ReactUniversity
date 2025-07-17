@@ -221,3 +221,76 @@ export const ModernTemplatePDF: React.FC<ModernTemplatePDFProps> = ({ data }) =>
     </Page>
   </Document>
 );
+
+// Preview component for the template selector
+export function ModernTemplatePreview({ data }: ModernTemplatePDFProps) {
+  return (
+    <div className="w-full h-full bg-white p-6 text-xs overflow-hidden">
+      {/* Header */}
+      <div className="border-b-2 border-blue-500 pb-3 mb-4">
+        <h1 className="text-2xl font-bold text-gray-800 mb-1">{data.personalInfo.fullName}</h1>
+        <div className="flex justify-between text-gray-600 text-xs">
+          <span>{data.personalInfo.email}</span>
+          <span>{data.personalInfo.phone}</span>
+          <span>{data.personalInfo.location}</span>
+        </div>
+        {data.personalInfo.summary && (
+          <p className="text-gray-700 text-xs mt-2 leading-relaxed">{data.personalInfo.summary.substring(0, 150)}...</p>
+        )}
+      </div>
+
+      {/* Experience */}
+      {data.experience.length > 0 && (
+        <div className="mb-4">
+          <h2 className="text-sm font-bold text-gray-800 mb-2 border-b border-gray-300 pb-1">EXPERIENCE</h2>
+          {data.experience.slice(0, 2).map((exp) => (
+            <div key={exp.id} className="mb-3">
+              <div className="flex justify-between items-start mb-1">
+                <div>
+                  <h3 className="font-bold text-gray-800 text-xs">{exp.jobTitle}</h3>
+                  <p className="text-blue-600 text-xs font-medium">{exp.company}</p>
+                </div>
+                <span className="text-gray-500 text-xs">{exp.startDate} - {exp.current ? 'Present' : exp.endDate}</span>
+              </div>
+              <div className="text-xs text-gray-700">
+                {exp.description.slice(0, 2).map((desc, index) => (
+                  <p key={index} className="mb-1">• {desc.substring(0, 80)}...</p>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="grid grid-cols-2 gap-4">
+        {/* Education */}
+        {data.education.length > 0 && (
+          <div>
+            <h2 className="text-sm font-bold text-gray-800 mb-2 border-b border-gray-300 pb-1">EDUCATION</h2>
+            {data.education.slice(0, 1).map((edu) => (
+              <div key={edu.id} className="mb-2">
+                <h3 className="font-bold text-gray-800 text-xs">{edu.degree}</h3>
+                <p className="text-gray-600 text-xs">{edu.institution}</p>
+                <p className="text-gray-500 text-xs">{edu.graduationDate}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Skills */}
+        {data.skills.length > 0 && (
+          <div>
+            <h2 className="text-sm font-bold text-gray-800 mb-2 border-b border-gray-300 pb-1">SKILLS</h2>
+            <div className="flex flex-wrap gap-1">
+              {data.skills.slice(0, 6).map((skill) => (
+                <span key={skill.id} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                  {skill.name}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

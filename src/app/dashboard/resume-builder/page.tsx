@@ -1,23 +1,28 @@
 "use client";
 import { useGlobalStore } from '@/store/useGlobalStore';
 import { StepIndicator } from './_components/StepIndicator';
+import { CareerFieldStep } from './_components/CareerFieldStep';
 import { PersonalInfoStep } from './_components/PersonalInfoStep';
+import { TemplateSelectionStep } from './_components/TemplateSelectionStep';
 import { ExperienceStep } from './_components/ExperienceStep';
 import { EducationStep } from './_components/EducationStep';
 import { SkillsStep } from './_components/SkillsStep';
 import { TemplatePreviewStep } from './_components/TemplatePreviewStep';
 import { ResumePreview } from './_components/ResumePreview';
-import { LivePreview } from './_components/LivePreview';
+import { LivePreviewPDF } from './_components/LivePreviewPDF';
 import { NavigationButtons } from './_components/NavigationButtons';
 
-import { resumeSteps } from './_components/resumeData';
+import { resumeSteps, resumeTemplates } from './_components/resumeData';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Bug } from 'lucide-react';
 import * as resumeService from '@/services/resumeService';
 
 export default function ResumeBuilderPage() {
   const { resumeBuilder, setResumeLoading } = useGlobalStore();
   const currentStep = resumeBuilder.currentStep;
   const [resumeId, setResumeId] = useState<string | null>(null);
+  const router = useRouter();
 
   // Background auto-save on data change
   useEffect(() => {
@@ -74,22 +79,41 @@ export default function ResumeBuilderPage() {
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 1:
-        return <PersonalInfoStep />;
+        return <CareerFieldStep />;
       case 2:
-        return <ExperienceStep />;
+        return <TemplateSelectionStep />;
       case 3:
-        return <EducationStep />;
+        return <PersonalInfoStep />;
       case 4:
-        return <SkillsStep />;
+        return <ExperienceStep />;
       case 5:
+        return <EducationStep />;
+      case 6:
+        return <SkillsStep />;
+      case 7:
         return <TemplatePreviewStep />;
       default:
-        return <PersonalInfoStep />;
+        return <CareerFieldStep />;
     }
   };
 
+  // Get current template for background synchronization
+  const currentTemplate = resumeTemplates.find(t => t.id === resumeBuilder.data.template);
+  const templateColor = currentTemplate?.color || '#3b82f6';
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div
+      className="min-h-screen transition-all duration-700 ease-in-out"
+      style={{
+        background: `linear-gradient(135deg,
+          ${templateColor}08 0%,
+          ${templateColor}05 25%,
+          transparent 50%,
+          ${templateColor}03 75%,
+          ${templateColor}08 100%
+        )`
+      }}
+    >
       {/* Enhanced Header with Glassmorphism */}
       <div className="relative bg-white/80 backdrop-blur-xl border-b border-white/20 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -148,6 +172,18 @@ export default function ResumeBuilderPage() {
               {/* Action Buttons */}
               <div className="flex items-center space-x-2">
                 <ResumePreview />
+
+                {/* Debug Button - Only show in development */}
+                {process.env.NODE_ENV === 'development' && (
+                  <button
+                    onClick={() => router.push('/dashboard/resume-builder/debug')}
+                    className="bg-orange-600 hover:bg-orange-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                    title="Template Debug Comparison"
+                  >
+                    <Bug size={16} />
+                    Debug
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -163,30 +199,32 @@ export default function ResumeBuilderPage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className={`grid grid-cols-1 gap-8 ${(currentStep === 1 || currentStep === 2) ? 'lg:grid-cols-1' : 'lg:grid-cols-2'}`}>
           {/* Form Section */}
-          <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 p-8">
+          <div className={`bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 p-8 ${(currentStep === 1 || currentStep === 2) ? 'max-w-4xl mx-auto' : ''}`}>
             {renderCurrentStep()}
             <NavigationButtons />
           </div>
 
-          {/* Live Preview Section - Sticky */}
-          <div className="lg:sticky lg:top-8 lg:self-start">
-            <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 p-8">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-8 h-8 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
+          {/* Live Preview Section - Only show after step 2 (after template selection) */}
+          {currentStep > 2 && (
+            <div className="lg:sticky lg:top-8 lg:self-start">
+              <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 p-8">
+                <div className="flex items-center space-x-3 mb-6">
+                  <div className="w-8 h-8 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900">Live Preview</h3>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">Live Preview</h3>
-              </div>
-              <div className="border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
-                <LivePreview />
+                <div className="border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
+                  <LivePreviewPDF />
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

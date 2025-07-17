@@ -248,3 +248,94 @@ export const ClassicTemplatePDF: React.FC<ClassicTemplatePDFProps> = ({ data }) 
     </Document>
   );
 };
+
+// Preview component for the template selector
+export function ClassicTemplatePreview({ data }: ClassicTemplatePDFProps) {
+  // Group skills by category
+  const skillsByCategory = data.skills.reduce((acc, skill) => {
+    if (!acc[skill.category]) {
+      acc[skill.category] = [];
+    }
+    acc[skill.category].push(skill.name);
+    return acc;
+  }, {} as Record<string, string[]>);
+
+  return (
+    <div className="w-full h-full bg-white p-6 text-xs overflow-hidden">
+      {/* Header */}
+      <div className="text-center mb-4">
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">{data.personalInfo.fullName}</h1>
+        <div className="text-gray-600 text-xs space-y-1">
+          <p>{data.personalInfo.email} | {data.personalInfo.phone}</p>
+          <p>{data.personalInfo.location}</p>
+          {data.personalInfo.linkedin && <p>{data.personalInfo.linkedin}</p>}
+        </div>
+      </div>
+
+      {/* Summary */}
+      {data.personalInfo.summary && (
+        <div className="mb-4">
+          <h2 className="text-sm font-bold text-gray-900 mb-2">PROFESSIONAL SUMMARY</h2>
+          <p className="text-gray-700 text-xs leading-relaxed">{data.personalInfo.summary.substring(0, 200)}...</p>
+        </div>
+      )}
+
+      {/* Experience */}
+      {data.experience.length > 0 && (
+        <div className="mb-4">
+          <h2 className="text-sm font-bold text-gray-900 mb-2">PROFESSIONAL EXPERIENCE</h2>
+          {data.experience.slice(0, 2).map((exp) => (
+            <div key={exp.id} className="mb-3">
+              <div className="flex justify-between items-start mb-1">
+                <div>
+                  <h3 className="font-bold text-gray-900 text-xs">{exp.jobTitle}</h3>
+                  <p className="text-gray-700 text-xs">{exp.company}, {exp.location}</p>
+                </div>
+                <span className="text-gray-600 text-xs">{exp.startDate} - {exp.current ? 'Present' : exp.endDate}</span>
+              </div>
+              <div className="text-xs text-gray-700">
+                {exp.description.slice(0, 2).map((desc, index) => (
+                  <p key={index} className="mb-1">• {desc.substring(0, 80)}...</p>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="grid grid-cols-2 gap-4">
+        {/* Education */}
+        {data.education.length > 0 && (
+          <div>
+            <h2 className="text-sm font-bold text-gray-900 mb-2">EDUCATION</h2>
+            {data.education.slice(0, 1).map((edu) => (
+              <div key={edu.id} className="mb-2">
+                <h3 className="font-bold text-gray-900 text-xs">{edu.degree}</h3>
+                <p className="text-gray-700 text-xs">{edu.institution}, {edu.location}</p>
+                <p className="text-gray-600 text-xs">{edu.graduationDate}</p>
+                {edu.gpa && <p className="text-gray-600 text-xs">GPA: {edu.gpa}</p>}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Skills */}
+        {data.skills.length > 0 && (
+          <div>
+            <h2 className="text-sm font-bold text-gray-900 mb-2">SKILLS & COMPETENCIES</h2>
+            <div className="space-y-2">
+              {Object.entries(skillsByCategory).slice(0, 2).map(([category, skills]) => (
+                <div key={category}>
+                  <h3 className="font-bold text-gray-900 text-xs">
+                    {category.charAt(0).toUpperCase() + category.slice(1)} Skills:
+                  </h3>
+                  <p className="text-gray-700 text-xs">{skills.slice(0, 4).join(', ')}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

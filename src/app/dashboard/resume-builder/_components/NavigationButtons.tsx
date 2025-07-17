@@ -33,13 +33,17 @@ export function NavigationButtons() {
     const { data } = resumeBuilder;
 
     switch (currentStep) {
-      case 1: // Personal Info - Only require name and email
+      case 1: // Career Field - Require selection
+        return !data.careerField;
+      case 2: // Template Selection - Require template
+        return !data.template;
+      case 3: // Personal Info - Only require name and email
         return !data.personalInfo.fullName || !data.personalInfo.email;
-      case 2: // Experience - Optional for freshers
+      case 4: // Experience - Optional for freshers
         return false; // Allow skipping experience
-      case 3: // Education - Require at least one
+      case 5: // Education - Require at least one
         return data.education.length === 0;
-      case 4: // Skills - Require at least one
+      case 6: // Skills - Require at least one
         return data.skills.length === 0;
       default:
         return false;

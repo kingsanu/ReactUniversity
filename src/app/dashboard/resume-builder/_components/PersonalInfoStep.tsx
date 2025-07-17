@@ -2,15 +2,26 @@
 import { useGlobalStore } from '@/store/useGlobalStore';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import { motion } from 'motion/react';
+import { Sparkles } from 'lucide-react';
+import { careerFields } from './resumeData';
 
 export function PersonalInfoStep() {
-  const { resumeBuilder, updatePersonalInfo } = useGlobalStore();
-  const { personalInfo } = resumeBuilder.data;
+  const { resumeBuilder, updatePersonalInfo, populateWithDummyContent } = useGlobalStore();
+  const { personalInfo, careerField } = resumeBuilder.data;
 
   const handleInputChange = (field: string, value: string) => {
     updatePersonalInfo({ [field]: value });
   };
+
+  const handlePopulateWithSample = () => {
+    if (careerField) {
+      populateWithDummyContent(careerField);
+    }
+  };
+
+  const selectedCareerField = careerFields.find(f => f.id === careerField);
 
   return (
     <motion.div
@@ -18,11 +29,24 @@ export function PersonalInfoStep() {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6"
     >
-      <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Personal Information</h2>
-        <p className="text-sm text-gray-600">
-          Start with your basic contact information and a professional summary.
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Personal Information</h2>
+          <p className="text-sm text-gray-600">
+            Start with your basic contact information and a professional summary.
+          </p>
+        </div>
+
+        {/* Fill with Sample Data Button */}
+        <Button
+          onClick={handlePopulateWithSample}
+          variant="outline"
+          className="flex items-center gap-2 text-sm"
+          disabled={!careerField}
+        >
+          <Sparkles size={16} />
+          Fill with Sample Data
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -106,6 +130,38 @@ export function PersonalInfoStep() {
           <p><strong>For freshers:</strong> Focus on your education, skills, projects, and career aspirations rather than work experience.</p>
         </div>
       </div>
+
+      {/* Sample Content Option */}
+      {careerField && selectedCareerField && (
+        <motion.div
+          className="mt-8 p-6 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-200"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <Sparkles className="w-6 h-6 text-indigo-600" />
+              <div>
+                <h3 className="text-lg font-semibold text-indigo-900">Get Started Quickly</h3>
+                <p className="text-sm text-indigo-700">
+                  Fill your resume with realistic sample content for {selectedCareerField.name}
+                </p>
+              </div>
+            </div>
+            <Button
+              onClick={handlePopulateWithSample}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              Fill with Sample Content
+            </Button>
+          </div>
+          <div className="mt-4 text-xs text-indigo-600">
+            <p><strong>Note:</strong> This will populate all sections with sample data appropriate for your career field. You can edit or replace any content afterward.</p>
+          </div>
+        </motion.div>
+      )}
     </motion.div>
   );
 }

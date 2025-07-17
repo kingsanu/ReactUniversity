@@ -40,7 +40,8 @@ export function StepIndicator() {
 
   return (
     <nav aria-label="Progress" className="mb-8">
-      <ol className="flex items-start justify-between w-full">
+      {/* Desktop View */}
+      <ol className="hidden lg:flex items-start justify-between w-full">
         {resumeSteps.map((step, index) => {
           const isCompleted = step.id < currentStep;
           const isCurrent = step.id === currentStep;
@@ -182,6 +183,114 @@ export function StepIndicator() {
           );
         })}
       </ol>
+
+      {/* Mobile & Tablet View */}
+      <div className="lg:hidden">
+        {/* Current Step Display */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">
+              {resumeSteps[currentStep - 1]?.title}
+            </h2>
+            <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+              {currentStep} of {resumeSteps.length}
+            </span>
+          </div>
+          <p className="text-sm text-gray-600 mb-4">
+            {resumeSteps[currentStep - 1]?.description}
+          </p>
+
+          {/* Progress Bar */}
+          <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+            <motion.div
+              className="bg-gradient-to-r from-indigo-600 to-blue-600 h-2 rounded-full"
+              initial={{ width: 0 }}
+              animate={{ width: `${(currentStep / resumeSteps.length) * 100}%` }}
+              transition={{ duration: 0.5 }}
+            />
+          </div>
+        </div>
+
+        {/* Horizontal Step Indicators */}
+        <div className="flex justify-center space-x-2 mb-6">
+          {resumeSteps.map((step, index) => {
+            const isCompleted = step.id < currentStep;
+            const isCurrent = step.id === currentStep;
+            const isClickable = step.id <= currentStep;
+            const stepValidation = validation[step.id];
+
+            return (
+              <motion.button
+                key={step.id}
+                onClick={() => isClickable && setResumeStep(step.id)}
+                disabled={!isClickable}
+                className={cn(
+                  "w-10 h-10 rounded-full flex items-center justify-center text-xs font-medium transition-all duration-300",
+                  isCompleted && stepValidation.isValid
+                    ? "bg-green-500 text-white"
+                    : isCompleted && !stepValidation.isValid
+                    ? "bg-amber-500 text-white"
+                    : isCurrent
+                    ? "bg-indigo-600 text-white shadow-lg"
+                    : isClickable
+                    ? "bg-gray-200 text-gray-600 hover:bg-gray-300"
+                    : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                )}
+                whileHover={isClickable ? { scale: 1.1 } : {}}
+                whileTap={isClickable ? { scale: 0.95 } : {}}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                {isCompleted && stepValidation.isValid ? (
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                ) : isCompleted && !stepValidation.isValid ? (
+                  <AlertTriangle className="w-4 h-4" />
+                ) : (
+                  step.id
+                )}
+              </motion.button>
+            );
+          })}
+        </div>
+
+        {/* Step Navigation for Mobile */}
+        <div className="flex justify-between items-center">
+          <button
+            onClick={() => currentStep > 1 && setResumeStep(currentStep - 1)}
+            disabled={currentStep === 1}
+            className={cn(
+              "flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
+              currentStep === 1
+                ? "text-gray-400 cursor-not-allowed"
+                : "text-gray-700 hover:bg-gray-100"
+            )}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            <span>Previous</span>
+          </button>
+
+          <button
+            onClick={() => currentStep < resumeSteps.length && setResumeStep(currentStep + 1)}
+            disabled={currentStep === resumeSteps.length}
+            className={cn(
+              "flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
+              currentStep === resumeSteps.length
+                ? "text-gray-400 cursor-not-allowed"
+                : "text-indigo-600 hover:bg-indigo-50"
+            )}
+          >
+            <span>Next</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </div>
     </nav>
   );
 }
