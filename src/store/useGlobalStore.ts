@@ -42,6 +42,8 @@ interface Skill {
 
 export interface ResumeData {
   careerField: string;
+  // Optional legacy field for compatibility
+  userProfile?: any;
   personalInfo: PersonalInfo;
   experience: Experience[];
   education: Education[];
