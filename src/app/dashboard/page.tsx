@@ -1,4 +1,5 @@
 "use client";
+import { useState } from 'react';
 import { Sidebar } from './_components/Sidebar';
 import { TopNav } from './_components/TopNav';
 import { ActionCards } from './_components/ActionCards';
@@ -10,14 +11,19 @@ import { Benchmarks } from './_components/Benchmarks';
 import { Milestones } from './_components/Milestones';
 
 export default function DashboardPage() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
     <div className="flex h-screen bg-gray-50">
-      <Sidebar />
-      
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <TopNav />
-        
-        <main className="flex-1 overflow-y-auto p-6 space-y-6">
+      <Sidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
+
+      <div className="flex-1 flex flex-col overflow-hidden lg:ml-0">
+        <TopNav onMenuClick={() => setSidebarOpen(true)} />
+
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6">
           {/* Action Cards */}
           <ActionCards />
 

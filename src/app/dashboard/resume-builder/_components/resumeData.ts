@@ -146,8 +146,8 @@ export const resumeSteps = [
   },
   {
     id: 7,
-    title: "Review & Finalize",
-    description: "Review and finalize your resume",
+    title: "Summary",
+    description: "Review your completed resume",
     icon: ClipboardCheck,
     fields: ["summary"]
   }

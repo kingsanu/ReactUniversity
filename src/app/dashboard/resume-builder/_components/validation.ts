@@ -73,8 +73,8 @@ export function validateTemplate(template: string): ValidationResult {
 
 export function validatePersonalInfo(personalInfo: any): ValidationResult {
   const missing: string[] = [];
-  const required = requiredFields[2].required;
-  
+  const required = requiredFields[3].required; // Fixed: Use step 3 (Personal Info) instead of step 2 (Template)
+
   required.forEach(field => {
     if (!personalInfo[field] || personalInfo[field].trim() === '') {
       missing.push(field);
@@ -86,8 +86,8 @@ export function validatePersonalInfo(personalInfo: any): ValidationResult {
     missing.push('valid email');
   }
 
-  const totalFields = required.length + requiredFields[2].optional.length;
-  const filledFields = Object.keys(personalInfo).filter(key => 
+  const totalFields = required.length + requiredFields[3].optional.length; // Fixed: Use step 3
+  const filledFields = Object.keys(personalInfo).filter(key =>
     personalInfo[key] && personalInfo[key].toString().trim() !== ''
   ).length;
 

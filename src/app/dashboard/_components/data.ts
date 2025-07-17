@@ -159,10 +159,9 @@ export const sidebarData = {
   navigation: [
     {
       id: "dashboard",
-      name: "Dashboard", 
+      name: "Dashboard",
       icon: "dashboard",
-      path: "/dashboard",
-      active: true
+      path: "/dashboard"
     },
     {
       id: "analytics",
@@ -205,13 +204,19 @@ export const sidebarData = {
     {
       id: "learning",
       name: "Learning & Tools",
-      icon: "learning", 
+      icon: "learning",
       path: "/dashboard/learning",
       submenu: [
         { name: "Course Catalog", path: "/dashboard/learning/courses" },
         { name: "Resume Builder", path: "/dashboard/learning/resume" },
         { name: "Resource Library", path: "/dashboard/learning/library" }
       ]
+    },
+    {
+      id: "subscriptions",
+      name: "Subscriptions",
+      icon: "subscriptions",
+      path: "/dashboard/subscriptions"
     }
   ]
 };

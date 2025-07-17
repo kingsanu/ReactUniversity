@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import * as resumeService from '@/services/resumeService';
 import { useState } from 'react';
 import { useGlobalStore } from '@/store/useGlobalStore';
-import { SmartTemplateSelector } from './SmartTemplateSelector';
+
 import { careerFields } from './resumeData';
 
 export function TemplatePreviewStep() {
@@ -24,19 +24,19 @@ export function TemplatePreviewStep() {
       count: data.careerField ? 1 : 0
     },
     personalInfo: {
-      isComplete: validation[2].isValid,
+      isComplete: validation[3].isValid, // Fixed: Personal Info is step 3
       count: data.personalInfo.fullName ? 1 : 0
     },
     experience: {
-      isComplete: validation[3].isValid,
+      isComplete: validation[4].isValid, // Fixed: Experience is step 4
       count: data.experience.length
     },
     education: {
-      isComplete: validation[4].isValid,
+      isComplete: validation[5].isValid, // Fixed: Education is step 5
       count: data.education.length
     },
     skills: {
-      isComplete: validation[5].isValid,
+      isComplete: validation[6].isValid, // Fixed: Skills is step 6
       count: data.skills.length
     }
   };
@@ -54,15 +54,10 @@ export function TemplatePreviewStep() {
       className="space-y-6"
     >
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Choose Template & Review</h2>
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">Resume Summary</h2>
         <p className="text-sm text-gray-600">
-          Select your preferred template and review all sections of your resume.
+          Review your completed resume. All sections have been filled out and your resume is ready.
         </p>
-      </div>
-
-      {/* Smart Template Selector */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-        <SmartTemplateSelector />
       </div>
 
       {/* Completion Progress */}
@@ -200,9 +195,9 @@ export function TemplatePreviewStep() {
             </svg>
           </div>
           <div>
-            <h4 className="font-medium text-green-900">Resume Review Complete!</h4>
+            <h4 className="font-medium text-green-900">Resume Summary Complete!</h4>
             <p className="text-sm text-green-700 mt-1">
-              Your resume is {Math.round(completionPercentage)}% complete. You can continue editing any section using the navigation above.
+              Your resume is {Math.round(completionPercentage)}% complete and ready for use. You can go back to edit any section if needed.
             </p>
           </div>
         </div>
