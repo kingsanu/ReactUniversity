@@ -1,17 +1,9 @@
 import React from 'react';
+import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 
 // This function will be called dynamically, so we need to import React PDF components here
 export function createPDFDocument(data: any) {
-  // This will be populated when the function is called
-  let Document: any, Page: any, Text: any, View: any, StyleSheet: any;
-  
-  // We need to import these dynamically since this is called from the download function
-  const ReactPDF = require('@react-pdf/renderer');
-  Document = ReactPDF.Document;
-  Page = ReactPDF.Page;
-  Text = ReactPDF.Text;
-  View = ReactPDF.View;
-  StyleSheet = ReactPDF.StyleSheet;
+  // Using statically imported React PDF components
 
   const { personalInfo, experience, education, skills, template } = data;
 
@@ -356,7 +348,8 @@ export function createPDFDocument(data: any) {
     }
   };
 
-  const styles = StyleSheet.create(getTemplateStyles(template || 'modern'));
+  // Cast to any to satisfy ESM style type expectations
+  const styles = StyleSheet.create(getTemplateStyles(template || 'modern') as any);
 
 
   // Create template-specific layouts

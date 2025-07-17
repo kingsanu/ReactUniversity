@@ -2,7 +2,8 @@
 import { motion } from 'motion/react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { subscriptionData } from './data';
+import { subscriptionData } from '@/app/dashboard/subscriptions/_components/data';
+import type { BillingOption, FeatureComparison } from '@/app/dashboard/subscriptions/_components/data';
 import { FAQ } from './FAQ';
 
 interface SubscriptionPlansProps {
@@ -146,7 +147,7 @@ export function SubscriptionPlans({ className }: SubscriptionPlansProps) {
                   <th className="px-4 md:px-6 py-3 md:py-4 text-left text-sm font-semibold text-gray-900">
                     Features
                   </th>
-                  {billingOptions.map((option) => (
+                  {billingOptions.map((option: BillingOption) => (
                     <th key={option.id} className="px-4 md:px-6 py-3 md:py-4 text-center text-sm font-semibold text-gray-900">
                       {option.name}
                     </th>
@@ -154,7 +155,7 @@ export function SubscriptionPlans({ className }: SubscriptionPlansProps) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {features.map((feature, index) => (
+                {features.map((feature: FeatureComparison, index: number) => (
                   <motion.tr
                     key={feature.name}
                     initial={{ opacity: 0 }}
@@ -165,15 +166,15 @@ export function SubscriptionPlans({ className }: SubscriptionPlansProps) {
                     <td className="px-4 md:px-6 py-3 md:py-4 text-sm text-gray-900 font-medium">
                       {feature.name}
                     </td>
-                    {billingOptions.map((option) => (
+                    {billingOptions.map((option: BillingOption) => (
                       <td key={option.id} className="px-4 md:px-6 py-3 md:py-4 text-center">
-                        {feature.availability[option.id] === true ? (
+                        {feature.availability[option.id as keyof typeof feature.availability] === true ? (
                           <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center mx-auto">
                             <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                             </svg>
                           </div>
-                        ) : feature.availability[option.id] === false ? (
+                        ) : feature.availability[option.id as keyof typeof feature.availability] === false ? (
                           <div className="w-5 h-5 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
                             <svg className="w-3 h-3 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -181,7 +182,7 @@ export function SubscriptionPlans({ className }: SubscriptionPlansProps) {
                           </div>
                         ) : (
                           <span className="text-sm text-gray-600">
-                            {feature.availability[option.id]}
+                            {feature.availability[option.id as keyof typeof feature.availability]}
                           </span>
                         )}
                       </td>
