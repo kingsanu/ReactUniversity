@@ -1,39 +1,40 @@
 "use client";
-import { motion, AnimatePresence } from 'motion/react';
-import { useState } from 'react';
-import { cn } from '@/lib/utils';
+import { motion, AnimatePresence } from "motion/react";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 const faqData = [
   {
     id: 1,
     question: "Can I change my plan anytime?",
-    answer: "Yes, you can upgrade or downgrade your plan at any time. Changes will be reflected in your next billing cycle."
+    answer:
+      "Yes, you can upgrade or downgrade your plan at any time. Changes will be reflected in your next billing cycle.",
   },
   {
     id: 2,
     question: "What payment methods do you accept?",
-    answer: "We accept all major credit cards (Visa, MasterCard, American Express), PayPal, and bank transfers for enterprise customers."
+    answer:
+      "We accept all major credit cards (Visa, MasterCard, American Express), PayPal, and bank transfers for enterprise customers.",
   },
   {
     id: 3,
     question: "Is there a free trial available?",
-    answer: "Yes, Premium plans come with a 7-day free trial. No credit card required to start your trial."
+    answer:
+      "Yes, Premium plans come with a 7-day free trial. No credit card required to start your trial.",
   },
   {
     id: 4,
     question: "Can I cancel my subscription anytime?",
-    answer: "Absolutely! You can cancel your subscription at any time from your account settings. You'll continue to have access until the end of your billing period."
+    answer:
+      "Absolutely! You can cancel your subscription at any time from your account settings. You'll continue to have access until the end of your billing period.",
   },
+
   {
     id: 5,
-    question: "Do you offer student discounts?",
-    answer: "Yes, we offer a 50% discount for verified students. Contact our support team with your student ID for verification."
-  },
-  {
-    id: 6,
     question: "What happens to my data if I cancel?",
-    answer: "Your data will be retained for 30 days after cancellation, giving you time to export or reactivate your account if needed."
-  }
+    answer:
+      "Your data will be retained for 30 days after cancellation, giving you time to export or reactivate your account if needed.",
+  },
 ];
 
 interface FAQProps {
@@ -44,10 +45,8 @@ export function FAQ({ className }: FAQProps) {
   const [openItems, setOpenItems] = useState<number[]>([]);
 
   const toggleItem = (id: number) => {
-    setOpenItems(prev =>
-      prev.includes(id)
-        ? prev.filter(item => item !== id)
-        : [...prev, id]
+    setOpenItems((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
   };
 
@@ -98,7 +97,7 @@ export function FAQ({ className }: FAQProps) {
                 </svg>
               </motion.div>
             </button>
-            
+
             <AnimatePresence>
               {openItems.includes(item.id) && (
                 <motion.div
