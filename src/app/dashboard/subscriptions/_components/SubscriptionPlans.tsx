@@ -1,25 +1,151 @@
 "use client";
-import { motion } from 'motion/react';
-import { useState } from 'react';
-import { cn } from '@/lib/utils';
-import { subscriptionData } from '@/app/dashboard/subscriptions/_components/data';
-import type { BillingOption, FeatureComparison } from '@/app/dashboard/subscriptions/_components/data';
-import { FAQ } from './FAQ';
+import { motion } from "motion/react";
+import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
+import { FAQ } from "./FAQ";
+import { LoadingState } from "./LoadingState";
+import { useGlobalStore } from "@/store/useGlobalStore";
+import StripeCheckout from "@/components/StripeCheckout";
+import * as subscriptionService from "@/services/subscriptionService";
+import type {
+  SubscriptionPlan,
+  FeatureComparison,
+  SubscriptionData,
+  UserSubscription,
+} from "@/services/subscriptionService";
 
 interface SubscriptionPlansProps {
   className?: string;
 }
 
 export function SubscriptionPlans({ className }: SubscriptionPlansProps) {
+  const { user } = useGlobalStore();
+  const [subscriptionData, setSubscriptionData] =
+    useState<SubscriptionData | null>(null);
+  const [userSubscription, setUserSubscription] =
+    useState<UserSubscription | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [processingPayment, setProcessingPayment] = useState<string | null>(
+    null
+  );
+
+  // Get user ID from global store, fallback to mock for development
+  const userId = user.id || "user-123";
+
+  // Load subscription data and user's current subscription
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        const [plans, userSub] = await Promise.all([
+          subscriptionService.fetchSubscriptionPlans(),
+          subscriptionService.getUserSubscription(userId),
+        ]);
+        setSubscriptionData(plans);
+        setUserSubscription(userSub);
+      } catch (err) {
+        console.error("Failed to load subscription data:", err);
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to load subscription data"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [userId]);
+
+  // Show loading state
+  if (loading) {
+    return <LoadingState />;
+  }
+
+  // Show error state
+  if (error || !subscriptionData) {
+    return (
+      <div className="text-center py-12">
+        <div className="text-red-600 mb-4">
+          <svg
+            className="w-12 h-12 mx-auto mb-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <p className="text-lg font-semibold">
+            Failed to load subscription plans
+          </p>
+          <p className="text-sm text-gray-600 mt-2">{error}</p>
+        </div>
+        <button
+          onClick={() => window.location.reload()}
+          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Try Again
+        </button>
+      </div>
+    );
+  }
+
   const { subscription, billingOptions, features } = subscriptionData;
 
-  const handleSubscribe = (billingOptionId: string) => {
-    // TODO: Integrate with payment API
-    console.log(`Subscribing to billing option: ${billingOptionId}`);
-  };
+  const hasActiveSubscription =
+    subscriptionService.hasActiveSubscription(userSubscription);
+  const currentPlan =
+    userSubscription && hasActiveSubscription
+      ? subscriptionService.getSubscriptionPlanById(
+          userSubscription.planId,
+          billingOptions
+        )
+      : null;
 
   return (
     <div className={cn("space-y-8", className)}>
+      {/* Current Subscription Status */}
+      {hasActiveSubscription && currentPlan && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-green-50 border border-green-200 rounded-2xl p-6 mb-8"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+              <div>
+                <h3 className="font-semibold text-green-900">
+                  Active Subscription
+                </h3>
+                <p className="text-green-700 text-sm">
+                  You're currently subscribed to {currentPlan.name}
+                  {userSubscription?.endDate && (
+                    <span>
+                      {" "}
+                      - Expires{" "}
+                      {new Date(userSubscription.endDate).toLocaleDateString()}
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="font-semibold text-green-900">
+                ${currentPlan.price}/{currentPlan.period}
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       {/* Subscription Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -63,8 +189,12 @@ export function SubscriptionPlans({ className }: SubscriptionPlansProps) {
 
             {/* Option Header */}
             <div className="text-center mb-6 md:mb-8">
-              <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">{option.name}</h3>
-              <p className="text-gray-600 mb-4 md:mb-6 text-sm md:text-base">{option.description}</p>
+              <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">
+                {option.name}
+              </h3>
+              <p className="text-gray-600 mb-4 md:mb-6 text-sm md:text-base">
+                {option.description}
+              </p>
 
               {/* Pricing */}
               <div className="mb-4 md:mb-6">
@@ -98,31 +228,78 @@ export function SubscriptionPlans({ className }: SubscriptionPlansProps) {
                   key={featureIndex}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: (index * 0.1) + (featureIndex * 0.05) }}
+                  transition={{ delay: index * 0.1 + featureIndex * 0.05 }}
                   className="flex items-start"
                 >
                   <div className="flex-shrink-0 w-5 h-5 bg-green-100 rounded-full flex items-center justify-center mt-0.5">
-                    <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    <svg
+                      className="w-3 h-3 text-green-600"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </div>
-                  <span className="ml-3 text-gray-700 text-sm md:text-base">{feature}</span>
+                  <span className="ml-3 text-gray-700 text-sm md:text-base">
+                    {feature}
+                  </span>
                 </motion.div>
               ))}
             </div>
 
             {/* CTA Button */}
-            <button
-              onClick={() => handleSubscribe(option.id)}
-              className={cn(
-                "w-full py-3 md:py-4 px-4 md:px-6 rounded-xl font-semibold text-base md:text-lg transition-all duration-200 transform hover:scale-105 active:scale-95",
-                option.popular
-                  ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg hover:shadow-xl"
-                  : "bg-gray-900 text-white hover:bg-gray-800"
-              )}
-            >
-              {option.ctaText}
-            </button>
+            {hasActiveSubscription && currentPlan?.id === option.id ? (
+              <button
+                disabled
+                className="w-full py-3 md:py-4 px-4 md:px-6 rounded-xl font-semibold text-base md:text-lg bg-gray-100 text-gray-500 cursor-not-allowed"
+              >
+                Current Plan
+              </button>
+            ) : (
+              <StripeCheckout
+                amount={option.price * 100} // Convert to cents
+                userId={userId}
+                productName={`${option.name} - ${option.description}`}
+                onStart={() => {
+                  setProcessingPayment(option.id);
+                }}
+                onSuccess={() => {
+                  console.log("Payment successful for", option.name);
+                  // Refresh subscription data
+                  window.location.reload();
+                }}
+                onError={(error: string) => {
+                  console.error("Payment failed:", error);
+                  alert(`Payment failed: ${error}`);
+                  setProcessingPayment(null);
+                }}
+                disabled={processingPayment !== null}
+                className={cn(
+                  "w-full py-3 md:py-4 px-4 md:px-6 rounded-xl font-semibold text-base md:text-lg transition-all duration-200 flex items-center justify-center space-x-2",
+                  processingPayment !== null
+                    ? "bg-gray-400 text-white cursor-not-allowed"
+                    : cn(
+                        "transform hover:scale-105 active:scale-95",
+                        option.popular
+                          ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg hover:shadow-xl"
+                          : "bg-gray-900 text-white hover:bg-gray-800"
+                      )
+                )}
+              >
+                {processingPayment === option.id ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Redirecting to Stripe...</span>
+                  </>
+                ) : (
+                  <span>{option.ctaText}</span>
+                )}
+              </StripeCheckout>
+            )}
 
             {/* Additional Info */}
             {option.additionalInfo && (
@@ -147,8 +324,11 @@ export function SubscriptionPlans({ className }: SubscriptionPlansProps) {
                   <th className="px-4 md:px-6 py-3 md:py-4 text-left text-sm font-semibold text-gray-900">
                     Features
                   </th>
-                  {billingOptions.map((option: BillingOption) => (
-                    <th key={option.id} className="px-4 md:px-6 py-3 md:py-4 text-center text-sm font-semibold text-gray-900">
+                  {billingOptions.map((option: SubscriptionPlan) => (
+                    <th
+                      key={option.id}
+                      className="px-4 md:px-6 py-3 md:py-4 text-center text-sm font-semibold text-gray-900"
+                    >
                       {option.name}
                     </th>
                   ))}
@@ -166,23 +346,50 @@ export function SubscriptionPlans({ className }: SubscriptionPlansProps) {
                     <td className="px-4 md:px-6 py-3 md:py-4 text-sm text-gray-900 font-medium">
                       {feature.name}
                     </td>
-                    {billingOptions.map((option: BillingOption) => (
-                      <td key={option.id} className="px-4 md:px-6 py-3 md:py-4 text-center">
-                        {feature.availability[option.id as keyof typeof feature.availability] === true ? (
+                    {billingOptions.map((option: SubscriptionPlan) => (
+                      <td
+                        key={option.id}
+                        className="px-4 md:px-6 py-3 md:py-4 text-center"
+                      >
+                        {feature.availability[
+                          option.id as keyof typeof feature.availability
+                        ] === true ? (
                           <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                            <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            <svg
+                              className="w-3 h-3 text-green-600"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              />
                             </svg>
                           </div>
-                        ) : feature.availability[option.id as keyof typeof feature.availability] === false ? (
+                        ) : feature.availability[
+                            option.id as keyof typeof feature.availability
+                          ] === false ? (
                           <div className="w-5 h-5 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
-                            <svg className="w-3 h-3 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                            <svg
+                              className="w-3 h-3 text-gray-400"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                clipRule="evenodd"
+                              />
                             </svg>
                           </div>
                         ) : (
                           <span className="text-sm text-gray-600">
-                            {feature.availability[option.id as keyof typeof feature.availability]}
+                            {
+                              feature.availability[
+                                option.id as keyof typeof feature.availability
+                              ]
+                            }
                           </span>
                         )}
                       </td>

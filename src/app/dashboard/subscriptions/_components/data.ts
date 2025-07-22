@@ -1,5 +1,10 @@
-// Dummy subscription data - will be replaced with API calls
-export const subscriptionData = {
+// This file is deprecated - subscription data is now handled by subscriptionService.ts
+// Keeping for backward compatibility during migration
+
+import type { SubscriptionData } from '@/services/subscriptionService';
+
+// Legacy export for backward compatibility
+export const subscriptionData: SubscriptionData = {
   subscription: {
     name: 'UNIV.365 Premium',
     description: 'Complete access to accelerate your career journey',
@@ -160,56 +165,13 @@ export const subscriptionData = {
   ]
 };
 
-// API integration structure for future implementation
-export interface BillingOption {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  originalPrice?: number;
-  period: string;
-  popular: boolean;
-  ctaText: string;
-  additionalInfo?: string;
-  discount?: number;
-  features: string[];
-}
+// Legacy interfaces - now defined in subscriptionService.ts
+export type { SubscriptionPlan as BillingOption, FeatureComparison, SubscriptionData } from '@/services/subscriptionService';
 
-export interface Subscription {
-  name: string;
-  description: string;
-  icon: string;
-  features: string[];
-}
-
-export interface FeatureComparison {
-  name: string;
-  availability: {
-    [billingId: string]: boolean | string;
-  };
-}
-
-export interface SubscriptionData {
-  subscription: Subscription;
-  billingOptions: BillingOption[];
-  features: FeatureComparison[];
-}
-
-// Future API functions (to be implemented)
-export async function fetchSubscriptionPlans(): Promise<SubscriptionData> {
-  // TODO: Replace with actual API call
-  // const response = await fetch('/api/subscriptions');
-  // return response.json();
-  return subscriptionData;
-}
+// Legacy functions - now handled by subscriptionService.ts
+export { fetchSubscriptionPlans } from '@/services/subscriptionService';
 
 export async function createSubscription(billingOptionId: string) {
-  // TODO: Implement subscription creation
-  // const response = await fetch('/api/subscriptions', {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify({ billingOptionId })
-  // });
-  // return response.json();
-  console.log('Creating subscription:', { billingOptionId });
+  console.log('Legacy createSubscription called:', { billingOptionId });
+  console.warn('This function is deprecated. Use subscriptionService.createSubscription instead.');
 }

@@ -342,6 +342,104 @@
           }
         }
       ]
+    },
+    {
+      "name": "Stripe Payment",
+      "item": [
+        {
+          "name": "Get Stripe Config",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/stripe/config",
+              "protocol": "https",
+              "host": [
+                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "stripe", "config"]
+            }
+          }
+        },
+        {
+          "name": "Create Payment Intent",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"amount\": 2000,\n  \"currency\": \"usd\",\n  \"description\": \"Test payment for resume builder\"\n}"
+            },
+            "url": {
+              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/stripe/create-payload",
+              "protocol": "https",
+              "host": [
+                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "stripe", "create-payload"]
+            }
+          }
+        },
+        {
+          "name": "Create Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"paymentIntentId\": \"{{paymentIntentId}}\",\n  \"paymentMethodId\": \"pm_card_visa\",\n  \"returnUrl\": \"https://example.com/success\"\n}"
+            },
+            "url": {
+              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/stripe/create-payment",
+              "protocol": "https",
+              "host": [
+                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "stripe", "create-payment"]
+            }
+          }
+        },
+        {
+          "name": "Check Payment Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/stripe/status/{{paymentIntentId}}",
+              "protocol": "https",
+              "host": [
+                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "stripe", "status", "{{paymentIntentId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get User Payments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/stripe/user/{{userId}}",
+              "protocol": "https",
+              "host": [
+                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "stripe", "user", "{{userId}}"]
+            }
+          }
+        }
+      ]
     }
   ],
   "variable": [
@@ -364,6 +462,11 @@
       "key": "resumeId",
       "value": "your-resume-id-here",
       "description": "Replace with actual resume ID for testing"
+    },
+    {
+      "key": "paymentIntentId",
+      "value": "pi_your-payment-intent-id-here",
+      "description": "Replace with actual payment intent ID for testing"
     }
   ]
 }
