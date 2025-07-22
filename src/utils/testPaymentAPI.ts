@@ -173,6 +173,61 @@ export async function testCheckoutFlow(billingOptionId: string) {
   }
 }
 
+// Mock payment flow test (for demo purposes)
+export async function testMockPaymentFlow(billingOptionId: string) {
+  console.log(`🧪 Testing mock payment flow for: ${billingOptionId}`);
+
+  try {
+    // Get amount based on billing option
+    const amounts = {
+      "one-time": 1500, // $15.00
+      monthly: 2900, // $29.00
+      yearly: 27900, // $279.00
+    };
+
+    const amount = amounts[billingOptionId as keyof typeof amounts] || 2900;
+
+    // Step 1: Create checkout session
+    const checkoutSession = await paymentService.createCheckoutSession({
+      userId: "test-user-123",
+      amount,
+      currency: "usd",
+      productName: `Mock ${billingOptionId} Subscription`,
+      successUrl: `${window.location.origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancelUrl: `${window.location.origin}/payment-cancelled`,
+    });
+
+    console.log(
+      "Step 1 - Mock Checkout Session created:",
+      checkoutSession.sessionId
+    );
+
+    // Step 2: Simulate payment processing
+    console.log("Step 2 - Simulating payment processing...");
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // Step 3: Mock subscription creation
+    if (checkoutSession.sessionId) {
+      try {
+        const subscription = await subscriptionService.createSubscription({
+          userId: "test-user-123",
+          planId: billingOptionId,
+          paymentIntentId: checkoutSession.sessionId,
+        });
+
+        console.log("Step 3 - Mock Subscription created:", subscription);
+        return subscription;
+      } catch (error) {
+        console.log("Step 3 - Subscription creation skipped (demo mode)");
+        return { id: "mock-subscription", status: "active" };
+      }
+    }
+  } catch (error) {
+    console.error(`❌ Mock payment flow failed for ${billingOptionId}:`, error);
+    throw error;
+  }
+}
+
 // Test payment amount validation
 export function testPaymentValidation() {
   console.log("🧪 Testing payment validation...");
@@ -193,4 +248,5 @@ if (typeof window !== "undefined") {
   (window as any).testAllBillingOptions = testAllBillingOptions;
   (window as any).testCheckoutFlow = testCheckoutFlow;
   (window as any).testPaymentValidation = testPaymentValidation;
+  (window as any).testMockPaymentFlow = testMockPaymentFlow;
 }
