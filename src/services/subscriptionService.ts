@@ -218,6 +218,8 @@ function enhancePlanWithUIFields(plan: any) {
       popular: false,
       ctaText: "Buy Now",
       additionalInfo: "Single purchase",
+      discount: undefined,
+      originalPrice: undefined,
       description: "Download PDF Document, limited information",
     };
   } else if (interval === "month" || interval === "monthly") {
@@ -225,6 +227,8 @@ function enhancePlanWithUIFields(plan: any) {
       popular: true,
       ctaText: "Start Monthly",
       additionalInfo: "7-day free trial",
+      discount: undefined,
+      originalPrice: undefined,
       description: "Complete access to the platform",
     };
   } else if (interval === "year" || interval === "yearly") {
