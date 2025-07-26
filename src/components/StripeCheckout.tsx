@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { getSafeStripeUrls, debugStripeUrls } from "@/utils/debugStripeUrls";
 
 interface StripeCheckoutProps {
   amount: number; // in cents
@@ -33,6 +34,14 @@ export default function StripeCheckout({
     onStart?.();
 
     try {
+      // Debug URL configuration
+      debugStripeUrls();
+
+      // Use the safe URL utility
+      const { successUrl, cancelUrl, baseUrl } = getSafeStripeUrls();
+
+      console.log("🔗 Final Stripe URLs:", { baseUrl, successUrl, cancelUrl });
+
       // Create checkout session
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/stripe/create-checkout-session`,
@@ -47,8 +56,8 @@ export default function StripeCheckout({
             amount,
             currency: "usd",
             productName,
-            successUrl: `${window.location.origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-            cancelUrl: `${window.location.origin}/payment-cancelled`,
+            successUrl,
+            cancelUrl,
           }),
         }
       );

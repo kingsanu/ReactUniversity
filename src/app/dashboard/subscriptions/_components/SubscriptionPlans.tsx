@@ -103,7 +103,7 @@ export function SubscriptionPlans({ className }: SubscriptionPlansProps) {
     subscriptionService.hasActiveSubscription(userSubscription);
   const currentPlan =
     userSubscription && hasActiveSubscription
-      ? subscriptionService.getSubscriptionPlanById(
+      ? subscriptionService.findSubscriptionPlanById(
           userSubscription.planId,
           billingOptions
         )
@@ -311,96 +311,98 @@ export function SubscriptionPlans({ className }: SubscriptionPlansProps) {
         ))}
       </div>
 
-      {/* Features Comparison */}
-      <div className="mt-12 md:mt-16">
-        <h2 className="text-xl md:text-2xl font-bold text-gray-900 text-center mb-6 md:mb-8">
-          Compare Features
-        </h2>
-        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-lg">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[600px]">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 md:px-6 py-3 md:py-4 text-left text-sm font-semibold text-gray-900">
-                    Features
-                  </th>
-                  {billingOptions.map((option: SubscriptionPlan) => (
-                    <th
-                      key={option.id}
-                      className="px-4 md:px-6 py-3 md:py-4 text-center text-sm font-semibold text-gray-900"
-                    >
-                      {option.name}
+      {/* Features Comparison - Hidden for now */}
+      {false && (
+        <div className="mt-12 md:mt-16">
+          <h2 className="text-xl md:text-2xl font-bold text-gray-900 text-center mb-6 md:mb-8">
+            Compare Features
+          </h2>
+          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-lg">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[600px]">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 md:px-6 py-3 md:py-4 text-left text-sm font-semibold text-gray-900">
+                      Features
                     </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {features.map((feature: FeatureComparison, index: number) => (
-                  <motion.tr
-                    key={feature.name}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="hover:bg-gray-50"
-                  >
-                    <td className="px-4 md:px-6 py-3 md:py-4 text-sm text-gray-900 font-medium">
-                      {feature.name}
-                    </td>
                     {billingOptions.map((option: SubscriptionPlan) => (
-                      <td
+                      <th
                         key={option.id}
-                        className="px-4 md:px-6 py-3 md:py-4 text-center"
+                        className="px-4 md:px-6 py-3 md:py-4 text-center text-sm font-semibold text-gray-900"
                       >
-                        {feature.availability[
-                          option.id as keyof typeof feature.availability
-                        ] === true ? (
-                          <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                            <svg
-                              className="w-3 h-3 text-green-600"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          </div>
-                        ) : feature.availability[
-                            option.id as keyof typeof feature.availability
-                          ] === false ? (
-                          <div className="w-5 h-5 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
-                            <svg
-                              className="w-3 h-3 text-gray-400"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          </div>
-                        ) : (
-                          <span className="text-sm text-gray-600">
-                            {
-                              feature.availability[
-                                option.id as keyof typeof feature.availability
-                              ]
-                            }
-                          </span>
-                        )}
-                      </td>
+                        {option.name}
+                      </th>
                     ))}
-                  </motion.tr>
-                ))}
-              </tbody>
-            </table>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {features.map((feature: FeatureComparison, index: number) => (
+                    <motion.tr
+                      key={feature.name}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="hover:bg-gray-50"
+                    >
+                      <td className="px-4 md:px-6 py-3 md:py-4 text-sm text-gray-900 font-medium">
+                        {feature.name}
+                      </td>
+                      {billingOptions.map((option: SubscriptionPlan) => (
+                        <td
+                          key={option.id}
+                          className="px-4 md:px-6 py-3 md:py-4 text-center"
+                        >
+                          {feature.availability[
+                            option.id as keyof typeof feature.availability
+                          ] === true ? (
+                            <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                              <svg
+                                className="w-3 h-3 text-green-600"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            </div>
+                          ) : feature.availability[
+                              option.id as keyof typeof feature.availability
+                            ] === false ? (
+                            <div className="w-5 h-5 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
+                              <svg
+                                className="w-3 h-3 text-gray-400"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            </div>
+                          ) : (
+                            <span className="text-sm text-gray-600">
+                              {
+                                feature.availability[
+                                  option.id as keyof typeof feature.availability
+                                ]
+                              }
+                            </span>
+                          )}
+                        </td>
+                      ))}
+                    </motion.tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* FAQ Section */}
       <FAQ className="mt-16 md:mt-24" />

@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
-import { generateDummyContent } from '@/app/dashboard/resume-builder/_components/dummyContentGenerator';
+import { create } from "zustand";
+import { devtools, persist } from "zustand/middleware";
+import { generateDummyContent } from "@/app/dashboard/resume-builder/_components/dummyContentGenerator";
 
 // Resume Builder Types
 interface PersonalInfo {
@@ -36,8 +36,8 @@ interface Education {
 interface Skill {
   id: string;
   name: string;
-  category: 'technical' | 'soft' | 'language';
-  level: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  category: "technical" | "soft" | "language";
+  level: "beginner" | "intermediate" | "advanced" | "expert";
 }
 
 export interface ResumeData {
@@ -48,13 +48,19 @@ export interface ResumeData {
   experience: Experience[];
   education: Education[];
   skills: Skill[];
-  template: 'modern' | 'classic' | 'creative' | 'minimal' | 'executive' | 'tech';
+  template:
+    | "modern"
+    | "classic"
+    | "creative"
+    | "minimal"
+    | "executive"
+    | "tech";
 }
 
 // Global State Interface
 interface GlobalState {
   // Theme
-  theme: 'light' | 'dark';
+  theme: "light" | "dark";
   toggleTheme: () => void;
 
   // User Authentication
@@ -62,9 +68,10 @@ interface GlobalState {
     id: string | null;
     email: string | null;
     name: string | null;
+    role: string | null;
     isAuthenticated: boolean;
   };
-  setUser: (user: Partial<GlobalState['user']>) => void;
+  setUser: (user: Partial<GlobalState["user"]>) => void;
   logout: () => void;
   initializeAuth: () => Promise<void>;
 
@@ -78,15 +85,15 @@ interface GlobalState {
   setResumeStep: (step: number) => void;
   setCareerField: (careerField: string) => void;
   updatePersonalInfo: (info: Partial<PersonalInfo>) => void;
-  addExperience: (experience: Omit<Experience, 'id'>) => void;
+  addExperience: (experience: Omit<Experience, "id">) => void;
   updateExperience: (id: string, experience: Partial<Experience>) => void;
   removeExperience: (id: string) => void;
-  addEducation: (education: Omit<Education, 'id'>) => void;
+  addEducation: (education: Omit<Education, "id">) => void;
   updateEducation: (id: string, education: Partial<Education>) => void;
   removeEducation: (id: string) => void;
-  addSkill: (skill: Omit<Skill, 'id'>) => void;
+  addSkill: (skill: Omit<Skill, "id">) => void;
   removeSkill: (id: string) => void;
-  setResumeTemplate: (template: ResumeData['template']) => void;
+  setResumeTemplate: (template: ResumeData["template"]) => void;
   setResumeLoading: (loading: boolean) => void;
   resetResumeBuilder: () => void;
   populateWithDummyContent: (careerField: string) => void;
@@ -98,23 +105,21 @@ interface GlobalState {
 
 // Initial Resume Data
 const initialResumeData: ResumeData = {
-  careerField: '',
+  careerField: "",
   personalInfo: {
-    fullName: '',
-    email: '',
-    phone: '',
-    location: '',
-    linkedin: '',
-    website: '',
-    summary: '',
+    fullName: "",
+    email: "",
+    phone: "",
+    location: "",
+    linkedin: "",
+    website: "",
+    summary: "",
   },
   experience: [],
   education: [],
   skills: [],
-  template: 'modern',
+  template: "modern",
 };
-
-
 
 // Create the store
 export const useGlobalStore = create<GlobalState>()(
@@ -122,15 +127,18 @@ export const useGlobalStore = create<GlobalState>()(
     persist(
       (set, get) => ({
         // Theme
-        theme: 'light',
+        theme: "light",
         toggleTheme: () =>
-          set((state) => ({ theme: state.theme === 'light' ? 'dark' : 'light' })),
+          set((state) => ({
+            theme: state.theme === "light" ? "dark" : "light",
+          })),
 
         // User
         user: {
           id: null,
           email: null,
           name: null,
+          role: null,
           isAuthenticated: false,
         },
         setUser: (userData) =>
@@ -139,8 +147,8 @@ export const useGlobalStore = create<GlobalState>()(
           })),
         logout: () => {
           // Clear localStorage token
-          if (typeof window !== 'undefined') {
-            localStorage.removeItem('token');
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("token");
           }
           // Reset user state
           set({
@@ -148,6 +156,7 @@ export const useGlobalStore = create<GlobalState>()(
               id: null,
               email: null,
               name: null,
+              role: null,
               isAuthenticated: false,
             },
           });
@@ -155,8 +164,8 @@ export const useGlobalStore = create<GlobalState>()(
 
         // Initialize authentication state from localStorage
         initializeAuth: async () => {
-          if (typeof window !== 'undefined') {
-            const token = localStorage.getItem('token');
+          if (typeof window !== "undefined") {
+            const token = localStorage.getItem("token");
             const currentUser = get().user;
 
             if (token && currentUser.email) {
@@ -168,13 +177,14 @@ export const useGlobalStore = create<GlobalState>()(
               // No token or no user data, ensure we're in unauthenticated state
               if (token && !currentUser.email) {
                 // Token exists but no user data, clear the token
-                localStorage.removeItem('token');
+                localStorage.removeItem("token");
               }
               set({
                 user: {
                   id: null,
                   email: null,
                   name: null,
+                  role: null,
                   isAuthenticated: false,
                 },
               });
@@ -210,7 +220,10 @@ export const useGlobalStore = create<GlobalState>()(
               ...state.resumeBuilder,
               data: {
                 ...state.resumeBuilder.data,
-                personalInfo: { ...state.resumeBuilder.data.personalInfo, ...info },
+                personalInfo: {
+                  ...state.resumeBuilder.data.personalInfo,
+                  ...info,
+                },
               },
               isDirty: true,
             },
@@ -320,7 +333,9 @@ export const useGlobalStore = create<GlobalState>()(
         removeSkill: (id) =>
           set((state) => {
             const currentSkills = state.resumeBuilder.data.skills || [];
-            const filteredSkills = currentSkills.filter((skill) => skill && skill.id !== id);
+            const filteredSkills = currentSkills.filter(
+              (skill) => skill && skill.id !== id
+            );
 
             return {
               resumeBuilder: {
@@ -361,10 +376,16 @@ export const useGlobalStore = create<GlobalState>()(
         populateWithDummyContent: (careerField) =>
           set((state) => {
             // Determine experience level based on existing data or default to 'mid'
-            const experienceLevel = state.resumeBuilder.data.experience.length === 0 ? 'fresher' : 'mid';
+            const experienceLevel =
+              state.resumeBuilder.data.experience.length === 0
+                ? "fresher"
+                : "mid";
 
             // Generate dummy content
-            const dummyContent = generateDummyContent(careerField, experienceLevel);
+            const dummyContent = generateDummyContent(
+              careerField,
+              experienceLevel
+            );
 
             return {
               resumeBuilder: {
@@ -374,15 +395,15 @@ export const useGlobalStore = create<GlobalState>()(
                   personalInfo: dummyContent.personalInfo,
                   experience: dummyContent.experience.map((exp, index) => ({
                     ...exp,
-                    id: `exp-${Date.now()}-${index}`
+                    id: `exp-${Date.now()}-${index}`,
                   })),
                   education: dummyContent.education.map((edu, index) => ({
                     ...edu,
-                    id: `edu-${Date.now()}-${index}`
+                    id: `edu-${Date.now()}-${index}`,
                   })),
                   skills: dummyContent.skills.map((skill, index) => ({
                     ...skill,
-                    id: `skill-${Date.now()}-${index}`
+                    id: `skill-${Date.now()}-${index}`,
                   })),
                   template: state.resumeBuilder.data.template,
                 },
@@ -397,7 +418,7 @@ export const useGlobalStore = create<GlobalState>()(
           set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
       }),
       {
-        name: 'timcare-global-store',
+        name: "timcare-global-store",
         partialize: (state) => ({
           theme: state.theme,
           user: state.user,
@@ -408,6 +429,6 @@ export const useGlobalStore = create<GlobalState>()(
         }),
       }
     ),
-    { name: 'TimCareGlobalStore' }
+    { name: "TimCareGlobalStore" }
   )
 );

@@ -1,22 +1,22 @@
 "use client";
-import { useGlobalStore } from '@/store/useGlobalStore';
-import { StepIndicator } from './_components/StepIndicator';
-import { CareerFieldStep } from './_components/CareerFieldStep';
-import { PersonalInfoStep } from './_components/PersonalInfoStep';
-import { TemplateSelectionStep } from './_components/TemplateSelectionStep';
-import { ExperienceStep } from './_components/ExperienceStep';
-import { EducationStep } from './_components/EducationStep';
-import { SkillsStep } from './_components/SkillsStep';
-import { TemplatePreviewStep } from './_components/TemplatePreviewStep';
-import { ResumePreview } from './_components/ResumePreview';
-import { LivePreviewPDF } from './_components/LivePreviewPDF';
-import { NavigationButtons } from './_components/NavigationButtons';
+import { useGlobalStore } from "@/store/useGlobalStore";
+import { StepIndicator } from "./_components/StepIndicator";
+import { CareerFieldStep } from "./_components/CareerFieldStep";
+import { PersonalInfoStep } from "./_components/PersonalInfoStep";
+import { TemplateSelectionStep } from "./_components/TemplateSelectionStep";
+import { ExperienceStep } from "./_components/ExperienceStep";
+import { EducationStep } from "./_components/EducationStep";
+import { SkillsStep } from "./_components/SkillsStep";
+import { TemplatePreviewStep } from "./_components/TemplatePreviewStep";
+import { ResumePreview } from "./_components/ResumePreview";
+import { LivePreviewPDF } from "./_components/LivePreviewPDF";
+import { NavigationButtons } from "./_components/NavigationButtons";
 
-import { resumeSteps, resumeTemplates } from './_components/resumeData';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Bug } from 'lucide-react';
-import * as resumeService from '@/services/resumeService';
+import { resumeSteps, resumeTemplates } from "./_components/resumeData";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+import * as resumeService from "@/services/resumeService";
 
 export default function ResumeBuilderPage() {
   const { resumeBuilder, setResumeLoading } = useGlobalStore();
@@ -38,27 +38,30 @@ export default function ResumeBuilderPage() {
           phone: data.personalInfo.phone,
           location: data.personalInfo.location,
           linkedIn: data.personalInfo.linkedin,
-          website: data.personalInfo.website
+          website: data.personalInfo.website,
         },
         summary: data.personalInfo.summary,
-        skills: { skills: data.skills.reduce((acc, s) => {
-          acc[s.category] = [...(acc[s.category]||[]), s.name]; return acc;
-        }, {} as Record<string,string[]>) },
-        experience: data.experience.map(e => ({
+        skills: {
+          skills: data.skills.reduce((acc, s) => {
+            acc[s.category] = [...(acc[s.category] || []), s.name];
+            return acc;
+          }, {} as Record<string, string[]>),
+        },
+        experience: data.experience.map((e) => ({
           company: e.company,
           location: e.location,
           title: e.jobTitle,
           startDate: e.startDate,
           endDate: e.endDate,
-          descriptions: e.description
+          descriptions: e.description,
         })),
-        education: data.education.map(ed => ({
+        education: data.education.map((ed) => ({
           degree: ed.degree,
           institution: ed.institution,
           location: ed.location,
-          startDate: '',
-          endDate: ed.graduationDate
-        }))
+          startDate: "",
+          endDate: ed.graduationDate,
+        })),
       };
       try {
         if (resumeId) {
@@ -68,7 +71,7 @@ export default function ResumeBuilderPage() {
           setResumeId(res._id);
         }
       } catch (err) {
-        console.error('Auto-save failed', err);
+        console.error("Auto-save failed", err);
       } finally {
         setResumeLoading(false);
       }
@@ -98,8 +101,10 @@ export default function ResumeBuilderPage() {
   };
 
   // Get current template for background synchronization
-  const currentTemplate = resumeTemplates.find(t => t.id === resumeBuilder.data.template);
-  const templateColor = currentTemplate?.color || '#3b82f6';
+  const currentTemplate = resumeTemplates.find(
+    (t) => t.id === resumeBuilder.data.template
+  );
+  const templateColor = currentTemplate?.color || "#3b82f6";
 
   return (
     <div
@@ -111,7 +116,7 @@ export default function ResumeBuilderPage() {
           transparent 50%,
           ${templateColor}03 75%,
           ${templateColor}08 100%
-        )`
+        )`,
       }}
     >
       {/* Enhanced Header with Glassmorphism */}
@@ -123,25 +128,40 @@ export default function ResumeBuilderPage() {
               <div>
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-gradient-to-r from-indigo-600 to-blue-600 rounded-xl flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    <svg
+                      className="w-6 h-6 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
                     </svg>
                   </div>
                   <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Resume Builder</h1>
+                    <h1 className="text-2xl font-bold text-gray-900">
+                      Resume Builder
+                    </h1>
                     <p className="text-sm text-gray-600">
-                      Step {currentStep} of {resumeSteps.length}: {resumeSteps[currentStep - 1]?.title}
+                      Step {currentStep} of {resumeSteps.length}:{" "}
+                      {resumeSteps[currentStep - 1]?.title}
                     </p>
                   </div>
                 </div>
               </div>
-              
+
               {/* Progress Bar */}
               <div className="hidden md:flex items-center space-x-3">
                 <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div 
+                  <div
                     className="h-full bg-gradient-to-r from-indigo-600 to-blue-600 transition-all duration-300"
-                    style={{ width: `${(currentStep / resumeSteps.length) * 100}%` }}
+                    style={{
+                      width: `${(currentStep / resumeSteps.length) * 100}%`,
+                    }}
                   />
                 </div>
                 <span className="text-sm text-gray-600 font-medium">
@@ -161,8 +181,16 @@ export default function ResumeBuilderPage() {
                   </div>
                 ) : (
                   <div className="flex items-center space-x-2 text-green-600">
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                     <span className="text-sm font-medium">Saved</span>
                   </div>
@@ -172,18 +200,6 @@ export default function ResumeBuilderPage() {
               {/* Action Buttons */}
               <div className="flex items-center space-x-2">
                 <ResumePreview />
-
-                {/* Debug Button - Only show in development */}
-                {process.env.NODE_ENV === 'development' && (
-                  <button
-                    onClick={() => router.push('/dashboard/resume-builder/debug')}
-                    className="bg-orange-600 hover:bg-orange-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
-                    title="Template Debug Comparison"
-                  >
-                    <Bug size={16} />
-                    Debug
-                  </button>
-                )}
               </div>
             </div>
           </div>
@@ -199,9 +215,19 @@ export default function ResumeBuilderPage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className={`grid grid-cols-1 gap-8 ${(currentStep === 1 || currentStep === 2) ? 'lg:grid-cols-1' : 'lg:grid-cols-2'}`}>
+        <div
+          className={`grid grid-cols-1 gap-8 ${
+            currentStep === 1 || currentStep === 2
+              ? "lg:grid-cols-1"
+              : "lg:grid-cols-2"
+          }`}
+        >
           {/* Form Section */}
-          <div className={`bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 p-8 ${(currentStep === 1 || currentStep === 2) ? 'max-w-4xl mx-auto' : ''}`}>
+          <div
+            className={`bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 p-8 ${
+              currentStep === 1 || currentStep === 2 ? "max-w-4xl mx-auto" : ""
+            }`}
+          >
             {renderCurrentStep()}
             <NavigationButtons />
           </div>
@@ -212,12 +238,29 @@ export default function ResumeBuilderPage() {
               <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 p-8">
                 <div className="flex items-center space-x-3 mb-6">
                   <div className="w-8 h-8 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    <svg
+                      className="w-5 h-5 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                      />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900">Live Preview</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Live Preview
+                  </h3>
                 </div>
                 <div className="border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
                   <LivePreviewPDF />

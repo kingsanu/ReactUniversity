@@ -4,18 +4,11 @@ import { useSearchParams } from "next/navigation";
 import { Sidebar } from "../_components/Sidebar";
 import { TopNav } from "../_components/TopNav";
 import { SubscriptionPlans } from "./_components/SubscriptionPlans";
-import StripeTestButton from "@/components/StripeTestButton";
 
 export default function SubscriptionsPage() {
   const searchParams = useSearchParams();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [showTestButton, setShowTestButton] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-
-  // Show test button in development mode
-  useEffect(() => {
-    setShowTestButton(process.env.NODE_ENV === "development");
-  }, []);
 
   // Check for success/cancelled parameters from Stripe redirect
   useEffect(() => {
@@ -66,54 +59,6 @@ export default function SubscriptionsPage() {
       }, 500);
     }
   }, [searchParams]);
-
-  const handleTestAPIs = async () => {
-    try {
-      const { testPaymentAPIs } = await import("@/utils/testPaymentAPI");
-      await testPaymentAPIs();
-    } catch (error) {
-      console.error("Failed to run API tests:", error);
-    }
-  };
-
-  const handleTestStripeAPI = async () => {
-    try {
-      console.log("Testing Stripe API...");
-
-      // Test create-payload endpoint
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/stripe/create-payload`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({
-            userId: "test-user-123",
-            amount: 2900, // $29.00
-            currency: "usd",
-            description: "Test Monthly Subscription",
-          }),
-        }
-      );
-
-      console.log("Response status:", response.status);
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log("API Response:", data);
-        alert(`API Response: ${JSON.stringify(data, null, 2)}`);
-      } else {
-        const errorText = await response.text();
-        console.error("API Error:", errorText);
-        alert(`API Error (${response.status}): ${errorText}`);
-      }
-    } catch (error) {
-      console.error("Test failed:", error);
-      alert(`Test failed: ${error}`);
-    }
-  };
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -184,33 +129,8 @@ export default function SubscriptionsPage() {
                   Choose the perfect plan for your career journey
                 </p>
               </div>
-              {showTestButton && (
-                <div className="flex space-x-2">
-                  <button
-                    onClick={handleTestAPIs}
-                    className="bg-yellow-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-yellow-600 transition-colors"
-                    title="Test Payment APIs (Development Only)"
-                  >
-                    🧪 Test APIs
-                  </button>
-                  <button
-                    onClick={handleTestStripeAPI}
-                    className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-600 transition-colors"
-                    title="Test Stripe API Response"
-                  >
-                    🔍 Test Stripe
-                  </button>
-                </div>
-              )}
             </div>
           </div>
-
-          {/* Stripe Test Component (Development Only) */}
-          {/* {showTestButton && (
-            <div className="mb-6">
-              <StripeTestButton />
-            </div>
-          )} */}
 
           {/* Subscription Plans */}
           <SubscriptionPlans />

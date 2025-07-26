@@ -1,57 +1,140 @@
-import { apiRequest } from '@/lib/api/apiClient';
+// Role service for handling role-related API calls
 
 export interface Role {
-  _id: string;
+  id: string;
   name: string;
-  description?: string;
+  description: string;
   isActive: boolean;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+  updatedBy: string;
 }
 
-export interface CreateRolePayload {
+export interface UserWithRole {
+  id: string;
   name: string;
-  description?: string;
+  email: string;
+  roleId: string;
+  role?: Role;
 }
 
-export interface UpdateRolePayload {
-  name?: string;
-  description?: string;
-  isActive?: boolean;
-}
-
+// Get all roles
 export async function getAllRoles(): Promise<Role[]> {
-  return apiRequest('/api/roleapi', { method: 'GET' });
+  const token = localStorage.getItem("token");
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/roleapi`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch roles: ${response.statusText}`);
+  }
+
+  return await response.json();
 }
 
+// Get active roles only
 export async function getActiveRoles(): Promise<Role[]> {
-  return apiRequest('/api/roleapi/active', { method: 'GET' });
+  const token = localStorage.getItem("token");
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/roleapi/active`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch active roles: ${response.statusText}`);
+  }
+
+  return await response.json();
 }
 
+// Get role by ID
 export async function getRoleById(roleId: string): Promise<Role> {
-  return apiRequest(`/api/roleapi/${roleId}`, { method: 'GET' });
+  const token = localStorage.getItem("token");
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/roleapi/${roleId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch role: ${response.statusText}`);
+  }
+
+  return await response.json();
 }
 
+// Get role by name
 export async function getRoleByName(roleName: string): Promise<Role> {
-  return apiRequest(`/api/roleapi/name/${encodeURIComponent(roleName)}`, { method: 'GET' });
+  const token = localStorage.getItem("token");
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/roleapi/name/${roleName}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch role by name: ${response.statusText}`);
+  }
+
+  return await response.json();
 }
 
-export async function createRole(payload: CreateRolePayload): Promise<Role> {
-  return apiRequest('/api/roleapi', { method: 'POST', data: payload });
-}
+// Test function to explore what the APIs return
+export async function testRoleAPIs(): Promise<void> {
+  try {
+    console.log("🔍 Testing Role APIs...");
 
-export async function updateRole(roleId: string, payload: UpdateRolePayload): Promise<Role> {
-  return apiRequest(`/api/roleapi/${roleId}`, { method: 'PUT', data: payload });
-}
+    // Test get all roles
+    try {
+      const allRoles = await getAllRoles();
+      console.log("✅ All Roles:", allRoles);
+    } catch (error) {
+      console.log("❌ Get All Roles failed:", error);
+    }
 
-export async function deleteRole(roleId: string): Promise<void> {
-  return apiRequest(`/api/roleapi/${roleId}`, { method: 'DELETE' });
-}
+    // Test get active roles
+    try {
+      const activeRoles = await getActiveRoles();
+      console.log("✅ Active Roles:", activeRoles);
+    } catch (error) {
+      console.log("❌ Get Active Roles failed:", error);
+    }
 
-export async function activateRole(roleId: string): Promise<Role> {
-  return apiRequest(`/api/roleapi/${roleId}/activate`, { method: 'PATCH' });
-}
-
-export async function deactivateRole(roleId: string): Promise<Role> {
-  return apiRequest(`/api/roleapi/${roleId}/deactivate`, { method: 'PATCH' });
+    // Test get role by name (try common role names)
+    const commonRoleNames = ["Admin", "User", "SuperAdmin", "admin", "user"];
+    for (const roleName of commonRoleNames) {
+      try {
+        const role = await getRoleByName(roleName);
+        console.log(`✅ Role "${roleName}":`, role);
+      } catch (error) {
+        console.log(`❌ Role "${roleName}" not found:`, error);
+      }
+    }
+  } catch (error) {
+    console.error("Role API testing failed:", error);
+  }
 }

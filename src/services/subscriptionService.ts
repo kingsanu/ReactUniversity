@@ -1,4 +1,4 @@
-import { apiRequest } from '@/lib/api/apiClient';
+import { apiRequest } from "@/lib/api/apiClient";
 
 // Subscription Plan Interfaces
 export interface SubscriptionPlan {
@@ -40,7 +40,7 @@ export interface UserSubscription {
   id: string;
   userId: string;
   planId: string;
-  status: 'active' | 'inactive' | 'cancelled' | 'expired' | 'pending';
+  status: "active" | "inactive" | "cancelled" | "expired" | "pending";
   startDate: string;
   endDate?: string;
   paymentIntentId?: string;
@@ -55,131 +55,193 @@ export interface CreateSubscriptionPayload {
 }
 
 export interface UpdateSubscriptionPayload {
-  status?: 'active' | 'inactive' | 'cancelled' | 'expired';
+  status?: "active" | "inactive" | "cancelled" | "expired";
   endDate?: string;
 }
 
 // Default subscription data (fallback)
 const defaultSubscriptionData: SubscriptionData = {
   subscription: {
-    name: 'UNIV.365 Premium',
-    description: 'Complete access to accelerate your career journey',
-    icon: '🎓',
+    name: "UNIV.365 Premium",
+    description: "Complete access to accelerate your career journey",
+    icon: "🎓",
     features: [
-      'Complete Platform Access',
-      'Advanced Career Analytics',
-      'Priority Support',
-      'Career Mentorship Program',
-      'Unlimited Skill Assessments',
-      'Advanced Job Matching Algorithm',
-      'Resume Builder Pro',
-      'Interview Preparation Tools',
-      'Resource Library Access',
-      'Community & Networking'
-    ]
+      "Complete Platform Access",
+      "Advanced Career Analytics",
+      "Priority Support",
+      "Career Mentorship Program",
+      "Unlimited Skill Assessments",
+      "Advanced Job Matching Algorithm",
+      "Resume Builder Pro",
+      "Interview Preparation Tools",
+      "Resource Library Access",
+      "Community & Networking",
+    ],
   },
   billingOptions: [
     {
-      id: 'one-time',
-      name: 'One-Time Payment',
-      description: 'Download PDF Document, limited information',
+      id: "one-time",
+      name: "One-Time Payment",
+      description: "Download PDF Document, limited information",
       price: 15,
-      period: 'one-time',
+      period: "one-time",
       popular: false,
-      ctaText: 'Buy Now',
-      additionalInfo: 'Single purchase',
+      ctaText: "Buy Now",
+      additionalInfo: "Single purchase",
       features: [
-        'Download PDF Document',
-        'Limited Information Access',
-        'Basic Career Guidance',
-        'Email Support'
-      ]
+        "Download PDF Document",
+        "Limited Information Access",
+        "Basic Career Guidance",
+        "Email Support",
+      ],
     },
     {
-      id: 'monthly',
-      name: 'Monthly Subscription',
-      description: 'Complete access to the platform',
+      id: "monthly",
+      name: "Monthly Subscription",
+      description: "Complete access to the platform",
       price: 29,
-      period: 'month',
+      period: "month",
       popular: true,
-      ctaText: 'Start Monthly',
-      additionalInfo: '7-day free trial',
+      ctaText: "Start Monthly",
+      additionalInfo: "7-day free trial",
       features: [
-        'Everything in One-Time',
-        'Complete Platform Access',
-        'Advanced Analytics',
-        'Priority Support',
-        'Career Mentorship',
-        'Skill Assessments',
-        'Job Matching Algorithm',
-        'Resume Builder Pro',
-        'Interview Preparation'
-      ]
+        "Everything in One-Time",
+        "Complete Platform Access",
+        "Advanced Analytics",
+        "Priority Support",
+        "Career Mentorship",
+        "Skill Assessments",
+        "Job Matching Algorithm",
+        "Resume Builder Pro",
+        "Interview Preparation",
+      ],
     },
     {
-      id: 'yearly',
-      name: 'Yearly Subscription',
-      description: 'Complete access with significant savings',
+      id: "yearly",
+      name: "Yearly Subscription",
+      description: "Complete access with significant savings",
       price: 279,
       originalPrice: 348,
-      period: 'year',
+      period: "year",
       popular: false,
-      ctaText: 'Start Yearly',
-      additionalInfo: 'Save $69 per year',
+      ctaText: "Start Yearly",
+      additionalInfo: "Save $69 per year",
       discount: 20,
       features: [
-        'Everything in Monthly',
-        'Priority Customer Support',
-        'Advanced Reporting',
-        'Early Access to New Features',
-        'Dedicated Account Manager',
-        'Custom Training Sessions'
-      ]
-    }
+        "Everything in Monthly",
+        "Priority Customer Support",
+        "Advanced Reporting",
+        "Early Access to New Features",
+        "Dedicated Account Manager",
+        "Custom Training Sessions",
+      ],
+    },
   ],
   features: [
     {
-      name: 'PDF Downloads',
-      availability: { 'one-time': true, 'monthly': true, 'yearly': true }
+      name: "PDF Downloads",
+      availability: { "one-time": true, monthly: true, yearly: true },
     },
     {
-      name: 'Career Analytics',
-      availability: { 'one-time': false, 'monthly': true, 'yearly': true }
+      name: "Career Analytics",
+      availability: { "one-time": false, monthly: true, yearly: true },
     },
     {
-      name: 'Priority Support',
-      availability: { 'one-time': false, 'monthly': true, 'yearly': true }
+      name: "Priority Support",
+      availability: { "one-time": false, monthly: true, yearly: true },
     },
     {
-      name: 'Mentorship Program',
-      availability: { 'one-time': false, 'monthly': true, 'yearly': true }
+      name: "Mentorship Program",
+      availability: { "one-time": false, monthly: true, yearly: true },
     },
     {
-      name: 'Advanced Reporting',
-      availability: { 'one-time': false, 'monthly': false, 'yearly': true }
+      name: "Advanced Reporting",
+      availability: { "one-time": false, monthly: false, yearly: true },
     },
     {
-      name: 'Early Access Features',
-      availability: { 'one-time': false, 'monthly': false, 'yearly': true }
+      name: "Early Access Features",
+      availability: { "one-time": false, monthly: false, yearly: true },
     },
     {
-      name: 'Dedicated Account Manager',
-      availability: { 'one-time': false, 'monthly': false, 'yearly': true }
+      name: "Dedicated Account Manager",
+      availability: { "one-time": false, monthly: false, yearly: true },
     },
     {
-      name: 'Skill Assessments',
-      availability: { 'one-time': 'Limited', 'monthly': 'Unlimited', 'yearly': 'Unlimited' }
+      name: "Skill Assessments",
+      availability: {
+        "one-time": "Limited",
+        monthly: "Unlimited",
+        yearly: "Unlimited",
+      },
     },
     {
-      name: 'Job Matching',
-      availability: { 'one-time': 'Basic', 'monthly': 'Advanced', 'yearly': 'Advanced' }
+      name: "Job Matching",
+      availability: {
+        "one-time": "Basic",
+        monthly: "Advanced",
+        yearly: "Advanced",
+      },
     },
     {
-      name: 'Resume Templates',
-      availability: { 'one-time': '3 templates', 'monthly': '50+ templates', 'yearly': '50+ templates' }
-    }
-  ]
+      name: "Resume Templates",
+      availability: {
+        "one-time": "3 templates",
+        monthly: "50+ templates",
+        yearly: "50+ templates",
+      },
+    },
+  ],
 };
+
+// Helper Functions
+
+/**
+ * Enhance plan data with UI-specific fields based on plan characteristics
+ */
+function enhancePlanWithUIFields(plan: any) {
+  const interval = plan.interval || "month";
+  const price = plan.price || 0;
+
+  // Default enhancements
+  let enhancements = {
+    popular: false,
+    ctaText: "Subscribe",
+    additionalInfo: "",
+    discount: undefined as number | undefined,
+    originalPrice: undefined as number | undefined,
+    description: "",
+  };
+
+  // Enhance based on interval type
+  if (interval === "one_time" || interval === "one-time") {
+    enhancements = {
+      popular: false,
+      ctaText: "Buy Now",
+      additionalInfo: "Single purchase",
+      description: "Download PDF Document, limited information",
+    };
+  } else if (interval === "month" || interval === "monthly") {
+    enhancements = {
+      popular: true,
+      ctaText: "Start Monthly",
+      additionalInfo: "7-day free trial",
+      description: "Complete access to the platform",
+    };
+  } else if (interval === "year" || interval === "yearly") {
+    // Calculate savings if price suggests yearly plan
+    const monthlyEquivalent = Math.round((price / 12) * 1.2); // Assume 20% discount
+    enhancements = {
+      popular: false,
+      ctaText: "Start Yearly",
+      additionalInfo: `Save $${monthlyEquivalent * 12 - price} per year`,
+      discount: 20,
+      originalPrice: monthlyEquivalent * 12,
+      description: "Complete access with significant savings",
+    };
+  }
+
+  return enhancements;
+}
 
 // API Functions
 
@@ -188,15 +250,123 @@ const defaultSubscriptionData: SubscriptionData = {
  */
 export async function fetchSubscriptionPlans(): Promise<SubscriptionData> {
   try {
-    // TODO: Replace with actual API endpoint when available
-    // return apiRequest('/api/subscriptions/plans', { method: 'GET' });
-    
-    // For now, return default data
+    console.log("🔍 Fetching subscription plans from API...");
+
+    // Use the actual API endpoint from the Postman collection
+    const response = await apiRequest("/api/subscriptionplan", {
+      method: "GET",
+    });
+
+    console.log("📥 Raw API response:", response);
+
+    // Handle the API response format: {data: [...], message: "...", success: true}
+    const plans = response?.data || response;
+
+    console.log("📥 Extracted plans:", plans);
+    console.log("📥 Is array?", Array.isArray(plans));
+    console.log("📥 Length:", plans?.length);
+
+    // Transform API response to match our interface
+    if (plans && Array.isArray(plans)) {
+      if (plans.length > 0) {
+        console.log("✅ Processing", plans.length, "real plans from API");
+
+        const transformedData: SubscriptionData = {
+          subscription: defaultSubscriptionData.subscription,
+          billingOptions: plans.map((plan: any) => {
+            console.log("🔄 Transforming plan:", plan);
+
+            // Enhance plan data with UI-specific fields based on interval
+            const enhancedPlan = enhancePlanWithUIFields(plan);
+
+            return {
+              id: plan.id || plan._id,
+              name: plan.name,
+              description: plan.description || enhancedPlan.description,
+              price: plan.price,
+              originalPrice: enhancedPlan.originalPrice,
+              period: plan.interval || "month",
+              popular: enhancedPlan.popular,
+              ctaText: enhancedPlan.ctaText,
+              additionalInfo: enhancedPlan.additionalInfo,
+              discount: enhancedPlan.discount,
+              features: plan.features || [],
+              stripeProductId: plan.stripeProductId,
+              stripePriceId: plan.stripePriceId,
+            };
+          }),
+          features: defaultSubscriptionData.features,
+        };
+
+        console.log("✅ Returning real API data:", transformedData);
+        return transformedData;
+      } else {
+        console.warn("⚠️ API returned empty array, using mock data");
+        return defaultSubscriptionData;
+      }
+    }
+
+    console.warn("⚠️ API response is not an array, using mock data");
     return defaultSubscriptionData;
   } catch (error) {
-    console.warn('Failed to fetch subscription plans from API, using default data:', error);
+    console.error("❌ Failed to fetch subscription plans from API:", error);
+    console.warn("⚠️ Using mock data as fallback");
     return defaultSubscriptionData;
   }
+}
+
+/**
+ * Create a new subscription plan (admin only)
+ */
+export async function createSubscriptionPlan(payload: {
+  name: string;
+  price: number;
+  interval: string;
+  features: string[];
+  description?: string;
+}): Promise<any> {
+  return apiRequest("/api/subscriptionplan", {
+    method: "POST",
+    data: payload,
+  });
+}
+
+/**
+ * Update a subscription plan (admin only)
+ */
+export async function updateSubscriptionPlan(
+  planId: string,
+  payload: {
+    name?: string;
+    price?: number;
+    interval?: string;
+    features?: string[];
+    description?: string;
+    isActive?: boolean;
+  }
+): Promise<any> {
+  return apiRequest(`/api/subscriptionplan/${planId}`, {
+    method: "PUT",
+    data: payload,
+  });
+}
+
+/**
+ * Delete (deactivate) a subscription plan (admin only)
+ */
+export async function deleteSubscriptionPlan(planId: string): Promise<any> {
+  return apiRequest(`/api/subscriptionplan/${planId}`, {
+    method: "DELETE",
+  });
+}
+
+/**
+ * Get a specific subscription plan by ID
+ */
+export async function getSubscriptionPlanById(planId: string): Promise<any> {
+  return apiRequest(`/api/subscriptionplan/${planId}`, {
+    method: "GET",
+  });
 }
 
 /**
@@ -205,8 +375,8 @@ export async function fetchSubscriptionPlans(): Promise<SubscriptionData> {
 export async function createSubscription(
   payload: CreateSubscriptionPayload
 ): Promise<UserSubscription> {
-  return apiRequest('/api/subscriptions', {
-    method: 'POST',
+  return apiRequest("/api/subscriptions", {
+    method: "POST",
     data: payload,
   });
 }
@@ -214,10 +384,12 @@ export async function createSubscription(
 /**
  * Get user's current subscription
  */
-export async function getUserSubscription(userId: string): Promise<UserSubscription | null> {
+export async function getUserSubscription(
+  userId: string
+): Promise<UserSubscription | null> {
   try {
     return await apiRequest(`/api/subscriptions/user/${userId}`, {
-      method: 'GET',
+      method: "GET",
     });
   } catch (error) {
     // Return null if no subscription found
@@ -236,7 +408,7 @@ export async function updateSubscription(
   payload: UpdateSubscriptionPayload
 ): Promise<UserSubscription> {
   return apiRequest(`/api/subscriptions/${subscriptionId}`, {
-    method: 'PUT',
+    method: "PUT",
     data: payload,
   });
 }
@@ -244,36 +416,45 @@ export async function updateSubscription(
 /**
  * Cancel user subscription
  */
-export async function cancelSubscription(subscriptionId: string): Promise<UserSubscription> {
+export async function cancelSubscription(
+  subscriptionId: string
+): Promise<UserSubscription> {
   return apiRequest(`/api/subscriptions/${subscriptionId}/cancel`, {
-    method: 'POST',
+    method: "POST",
   });
 }
 
 /**
  * Get all user subscriptions (history)
  */
-export async function getUserSubscriptionHistory(userId: string): Promise<UserSubscription[]> {
+export async function getUserSubscriptionHistory(
+  userId: string
+): Promise<UserSubscription[]> {
   return apiRequest(`/api/subscriptions/user/${userId}/history`, {
-    method: 'GET',
+    method: "GET",
   });
 }
 
 /**
  * Helper function to check if user has active subscription
  */
-export function hasActiveSubscription(subscription: UserSubscription | null): boolean {
+export function hasActiveSubscription(
+  subscription: UserSubscription | null
+): boolean {
   if (!subscription) return false;
-  
+
   const now = new Date();
   const endDate = subscription.endDate ? new Date(subscription.endDate) : null;
-  
-  return subscription.status === 'active' && (!endDate || endDate > now);
+
+  return subscription.status === "active" && (!endDate || endDate > now);
 }
 
 /**
- * Helper function to get subscription plan by ID
+ * Helper function to find subscription plan by ID from a local array
  */
-export function getSubscriptionPlanById(planId: string, plans: SubscriptionPlan[]): SubscriptionPlan | null {
-  return plans.find(plan => plan.id === planId) || null;
+export function findSubscriptionPlanById(
+  planId: string,
+  plans: SubscriptionPlan[]
+): SubscriptionPlan | null {
+  return plans.find((plan) => plan.id === planId) || null;
 }

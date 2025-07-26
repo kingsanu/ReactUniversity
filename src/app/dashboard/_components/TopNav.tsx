@@ -1,14 +1,14 @@
 "use client";
-import { useState } from 'react';
-import { cn } from '@/lib/utils';
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 const topNavItems = [
-  { name: 'Dashboard', active: true },
-  { name: 'Analytics', active: false },
-  { name: 'Career Paths', active: false },
-  { name: 'Jobs & Internship', active: false },
-  { name: 'Learnings', active: false },
-  { name: 'Community & Netw..', active: false }
+  { name: "Dashboard", active: true },
+  { name: "Analytics", active: false },
+  { name: "Career Paths", active: false },
+  { name: "Jobs & Internship", active: false },
+  { name: "Learnings", active: false },
+  { name: "Community & Netw..", active: false },
 ];
 
 interface TopNavProps {
@@ -17,7 +17,7 @@ interface TopNavProps {
 }
 
 export function TopNav({ className, onMenuClick }: TopNavProps) {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   return (
     <header className={cn("bg-white border-b border-gray-200", className)}>
@@ -27,8 +27,18 @@ export function TopNav({ className, onMenuClick }: TopNavProps) {
           onClick={onMenuClick}
           className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
         >
-          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16M4 18h16"
+            />
           </svg>
         </button>
 
@@ -39,8 +49,8 @@ export function TopNav({ className, onMenuClick }: TopNavProps) {
               key={item.name}
               className={cn(
                 "text-sm font-medium pb-3 border-b-2 transition-colors",
-                item.active 
-                  ? "text-gray-900 border-blue-600" 
+                item.active
+                  ? "text-gray-900 border-blue-600"
                   : "text-gray-500 border-transparent hover:text-gray-700"
               )}
             >
@@ -54,8 +64,18 @@ export function TopNav({ className, onMenuClick }: TopNavProps) {
           {/* Search */}
           <div className="relative hidden sm:block">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              <svg
+                className="h-4 w-4 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
               </svg>
             </div>
             <input
@@ -69,15 +89,35 @@ export function TopNav({ className, onMenuClick }: TopNavProps) {
 
           {/* Mobile Search Button */}
           <button className="sm:hidden p-2 text-gray-400 hover:text-gray-500 transition-colors">
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
             </svg>
           </button>
 
           {/* Notifications */}
           <button className="p-2 text-gray-400 hover:text-gray-500 transition-colors">
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5-5-5h5zm0 0v-12a3 3 0 10-6 0v12" />
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 17h5l-5 5-5-5h5zm0 0v-12a3 3 0 10-6 0v12"
+              />
             </svg>
           </button>
 

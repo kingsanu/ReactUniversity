@@ -78,13 +78,20 @@ export async function redirectToStripeCheckout(
   userId: string
 ): Promise<void> {
   try {
+    // Ensure we have absolute URLs
+    const baseUrl = window.location.origin;
+    const successUrl = `${baseUrl}/payment-success?session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `${baseUrl}/payment-cancelled`;
+
+    console.log("🔗 Payment service URLs:", { successUrl, cancelUrl, baseUrl });
+
     const request: CreateCheckoutSessionRequest = {
       userId,
       amount,
       currency: "usd",
       productName,
-      successUrl: `${window.location.origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancelUrl: `${window.location.origin}/payment-cancelled`,
+      successUrl,
+      cancelUrl,
     };
 
     const response = await createCheckoutSession(request);

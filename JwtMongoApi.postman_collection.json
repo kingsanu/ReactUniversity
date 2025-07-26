@@ -415,13 +415,39 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/stripe/status/{{paymentIntentId}}",
+              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/stripe/status/{{sessionId}}",
               "protocol": "https",
               "host": [
                 "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
               ],
-              "path": ["api", "stripe", "status", "{{paymentIntentId}}"]
-            }
+              "path": ["api", "stripe", "status", "{{sessionId}}"]
+            },
+            "description": "Use either a PaymentIntent ID (pi_...) or a Checkout Session ID (cs_...) for sessionId."
+          }
+        },
+        {
+          "name": "Create Checkout Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"amount\": 2000,\n  \"currency\": \"usd\",\n  \"productName\": \"Resume Builder Premium\",\n  \"successUrl\": \"https://your-frontend-domain/payment-success?session_id={CHECKOUT_SESSION_ID}\",\n  \"cancelUrl\": \"https://your-frontend-domain/payment-cancelled\"\n}"
+            },
+            "url": {
+              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/stripe/create-checkout-session",
+              "protocol": "https",
+              "host": [
+                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "stripe", "create-checkout-session"]
+            },
+            "description": "Creates a Stripe Checkout Session. Use the returned sessionUrl to redirect the user to Stripe's hosted payment page."
           }
         },
         {
@@ -436,6 +462,102 @@
                 "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "stripe", "user", "{{userId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "SubscriptionPlan",
+      "item": [
+        {
+          "name": "Get All Subscription Plans",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/subscriptionplan",
+              "protocol": "https",
+              "host": [
+                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "subscriptionplan"]
+            }
+          }
+        },
+        {
+          "name": "Get Subscription Plan By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/subscriptionplan/{{subscriptionPlanId}}",
+              "protocol": "https",
+              "host": [
+                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "subscriptionplan", "{{subscriptionPlanId}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Subscription Plan",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Pro Plan\",\n  \"price\": 29.99,\n  \"interval\": \"monthly\",\n  \"features\": [\"Unlimited Projects\", \"Priority Support\"]\n}\n\n// Note: CreatedBy is set automatically from the authenticated user."
+            },
+            "url": {
+              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/subscriptionplan",
+              "protocol": "https",
+              "host": [
+                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "subscriptionplan"]
+            }
+          }
+        },
+        {
+          "name": "Update Subscription Plan",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Pro Plan Updated\",\n  \"price\": 39.99,\n  \"interval\": \"monthly\",\n  \"features\": [\"Unlimited Projects\", \"Priority Support\", \"Custom Reports\"],\n  \"isActive\": true\n}\n\n// Note: UpdatedBy is set automatically from the authenticated user."
+            },
+            "url": {
+              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/subscriptionplan/{{subscriptionPlanId}}",
+              "protocol": "https",
+              "host": [
+                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "subscriptionplan", "{{subscriptionPlanId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete (Deactivate) Subscription Plan",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": {
+              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/subscriptionplan/{{subscriptionPlanId}}",
+              "protocol": "https",
+              "host": [
+                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "subscriptionplan", "{{subscriptionPlanId}}"]
             }
           }
         }
@@ -467,6 +589,21 @@
       "key": "paymentIntentId",
       "value": "pi_your-payment-intent-id-here",
       "description": "Replace with actual payment intent ID for testing"
+    },
+    {
+      "key": "sessionId",
+      "value": "your-session-or-payment-intent-id-here",
+      "description": "Replace with actual PaymentIntent ID (pi_...) or Checkout Session ID (cs_...) for testing"
+    },
+    {
+      "key": "subscriptionPlanId",
+      "value": "your-subscription-plan-id-here",
+      "description": "Replace with actual subscription plan ID for testing"
+    },
+    {
+      "key": "jwtToken",
+      "value": "your-jwt-token-here",
+      "description": "Paste a valid JWT token here after login."
     }
   ]
 }

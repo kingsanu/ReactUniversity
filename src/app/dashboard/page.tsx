@@ -1,24 +1,22 @@
 "use client";
-import { useState } from 'react';
-import { Sidebar } from './_components/Sidebar';
-import { TopNav } from './_components/TopNav';
-import { ActionCards } from './_components/ActionCards';
-import { CompetencyChart } from './_components/CompetencyChart';
-import { OpportunitiesTable } from './_components/OpportunitiesTable';
-import { CareerMatches } from './_components/CareerMatches';
-import { ActivityChart } from './_components/ActivityChart';
-import { Benchmarks } from './_components/Benchmarks';
-import { Milestones } from './_components/Milestones';
+import { useState, useEffect } from "react";
+import { Sidebar } from "./_components/Sidebar";
+import { TopNav } from "./_components/TopNav";
+import { ActionCards } from "./_components/ActionCards";
+import { CompetencyChart } from "./_components/CompetencyChart";
+import { OpportunitiesTable } from "./_components/OpportunitiesTable";
+import { CareerMatches } from "./_components/CareerMatches";
+import { ActivityChart } from "./_components/ActivityChart";
+import { Benchmarks } from "./_components/Benchmarks";
+import { Milestones } from "./_components/Milestones";
+import "@/utils/adminTestUtils"; // Make admin test functions available globally
 
 export default function DashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="flex h-screen bg-gray-50">
-      <Sidebar
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-      />
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div className="flex-1 flex flex-col overflow-hidden lg:ml-0">
         <TopNav onMenuClick={() => setSidebarOpen(true)} />
@@ -33,7 +31,7 @@ export default function DashboardPage() {
             <div className="lg:col-span-2">
               <CompetencyChart />
             </div>
-            
+
             {/* Right: Career Matches */}
             <CareerMatches />
           </div>
