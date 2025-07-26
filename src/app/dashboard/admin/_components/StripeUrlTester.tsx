@@ -1,154 +1,205 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { debugStripeUrls, getSafeStripeUrls } from '@/utils/debugStripeUrls';
+import { useState } from "react";
+import { debugStripeUrls, getSafeStripeUrls } from "@/utils/debugStripeUrls";
 
 export default function StripeUrlTester() {
-  const [testResults, setTestResults] = useState<any>(nu);
+  const [testResults, setTestResults] = useState<any>(null);
   const [showTester, setShowTester] = useState(false);
 
   const runUrlTest = () => {
     try {
-      // Test current eent
-    ;
-;
-      
+      // Test current environment
+      const debugInfo = debugStripeUrls();
+      const safeUrls = getSafeStripeUrls();
+
       const results = {
-,
-        d
+        success: true,
+        debugInfo,
         safeUrls,
-onment: {
+        environment: {
           NODE_ENV: process.env.NODE_ENV,
           NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL,
-         SR)',
-          windowLocation:R)'
-        }
+          windowOrigin:
+            typeof window !== "undefined"
+              ? window.location.origin
+              : "N/A (SSR)",
+          windowLocation:
+            typeof window !== "undefined" ? window.location.href : "N/A (SSR)",
+        },
       };
-      
-      setTeslts);
+
+      setTestResults(results);
     } catch (error) {
       setTestResults({
         success: false,
-        error: error instancor',
+        error: error instanceof Error ? error.message : "Unknown error",
         environment: {
-          NODE_ENV: pro
-          NEXT_PUBLIC_
-          win',
-         
-        
-    });
+          NODE_ENV: process.env.NODE_ENV,
+          NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL,
+          windowOrigin:
+            typeof window !== "undefined"
+              ? window.location.origin
+              : "N/A (SSR)",
+          windowLocation:
+            typeof window !== "undefined" ? window.location.href : "N/A (SSR)",
+        },
+      });
     }
   };
 
   if (!showTester) {
     return (
-      <
->
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+        <div className="flex items-center justify-between">
           <div>
             <h3 className="font-medium text-yellow-900 mb-1">
               🔗 Stripe URL Tester
             </h3>
-            <p className="-700">
-              Test Stripe checkout URL generation to debug paymenssues
+            <p className="text-sm text-yellow-700">
+              Test Stripe checkout URL generation to debug payment issues
             </p>
           </div>
-     on
-    e)}
-text-sm"
+          <button
+            onClick={() => setShowTester(true)}
+            className="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition-colors text-sm"
           >
             Test URLs
           </button>
-div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div cl-6">
-      <div className="mb-6">
+    <div className="bg-white rounded-lg shadow p-6 mb-6">
+      <div className="flex items-center justify-between mb-6">
         <div>
-3>
-          <p clas
-            Debug Stripe checkout URL genn
+          <h3 className="text-lg font-semibold mb-2">Stripe URL Tester</h3>
+          <p className="text-gray-600 text-sm">
+            Debug Stripe checkout URL generation
           </p>
-        </dv>
+        </div>
         <button
-          onClick={e)}
-          clas"
-      >
-          <svg className4">
-            <p/>
+          onClick={() => setShowTester(false)}
+          className="text-gray-400 hover:text-gray-600"
+        >
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       </div>
 
       <div className="space-y-4">
         <button
-          onCli
-          c"
+          onClick={runUrlTest}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
         >
-          Run UR
-        </>
+          Run URL Test
+        </button>
 
         {testResults && (
           <div className="mt-6">
             <h4 className="font-medium mb-3">Test Results:</h4>
-            
+
             {testResults.success ? (
-              <div
-                
-          
-            700">
-          p>
-    >
- }</p>
+              <div className="space-y-4">
+                <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <h5 className="font-medium text-green-800 mb-2">
+                    ✅ URLs Generated Successfully
+                  </h5>
+                  <div className="text-sm text-green-700">
+                    <p>
+                      <strong>Success URL:</strong>{" "}
+                      {testResults.safeUrls.successUrl}
+                    </p>
+                    <p>
+                      <strong>Cancel URL:</strong>{" "}
+                      {testResults.safeUrls.cancelUrl}
+                    </p>
+                    <p>
+                      <strong>Base URL:</strong> {testResults.safeUrls.baseUrl}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                <h5 className="font-medium text-red-800 mb-2">
+                  ❌ URL Generation Failed
+                </h5>
+                <p className="text-sm text-red-700">{testResults.error}</p>
+              </div>
+            )}
 
-}v>
-  );v>
-    </di</di    
-    </div>     /div>
-         <
-  </ul>   
-         ble</li>s accessient URL iyour deploym<li>Verify        li>
-       col</to/ proudes https:/ inclthe domainure  <li>Make s            /li>
- ectly<set corrBASE_URL is UBLIC_API_e NEXT_Pur     <li>Ens         tion)</li>
-produchost for t localr domain (no on a propee runningat you'rk th <li>Chec            
- ">y-1 space-inside ml-4disc list-list-sName="l clas    <u      >
-  strong></pvalid:</s are inRLg>If U   <p><stron         -2">
-700 space-ytext-blue-sm Name="text-v class     <di5>
-     Fixes</hick ">💡 Que-800 mb-2lutext-bont-medium e="fssNam    <h5 cla      ">
-lgounded-blue-200 rrder border-e-50 bo4 bg-blu"mt-6 p-e=div classNam}
-        < Fixes */* Quick
-        {/}
-       )  </div>
- 
-                )}ails>
-    et     </d
-               </pre>          l, 2)}
-ul, nInfos.debuglttestResuingify(   {JSON.str       ">
-        autoow-x-fl overmt-2-700 luetext-bext-xs ="te className      <pr
-          s</summary>ebug Detailpointer">Drsor-0 cue-80ext-blu tediumont-mme="fclassNammary      <su          >
- d-lg" rounder-blue-200border borde-50 g-blue b"p-4e=lassNamls ctai     <de   && (
-      fo .debugIntResultstes         {/}
-    Info */* Debug    {
+            {/* Environment Info */}
+            <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+              <h5 className="font-medium text-gray-800 mb-2">
+                Environment Info
+              </h5>
+              <div className="text-sm text-gray-600 space-y-1">
+                <p>
+                  <strong>NODE_ENV:</strong> {testResults.environment.NODE_ENV}
+                </p>
+                <p>
+                  <strong>NEXT_PUBLIC_API_BASE_URL:</strong>{" "}
+                  {testResults.environment.NEXT_PUBLIC_API_BASE_URL ||
+                    "Not set"}
+                </p>
+                <p>
+                  <strong>Window Origin:</strong>{" "}
+                  {testResults.environment.windowOrigin}
+                </p>
+                <p>
+                  <strong>Current Location:</strong>{" "}
+                  {testResults.environment.windowLocation}
+                </p>
+              </div>
+            </div>
 
-        iv></d       div>
-            </    }</p>
-   ndowLocation.wiironmentesults.envtestRong> {</str Location:rentstrong>Cur     <p><       
-    Origin}</p>nment.windownviroResults.e {testin:</strong>rigindow O><strong>W <p        
-       p>ot set'}</E_URL || 'NBLIC_API_BASent.NEXT_PUronmenviResults.testong> {trURL:</s_BASE__PUBLIC_APIong>NEXTp><str  <            /p>
-  ODE_ENV}<ronment.Nvits.en{testResulV:</strong> g>NODE_ENtron    <p><s            -y-1">
-00 spaceray-6xt-sm text-g"tesName=  <div clas       5>
-     t Info</hronmen">Envi00 mb-2t-gray-8text-medium ame="fon<h5 classN              -lg">
-roundedr-gray-200 rdeborder g-gray-50 boe="p-4 blassNam  <div c        /}
-  ment Info * Environ     {/*
-          )}
+            {/* Debug Info */}
+            {testResults.debugInfo && (
+              <details className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <summary className="font-medium text-blue-800 cursor-pointer">
+                  Debug Details
+                </summary>
+                <pre className="text-xs text-blue-700 mt-2 overflow-x-auto">
+                  {JSON.stringify(testResults.debugInfo, null, 2)}
+                </pre>
+              </details>
+            )}
+          </div>
+        )}
 
-         div> </         /p>
-    s.error}<ult">{testResext-red-700-sm txte="te<p classNam               ed</h5>
- on FailRL Generatib-2">❌ U00 mm text-red-8"font-mediuame=lassN       <h5 c      
-   g">00 rounded-l-red-2erorder bordg-red-50 b4 bName="p-class     <div    
-         ) : (         div>
-    </         div>
-     </          iv>
-   </d                 
+        {/* Quick Fixes */}
+        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <h5 className="font-medium text-blue-800 mb-2">💡 Quick Fixes</h5>
+          <div className="text-sm text-blue-700 space-y-2">
+            <p>
+              <strong>If URLs are invalid:</strong>
+            </p>
+            <ul className="list-disc list-inside ml-4 space-y-1">
+              <li>
+                Check that you're running on a proper domain (not localhost for
+                production)
+              </li>
+              <li>Ensure NEXT_PUBLIC_API_BASE_URL is set correctly</li>
+              <li>Make sure the domain includes https:// protocol</li>
+              <li>Verify your deployment URL is accessible</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
