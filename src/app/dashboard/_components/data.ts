@@ -241,6 +241,12 @@ export const sidebarData = {
       ],
     },
     {
+      id: "assessments",
+      name: "Assessments",
+      icon: "assessments",
+      path: "/dashboard/assessments",
+    },
+    {
       id: "subscriptions",
       name: "Subscriptions",
       icon: "subscriptions",

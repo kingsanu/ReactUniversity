@@ -9,6 +9,7 @@ import { CareerMatches } from "./_components/CareerMatches";
 import { ActivityChart } from "./_components/ActivityChart";
 import { Benchmarks } from "./_components/Benchmarks";
 import { Milestones } from "./_components/Milestones";
+import { PCAResults } from "./_components/PCAResults";
 import "@/utils/adminTestUtils"; // Make admin test functions available globally
 
 export default function DashboardPage() {
@@ -32,8 +33,14 @@ export default function DashboardPage() {
               <CompetencyChart />
             </div>
 
-            {/* Right: Career Matches */}
-            <CareerMatches />
+            {/* Right Column */}
+            <div className="space-y-6">
+              {/* PCA Results */}
+              <PCAResults />
+
+              {/* Career Matches */}
+              <CareerMatches />
+            </div>
           </div>
 
           {/* Opportunities Table */}

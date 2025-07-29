@@ -13,6 +13,7 @@ const IconMap = {
   career: "📋",
   opportunities: "💼",
   learning: "🎓",
+  assessments: "📝",
   subscriptions: "💳",
 };
 
