@@ -1,7 +1,7 @@
-import { motion } from 'motion/react';
-import { dashboardData } from './data';
-import { cn } from '@/lib/utils';
-import Link from 'next/link';
+import { motion } from "motion/react";
+import { dashboardData } from "./data";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 interface ActionCardsProps {
   className?: string;
@@ -11,7 +11,12 @@ export function ActionCards({ className }: ActionCardsProps) {
   const { actionCards } = dashboardData;
 
   return (
-    <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4", className)}>
+    <div
+      className={cn(
+        "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4",
+        className
+      )}
+    >
       {actionCards.map((card, index) => (
         <motion.div
           key={card.id}
@@ -23,14 +28,24 @@ export function ActionCards({ className }: ActionCardsProps) {
           {/* Badge */}
           {card.badge && (
             <div className="absolute -top-2 -right-2">
-              <span className="bg-purple-600 text-white text-xs px-2 py-1 rounded-full font-medium">
+              <span
+                className={cn(
+                  "text-white text-xs px-2 py-1 rounded-full font-medium",
+                  card.id === 1 ? "bg-green-600" : "bg-purple-600"
+                )}
+              >
                 {card.badge}
               </span>
             </div>
           )}
 
           {/* Icon */}
-          <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-3">
+          <div
+            className={cn(
+              "w-12 h-12 rounded-lg flex items-center justify-center mb-3",
+              card.id === 1 ? "bg-blue-100" : "bg-gray-100"
+            )}
+          >
             <span className="text-2xl">{card.icon}</span>
           </div>
 
@@ -45,7 +60,7 @@ export function ActionCards({ className }: ActionCardsProps) {
             <button
               className={cn(
                 "w-full py-2 px-3 rounded-md text-sm font-medium transition-colors",
-                card.variant === 'primary'
+                card.variant === "primary"
                   ? "bg-blue-600 text-white hover:bg-blue-700"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               )}

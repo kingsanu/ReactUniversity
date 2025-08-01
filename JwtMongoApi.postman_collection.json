@@ -94,6 +94,30 @@
               "path": ["authapi", "change-role"]
             }
           }
+        },
+        {
+          "name": "Activate All Members",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/authapi/activate-all-members",
+              "protocol": "https",
+              "host": [
+                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["authapi", "activate-all-members"]
+            }
+          }
         }
       ]
     },
@@ -464,6 +488,30 @@
               "path": ["api", "stripe", "user", "{{userId}}"]
             }
           }
+        },
+        {
+          "name": "Activate All Payments",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/payment/activate-all-payments",
+              "protocol": "https",
+              "host": [
+                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "payment", "activate-all-payments"]
+            }
+          }
         }
       ]
     },
@@ -562,6 +610,682 @@
           }
         }
       ]
+    },
+    {
+      "name": "UserSubscription",
+      "item": [
+        {
+          "name": "Get All User Subscriptions",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": {
+              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/usersubscription",
+              "protocol": "https",
+              "host": [
+                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "usersubscription"]
+            }
+          }
+        },
+        {
+          "name": "Get User Subscription By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": {
+              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/usersubscription/{{userSubscriptionId}}",
+              "protocol": "https",
+              "host": [
+                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "usersubscription", "{{userSubscriptionId}}"]
+            }
+          }
+        },
+        {
+          "name": "Create User Subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"planId\": \"{{subscriptionPlanId}}\",\n  \"nextBillingDate\": \"2024-08-01T00:00:00Z\"\n}\n\n// Note: UserId is set automatically from the authenticated user."
+            },
+            "url": {
+              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/usersubscription",
+              "protocol": "https",
+              "host": [
+                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "usersubscription"]
+            }
+          }
+        },
+        {
+          "name": "Update User Subscription",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"active\",\n  \"nextBillingDate\": \"2024-09-01T00:00:00Z\"\n}\n\n// Note: UserId and UpdatedBy are set automatically from the authenticated user."
+            },
+            "url": {
+              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/usersubscription/{{userSubscriptionId}}",
+              "protocol": "https",
+              "host": [
+                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "usersubscription", "{{userSubscriptionId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete (Deactivate) User Subscription",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": {
+              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/usersubscription/{{userSubscriptionId}}",
+              "protocol": "https",
+              "host": [
+                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "usersubscription", "{{userSubscriptionId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "PCAModule",
+      "item": [
+        {
+          "name": "PCA Authenticate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"CoKey\": \"8A38EEAA-9B94-474D-BE6A-0AB193DDD98D\"\n}"
+            },
+            "url": {
+              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/pcaapi/authenticate",
+              "protocol": "https",
+              "host": [
+                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "pcaapi", "authenticate"]
+            },
+            "description": "Authenticate with the PCA service using the Nexa Developments account code"
+          }
+        },
+        {
+          "name": "Add PCA Evaluation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"CoKey\": \"NXDAPS\",\n  \"PerNom\": \"John\",\n  \"PerApe\": \"Doe\",\n  \"PerNumIde\": \"12345678\",\n  \"PerGen\": \"M\",\n  \"permail\": \"john.doe@example.com\",\n  \"JcaCod\": \"GTCML\",\n  \"BillingCenter\": \"\",\n  \"UserMail\": \"admin@example.com\"\n}"
+            },
+            "url": {
+              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/pcaapi/add-evaluation",
+              "protocol": "https",
+              "host": [
+                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "pcaapi", "add-evaluation"]
+            },
+            "description": "Add a new PCA evaluation. Use NXDAPS for Spanish or NXDAPI for English format"
+          }
+        },
+        {
+          "name": "Get PCA Result",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"CoKey\": \"8A38EEAA-9B94-474D-BE6A-0AB193DDD98D\",\n  \"PcaCod\": \"{{pcaCode}}\"\n}"
+            },
+            "url": {
+              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/pcaapi/get-result",
+              "protocol": "https",
+              "host": [
+                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "pcaapi", "get-result"]
+            },
+            "description": "Get PCA result by PCA code"
+          }
+        },
+        {
+          "name": "Get PCA Competences",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"CoKey\": \"8A38EEAA-9B94-474D-BE6A-0AB193DDD98D\",\n  \"PcaCod\": \"{{pcaCode}}\",\n  \"CmpTims\": \"1\"\n}"
+            },
+            "url": {
+              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/pcaapi/get-competences",
+              "protocol": "https",
+              "host": [
+                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "pcaapi", "get-competences"]
+            },
+            "description": "Get PCA competences. Use CmpTims=1 for TIMS or CmpTims=0 for ORG"
+          }
+        },
+        {
+          "name": "Get PCA vs JCA Analysis",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"CoKey\": \"8A38EEAA-9B94-474D-BE6A-0AB193DDD98D\",\n  \"PcaCod\": \"{{pcaCode}}\",\n  \"JcaCodExt\": \"GTCML\",\n  \"AnlsTip\": \"g\"\n}"
+            },
+            "url": {
+              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/pcaapi/get-pca-vs-jca",
+              "protocol": "https",
+              "host": [
+                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "pcaapi", "get-pca-vs-jca"]
+            },
+            "description": "Get PCA vs JCA gap analysis. JCA codes: GTCML (Gerente Comercial), ASCML (Asesor Comercial), GEFCR (Gerente Financiero)"
+          }
+        },
+        {
+          "name": "Get JCA Codes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/pcaapi/jca-codes",
+              "protocol": "https",
+              "host": [
+                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "pcaapi", "jca-codes"]
+            },
+            "description": "Get available JCA codes and language options for PCA evaluations"
+          }
+        },
+        {
+          "name": "PCA Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/pcaapi/health",
+              "protocol": "https",
+              "host": [
+                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "pcaapi", "health"]
+            },
+            "description": "Health check for PCA service"
+          }
+        }
+      ]
+    },
+    {
+      "name": "PCA Exam",
+      "item": [
+        {
+          "name": "Get All Exams",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams",
+              "protocol": "https",
+              "host": [
+                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "PCAExam", "exams"]
+            },
+            "description": "Get all available PCA exams with metadata"
+          }
+        },
+        {
+          "name": "Pattern Recognition Exam",
+          "item": [
+            {
+              "name": "Get Pattern Recognition Exam",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/pattern-recognition-001",
+                  "protocol": "https",
+                  "host": [
+                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "PCAExam", "exams", "pattern-recognition-001"]
+                },
+                "description": "Get Pattern Recognition exam with 60 questions"
+              }
+            },
+            {
+              "name": "Start Pattern Recognition Exam",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/pattern-recognition-001/start",
+                  "protocol": "https",
+                  "host": [
+                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": [
+                    "api",
+                    "PCAExam",
+                    "exams",
+                    "pattern-recognition-001",
+                    "start"
+                  ]
+                },
+                "description": "Start Pattern Recognition exam session"
+              }
+            },
+            {
+              "name": "Get Pattern Recognition Instructions",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/pattern-recognition-001/instructions",
+                  "protocol": "https",
+                  "host": [
+                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": [
+                    "api",
+                    "PCAExam",
+                    "exams",
+                    "pattern-recognition-001",
+                    "instructions"
+                  ]
+                },
+                "description": "Get Pattern Recognition exam instructions and examples"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Verbal Reasoning Exam",
+          "item": [
+            {
+              "name": "Get Verbal Reasoning Exam",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/verbal-reasoning-001",
+                  "protocol": "https",
+                  "host": [
+                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "PCAExam", "exams", "verbal-reasoning-001"]
+                },
+                "description": "Get Verbal Reasoning exam with 50 questions"
+              }
+            },
+            {
+              "name": "Start Verbal Reasoning Exam",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/verbal-reasoning-001/start",
+                  "protocol": "https",
+                  "host": [
+                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": [
+                    "api",
+                    "PCAExam",
+                    "exams",
+                    "verbal-reasoning-001",
+                    "start"
+                  ]
+                },
+                "description": "Start Verbal Reasoning exam session"
+              }
+            },
+            {
+              "name": "Get Verbal Reasoning Instructions",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/verbal-reasoning-001/instructions",
+                  "protocol": "https",
+                  "host": [
+                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": [
+                    "api",
+                    "PCAExam",
+                    "exams",
+                    "verbal-reasoning-001",
+                    "instructions"
+                  ]
+                },
+                "description": "Get Verbal Reasoning exam instructions and examples"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Numeric Velocity Exam",
+          "item": [
+            {
+              "name": "Get Numeric Velocity Exam",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/numeric-velocity-001",
+                  "protocol": "https",
+                  "host": [
+                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "PCAExam", "exams", "numeric-velocity-001"]
+                },
+                "description": "Get Numeric Velocity exam with 60 questions"
+              }
+            },
+            {
+              "name": "Start Numeric Velocity Exam",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/numeric-velocity-001/start",
+                  "protocol": "https",
+                  "host": [
+                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": [
+                    "api",
+                    "PCAExam",
+                    "exams",
+                    "numeric-velocity-001",
+                    "start"
+                  ]
+                },
+                "description": "Start Numeric Velocity exam session"
+              }
+            },
+            {
+              "name": "Get Numeric Velocity Instructions",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/numeric-velocity-001/instructions",
+                  "protocol": "https",
+                  "host": [
+                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": [
+                    "api",
+                    "PCAExam",
+                    "exams",
+                    "numeric-velocity-001",
+                    "instructions"
+                  ]
+                },
+                "description": "Get Numeric Velocity exam instructions and examples"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Generic Exam Endpoints",
+          "item": [
+            {
+              "name": "Get Exam By ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/{{examId}}",
+                  "protocol": "https",
+                  "host": [
+                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "PCAExam", "exams", "{{examId}}"]
+                },
+                "description": "Get specific exam with all questions. Available exam IDs: pattern-recognition-001, verbal-reasoning-001, working-memory-001, numeric-velocity-001, visual-rotation-001"
+              }
+            },
+            {
+              "name": "Start Exam",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/{{examId}}/start",
+                  "protocol": "https",
+                  "host": [
+                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "PCAExam", "exams", "{{examId}}", "start"]
+                },
+                "description": "Start an exam session. Returns exam data with start timestamp. Available exam IDs: pattern-recognition-001, verbal-reasoning-001, working-memory-001, numeric-velocity-001, visual-rotation-001"
+              }
+            },
+            {
+              "name": "Get Exam Instructions",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/{{examId}}/instructions",
+                  "protocol": "https",
+                  "host": [
+                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": [
+                    "api",
+                    "PCAExam",
+                    "exams",
+                    "{{examId}}",
+                    "instructions"
+                  ]
+                },
+                "description": "Get detailed instructions and examples for the exam. Available exam IDs: pattern-recognition-001, verbal-reasoning-001, working-memory-001, numeric-velocity-001, visual-rotation-001"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Exam Completion & Scoring",
+          "item": [
+            {
+              "name": "Submit Exam",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"examId\": \"pattern-recognition-001\",\n  \"userId\": \"{{userId}}\",\n  \"startTime\": \"2024-01-15T10:00:00Z\",\n  \"endTime\": \"2024-01-15T10:03:00Z\",\n  \"isTimeExpired\": false,\n  \"answers\": [\n    {\n      \"questionNumber\": 1,\n      \"selectedAnswer\": \"3\",\n      \"isAnswered\": true,\n      \"timeSpent\": \"00:00:30\"\n    },\n    {\n      \"questionNumber\": 2,\n      \"selectedAnswer\": \"2\",\n      \"isAnswered\": true,\n      \"timeSpent\": \"00:00:45\"\n    },\n    {\n      \"questionNumber\": 3,\n      \"selectedAnswer\": \"1\",\n      \"isAnswered\": true,\n      \"timeSpent\": \"00:00:20\"\n    }\n  ]\n}"
+                },
+                "url": {
+                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/submit",
+                  "protocol": "https",
+                  "host": [
+                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "PCAExam", "submit"]
+                },
+                "description": "Submit exam answers and get immediate scoring results. Returns detailed breakdown of correct/incorrect answers, score percentage, and accuracy."
+              }
+            },
+            {
+              "name": "Complete Exam (Time Expired)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"examId\": \"pattern-recognition-001\",\n  \"userId\": \"{{userId}}\",\n  \"startTime\": \"2024-01-15T10:00:00Z\",\n  \"endTime\": \"2024-01-15T10:03:00Z\",\n  \"isTimeExpired\": true,\n  \"isCompleted\": false,\n  \"answers\": [\n    {\n      \"questionNumber\": 1,\n      \"selectedAnswer\": \"3\",\n      \"isAnswered\": true,\n      \"timeSpent\": \"00:00:30\"\n    },\n    {\n      \"questionNumber\": 2,\n      \"selectedAnswer\": \"2\",\n      \"isAnswered\": true,\n      \"timeSpent\": \"00:00:45\"\n    }\n  ]\n}"
+                },
+                "url": {
+                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/complete",
+                  "protocol": "https",
+                  "host": [
+                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "PCAExam", "complete"]
+                },
+                "description": "Complete exam when time expires automatically. Used for auto-submission scenarios."
+              }
+            },
+            {
+              "name": "Get Exam Session Status",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/session/{{sessionId}}",
+                  "protocol": "https",
+                  "host": [
+                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "PCAExam", "session", "{{sessionId}}"]
+                },
+                "description": "Get current session status and time remaining. Useful for checking if exam is still active."
+              }
+            },
+            {
+              "name": "Get User Exam History",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/history/{{userId}}",
+                  "protocol": "https",
+                  "host": [
+                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "PCAExam", "history", "{{userId}}"]
+                },
+                "description": "Get user's completed exam history with scores and performance data."
+              }
+            },
+            {
+              "name": "Get Exam Statistics",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/statistics/{{examId}}",
+                  "protocol": "https",
+                  "host": [
+                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "PCAExam", "statistics", "{{examId}}"]
+                },
+                "description": "Get comprehensive statistics for a specific exam including:\n- Overall statistics (total attempts, completion rates)\n- Score analysis (average, highest, lowest, median, standard deviation)\n- Time analysis (average time spent, fastest/slowest completion)\n- Accuracy statistics\n- Performance trends (monthly/weekly)\n- Score distribution\n- Recent attempts\n- Question analysis"
+              }
+            }
+          ]
+        }
+      ]
     }
   ],
   "variable": [
@@ -604,6 +1328,26 @@
       "key": "jwtToken",
       "value": "your-jwt-token-here",
       "description": "Paste a valid JWT token here after login."
+    },
+    {
+      "key": "userSubscriptionId",
+      "value": "your-user-subscription-id-here",
+      "description": "Replace with actual user subscription ID for testing"
+    },
+    {
+      "key": "pcaCode",
+      "value": "your-pca-code-here",
+      "description": "Replace with actual PCA code returned from add-evaluation"
+    },
+    {
+      "key": "examId",
+      "value": "pattern-recognition-001",
+      "description": "Available exam IDs: pattern-recognition-001, verbal-reasoning-001, working-memory-001, numeric-velocity-001, visual-rotation-001"
+    },
+    {
+      "key": "sessionId",
+      "value": "your-session-id-here",
+      "description": "Replace with actual exam session ID for testing"
     }
   ]
 }

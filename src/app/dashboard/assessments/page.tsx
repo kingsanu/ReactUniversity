@@ -20,27 +20,91 @@ export default function AssessmentsPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Breadcrumb */}
+        <nav className="flex mb-6" aria-label="Breadcrumb">
+          <ol className="inline-flex items-center space-x-1 md:space-x-3">
+            <li className="inline-flex items-center">
+              <a
+                href="/dashboard"
+                className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600"
+              >
+                <svg
+                  className="w-4 h-4 mr-2"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                </svg>
+                Dashboard
+              </a>
+            </li>
+            <li>
+              <div className="flex items-center">
+                <svg
+                  className="w-6 h-6 text-gray-400"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2">
+                  Assessments
+                </span>
+              </div>
+            </li>
+          </ol>
+        </nav>
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Assessments</h1>
-          <p className="text-gray-600">
-            Complete your professional assessments to unlock insights about your
-            competencies and career path
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-4"
+          >
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg
+                className="w-8 h-8 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                />
+              </svg>
+            </div>
+          </motion.div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Professional Assessments
+          </h1>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Complete your professional assessments to unlock personalized
+            insights about your competencies, cognitive abilities, and ideal
+            career path. Each assessment provides valuable data for your
+            professional development.
           </p>
         </div>
 
         {/* Development Test Button */}
         {process.env.NODE_ENV === "development" && <PCATestButton />}
 
-        {/* User Info Card */}
-        {user.name && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8"
-          >
+        {/* Progress Overview */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-6 mb-8"
+        >
+          <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <div className="bg-blue-100 rounded-lg p-3 mr-4">
+              <div className="bg-white rounded-lg p-3 mr-4 shadow-sm">
                 <svg
                   className="w-6 h-6 text-blue-600"
                   fill="none"
@@ -51,21 +115,50 @@ export default function AssessmentsPage() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
               </div>
               <div>
-                <h3 className="font-medium text-blue-900">
-                  Ready to start, {user.name.split(" ")[0]}!
+                <h3 className="font-semibold text-gray-900 mb-1">
+                  {user.name
+                    ? `Welcome back, ${user.name.split(" ")[0]}!`
+                    : "Welcome!"}
                 </h3>
-                <p className="text-sm text-blue-700">
-                  Your profile information will be used for the assessments
+                <p className="text-sm text-gray-600">
+                  Complete all assessments to unlock your full professional
+                  profile
                 </p>
               </div>
             </div>
-          </motion.div>
-        )}
+            <div className="text-right">
+              <div className="text-2xl font-bold text-blue-600">
+                {pcaStatus === "completed" ? "1" : "0"}/3
+              </div>
+              <div className="text-xs text-gray-500">Completed</div>
+            </div>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="mt-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-gray-700">
+                Overall Progress
+              </span>
+              <span className="text-sm text-gray-600">
+                {Math.round(((pcaStatus === "completed" ? 1 : 0) / 3) * 100)}%
+              </span>
+            </div>
+            <div className="w-full bg-white rounded-full h-2 shadow-inner">
+              <div
+                className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-500"
+                style={{
+                  width: `${((pcaStatus === "completed" ? 1 : 0) / 3) * 100}%`,
+                }}
+              />
+            </div>
+          </div>
+        </motion.div>
 
         {/* Assessment Cards */}
         <div className="space-y-6">
@@ -138,24 +231,21 @@ export default function AssessmentsPage() {
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
                 <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                  2. MIL
+                  2. Labor Intelligence Measurement (MIL)
                 </h2>
                 <p className="text-gray-600 mb-6">
-                  Conduct internal assessment of logical reasoning and
-                  problem-solving capabilities.
+                  Assess your cognitive abilities through pattern recognition,
+                  verbal reasoning, and problem-solving tasks
                 </p>
               </div>
-              <span className="bg-gray-100 text-gray-600 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                Coming Soon
-              </span>
             </div>
 
-            <button
-              disabled
-              className="w-full bg-gray-400 text-white py-3 px-6 rounded-lg cursor-not-allowed font-medium"
+            <a
+              href="/dashboard/assessments/mil"
+              className="inline-flex items-center justify-center w-full bg-purple-600 text-white py-3 px-6 rounded-lg hover:bg-purple-700 transition-colors font-medium"
             >
-              Start MIL
-            </button>
+              Start MIL Assessment
+            </a>
           </motion.div>
 
           {/* 3. 360 Evaluation */}
@@ -220,10 +310,10 @@ export default function AssessmentsPage() {
             <div>
               <h4 className="font-medium text-gray-900 mb-2">MIL Assessment</h4>
               <ul className="text-gray-600 space-y-1">
-                <li>• Logical reasoning test</li>
-                <li>• Problem-solving focus</li>
-                <li>• Internal assessment</li>
-                <li>• Coming soon</li>
+                <li>• 5 cognitive subtests</li>
+                <li>• Pattern recognition & reasoning</li>
+                <li>• 15-20 minutes total</li>
+                <li>• Available now</li>
               </ul>
             </div>
             <div>

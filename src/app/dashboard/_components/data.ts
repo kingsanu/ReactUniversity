@@ -30,15 +30,25 @@ export const dashboardData = {
   actionCards: [
     {
       id: 1,
+      title: "Start Assessment",
+      subtitle: "Complete your evaluations",
+      icon: "🧠",
+      action: "Begin Assessment",
+      link: "/dashboard/assessments",
+      variant: "primary",
+      badge: "RECOMMENDED",
+    },
+    {
+      id: 2,
       title: "Start Course",
       subtitle: "Go to catalog",
       icon: "📚",
       action: "Browse Courses",
       link: "/dashboard/learning/courses",
-      variant: "primary",
+      variant: "secondary",
     },
     {
-      id: 2,
+      id: 3,
       title: "Build Resume",
       subtitle: "Create with AI assistance",
       icon: "📄",
@@ -46,15 +56,6 @@ export const dashboardData = {
       link: "/dashboard/resume-builder",
       variant: "secondary",
       badge: "WITH AI",
-    },
-    {
-      id: 3,
-      title: "Link Profile",
-      subtitle: "Connect your accounts",
-      icon: "🔗",
-      action: "Connect Now",
-      link: "/dashboard/profile/connect",
-      variant: "secondary",
     },
     {
       id: 4,

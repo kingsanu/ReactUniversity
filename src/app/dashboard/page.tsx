@@ -10,7 +10,9 @@ import { ActivityChart } from "./_components/ActivityChart";
 import { Benchmarks } from "./_components/Benchmarks";
 import { Milestones } from "./_components/Milestones";
 import { PCAResults } from "./_components/PCAResults";
+import { MILResults } from "./_components/MILResults";
 import "@/utils/adminTestUtils"; // Make admin test functions available globally
+import "@/utils/milTestUtils"; // Make MIL test functions available globally
 
 export default function DashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -37,6 +39,9 @@ export default function DashboardPage() {
             <div className="space-y-6">
               {/* PCA Results */}
               <PCAResults />
+
+              {/* MIL Results */}
+              <MILResults />
 
               {/* Career Matches */}
               <CareerMatches />
