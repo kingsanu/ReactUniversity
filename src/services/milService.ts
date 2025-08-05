@@ -15,9 +15,14 @@ export interface MILQuestion {
     middleLetterIndex?: number | null;
     numbers?: number[] | null;
     figurePairs?: any[] | null;
+    letterSequence?: {
+      letters: string[];
+      outerLetters: string[];
+      middleLetter: string;
+    } | null;
   };
   explanation: string;
-  correctAnswer?: number; // Index of the correct answer
+  correctAnswer?: number | string; // Index of the correct answer or actual value (for letters/numbers)
 }
 
 export interface MILExam {
