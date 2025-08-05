@@ -736,6 +736,7 @@ export default function MILPracticeExamples({
                     if (
                       currentQ.data.options &&
                       currentQ.correctAnswer !== undefined &&
+                      typeof currentQ.correctAnswer === 'number' &&
                       currentQ.data.options[currentQ.correctAnswer]
                     ) {
                       return `"${
