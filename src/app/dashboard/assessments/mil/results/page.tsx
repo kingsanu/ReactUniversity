@@ -82,7 +82,7 @@ export default function MILResultsPage() {
           className="text-center mb-8"
         >
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            MIL Assessment Results
+            LIA Assessment Results
           </h1>
           <p className="text-gray-600">
             Your Labor Intelligence Measurement assessment is{" "}

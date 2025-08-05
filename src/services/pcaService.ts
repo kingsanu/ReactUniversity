@@ -258,4 +258,10 @@ export const JCA_CODES = {
   GEFCR: "Gerente Financiero",
 } as const;
 
+export const JCA_CODES_ENGLISH = {
+  GTCML: "Commercial Manager",
+  ASCML: "Commercial Advisor",
+  GEFCR: "Financial Manager",
+} as const;
+
 export type JCACode = keyof typeof JCA_CODES;

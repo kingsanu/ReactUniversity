@@ -97,7 +97,7 @@ export default function MILAssessmentPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading MIL Assessment...</p>
+          <p className="text-gray-600">Loading LIA Assessment...</p>
         </div>
       </div>
     );
@@ -140,8 +140,8 @@ export default function MILAssessmentPage() {
   // Overview Screen
   if (currentStep === "overview") {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -165,10 +165,10 @@ export default function MILAssessmentPage() {
                 </svg>
               </div>
               <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                Labor Intelligence Measurement (MIL)
+                Labor Intelligence Assessment (LIA)
               </h1>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                The MIL assesses your ability to learn and adapt to new
+                The LIA assesses your ability to learn and adapt to new
                 situations through various cognitive tasks.
               </p>
             </div>

@@ -20,210 +20,205 @@ export default function PCAResultsPanel({
 }: PCAResultsPanelProps) {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<any>(null);
+  const [competences, setCompetences] = useState<any>(null);
+  const [analysis, setAnalysis] = useState<any>(null);
   const [selectedJCA, setSelectedJCA] = useState<JCACode>("GTCML");
-  const [activeTab, setActiveTab] = useState<"results" | "competences" | "gap">(
-    "results"
-  );
+  const [activeTab, setActiveTab] = useState<
+    "results" | "competences" | "analysis"
+  >("results");
 
-  const handleGetResults = async () => {
+  const loadResults = async () => {
     setLoading(true);
     try {
       const data = await getPCAResult(pcaCod);
       setResults(data);
-      console.log("PCA Results:", data);
     } catch (error) {
-      console.error("Error getting PCA results:", error);
-      setResults({
-        error: error instanceof Error ? error.message : "Failed to get results",
-      });
+      console.error("Failed to load PCA results:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGetCompetences = async () => {
+  const loadCompetences = async () => {
     setLoading(true);
     try {
-      const data = await getPCACompetences(pcaCod);
-      setResults(data);
-      console.log("PCA Competences:", data);
+      const data = await getPCACompetences(pcaCod, "1"); // TIMS format
+      setCompetences(data);
     } catch (error) {
-      console.error("Error getting PCA competences:", error);
-      setResults({
-        error:
-          error instanceof Error ? error.message : "Failed to get competences",
-      });
+      console.error("Failed to load PCA competences:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGetGapAnalysis = async () => {
+  const loadAnalysis = async () => {
     setLoading(true);
     try {
-      const data = await getPCAVsJCAAnalysis(pcaCod, selectedJCA);
-      setResults(data);
-      console.log("PCA Gap Analysis:", data);
+      const data = await getPCAVsJCAAnalysis(pcaCod, selectedJCA, "g");
+      setAnalysis(data);
     } catch (error) {
-      console.error("Error getting gap analysis:", error);
-      setResults({
-        error:
-          error instanceof Error ? error.message : "Failed to get gap analysis",
-      });
+      console.error("Failed to load PCA analysis:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleTabChange = (tab: "results" | "competences" | "analysis") => {
+    setActiveTab(tab);
+
+    switch (tab) {
+      case "results":
+        if (!results) loadResults();
+        break;
+      case "competences":
+        if (!competences) loadCompetences();
+        break;
+      case "analysis":
+        if (!analysis) loadAnalysis();
+        break;
     }
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-6 mt-6">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900">
-            PCA Results & Analysis
-          </h3>
-          <p className="text-sm text-gray-600">
-            PCA Code:{" "}
-            <code className="bg-gray-100 px-2 py-1 rounded">{pcaCod}</code>
-          </p>
-        </div>
-        <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b">
+          <h2 className="text-xl font-semibold text-gray-900">
+            PCA Results - {pcaCod.slice(0, 8)}...
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
-      </div>
-
-      {/* Tabs */}
-      <div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg">
-        <button
-          onClick={() => setActiveTab("results")}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            activeTab === "results"
-              ? "bg-white text-blue-600 shadow-sm"
-              : "text-gray-600 hover:text-gray-900"
-          }`}
-        >
-          PCA Results
-        </button>
-        <button
-          onClick={() => setActiveTab("competences")}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            activeTab === "competences"
-              ? "bg-white text-blue-600 shadow-sm"
-              : "text-gray-600 hover:text-gray-900"
-          }`}
-        >
-          Competences
-        </button>
-        <button
-          onClick={() => setActiveTab("gap")}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            activeTab === "gap"
-              ? "bg-white text-blue-600 shadow-sm"
-              : "text-gray-600 hover:text-gray-900"
-          }`}
-        >
-          Gap Analysis
-        </button>
-      </div>
-
-      {/* Tab Content */}
-      <div className="space-y-4">
-        {activeTab === "results" && (
-          <div>
-            <p className="text-gray-600 mb-4">
-              Get the complete PCA assessment results.
-            </p>
-            <button
-              onClick={handleGetResults}
-              disabled={loading}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              {loading ? "Loading..." : "Get PCA Results"}
-            </button>
-          </div>
-        )}
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
 
-        {activeTab === "competences" && (
-          <div>
-            <p className="text-gray-600 mb-4">
-              Get competences analysis from the PCA assessment.
-            </p>
-            <button
-              onClick={handleGetCompetences}
-              disabled={loading}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
-            >
-              {loading ? "Loading..." : "Get Competences"}
-            </button>
-          </div>
-        )}
-
-        {activeTab === "gap" && (
-          <div>
-            <p className="text-gray-600 mb-4">
-              Compare PCA results with job competency analysis (JCA).
-            </p>
-            <div className="flex items-center space-x-4 mb-4">
-              <label className="text-sm font-medium text-gray-700">
-                Select Position:
-              </label>
-              <select
-                value={selectedJCA}
-                onChange={(e) => setSelectedJCA(e.target.value as JCACode)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        {/* Tabs */}
+        <div className="border-b">
+          <nav className="flex space-x-8 px-6">
+            {[
+              { id: "results", label: "Results" },
+              { id: "competences", label: "Competences" },
+              { id: "analysis", label: "JCA Analysis" },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => handleTabChange(tab.id as any)}
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === tab.id
+                    ? "border-blue-500 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
               >
-                {Object.entries(JCA_CODES).map(([code, name]) => (
-                  <option key={code} value={code}>
-                    {name} ({code})
-                  </option>
-                ))}
-              </select>
-            </div>
-            <button
-              onClick={handleGetGapAnalysis}
-              disabled={loading}
-              className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
-            >
-              {loading ? "Loading..." : "Get Gap Analysis"}
-            </button>
-          </div>
-        )}
-      </div>
+                {tab.label}
+              </button>
+            ))}
+          </nav>
+        </div>
 
-      {/* Results Display */}
-      {results && (
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <h4 className="font-medium text-gray-900 mb-3">API Response:</h4>
-          {results.error ? (
-            <div className="text-red-600 text-sm">{results.error}</div>
-          ) : (
-            <pre className="text-xs text-gray-700 overflow-x-auto whitespace-pre-wrap">
-              {JSON.stringify(results, null, 2)}
-            </pre>
+        {/* Content */}
+        <div className="p-6 overflow-y-auto max-h-[60vh]">
+          {loading && (
+            <div className="flex items-center justify-center py-12">
+              <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+              <span className="ml-3 text-gray-600">Loading...</span>
+            </div>
+          )}
+
+          {/* Results Tab */}
+          {activeTab === "results" && !loading && (
+            <div>
+              {results ? (
+                <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto text-sm">
+                  {JSON.stringify(results, null, 2)}
+                </pre>
+              ) : (
+                <div className="text-center py-8">
+                  <button
+                    onClick={loadResults}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Load Results
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Competences Tab */}
+          {activeTab === "competences" && !loading && (
+            <div>
+              {competences ? (
+                <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto text-sm">
+                  {JSON.stringify(competences, null, 2)}
+                </pre>
+              ) : (
+                <div className="text-center py-8">
+                  <button
+                    onClick={loadCompetences}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Load Competences
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Analysis Tab */}
+          {activeTab === "analysis" && !loading && (
+            <div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Select JCA for Analysis:
+                </label>
+                <select
+                  value={selectedJCA}
+                  onChange={(e) => {
+                    setSelectedJCA(e.target.value as JCACode);
+                    setAnalysis(null); // Reset analysis when JCA changes
+                  }}
+                  className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  {Object.entries(JCA_CODES).map(([code, name]) => (
+                    <option key={code} value={code}>
+                      {name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {analysis ? (
+                <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto text-sm">
+                  {JSON.stringify(analysis, null, 2)}
+                </pre>
+              ) : (
+                <div className="text-center py-8">
+                  <button
+                    onClick={loadAnalysis}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Load Analysis for {JCA_CODES[selectedJCA]}
+                  </button>
+                </div>
+              )}
+            </div>
           )}
         </div>
-      )}
-
-      <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <h5 className="font-medium text-blue-800 mb-2">💡 Next Steps</h5>
-        <ul className="text-sm text-blue-700 space-y-1">
-          <li>• Complete the assessment first before getting results</li>
-          <li>• Use the PCA Code to retrieve results and analysis</li>
-          <li>• Gap analysis compares your results with job requirements</li>
-          <li>• Results can be used for career planning and development</li>
-        </ul>
       </div>
     </div>
   );

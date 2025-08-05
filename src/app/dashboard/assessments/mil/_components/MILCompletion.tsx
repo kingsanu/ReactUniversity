@@ -97,7 +97,7 @@ export default function MILCompletion({
             transition={{ delay: 0.4 }}
             className="text-lg text-gray-600 mb-8"
           >
-            You have completed the MIL Assessment
+            You have completed the LIA Assessment
           </motion.p>
 
           {/* Score Summary */}

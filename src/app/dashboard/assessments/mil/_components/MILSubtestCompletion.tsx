@@ -28,7 +28,7 @@ export default function MILSubtestCompletion({
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.2 }}
-        className="bg-white rounded-2xl shadow-xl border p-8 text-center max-w-md w-full"
+        className="bg-white rounded-2xl shadow-xl border p-6 sm:p-8 text-center max-w-md w-full"
       >
         {/* Success Icon */}
         <motion.div

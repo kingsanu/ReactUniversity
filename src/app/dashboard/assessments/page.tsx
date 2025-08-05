@@ -3,7 +3,6 @@
 import { motion } from "motion/react";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { usePCAData } from "@/hooks/usePCAData";
-import PCATestButton from "./_components/PCATestButton";
 
 export default function AssessmentsPage() {
   const { user } = useGlobalStore();
@@ -92,9 +91,6 @@ export default function AssessmentsPage() {
           </p>
         </div>
 
-        {/* Development Test Button */}
-        {process.env.NODE_ENV === "development" && <PCATestButton />}
-
         {/* Progress Overview */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -172,7 +168,7 @@ export default function AssessmentsPage() {
               <div className="flex-1">
                 <div className="flex items-center mb-2">
                   <h2 className="text-xl font-semibold text-gray-900 mr-3">
-                    1. Personal Competence Analysis (via API)
+                    1. Personal Competence Analysis (PCA)
                   </h2>
                   {pcaStatus === "completed" && (
                     <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
@@ -221,7 +217,7 @@ export default function AssessmentsPage() {
             )}
           </motion.div>
 
-          {/* 2. MIL Assessment */}
+          {/* 2. LIA Assessment */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -231,7 +227,7 @@ export default function AssessmentsPage() {
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
                 <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                  2. Labor Intelligence Measurement (MIL)
+                  2. Labor Intelligence Assessment (LIA)
                 </h2>
                 <p className="text-gray-600 mb-6">
                   Assess your cognitive abilities through pattern recognition,
@@ -244,7 +240,7 @@ export default function AssessmentsPage() {
               href="/dashboard/assessments/mil"
               className="inline-flex items-center justify-center w-full bg-purple-600 text-white py-3 px-6 rounded-lg hover:bg-purple-700 transition-colors font-medium"
             >
-              Start MIL Assessment
+              Start LIA Assessment
             </a>
           </motion.div>
 
@@ -308,7 +304,7 @@ export default function AssessmentsPage() {
               </ul>
             </div>
             <div>
-              <h4 className="font-medium text-gray-900 mb-2">MIL Assessment</h4>
+              <h4 className="font-medium text-gray-900 mb-2">LIA Assessment</h4>
               <ul className="text-gray-600 space-y-1">
                 <li>• 5 cognitive subtests</li>
                 <li>• Pattern recognition & reasoning</li>

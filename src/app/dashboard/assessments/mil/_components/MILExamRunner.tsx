@@ -44,6 +44,7 @@ export default function MILExamRunner({
     Date.now()
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   const { user } = useGlobalStore();
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -158,7 +159,16 @@ export default function MILExamRunner({
   };
 
   const handleTimeUp = useCallback(async () => {
+    console.log("⏰ [MIL RUNNER] Time expired! Handling automatic completion");
+
     if (session && !session.isCompleted) {
+      console.log("⏰ [MIL RUNNER] Session details at time expiry:", {
+        examId: session.examId,
+        answersCompleted: session.answers.length,
+        currentQuestion: session.currentQuestion,
+        userId: user?.id,
+      });
+
       try {
         setIsSubmitting(true);
 
@@ -168,19 +178,78 @@ export default function MILExamRunner({
         };
         saveMILSession(updatedSession);
 
-        // Time expired - silently complete
+        if (user?.id && !hasSubmitted) {
+          console.log("📡 [MIL RUNNER] Submitting time-expired exam to API...");
+          setHasSubmitted(true);
+          const submitResult = await submitMILExam(updatedSession, user.id);
+          console.log(
+            "✅ [MIL RUNNER] Time-expired exam submitted successfully:",
+            submitResult
+          );
+        } else if (hasSubmitted) {
+          console.log(
+            "⚠️ [MIL RUNNER] Time-expired exam already submitted, skipping"
+          );
+        } else {
+          console.warn(
+            "⚠️ [MIL RUNNER] No user ID for time-expired submission"
+          );
+        }
+
+        console.log("✅ [MIL RUNNER] Time-expired exam processed successfully");
       } catch (error) {
-        console.error("Failed to submit time-expired exam:", error);
-        // Time expired - silently complete
+        console.error(
+          "❌ [MIL RUNNER] Failed to submit time-expired exam:",
+          error
+        );
+        console.error("❌ [MIL RUNNER] Time-expired error context:", {
+          examId: session.examId,
+          userId: user?.id,
+          answersCount: session.answers.length,
+          errorMessage: error instanceof Error ? error.message : String(error),
+        });
       } finally {
         setIsSubmitting(false);
+        console.log(
+          "🔄 [MIL RUNNER] Time-expired submission process completed"
+        );
       }
+    } else {
+      console.log(
+        "ℹ️ [MIL RUNNER] No active session or already completed, skipping time-expired submission"
+      );
     }
 
+    console.log("🎯 [MIL RUNNER] Time expired - calling onComplete()");
     onComplete();
   }, [session, user.id, onComplete]);
 
   const handleAnswerSelect = (answer: number) => {
+    const currentQuestion = exam?.questions[currentQuestionIndex];
+    let optionText = `Numeric: ${answer}`;
+
+    if (currentQuestion?.data.options) {
+      optionText = currentQuestion.data.options[answer];
+    } else if (currentQuestion?.data.letterSequence?.outerLetters) {
+      optionText = currentQuestion.data.letterSequence.outerLetters[answer];
+    } else if (
+      currentQuestion?.data.numbers &&
+      currentQuestion.data.numbers.length === 3
+    ) {
+      const numbers = currentQuestion.data.numbers;
+      const sortedNumbers = [...numbers].sort((a, b) => a - b);
+      const extremes = [sortedNumbers[0], sortedNumbers[2]]; // [lowest, highest]
+      optionText = `Number: ${extremes[answer]}`;
+    }
+
+    console.log("✅ [LIA RUNNER] Answer selected:", {
+      answerIndex: answer,
+      questionType: currentQuestion?.type,
+      hasOptions: currentQuestion?.data.options ? true : false,
+      hasLetterSequence: currentQuestion?.data.letterSequence ? true : false,
+      hasNumbers: currentQuestion?.data.numbers ? true : false,
+      optionText,
+    });
     setSelectedAnswer(answer);
   };
 
@@ -210,18 +279,62 @@ export default function MILExamRunner({
 
     // If this is the last question, submit the exam
     if (currentQuestionIndex + 1 >= exam.questions.length) {
-      if (user?.id) {
+      console.log(
+        "🏁 [MIL RUNNER] Last question completed, preparing to submit exam"
+      );
+      console.log("🏁 [MIL RUNNER] Exam details:", {
+        examName: exam.name,
+        examId: exam.id,
+        totalQuestions: exam.questions.length,
+        answeredQuestions: updatedSession.answers.length,
+        userId: user?.id,
+        timeLimitMinutes: exam.timeLimitMinutes,
+      });
+
+      if (user?.id && !hasSubmitted && !isSubmitting) {
         try {
           setIsSubmitting(true);
-          await submitMILExam(updatedSession, user.id);
+          setHasSubmitted(true);
+          console.log("📡 [MIL RUNNER] Calling submitMILExam API...");
+
+          const submitResult = await submitMILExam(updatedSession, user.id);
+
+          console.log("✅ [MIL RUNNER] Exam submitted successfully!");
+          console.log("✅ [MIL RUNNER] Submit result:", submitResult);
         } catch (error) {
-          console.error("Failed to submit exam:", error);
-          // Silently continue - no user alert needed
+          console.error("❌ [MIL RUNNER] Failed to submit exam:", error);
+          console.error("❌ [MIL RUNNER] Error context:", {
+            examId: exam.id,
+            userId: user.id,
+            sessionAnswers: updatedSession.answers.length,
+            errorMessage:
+              error instanceof Error ? error.message : String(error),
+          });
+          // Reset hasSubmitted on error to allow retry
+          setHasSubmitted(false);
         } finally {
           setIsSubmitting(false);
+          console.log(
+            "🔄 [MIL RUNNER] Submit process completed, proceeding to completion screen"
+          );
         }
+      } else if (hasSubmitted) {
+        console.log(
+          "⚠️ [MIL RUNNER] Exam already submitted, skipping duplicate submission"
+        );
+      } else if (isSubmitting) {
+        console.log(
+          "⚠️ [MIL RUNNER] Submission already in progress, skipping duplicate"
+        );
+      } else {
+        console.warn(
+          "⚠️ [MIL RUNNER] No user ID available, skipping API submission"
+        );
       }
 
+      console.log(
+        "🎯 [MIL RUNNER] Calling onComplete() to show completion screen"
+      );
       onComplete();
     } else {
       // Move to next question
@@ -235,15 +348,15 @@ export default function MILExamRunner({
     if (!question.data.letterPairs) return null;
 
     return (
-      <div className="max-w-2xl mx-auto mb-8">
+      <div className="max-w-2xl mx-auto mb-6 sm:mb-8">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.1 }}
-          className="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 border-2 border-blue-200/60 rounded-2xl p-6 shadow-xl backdrop-blur-sm"
+          className="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 border-2 border-blue-200/60 rounded-xl sm:rounded-2xl p-3 sm:p-6 shadow-xl backdrop-blur-sm"
         >
           {/* Top Row */}
-          <div className="grid grid-cols-4 gap-8 mb-8">
+          <div className="grid grid-cols-4 gap-2 sm:gap-4 md:gap-8 mb-4 sm:mb-8">
             {question.data.letterPairs.map((pair, index) => (
               <motion.div
                 key={`top-${index}`}
@@ -252,7 +365,7 @@ export default function MILExamRunner({
                 transition={{ delay: index * 0.02, duration: 0.05 }}
                 className="text-center"
               >
-                <div className="text-4xl font-bold text-gray-800 font-mono tracking-wider drop-shadow-sm">
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 font-mono tracking-wider drop-shadow-sm">
                   {pair.topLetter}
                 </div>
               </motion.div>
@@ -264,11 +377,11 @@ export default function MILExamRunner({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.05, duration: 0.1 }}
-            className="h-px bg-gradient-to-r from-transparent via-blue-300 to-transparent mb-8"
+            className="h-px bg-gradient-to-r from-transparent via-blue-300 to-transparent mb-4 sm:mb-8"
           />
 
           {/* Bottom Row */}
-          <div className="grid grid-cols-4 gap-8">
+          <div className="grid grid-cols-4 gap-2 sm:gap-4 md:gap-8">
             {question.data.letterPairs.map((pair, index) => (
               <motion.div
                 key={`bottom-${index}`}
@@ -277,7 +390,7 @@ export default function MILExamRunner({
                 transition={{ delay: 0.1 + index * 0.02, duration: 0.1 }}
                 className="text-center"
               >
-                <div className="text-4xl font-bold text-gray-800 font-mono tracking-wider drop-shadow-sm">
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 font-mono tracking-wider drop-shadow-sm">
                   {pair.bottomLetter}
                 </div>
               </motion.div>
@@ -288,9 +401,250 @@ export default function MILExamRunner({
     );
   };
 
+  const renderLetterSequence = (question: MILQuestion) => {
+    if (!question.data.letterSequence) return null;
+
+    const { letters } = question.data.letterSequence;
+
+    return (
+      <div className="max-w-lg mx-auto mb-6 sm:mb-8">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.1 }}
+          className="relative bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 border-2 border-purple-200/60 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-xl backdrop-blur-sm"
+        >
+          {/* Letter Sequence Display */}
+          <div className="flex justify-center items-center space-x-4 sm:space-x-6 md:space-x-8">
+            {letters.map((letter, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.1, duration: 0.2 }}
+                className={`text-center ${
+                  index === 1 ? "transform scale-110" : ""
+                }`}
+              >
+                <div
+                  className={`w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center ${
+                    index === 1
+                      ? "bg-gradient-to-br from-purple-100 to-blue-100 border-2 border-purple-300 shadow-lg"
+                      : "bg-gradient-to-br from-gray-100 to-gray-200 border-2 border-gray-300"
+                  }`}
+                >
+                  <span className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 font-mono">
+                    {letter}
+                  </span>
+                </div>
+                {index === 1 && (
+                  <div className="text-xs sm:text-sm text-purple-600 font-medium mt-2">
+                    Middle
+                  </div>
+                )}
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Helper text */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.2 }}
+            className="text-center mt-4 sm:mt-6"
+          >
+            <p className="text-xs sm:text-sm text-gray-600">
+              Which outer letter is alphabetically furthest from the middle
+              letter?
+            </p>
+          </motion.div>
+        </motion.div>
+      </div>
+    );
+  };
+
+  const renderNumberSequence = (question: MILQuestion) => {
+    if (!question.data.numbers || question.data.numbers.length !== 3)
+      return null;
+
+    const numbers = question.data.numbers;
+    const sortedNumbers = [...numbers].sort((a, b) => a - b);
+    const lowest = sortedNumbers[0];
+    const highest = sortedNumbers[2];
+    const middle = sortedNumbers[1];
+
+    return (
+      <div className="max-w-lg mx-auto mb-6 sm:mb-8">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.1 }}
+          className="relative bg-gradient-to-br from-orange-50 via-yellow-50 to-red-50 border-2 border-orange-200/60 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-xl backdrop-blur-sm"
+        >
+          {/* Number Sequence Display */}
+          <div className="flex justify-center items-center space-x-4 sm:space-x-6 md:space-x-8">
+            {numbers.map((number, index) => {
+              const isMiddle = number === middle;
+              const isExtreme = number === lowest || number === highest;
+
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.1, duration: 0.2 }}
+                  className={`text-center ${
+                    isMiddle ? "transform scale-110" : ""
+                  }`}
+                >
+                  <div
+                    className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-xl flex items-center justify-center ${
+                      isMiddle
+                        ? "bg-gradient-to-br from-orange-100 to-yellow-100 border-2 border-orange-300 shadow-lg"
+                        : isExtreme
+                        ? "bg-gradient-to-br from-red-100 to-orange-100 border-2 border-red-300 shadow-md"
+                        : "bg-gradient-to-br from-gray-100 to-gray-200 border-2 border-gray-300"
+                    }`}
+                  >
+                    <span className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 font-mono">
+                      {number}
+                    </span>
+                  </div>
+                  {isMiddle && (
+                    <div className="text-xs sm:text-sm text-orange-600 font-medium mt-2">
+                      Middle
+                    </div>
+                  )}
+                  {number === lowest && (
+                    <div className="text-xs sm:text-sm text-red-600 font-medium mt-2">
+                      Lowest
+                    </div>
+                  )}
+                  {number === highest && (
+                    <div className="text-xs sm:text-sm text-red-600 font-medium mt-2">
+                      Highest
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Helper text */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.2 }}
+            className="text-center mt-4 sm:mt-6"
+          >
+            <p className="text-xs sm:text-sm text-gray-600">
+              Which extreme (highest or lowest) is furthest from the middle
+              number?
+            </p>
+          </motion.div>
+        </motion.div>
+      </div>
+    );
+  };
+
+  const renderAnswerOptions = (question: MILQuestion) => {
+    // Check if question has API-provided options (for Verbal Reasoning, etc.)
+    if (question.data.options && question.data.options.length > 0) {
+      console.log(
+        "🔤 [LIA RUNNER] Using API-provided options:",
+        question.data.options
+      );
+
+      return question.data.options.map((option, index) => (
+        <button
+          key={index}
+          onClick={() => handleAnswerSelect(index)}
+          disabled={isSubmitting}
+          className={`px-3 py-2 sm:px-4 sm:py-3 rounded-xl font-medium text-xs sm:text-sm transition-all duration-100 min-w-[100px] sm:min-w-[120px] max-w-[180px] sm:max-w-[200px] text-center ${
+            selectedAnswer === index
+              ? "bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-2xl transform scale-105 ring-4 ring-blue-200/50"
+              : "bg-white border-2 border-gray-200 text-gray-700 hover:border-blue-300 hover:bg-blue-50 shadow-lg hover:shadow-xl"
+          } disabled:opacity-50 disabled:cursor-not-allowed`}
+        >
+          <span className="block leading-tight">{option}</span>
+        </button>
+      ));
+    }
+
+    // Check if question has letter sequence (for Working Memory)
+    if (
+      question.data.letterSequence &&
+      question.data.letterSequence.outerLetters
+    ) {
+      console.log(
+        "🔤 [LIA RUNNER] Using letter sequence options:",
+        question.data.letterSequence.outerLetters
+      );
+
+      return question.data.letterSequence.outerLetters.map((letter, index) => (
+        <button
+          key={index}
+          onClick={() => handleAnswerSelect(index)}
+          disabled={isSubmitting}
+          className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-xl sm:rounded-2xl font-bold text-xl sm:text-2xl md:text-3xl transition-all duration-100 ${
+            selectedAnswer === index
+              ? "bg-gradient-to-br from-purple-600 to-blue-600 text-white shadow-2xl transform scale-105 sm:scale-110 ring-2 sm:ring-4 ring-purple-200/50"
+              : "bg-white border-2 border-gray-200 text-gray-700 hover:border-purple-300 hover:bg-purple-50 shadow-lg hover:shadow-xl"
+          } disabled:opacity-50 disabled:cursor-not-allowed font-mono`}
+        >
+          {letter}
+        </button>
+      ));
+    }
+
+    // Check if question has numbers (for Numeric Velocity)
+    if (question.data.numbers && question.data.numbers.length === 3) {
+      const numbers = question.data.numbers;
+      const sortedNumbers = [...numbers].sort((a, b) => a - b);
+      const lowest = sortedNumbers[0];
+      const highest = sortedNumbers[2];
+      const extremes = [lowest, highest];
+
+      console.log("🔢 [LIA RUNNER] Using numeric velocity options:", extremes);
+
+      return extremes.map((number, index) => (
+        <button
+          key={index}
+          onClick={() => handleAnswerSelect(index)}
+          disabled={isSubmitting}
+          className={`w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-xl sm:rounded-2xl font-bold text-xl sm:text-2xl md:text-3xl transition-all duration-100 ${
+            selectedAnswer === index
+              ? "bg-gradient-to-br from-orange-600 to-red-600 text-white shadow-2xl transform scale-105 sm:scale-110 ring-2 sm:ring-4 ring-orange-200/50"
+              : "bg-white border-2 border-gray-200 text-gray-700 hover:border-orange-300 hover:bg-orange-50 shadow-lg hover:shadow-xl"
+          } disabled:opacity-50 disabled:cursor-not-allowed font-mono`}
+        >
+          {number}
+        </button>
+      ));
+    }
+
+    // Default numeric options (for Pattern Recognition, etc.)
+    console.log("🔢 [LIA RUNNER] Using default numeric options (0-4)");
+
+    return [0, 1, 2, 3, 4].map((option) => (
+      <button
+        key={option}
+        onClick={() => handleAnswerSelect(option)}
+        disabled={isSubmitting}
+        className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-lg sm:rounded-xl font-bold text-lg sm:text-xl md:text-2xl transition-all duration-100 ${
+          selectedAnswer === option
+            ? "bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-2xl transform scale-105 sm:scale-110 ring-2 sm:ring-4 ring-blue-200/50"
+            : "bg-white border-2 border-gray-200 text-gray-700 hover:border-blue-300 hover:bg-blue-50 shadow-lg hover:shadow-xl"
+        } disabled:opacity-50 disabled:cursor-not-allowed`}
+      >
+        {option}
+      </button>
+    ));
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center px-4">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Loading assessment...</p>
@@ -301,8 +655,8 @@ export default function MILExamRunner({
 
   if (!exam || !session) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center px-4">
+        <div className="text-center max-w-md">
           <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg
               className="w-6 h-6 text-red-600"
@@ -478,15 +832,15 @@ export default function MILExamRunner({
 
       {/* Header */}
       <div className="bg-white/90 backdrop-blur-md shadow-sm border-b border-white/20 sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-2 sm:py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4 flex-1 min-w-0">
               <button
                 onClick={onBack}
-                className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+                className="flex items-center text-gray-600 hover:text-gray-900 transition-colors flex-shrink-0"
               >
                 <svg
-                  className="w-5 h-5 mr-1"
+                  className="w-4 h-4 sm:w-5 sm:h-5 mr-1"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -498,28 +852,89 @@ export default function MILExamRunner({
                     d="M15 19l-7-7 7-7"
                   />
                 </svg>
-                <span className="text-sm">Back</span>
+                <span className="text-xs sm:text-sm">Back</span>
               </button>
-              <div className="h-6 w-px bg-gray-300"></div>
-              <div>
-                <h1 className="text-xl font-semibold text-gray-900">
+              <div className="h-4 sm:h-6 w-px bg-gray-300 flex-shrink-0"></div>
+              <div className="min-w-0 flex-1">
+                <h1 className="text-sm sm:text-lg md:text-xl font-semibold text-gray-900 truncate">
                   {exam.name}
                 </h1>
-                <p className="text-sm text-gray-500">
-                  Question {currentQuestionIndex + 1} of {exam.questions.length}
+                <p className="text-xs sm:text-sm text-gray-500">
+                  Q {currentQuestionIndex + 1}/{exam.questions.length}
                 </p>
               </div>
-              <div className="hidden sm:flex items-center space-x-3">
-                <div className="w-32 bg-gray-200 rounded-full h-2">
+
+              {/* Mobile Progress Bar */}
+              <div className="sm:hidden flex items-center space-x-2 flex-shrink-0">
+                <div className="w-16 bg-gray-200 rounded-full h-1.5">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progress}%` }}
+                    className="bg-gradient-to-r from-blue-500 to-purple-600 h-1.5 rounded-full transition-all duration-100"
+                  />
+                </div>
+                <span className="text-xs text-gray-600 min-w-[30px]">
+                  {Math.round(progress)}%
+                </span>
+                {/* Mobile Question Dots - Limited */}
+                <div className="flex items-center space-x-0.5">
+                  {exam.questions
+                    .slice(0, Math.min(exam.questions.length, 10))
+                    .map((_, i) => (
+                      <div
+                        key={i}
+                        className={`w-1 h-1 rounded-full transition-all duration-100 ${
+                          i < currentQuestionIndex
+                            ? "bg-green-500"
+                            : i === currentQuestionIndex
+                            ? "bg-blue-500"
+                            : "bg-gray-300"
+                        }`}
+                      />
+                    ))}
+                  {exam.questions.length > 10 && (
+                    <span className="text-xs text-gray-500 ml-1">
+                      +{exam.questions.length - 10}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Desktop Progress Bar */}
+              <div className="hidden sm:flex items-center space-x-3 flex-shrink-0">
+                <div className="w-24 md:w-32 bg-gray-200 rounded-full h-2">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${progress}%` }}
                     className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-100"
                   />
                 </div>
-                <span className="text-sm text-gray-600 min-w-[60px]">
+                <span className="text-sm text-gray-600 min-w-[50px]">
                   {Math.round(progress)}%
                 </span>
+              </div>
+
+              {/* Question Progress Dots - Desktop */}
+              <div className="hidden md:flex items-center space-x-1 flex-shrink-0">
+                {exam.questions
+                  .slice(0, Math.min(exam.questions.length, 20))
+                  .map((_, i) => (
+                    <div
+                      key={i}
+                      className={`w-1.5 h-1.5 rounded-full transition-all duration-100 ${
+                        i < currentQuestionIndex
+                          ? "bg-green-500"
+                          : i === currentQuestionIndex
+                          ? "bg-blue-500"
+                          : "bg-gray-300"
+                      }`}
+                    />
+                  ))}
+                {exam.questions.length > 20 && (
+                  <span className="text-xs text-gray-500 ml-1">
+                    +{exam.questions.length - 20}
+                  </span>
+                )}
               </div>
 
               {/* Violation Counter */}
@@ -528,7 +943,7 @@ export default function MILExamRunner({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.1 }}
-                  className={`flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                  className={`flex items-center px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium flex-shrink-0 ${
                     tabViolations >= 3
                       ? "bg-red-100 text-red-800"
                       : tabViolations >= 2
@@ -537,7 +952,7 @@ export default function MILExamRunner({
                   }`}
                 >
                   <svg
-                    className="w-4 h-4 mr-1"
+                    className="w-3 h-3 sm:w-4 sm:h-4 mr-1"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -552,12 +967,14 @@ export default function MILExamRunner({
               )}
             </div>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
               <div className="text-right">
-                <div className="text-lg font-bold text-gray-900">
+                <div className="text-sm sm:text-base md:text-lg font-bold text-gray-900">
                   {formatTime(timeRemaining)}
                 </div>
-                <div className="text-xs text-gray-500">Time Remaining</div>
+                <div className="text-xs text-gray-500 hidden sm:block">
+                  Time Remaining
+                </div>
               </div>
             </div>
           </div>
@@ -565,26 +982,26 @@ export default function MILExamRunner({
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+      <div className="flex-1 flex items-center justify-center min-h-[calc(100vh-80px)] p-2 sm:p-4 md:p-6 lg:p-8">
         <div className="w-full max-w-5xl">
           <motion.div
             key={currentQuestionIndex}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.1 }}
-            className="bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-white/30 p-6 sm:p-8"
+            className="bg-white/95 backdrop-blur-md rounded-xl sm:rounded-2xl shadow-xl border border-white/30 p-3 sm:p-6 md:p-8"
           >
             {/* Question Header */}
-            <div className="text-center mb-8">
+            <div className="text-center mb-4 sm:mb-6 md:mb-8">
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.1 }}
-                className="mb-6"
+                className="mb-3 sm:mb-4 md:mb-6"
               >
-                <div className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full mb-4">
-                  <div className="w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mr-3"></div>
-                  <span className="text-sm font-medium text-gray-700">
+                <div className="inline-flex items-center px-2 sm:px-3 py-1 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full mb-2 sm:mb-4">
+                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mr-2 sm:mr-3"></div>
+                  <span className="text-xs sm:text-sm font-medium text-gray-700">
                     Question {currentQuestionIndex + 1} of{" "}
                     {exam.questions.length}
                   </span>
@@ -595,12 +1012,14 @@ export default function MILExamRunner({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.1 }}
-                className="text-xl font-bold text-gray-900 mb-6"
+                className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-3 sm:mb-4 md:mb-6 px-2"
               >
                 {currentQuestion.questionText}
               </motion.h2>
 
               {renderLetterPairs(currentQuestion)}
+              {renderLetterSequence(currentQuestion)}
+              {renderNumberSequence(currentQuestion)}
             </div>
 
             {/* Answer Options */}
@@ -608,22 +1027,9 @@ export default function MILExamRunner({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.1 }}
-              className="flex justify-center space-x-4 mb-8"
+              className="flex justify-center flex-wrap gap-2 sm:gap-3 mb-6 sm:mb-8 max-w-4xl mx-auto px-2"
             >
-              {[0, 1, 2, 3, 4].map((option) => (
-                <button
-                  key={option}
-                  onClick={() => handleAnswerSelect(option)}
-                  disabled={isSubmitting}
-                  className={`w-16 h-16 rounded-xl font-bold text-2xl transition-all duration-100 ${
-                    selectedAnswer === option
-                      ? "bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-2xl transform scale-110 ring-4 ring-blue-200/50"
-                      : "bg-white border-2 border-gray-200 text-gray-700 hover:border-blue-300 hover:bg-blue-50 shadow-lg hover:shadow-xl"
-                  } disabled:opacity-50 disabled:cursor-not-allowed`}
-                >
-                  {option}
-                </button>
-              ))}
+              {renderAnswerOptions(currentQuestion)}
             </motion.div>
 
             {/* Continue Button */}
@@ -631,17 +1037,19 @@ export default function MILExamRunner({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.1 }}
-              className="text-center"
+              className="text-center px-4"
             >
               <button
                 onClick={handleContinue}
                 disabled={selectedAnswer === null || isSubmitting}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-12 py-4 rounded-2xl hover:from-blue-700 hover:to-purple-700 transition-all duration-100 font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed shadow-xl min-w-[200px]"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 sm:px-8 sm:py-3 md:px-12 md:py-4 rounded-xl sm:rounded-2xl hover:from-blue-700 hover:to-purple-700 transition-all duration-100 font-semibold text-sm sm:text-base md:text-lg disabled:opacity-50 disabled:cursor-not-allowed shadow-xl min-w-[140px] sm:min-w-[180px] md:min-w-[200px]"
               >
                 {isSubmitting ? (
                   <div className="flex items-center justify-center">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                    Submitting...
+                    <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    <span className="text-xs sm:text-sm md:text-base">
+                      Submitting...
+                    </span>
                   </div>
                 ) : currentQuestionIndex + 1 >= exam.questions.length ? (
                   "Complete Assessment"
@@ -649,29 +1057,6 @@ export default function MILExamRunner({
                   "Continue"
                 )}
               </button>
-            </motion.div>
-
-            {/* Progress Indicator */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.1 }}
-              className="flex justify-center mt-8"
-            >
-              <div className="flex space-x-2">
-                {exam.questions.map((_, i) => (
-                  <div
-                    key={i}
-                    className={`w-2 h-2 rounded-full transition-all duration-100 ${
-                      i < currentQuestionIndex
-                        ? "bg-green-500"
-                        : i === currentQuestionIndex
-                        ? "bg-blue-500"
-                        : "bg-gray-300"
-                    }`}
-                  />
-                ))}
-              </div>
             </motion.div>
           </motion.div>
         </div>

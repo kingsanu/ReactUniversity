@@ -46,7 +46,7 @@ export function MILResults({ className }: MILResultsProps) {
             </svg>
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            Take MIL Assessment
+            Take LIA Assessment
           </h3>
           <p className="text-gray-600 text-sm mb-4">
             Measure your cognitive abilities through various intelligence tasks
@@ -85,10 +85,8 @@ export function MILResults({ className }: MILResultsProps) {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">MIL Results</h3>
-          <p className="text-sm text-gray-600">
-            Labor Intelligence Measurement
-          </p>
+          <h3 className="text-lg font-semibold text-gray-900">LIA Results</h3>
+          <p className="text-sm text-gray-600">Labor Intelligence Assessment</p>
         </div>
         <div className="text-right">
           <div className="text-2xl font-bold text-purple-600">

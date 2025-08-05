@@ -3,113 +3,138 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import { useGlobalStore } from "@/store/useGlobalStore";
+import { usePCAData } from "@/hooks/usePCAData";
 import {
+  authenticateNexaAPI,
   addPCAAssessmentSpanish,
   addPCAAssessmentEnglish,
-  PCAAssessmentResponse,
+  JCA_CODES,
+  JCA_CODES_ENGLISH,
+  JCACode,
 } from "@/services/pcaService";
-import { usePCAData } from "@/hooks/usePCAData";
+import PCAResultsPanel from "../_components/PCAResultsPanel";
 
 export default function PCAAssessmentPage() {
   const { user } = useGlobalStore();
-  const { savePCACode } = usePCAData();
-  const [gender, setGender] = useState<"M" | "F">("M");
-  const [language, setLanguage] = useState<"spanish" | "english">("spanish");
-  const [loading, setLoading] = useState(false);
-  const [assessmentUrl, setAssessmentUrl] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { pcaData, loading, error, refreshPCAData, hasPCA, isCompleted } =
+    usePCAData();
 
-  // Parse full name into first and last name
-  const parseFullName = (fullName: string) => {
-    const parts = fullName.trim().split(" ");
-    const firstName = parts[0] || "";
-    const lastName = parts.slice(1).join(" ") || "";
-    return { firstName, lastName };
-  };
+  const [selectedLanguage, setSelectedLanguage] = useState<
+    "spanish" | "english"
+  >("spanish");
+  const [selectedJCA, setSelectedJCA] = useState<JCACode>("GTCML");
+  const [isCreating, setIsCreating] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const [assessmentUrl, setAssessmentUrl] = useState<string | null>(null);
 
   const handleStartAssessment = async () => {
-    if (!user.name || !user.email) {
-      setError("User information not available. Please log in again.");
+    if (!user?.id || !user?.name || !user?.email) {
+      alert(
+        "User information is incomplete. Please complete your profile first."
+      );
       return;
     }
 
-    setLoading(true);
-    setError(null);
-
+    setIsCreating(true);
     try {
-      const { firstName, lastName } = parseFullName(user.name);
+      // Authenticate first
+      await authenticateNexaAPI();
 
       const userData = {
-        PerNom: firstName,
-        PerApe: lastName,
-        PerNumIde: user.id || "",
-        PerGen: gender,
+        PerNom: user.name.split(" ")[0] || "User",
+        PerApe: user.name.split(" ").slice(1).join(" ") || "Name",
+        PerNumIde: user.id.slice(-8), // Use last 8 chars of user ID
+        PerGen: "M" as const, // Default to M, could be made configurable
         permail: user.email,
-        JcaCod: "",
+        JcaCod: selectedJCA,
         BillingCenter: "",
         UserMail: user.email,
       };
 
-      let response: PCAAssessmentResponse;
-      if (language === "spanish") {
-        response = await addPCAAssessmentSpanish(userData);
+      const result =
+        selectedLanguage === "spanish"
+          ? await addPCAAssessmentSpanish(userData)
+          : await addPCAAssessmentEnglish(userData);
+
+      if (result.success && result.assessmentUrl) {
+        // Set the assessment URL to render in iframe
+        setAssessmentUrl(result.assessmentUrl);
+
+        // Refresh PCA data to update status
+        setTimeout(() => {
+          refreshPCAData();
+        }, 2000);
       } else {
-        response = await addPCAAssessmentEnglish(userData);
+        alert(`Failed to create assessment: ${result.message}`);
       }
-
-      if (response.success && response.assessmentUrl) {
-        setAssessmentUrl(response.assessmentUrl);
-
-        // Save PCA code for future use
-        if (response.pcaCod) {
-          savePCACode(response.pcaCod);
-        }
-
-        console.log("✅ PCA Assessment Started:", {
-          url: response.assessmentUrl,
-          pcaCod: response.pcaCod,
-        });
-      } else {
-        setError(response.message || "Failed to start PCA assessment");
-      }
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to start PCA assessment"
-      );
+    } catch (error) {
+      console.error("Assessment creation error:", error);
+      alert("Failed to create assessment. Please try again.");
     } finally {
-      setLoading(false);
+      setIsCreating(false);
     }
   };
 
-  const handleBackToDashboard = () => {
-    window.location.href = "/dashboard";
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading PCA data...</p>
+        </div>
+      </div>
+    );
+  }
 
+  // If assessment URL is available, render the iframe
   if (assessmentUrl) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <div className="bg-white shadow-sm border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <h1 className="text-xl font-semibold text-gray-900">
-                PCA Assessment
-              </h1>
+        {/* Header with back button */}
+        <div className="bg-white shadow-sm border-b px-4 py-3">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center">
               <button
-                onClick={handleBackToDashboard}
-                className="text-blue-600 hover:text-blue-700 font-medium"
+                onClick={() => {
+                  console.log(
+                    "Going back to configuration, preserving language:",
+                    selectedLanguage
+                  );
+                  setAssessmentUrl(null);
+                }}
+                className="flex items-center text-gray-600 hover:text-gray-900 transition-colors mr-4"
               >
-                ← Back to Dashboard
+                <svg
+                  className="w-5 h-5 mr-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+                <span className="text-sm">Back to Configuration</span>
               </button>
+              <h1 className="text-lg font-semibold text-gray-900">
+                Personal Competence Analysis (PCA)
+              </h1>
             </div>
+            <div className="text-sm text-gray-500">Assessment in Progress</div>
           </div>
         </div>
 
-        <div className="h-[calc(100vh-4rem)]">
+        {/* Iframe Container */}
+        <div className="h-[calc(100vh-64px)]">
           <iframe
             src={assessmentUrl}
             className="w-full h-full border-0"
             title="PCA Assessment"
-            sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
+            allow="fullscreen"
+            sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-top-navigation"
           />
         </div>
       </div>
@@ -118,160 +143,377 @@ export default function PCAAssessmentPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <button
-            onClick={handleBackToDashboard}
-            className="text-blue-600 hover:text-blue-700 font-medium mb-4 inline-flex items-center"
-          >
-            ← Back to Dashboard
-          </button>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Personal Competence Analysis
-          </h1>
-          <p className="text-gray-600">
-            Complete your PCA assessment to unlock insights about your
-            competencies
-          </p>
-        </div>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Breadcrumb */}
+        <nav className="flex mb-6" aria-label="Breadcrumb">
+          <ol className="inline-flex items-center space-x-1 md:space-x-3">
+            <li className="inline-flex items-center">
+              <a
+                href="/dashboard"
+                className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600"
+              >
+                Dashboard
+              </a>
+            </li>
+            <li>
+              <div className="flex items-center">
+                <svg
+                  className="w-6 h-6 text-gray-400"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <a
+                  href="/dashboard/assessments"
+                  className="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2"
+                >
+                  Assessments
+                </a>
+              </div>
+            </li>
+            <li>
+              <div className="flex items-center">
+                <svg
+                  className="w-6 h-6 text-gray-400"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2">
+                  PCA
+                </span>
+              </div>
+            </li>
+          </ol>
+        </nav>
 
-        {/* Assessment Card */}
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-lg shadow-sm border p-8"
+          className="text-center mb-8"
         >
-          {/* User Info Display */}
-          <div className="mb-8 p-4 bg-gray-50 rounded-lg">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Your Information
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-medium text-gray-700">Name:</span>
-                <span className="ml-2 text-gray-900">{user.name}</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-700">Email:</span>
-                <span className="ml-2 text-gray-900">{user.email}</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-700">User ID:</span>
-                <span className="ml-2 text-gray-900">{user.id}</span>
-              </div>
-            </div>
+          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg
+              className="w-8 h-8 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
           </div>
-
-          {/* Gender Selection */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              Gender *
-            </label>
-            <div className="flex space-x-4">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value="M"
-                  checked={gender === "M"}
-                  onChange={(e) => setGender(e.target.value as "M" | "F")}
-                  className="mr-2"
-                />
-                <span className="text-gray-700">Male</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value="F"
-                  checked={gender === "F"}
-                  onChange={(e) => setGender(e.target.value as "M" | "F")}
-                  className="mr-2"
-                />
-                <span className="text-gray-700">Female</span>
-              </label>
-            </div>
-          </div>
-
-          {/* Language Selection */}
-          <div className="mb-8">
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              Assessment Language *
-            </label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <button
-                onClick={() => setLanguage("spanish")}
-                className={`p-4 border-2 rounded-lg text-left transition-colors ${
-                  language === "spanish"
-                    ? "border-blue-500 bg-blue-50 text-blue-700"
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
-              >
-                <div className="font-medium">Spanish</div>
-                <div className="text-sm text-gray-600">
-                  Evaluación en Español
-                </div>
-              </button>
-              <button
-                onClick={() => setLanguage("english")}
-                className={`p-4 border-2 rounded-lg text-left transition-colors ${
-                  language === "english"
-                    ? "border-blue-500 bg-blue-50 text-blue-700"
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
-              >
-                <div className="font-medium">English</div>
-                <div className="text-sm text-gray-600">
-                  Assessment in English
-                </div>
-              </button>
-            </div>
-          </div>
-
-          {/* Error Display */}
-          {error && (
-            <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-red-700 text-sm">{error}</p>
-            </div>
-          )}
-
-          {/* Start Button */}
-          <button
-            onClick={handleStartAssessment}
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? (
-              <div className="flex items-center justify-center">
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                Starting Assessment...
-              </div>
-            ) : (
-              `Start PCA Assessment (${
-                language === "spanish" ? "Spanish" : "English"
-              })`
-            )}
-          </button>
-
-          {/* Info */}
-          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h4 className="font-medium text-blue-800 mb-2">
-              About PCA Assessment
-            </h4>
-            <ul className="text-sm text-blue-700 space-y-1">
-              <li>
-                • Personal Competence Analysis evaluates your professional
-                competencies
-              </li>
-              <li>
-                • The assessment takes approximately 15-20 minutes to complete
-              </li>
-              <li>
-                • Results will be available on your dashboard after completion
-              </li>
-              <li>• You can use results for career planning and development</li>
-            </ul>
-          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Personal Competence Analysis (PCA)
+          </h1>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Complete your professional competency assessment to unlock
+            personalized insights about your strengths and ideal career path.
+          </p>
         </motion.div>
+
+        {/* Status Card */}
+        {hasPCA && isCompleted && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-green-50 border border-green-200 rounded-lg p-6 mb-8"
+          >
+            <div className="flex items-center">
+              <div className="bg-green-100 rounded-full p-2 mr-4">
+                <svg
+                  className="w-6 h-6 text-green-600"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-green-900">
+                  Assessment Completed!
+                </h3>
+                <p className="text-green-700">
+                  Your PCA assessment has been completed successfully.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowResults(true)}
+                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+              >
+                View Results
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Assessment Configuration */}
+        {(!hasPCA || !isCompleted) && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-white rounded-lg shadow-sm border p-6 mb-8"
+          >
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">
+              Assessment Configuration
+            </h2>
+
+            {/* Language Selection */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Select Assessment Language
+                <span className="text-xs text-gray-500 ml-2">
+                  (Current: {selectedLanguage})
+                </span>
+              </label>
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  onClick={() => {
+                    console.log("Setting language to Spanish");
+                    setSelectedLanguage("spanish");
+                  }}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    selectedLanguage === "spanish"
+                      ? "border-blue-500 bg-blue-50 text-blue-700"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  <div className="text-center">
+                    <div className="text-2xl mb-2">🇪🇸</div>
+                    <div className="font-medium">Español</div>
+                    <div className="text-sm text-gray-500">
+                      Spanish Assessment
+                    </div>
+                  </div>
+                </button>
+                <button
+                  onClick={() => {
+                    console.log("Setting language to English");
+                    setSelectedLanguage("english");
+                  }}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    selectedLanguage === "english"
+                      ? "border-blue-500 bg-blue-50 text-blue-700"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  <div className="text-center">
+                    <div className="text-2xl mb-2">🇺🇸</div>
+                    <div className="font-medium">English</div>
+                    <div className="text-sm text-gray-500">
+                      English Assessment
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {/* JCA Selection */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Select Job Competency Analysis (JCA)
+              </label>
+              <select
+                value={selectedJCA}
+                onChange={(e) => setSelectedJCA(e.target.value as JCACode)}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                {Object.entries(
+                  selectedLanguage === "english" ? JCA_CODES_ENGLISH : JCA_CODES
+                ).map(([code, name]) => (
+                  <option key={code} value={code}>
+                    {name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Start Button */}
+            <button
+              onClick={handleStartAssessment}
+              disabled={isCreating}
+              className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isCreating ? (
+                <div className="flex items-center justify-center">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                  Creating Assessment...
+                </div>
+              ) : (
+                "Start PCA Assessment"
+              )}
+            </button>
+          </motion.div>
+        )}
+
+        {/* Information Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-white rounded-lg shadow-sm border p-6"
+          >
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              What is PCA?
+            </h3>
+            <ul className="space-y-2 text-gray-600">
+              <li className="flex items-start">
+                <svg
+                  className="w-5 h-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Evaluates your professional competencies
+              </li>
+              <li className="flex items-start">
+                <svg
+                  className="w-5 h-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Identifies your strengths and areas for development
+              </li>
+              <li className="flex items-start">
+                <svg
+                  className="w-5 h-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Provides job-specific competency matching
+              </li>
+              <li className="flex items-start">
+                <svg
+                  className="w-5 h-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Available in Spanish and English
+              </li>
+            </ul>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-white rounded-lg shadow-sm border p-6"
+          >
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Assessment Details
+            </h3>
+            <ul className="space-y-2 text-gray-600">
+              <li className="flex items-start">
+                <svg
+                  className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Duration: 15-20 minutes
+              </li>
+              <li className="flex items-start">
+                <svg
+                  className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Ipsative assessment format
+              </li>
+              <li className="flex items-start">
+                <svg
+                  className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Immediate results available
+              </li>
+              <li className="flex items-start">
+                <svg
+                  className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Secure external assessment platform
+              </li>
+            </ul>
+          </motion.div>
+        </div>
+
+        {/* Results Panel */}
+        {showResults && pcaData?.pcaCod && (
+          <PCAResultsPanel
+            pcaCod={pcaData.pcaCod}
+            onClose={() => setShowResults(false)}
+          />
+        )}
       </div>
     </div>
   );

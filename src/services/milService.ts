@@ -17,6 +17,7 @@ export interface MILQuestion {
     figurePairs?: any[] | null;
   };
   explanation: string;
+  correctAnswer?: number; // Index of the correct answer
 }
 
 export interface MILExam {
@@ -178,6 +179,15 @@ export async function submitMILExam(
   userId: string
 ): Promise<any> {
   try {
+    console.log("🚀 [LIA SUBMIT] Starting LIA exam submission...");
+    console.log("📋 [LIA SUBMIT] Session data:", {
+      examId: session.examId,
+      userId: userId,
+      startTime: session.startTime,
+      answersCount: session.answers.length,
+      isCompleted: session.isCompleted,
+    });
+
     const examAnswers = session.answers.map((answer) => ({
       questionNumber: answer.questionNumber,
       selectedAnswer: answer.answer.toString(),
@@ -194,6 +204,23 @@ export async function submitMILExam(
       answers: examAnswers,
     };
 
+    console.log(
+      "📤 [LIA SUBMIT] API Endpoint:",
+      `${API_BASE_URL}/api/PCAExam/submit`
+    );
+    console.log(
+      "📤 [LIA SUBMIT] Payload being sent:",
+      JSON.stringify(submissionData, null, 2)
+    );
+    console.log("📊 [LIA SUBMIT] Payload summary:", {
+      examId: submissionData.examId,
+      userId: submissionData.userId,
+      totalAnswers: submissionData.answers.length,
+      timeSpent: `${submissionData.startTime} → ${submissionData.endTime}`,
+      sampleAnswers: submissionData.answers.slice(0, 3), // First 3 answers for preview
+    });
+
+    const startTime = Date.now();
     const response = await fetch(`${API_BASE_URL}/api/PCAExam/submit`, {
       method: "POST",
       headers: {
@@ -202,13 +229,48 @@ export async function submitMILExam(
       body: JSON.stringify(submissionData),
     });
 
+    const responseTime = Date.now() - startTime;
+    console.log(`⏱️ [LIA SUBMIT] API Response time: ${responseTime}ms`);
+    console.log(
+      "📥 [LIA SUBMIT] Response status:",
+      response.status,
+      response.statusText
+    );
+    console.log(
+      "📥 [LIA SUBMIT] Response headers:",
+      Object.fromEntries(response.headers.entries())
+    );
+
     if (!response.ok) {
-      throw new Error(`Failed to submit MIL exam: ${response.status}`);
+      const errorText = await response.text();
+      console.error("❌ [LIA SUBMIT] API Error Response:", errorText);
+      throw new Error(
+        `Failed to submit LIA exam: ${response.status} - ${errorText}`
+      );
     }
 
-    return await response.json();
+    const responseData = await response.json();
+    console.log(
+      "✅ [LIA SUBMIT] Success! Response data:",
+      JSON.stringify(responseData, null, 2)
+    );
+    console.log("📊 [LIA SUBMIT] Response summary:", {
+      success: true,
+      responseTime: `${responseTime}ms`,
+      dataKeys: Object.keys(responseData),
+      hasScore: "score" in responseData,
+      hasResults: "results" in responseData,
+    });
+
+    return responseData;
   } catch (error) {
-    console.error("Submit MIL Exam Error:", error);
+    console.error("❌ [LIA SUBMIT] Submit LIA Exam Error:", error);
+    console.error("❌ [LIA SUBMIT] Error details:", {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      examId: session.examId,
+      userId: userId,
+    });
     throw error;
   }
 }
@@ -329,6 +391,32 @@ export function validatePatternRecognitionAnswer(
   if (!question.data.letterPairs) return false;
   const correctAnswer = calculateMatchingPairs(question.data.letterPairs);
   return answer === correctAnswer;
+}
+
+/**
+ * Generic answer validation for all question types
+ */
+export function validateAnswer(question: MILQuestion, answer: number): boolean {
+  // If API provides correctAnswer, use it
+  if (question.correctAnswer !== undefined) {
+    console.log(
+      "🎯 [LIA VALIDATION] Using API-provided correct answer:",
+      question.correctAnswer
+    );
+    return answer === question.correctAnswer;
+  }
+
+  // For Pattern Recognition, calculate from letter pairs
+  if (question.data.letterPairs) {
+    console.log("🔤 [LIA VALIDATION] Calculating Pattern Recognition answer");
+    return validatePatternRecognitionAnswer(question, answer);
+  }
+
+  // For other types without correctAnswer, we can't validate in practice
+  console.warn(
+    "⚠️ [LIA VALIDATION] No validation method available for this question type"
+  );
+  return true; // Allow to proceed
 }
 
 /**

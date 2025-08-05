@@ -1041,6 +1041,154 @@
           ]
         },
         {
+          "name": "Working Memory Exam",
+          "item": [
+            {
+              "name": "Get Working Memory Exam",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/working-memory-001",
+                  "protocol": "https",
+                  "host": [
+                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "PCAExam", "exams", "working-memory-001"]
+                },
+                "description": "Get Working Memory exam with 60 questions"
+              }
+            },
+            {
+              "name": "Start Working Memory Exam",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/working-memory-001/start",
+                  "protocol": "https",
+                  "host": [
+                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": [
+                    "api",
+                    "PCAExam",
+                    "exams",
+                    "working-memory-001",
+                    "start"
+                  ]
+                },
+                "description": "Start Working Memory exam session"
+              }
+            },
+            {
+              "name": "Get Working Memory Instructions",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/working-memory-001/instructions",
+                  "protocol": "https",
+                  "host": [
+                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": [
+                    "api",
+                    "PCAExam",
+                    "exams",
+                    "working-memory-001",
+                    "instructions"
+                  ]
+                },
+                "description": "Get Working Memory exam instructions and examples"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Visual Rotation Exam",
+          "item": [
+            {
+              "name": "Get Visual Rotation Exam",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/visual-rotation-001",
+                  "protocol": "https",
+                  "host": [
+                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "PCAExam", "exams", "visual-rotation-001"]
+                },
+                "description": "Get Visual Rotation exam with 60 questions"
+              }
+            },
+            {
+              "name": "Start Visual Rotation Exam",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/visual-rotation-001/start",
+                  "protocol": "https",
+                  "host": [
+                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": [
+                    "api",
+                    "PCAExam",
+                    "exams",
+                    "visual-rotation-001",
+                    "start"
+                  ]
+                },
+                "description": "Start Visual Rotation exam session"
+              }
+            },
+            {
+              "name": "Get Visual Rotation Instructions",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/visual-rotation-001/instructions",
+                  "protocol": "https",
+                  "host": [
+                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": [
+                    "api",
+                    "PCAExam",
+                    "exams",
+                    "visual-rotation-001",
+                    "instructions"
+                  ]
+                },
+                "description": "Get Visual Rotation exam instructions and examples"
+              }
+            }
+          ]
+        },
+        {
           "name": "Numeric Velocity Exam",
           "item": [
             {
@@ -1281,6 +1429,22 @@
                   "path": ["api", "PCAExam", "statistics", "{{examId}}"]
                 },
                 "description": "Get comprehensive statistics for a specific exam including:\n- Overall statistics (total attempts, completion rates)\n- Score analysis (average, highest, lowest, median, standard deviation)\n- Time analysis (average time spent, fastest/slowest completion)\n- Accuracy statistics\n- Performance trends (monthly/weekly)\n- Score distribution\n- Recent attempts\n- Question analysis"
+              }
+            },
+            {
+              "name": "Get All Exam Results",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/all-results",
+                  "protocol": "https",
+                  "host": [
+                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "PCAExam", "all-results"]
+                },
+                "description": "Get all completed exam results with detailed information including:\n- Username (retrieved from User entity)\n- Exam name and type\n- Comprehensive result summary (score percentage, accuracy, correct/incorrect answers)\n- Start and end dates\n- Total time spent\n- Detailed answers for each question (user answer, correct answer, time spent, explanations)\n- Time expiration and completion status\n\nReturns all exam sessions that are marked as completed, sorted by start time (most recent first)."
               }
             }
           ]
