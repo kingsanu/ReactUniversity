@@ -20,7 +20,7 @@ export default function MILInstructions({
   onStart,
   onBack,
 }: MILInstructionsProps) {
-  const [showPractice, setShowPractice] = useState(false);
+  const [currentStep, setCurrentStep] = useState<'instructions' | 'practice' | 'test'>('instructions');
   const [instructions, setInstructions] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -41,16 +41,18 @@ export default function MILInstructions({
   };
 
   const getExamIcon = () => {
+    const iconProps = {
+      className: "w-8 h-8",
+      fill: "none",
+      stroke: "currentColor",
+      viewBox: "0 0 24 24",
+    };
+
     switch (exam.id) {
-      case MIL_EXAMS.PATTERN_RECOGNITION:
+      case MIL_EXAMS.FEATURE_DETECTION:
         return (
           <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-            <svg
-              className="w-8 h-8 text-blue-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg {...iconProps} className="text-blue-600">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -63,12 +65,7 @@ export default function MILInstructions({
       case MIL_EXAMS.VERBAL_REASONING:
         return (
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-            <svg
-              className="w-8 h-8 text-green-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg {...iconProps} className="text-green-600">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -78,69 +75,10 @@ export default function MILInstructions({
             </svg>
           </div>
         );
-      case MIL_EXAMS.WORKING_MEMORY:
-        return (
-          <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center">
-            <svg
-              className="w-8 h-8 text-purple-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-        );
-      case MIL_EXAMS.NUMERIC_VELOCITY:
-        return (
-          <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center">
-            <svg
-              className="w-8 h-8 text-orange-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
-              />
-            </svg>
-          </div>
-        );
-      case MIL_EXAMS.VISUAL_ROTATION:
-        return (
-          <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center">
-            <svg
-              className="w-8 h-8 text-indigo-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-              />
-            </svg>
-          </div>
-        );
       default:
         return (
           <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-            <svg
-              className="w-8 h-8 text-gray-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg {...iconProps} className="text-gray-600">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -154,614 +92,409 @@ export default function MILInstructions({
   };
 
   const getInstructionContent = () => {
-    if (exam.id === MIL_EXAMS.VERBAL_REASONING) {
+    // Show API instructions if available
+    if (instructions) {
       return (
         <div className="space-y-6">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">
-              How it works:
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <h3 className="text-lg font-semibold text-blue-900 mb-2">
+              🎯 Test Instructions
             </h3>
-            <p className="text-gray-700 mb-4">
-              You will be presented with statements or logical reasoning
-              questions. Read each statement carefully and select the most
-              appropriate answer from the given options.
-            </p>
+            <div className="text-blue-800">
+              {typeof instructions === 'string' ? (
+                <p>{instructions}</p>
+              ) : (
+                <div>
+                  {instructions.title && <h4 className="font-semibold mb-2">{instructions.title}</h4>}
+                  {instructions.description && <p className="mb-3">{instructions.description}</p>}
+                  {instructions.instructions && (
+                    <div className="space-y-2">
+                      {Array.isArray(instructions.instructions) ? (
+                        <ul className="list-disc pl-5 space-y-1">
+                          {instructions.instructions.map((instruction: string, index: number) => (
+                            <li key={index}>{instruction}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p>{instructions.instructions}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">
-              How to respond:
-            </h3>
-            <p className="text-gray-700 mb-4">
-              Choose the option that best answers the question or completes the
-              statement. Trust your first instinct and work quickly.
-            </p>
-          </div>
+          {/* API Examples Section */}
+          {instructions.examples && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
+              <h3 className="text-lg font-semibold text-yellow-900 mb-3">
+                📝 Examples
+              </h3>
+              <div className="space-y-4">
+                {Array.isArray(instructions.examples) ? (
+                  instructions.examples.map((example: any, index: number) => (
+                    <div key={index} className="bg-white border border-yellow-300 rounded-lg p-4">
+                      {typeof example === 'string' ? (
+                        <p className="text-gray-700">{example}</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {example.question && (
+                            <p className="font-medium text-gray-900">{example.question}</p>
+                          )}
+                          {(example.data || example.letterPairs) && (
+                            <div className="space-y-3">
+                              {Array.isArray(example.data) && example.data.length > 0 && (
+                                <div className="grid grid-cols-4 gap-2">
+                                  {example.data.map((pair: string[], idx: number) => (
+                                    <div 
+                                      key={idx} 
+                                      className="border rounded p-2 text-center bg-white"
+                                    >
+                                      <div className="font-bold border-b pb-1">{pair[0]}</div>
+                                      <div className="pt-1">{pair[1]}</div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                              {Array.isArray(example.letterPairs) && example.letterPairs.length > 0 && (
+                                <div className="grid grid-cols-4 gap-2">
+                                  {example.letterPairs.map((pair: { top: string; bottom: string }, idx: number) => (
+                                    <div 
+                                      key={idx} 
+                                      className="border rounded p-2 text-center bg-white"
+                                    >
+                                      <div className="font-bold border-b pb-1">{pair.top}</div>
+                                      <div className="pt-1">{pair.bottom}</div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          {(example.answer !== undefined || example.correctAnswer !== undefined) && (
+                            <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded">
+                              <p className="text-green-700 font-medium">
+                                Correct Answer: {example.answer ?? example.correctAnswer}
+                              </p>
+                              {example.explanation && (
+                                <p className="text-green-700 text-sm mt-1">
+                                  {example.explanation}
+                                </p>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <div className="bg-white border border-yellow-300 rounded-lg p-4">
+                    <p className="text-gray-700">{instructions.examples}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
-          {/* Example 1 */}
-          <div className="bg-green-50 border border-green-200 rounded-lg p-6">
-            <h4 className="font-medium text-green-900 mb-4 text-center">
-              Example 1: Comparative Reasoning
-            </h4>
+          {/* Example */}
+          {instructions.example && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
+              <h3 className="text-lg font-semibold text-yellow-900 mb-3">
+                📝 Example
+              </h3>
+              <div className="space-y-4">
+                <div className="bg-white border border-yellow-300 rounded-lg p-4">
+                  {/* Render letter pairs example */}
+                  {instructions.example.letterPairs && (
+                    <div className="grid grid-cols-4 gap-2 mb-4">
+                      {instructions.example.letterPairs.map((pair: { top: string; bottom: string }, idx: number) => (
+                        <div 
+                          key={idx} 
+                          className="border rounded p-2 text-center bg-white"
+                        >
+                          <div className="font-bold border-b pb-1">{pair.top}</div>
+                          <div className="pt-1">{pair.bottom}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* Render numeric example */}
+                  {instructions.example.numbers && (
+                    <div className="max-w-lg mx-auto mb-6">
+                      <div className="relative bg-gradient-to-br from-orange-50 via-yellow-50 to-red-50 border-2 border-orange-200/60 rounded-xl p-4 sm:p-6 shadow-xl backdrop-blur-sm">
+                        <div className="flex justify-center items-center space-x-4 sm:space-x-6">
+                          {instructions.example.numbers.map((num: number, index: number) => {
+                            // Determine if this is the lowest, highest, or middle number
+                            const sorted = [...instructions.example.numbers].sort((a, b) => a - b);
+                            const lowest = sorted[0];
+                            const highest = sorted[sorted.length - 1];
+                            const middle = sorted[1];
+                            const isMiddle = num === middle;
+                            const isExtreme = num === lowest || num === highest;
+                            
+                            let bgColor = "bg-gradient-to-br from-gray-100 to-gray-200 border-2 border-gray-300";
+                            
+                            if (isMiddle) {
+                              bgColor = "bg-gradient-to-br from-orange-100 to-yellow-100 border-2 border-orange-300 shadow-lg";
+                            } else if (isExtreme) {
+                              bgColor = "bg-gradient-to-br from-red-100 to-orange-100 border-2 border-red-300 shadow-md";
+                            }
+                            
+                            return (
+                              <div 
+                                key={index} 
+                                className={`text-center ${
+                                  isMiddle ? "transform scale-110" : ""
+                                }`}
+                              >
+                                <div className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-xl flex items-center justify-center ${bgColor}`}>
+                                  <span className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 font-mono">
+                                    {num}
+                                  </span>
+                                </div>
+                                {isMiddle && (
+                                  <div className="text-xs sm:text-sm text-orange-600 font-medium mt-2">
+                                    Middle
+                                  </div>
+                                )}
+                                {num === lowest && (
+                                  <div className="text-xs sm:text-sm text-red-600 font-medium mt-2">
+                                    Lowest
+                                  </div>
+                                )}
+                                {num === highest && (
+                                  <div className="text-xs sm:text-sm text-red-600 font-medium mt-2">
+                                    Highest
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Render Verbal Reasoning example */}
+                  {instructions.example.statements && (
+                    <div className="space-y-4 mb-6">
+                      {/* Statements */}
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h4 className="font-semibold text-blue-900 mb-2">Statements:</h4>
+                        <ul className="space-y-1">
+                          {instructions.example.statements.map((statement: string, index: number) => (
+                            <li key={index} className="text-blue-800">
+                              • {statement}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      
+                      {/* Question */}
+                      {instructions.example.question && (
+                        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                          <h4 className="font-semibold text-purple-900 mb-2">Question:</h4>
+                          <p className="text-purple-800">{instructions.example.question}</p>
+                        </div>
+                      )}
+                      
+                      {/* Options */}
+                      {instructions.example.options && (
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                          <h4 className="font-semibold text-gray-900 mb-3">Options:</h4>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {instructions.example.options.map((option: string, index: number) => (
+                              <div 
+                                key={index}
+                                className="flex items-center p-2 bg-white border border-gray-300 rounded text-sm"
+                              >
+                                <span className="font-bold text-blue-600 mr-2">
+                                  {String.fromCharCode(65 + index)}.
+                                </span>
+                                <span className="text-gray-700">{option}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* Render Working Memory example */}
+                  {instructions.example.letters && (
+                    <div className="max-w-lg mx-auto mb-6">
+                      <div className="relative bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 border-2 border-purple-200/60 rounded-xl p-4 sm:p-6 shadow-xl backdrop-blur-sm">
+                        {/* Letter Sequence Display */}
+                        <div className="flex justify-center items-center space-x-4 sm:space-x-6">
+                          {instructions.example.letters.map((letter: string, index: number) => {
+                            const isMiddle = index === 1; // Middle letter is always at index 1
+                            
+                            return (
+                              <div
+                                key={index}
+                                className={`text-center ${
+                                  isMiddle ? "transform scale-110" : ""
+                                }`}
+                              >
+                                <div
+                                  className={`w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center ${
+                                    isMiddle
+                                      ? "bg-gradient-to-br from-purple-100 to-blue-100 border-2 border-purple-300 shadow-lg"
+                                      : "bg-gradient-to-br from-gray-100 to-gray-200 border-2 border-gray-300"
+                                  }`}
+                                >
+                                  <span className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 font-mono">
+                                    {letter}
+                                  </span>
+                                </div>
+                                {isMiddle && (
+                                  <div className="text-xs sm:text-sm text-purple-600 font-medium mt-2">
+                                    Middle
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Render Visual Rotation example */}
+                  {(instructions.example.grid || instructions.title === "Visual Rotation") && (
+                    <div className="space-y-4 mb-6">
+                      {/* Question */}
+                      <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                        <h4 className="font-semibold text-purple-900 mb-2">Question:</h4>
+                        <p className="text-purple-800">
+                          How many of the bottom figures are identical to the ones directly above them, after rotating them in any direction?
+                        </p>
+                      </div>
+                      
+                      {/* Visual Rotation Grid */}
+                      <div className="max-w-lg mx-auto">
+                        <div className="relative bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 border-2 border-indigo-200/60 rounded-xl p-4 sm:p-6 shadow-xl backdrop-blur-sm">
+                          {(() => {
+                            // Hardcoded example data matching your image
+                            const examplePairs = [
+                              {
+                                top: { letter: "R", rotationDegree: 0, isMirrored: false },
+                                bottom: { letter: "R", rotationDegree: 180, isMirrored: false }
+                              },
+                              {
+                                top: { letter: "R", rotationDegree: 0, isMirrored: false },
+                                bottom: { letter: "R", rotationDegree: 0, isMirrored: true }
+                              },
+                              {
+                                top: { letter: "R", rotationDegree: 0, isMirrored: false },
+                                bottom: { letter: "R", rotationDegree: 0, isMirrored: false }
+                              }
+                            ];
+                            
+                            const getTransform = (item: any) => {
+                              let transform = "";
+                              if (item.rotationDegree !== 0) {
+                                transform += `rotate(${item.rotationDegree}deg)`;
+                              }
+                              if (item.isMirrored) {
+                                transform += " scaleX(-1)";
+                              }
+                              return transform || "none";
+                            };
+                            
+                            return (
+                              <>
+                                {/* Top Row */}
+                                <div
+                                  className="grid gap-2 sm:gap-4 md:gap-6 mb-4 sm:mb-6"
+                                  style={{ gridTemplateColumns: `repeat(${examplePairs.length}, 1fr)` }}
+                                >
+                                  {examplePairs.map((pair, index) => (
+                                    <div key={`top-${index}`} className="text-center">
+                                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white border-2 border-indigo-300 rounded-lg flex items-center justify-center shadow-sm">
+                                        <span
+                                          className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 font-mono inline-block transition-transform duration-200"
+                                          style={{
+                                            transform: getTransform(pair.top),
+                                          }}
+                                        >
+                                          {pair.top.letter}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
 
-            <div className="bg-white border-2 border-green-300 rounded-lg p-4 mb-4">
-              <p className="text-gray-800 font-medium mb-4 text-center">
-                "Tom is stronger than Mike. Jake is stronger than Tom. Who is
-                the strongest?"
-              </p>
+                                {/* Divider */}
+                                <div className="h-px bg-gradient-to-r from-transparent via-indigo-300 to-transparent mb-4 sm:mb-6"></div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 max-w-xs sm:max-w-md mx-auto">
-                <div className="bg-gray-100 p-2 sm:p-3 rounded text-center text-xs sm:text-sm">
-                  Tom
-                </div>
-                <div className="bg-gray-100 p-2 sm:p-3 rounded text-center text-xs sm:text-sm">
-                  Mike
-                </div>
-                <div className="bg-green-200 p-2 sm:p-3 rounded text-center text-xs sm:text-sm font-medium">
-                  Jake
+                                {/* Bottom Row */}
+                                <div
+                                  className="grid gap-2 sm:gap-4 md:gap-6"
+                                  style={{ gridTemplateColumns: `repeat(${examplePairs.length}, 1fr)` }}
+                                >
+                                  {examplePairs.map((pair, index) => (
+                                    <div key={`bottom-${index}`} className="text-center">
+                                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white border-2 border-indigo-300 rounded-lg flex items-center justify-center shadow-sm">
+                                        <span
+                                          className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 font-mono inline-block transition-transform duration-200"
+                                          style={{
+                                            transform: getTransform(pair.bottom),
+                                          }}
+                                        >
+                                          {pair.bottom.letter}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </>
+                            );
+                          })()}
+                        </div>
+                      </div>
+                      
+                      {/* Answer Options */}
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                        <h4 className="font-semibold text-gray-900 mb-3">How many pairs match?</h4>
+                        <div className="flex justify-center space-x-4">
+                          {[0, 1, 2].map((num) => (
+                            <div 
+                              key={num}
+                              className={`w-12 h-12 rounded-lg flex items-center justify-center border-2 ${
+                                num === 1 ? "bg-green-50 border-green-400" : "bg-white border-gray-300"
+                              }`}
+                            >
+                              <span className="text-lg font-bold text-gray-800 font-mono">
+                                {num}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded">
+                    <p className="text-green-700 font-medium">
+                      Correct Answer: {instructions.example.correctAnswer}
+                    </p>
+                    <p className="text-green-700 text-sm mt-1">
+                      {instructions.example.explanation}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
+          )}
 
-            <div className="text-sm text-green-800">
-              <p className="font-medium mb-2">Answer: Jake</p>
-              <p>
-                Jake is stronger than Tom, and Tom is stronger than Mike, so
-                Jake is the strongest.
-              </p>
-            </div>
-          </div>
-
-          {/* Example 2 */}
-          <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
-            <h4 className="font-medium text-purple-900 mb-4 text-center">
-              Example 2: Comparative Reasoning
-            </h4>
-
-            <div className="bg-white border-2 border-purple-300 rounded-lg p-4 mb-4">
-              <p className="text-gray-800 font-medium mb-4 text-center">
-                "Emma is taller than Lisa. Sarah is shorter than Emma. Who is
-                the shortest?"
-              </p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 max-w-xs sm:max-w-md mx-auto">
-                <div className="bg-gray-100 p-2 sm:p-3 rounded text-center text-xs sm:text-sm">
-                  Emma
-                </div>
-                <div className="bg-gray-100 p-2 sm:p-3 rounded text-center text-xs sm:text-sm">
-                  Lisa
-                </div>
-                <div className="bg-purple-200 p-2 sm:p-3 rounded text-center text-xs sm:text-sm font-medium">
-                  Cannot be determined
-                </div>
-              </div>
-            </div>
-
-            <div className="text-sm text-purple-800">
-              <p className="font-medium mb-2">Answer: Cannot be determined</p>
-              <p>
-                We don't know how Sarah compares to Lisa, so we can't determine
-                who is shortest.
-              </p>
-            </div>
-          </div>
-
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <h3 className="text-lg font-semibold text-red-900 mb-2">
-              ⏱️ Speed Challenge:
-            </h3>
-            <p className="text-red-800 font-medium">
-              You have <strong>{exam.timeLimitMinutes} minutes</strong> for{" "}
-              <strong>{exam.totalQuestions} questions</strong>
-            </p>
-            <p className="text-red-700 text-sm mt-2">
-              That's only <strong>3 seconds per question</strong>! Work quickly
-              and trust your first instinct.
-            </p>
-          </div>
         </div>
       );
     }
 
-    if (exam.id === MIL_EXAMS.WORKING_MEMORY) {
-      return (
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">
-              How it works:
-            </h3>
-            <p className="text-gray-700 mb-4">
-              You will see a sequence of three letters. Your task is to identify
-              which outer letter is alphabetically furthest from the middle
-              letter.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">
-              How to respond:
-            </h3>
-            <p className="text-gray-700 mb-4">
-              Look at the three letters, identify the middle one, then determine
-              which of the two outer letters is alphabetically furthest away
-              from it.
-            </p>
-          </div>
-
-          <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
-            <h4 className="font-medium text-purple-900 mb-4 text-center">
-              Example: Letter Distance
-            </h4>
-
-            <div className="bg-white border-2 border-purple-300 rounded-lg p-4 mb-4">
-              <p className="text-gray-800 font-medium mb-4 text-center">
-                Letter sequence: <strong>K - N - R</strong>
-              </p>
-              <p className="text-gray-700 text-sm text-center mb-4">
-                Which outer letter is alphabetically furthest from the middle
-                letter?
-              </p>
-
-              <div className="flex justify-center space-x-4 mb-4">
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-gray-100 border-2 border-gray-300 rounded-full flex items-center justify-center">
-                    <span className="text-lg font-bold font-mono">K</span>
-                  </div>
-                  <div className="text-xs text-gray-600 mt-1">Outer</div>
-                </div>
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-purple-100 border-2 border-purple-300 rounded-full flex items-center justify-center">
-                    <span className="text-lg font-bold font-mono">N</span>
-                  </div>
-                  <div className="text-xs text-purple-600 mt-1">Middle</div>
-                </div>
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-gray-100 border-2 border-gray-300 rounded-full flex items-center justify-center">
-                    <span className="text-lg font-bold font-mono">R</span>
-                  </div>
-                  <div className="text-xs text-gray-600 mt-1">Outer</div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 max-w-xs mx-auto">
-                <div className="bg-gray-100 p-2 sm:p-3 rounded text-center text-xs sm:text-sm">
-                  K
-                </div>
-                <div className="bg-purple-200 p-2 sm:p-3 rounded text-center text-xs sm:text-sm font-medium">
-                  R
-                </div>
-              </div>
-            </div>
-
-            <div className="text-sm text-purple-800">
-              <p className="font-medium mb-2">Answer: R</p>
-              <p>
-                K is 3 positions before N, R is 4 positions after N. R is
-                further from N alphabetically.
-              </p>
-            </div>
-          </div>
-
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <h3 className="text-lg font-semibold text-red-900 mb-2">
-              ⏱️ Speed Challenge:
-            </h3>
-            <p className="text-red-800 font-medium">
-              You have <strong>{exam.timeLimitMinutes} minutes</strong> for{" "}
-              <strong>{exam.totalQuestions} questions</strong>
-            </p>
-            <p className="text-red-700 text-sm mt-2">
-              That's only <strong>3 seconds per question</strong>! Focus
-              intensely and trust your memory.
-            </p>
-          </div>
-        </div>
-      );
-    }
-
-    if (exam.id === MIL_EXAMS.NUMERIC_VELOCITY) {
-      return (
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">
-              How it works:
-            </h3>
-            <p className="text-gray-700 mb-4">
-              You will see three numbers. Your task is to find the highest and
-              lowest numbers, then determine which extreme is furthest from the
-              middle number.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">
-              How to respond:
-            </h3>
-            <p className="text-gray-700 mb-4">
-              Identify the lowest, middle, and highest numbers, then select
-              which extreme (lowest or highest) is furthest from the middle.
-            </p>
-          </div>
-
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-6">
-            <h4 className="font-medium text-orange-900 mb-4 text-center">
-              Example: Number Distance
-            </h4>
-
-            <div className="bg-white border-2 border-orange-300 rounded-lg p-4 mb-4">
-              <p className="text-gray-800 font-medium mb-4 text-center">
-                Numbers: <strong>6 - 11 - 17</strong>
-              </p>
-              <p className="text-gray-700 text-sm text-center mb-4">
-                Which extreme is furthest from the middle number?
-              </p>
-
-              <div className="flex justify-center space-x-4 mb-4">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-red-100 border-2 border-red-300 rounded-xl flex items-center justify-center">
-                    <span className="text-lg font-bold font-mono">6</span>
-                  </div>
-                  <div className="text-xs text-red-600 mt-1">Lowest</div>
-                </div>
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-orange-100 border-2 border-orange-300 rounded-xl flex items-center justify-center">
-                    <span className="text-lg font-bold font-mono">11</span>
-                  </div>
-                  <div className="text-xs text-orange-600 mt-1">Middle</div>
-                </div>
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-red-100 border-2 border-red-300 rounded-xl flex items-center justify-center">
-                    <span className="text-lg font-bold font-mono">17</span>
-                  </div>
-                  <div className="text-xs text-red-600 mt-1">Highest</div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 max-w-xs mx-auto">
-                <div className="bg-gray-100 p-2 sm:p-3 rounded text-center text-xs sm:text-sm">
-                  6
-                </div>
-                <div className="bg-orange-200 p-2 sm:p-3 rounded text-center text-xs sm:text-sm font-medium">
-                  17
-                </div>
-              </div>
-            </div>
-
-            <div className="text-sm text-orange-800">
-              <p className="font-medium mb-2">Answer: 17</p>
-              <p>
-                6 is 5 away from 11, but 17 is 6 away from 11. So 17 is furthest
-                from the middle.
-              </p>
-            </div>
-          </div>
-
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <h3 className="text-lg font-semibold text-red-900 mb-2">
-              ⏱️ Speed Challenge:
-            </h3>
-            <p className="text-red-800 font-medium">
-              You have <strong>{exam.timeLimitMinutes} minutes</strong> for{" "}
-              <strong>{exam.totalQuestions} questions</strong>
-            </p>
-            <p className="text-red-700 text-sm mt-2">
-              That's only <strong>3 seconds per question</strong>! Speed and
-              accuracy are both crucial.
-            </p>
-          </div>
-        </div>
-      );
-    }
-
-    if (exam.id === MIL_EXAMS.VISUAL_ROTATION) {
-      return (
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">
-              How it works:
-            </h3>
-            <p className="text-gray-700 mb-4">
-              You will see 3D objects or 2D shapes that have been rotated. Your
-              task is to identify which rotated version matches the original
-              object from a different angle.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">
-              How to respond:
-            </h3>
-            <p className="text-gray-700 mb-4">
-              Study the original shape carefully, then select which of the
-              rotated options represents the same object viewed from a different
-              angle.
-            </p>
-          </div>
-
-          <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-6">
-            <h4 className="font-medium text-indigo-900 mb-4 text-center">
-              Example: Shape Rotation
-            </h4>
-
-            <div className="bg-white border-2 border-indigo-300 rounded-lg p-4 mb-4">
-              <p className="text-gray-800 font-medium mb-4 text-center">
-                Original Shape: <strong>L</strong>
-              </p>
-              <p className="text-gray-700 text-sm text-center mb-4">
-                Which option shows the same L-shape rotated?
-              </p>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 max-w-sm mx-auto">
-                <div className="bg-gray-100 p-2 sm:p-3 rounded text-center text-xs sm:text-sm">
-                  ⅃
-                </div>
-                <div className="bg-indigo-200 p-2 sm:p-3 rounded text-center text-xs sm:text-sm font-medium">
-                  Γ
-                </div>
-                <div className="bg-gray-100 p-2 sm:p-3 rounded text-center text-xs sm:text-sm">
-                  ⅂
-                </div>
-                <div className="bg-gray-100 p-2 sm:p-3 rounded text-center text-xs sm:text-sm">
-                  ⌐
-                </div>
-              </div>
-            </div>
-
-            <div className="text-sm text-indigo-800">
-              <p className="font-medium mb-2">Answer: Γ (Option 2)</p>
-              <p>The L-shape rotated 90° clockwise becomes a Γ shape.</p>
-            </div>
-          </div>
-
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <h3 className="text-lg font-semibold text-red-900 mb-2">
-              ⏱️ Speed Challenge:
-            </h3>
-            <p className="text-red-800 font-medium">
-              You have <strong>{exam.timeLimitMinutes} minutes</strong> for{" "}
-              <strong>{exam.totalQuestions} questions</strong>
-            </p>
-            <p className="text-red-700 text-sm mt-2">
-              That's only <strong>3 seconds per question</strong>! Visualize
-              rotations quickly and trust your spatial reasoning.
-            </p>
-          </div>
-        </div>
-      );
-    }
-
-    if (exam.id === MIL_EXAMS.PATTERN_RECOGNITION) {
-      return (
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">
-              How it works:
-            </h3>
-            <p className="text-gray-700 mb-4">
-              Each box contains four pairs of letters. You have to identify how
-              many of those pairs are the same (it doesn't matter if a letter is
-              uppercase or lowercase).
-            </p>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">
-              How to respond:
-            </h3>
-            <p className="text-gray-700 mb-4">
-              Select the number that corresponds to the number of matching pairs
-              in each block.
-            </p>
-          </div>
-
-          {/* Visual Example */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-            <h4 className="font-medium text-blue-900 mb-4 text-center">
-              Example:
-            </h4>
-
-            {/* Example Letter Pairs Display */}
-            <div className="bg-white border-2 border-blue-300 rounded-lg p-2 sm:p-3 md:p-4 mb-4 max-w-xs sm:max-w-sm md:max-w-md mx-auto">
-              {/* Top Row */}
-              <div className="grid grid-cols-4 gap-2 sm:gap-3 mb-3 sm:mb-4">
-                <div className="text-center">
-                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 font-mono">
-                    A
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 font-mono">
-                    B
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 font-mono">
-                    D
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 font-mono">
-                    R
-                  </div>
-                </div>
-              </div>
-
-              {/* Divider */}
-              <div className="h-px bg-blue-300 mb-3 sm:mb-4"></div>
-
-              {/* Bottom Row */}
-              <div className="grid grid-cols-4 gap-2 sm:gap-3">
-                <div className="text-center">
-                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 font-mono">
-                    a
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 font-mono">
-                    c
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 font-mono">
-                    d
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 font-mono">
-                    r
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Explanation */}
-            <div className="space-y-3 text-sm text-blue-800">
-              <div className="flex items-center">
-                <div className="w-4 h-4 bg-green-500 rounded-full mr-3"></div>
-                <span>
-                  Pair 1: <strong>A</strong> and <strong>a</strong> → Same
-                  letter (match)
-                </span>
-              </div>
-              <div className="flex items-center">
-                <div className="w-4 h-4 bg-red-500 rounded-full mr-3"></div>
-                <span>
-                  Pair 2: <strong>B</strong> and <strong>c</strong> → Different
-                  letters (no match)
-                </span>
-              </div>
-              <div className="flex items-center">
-                <div className="w-4 h-4 bg-green-500 rounded-full mr-3"></div>
-                <span>
-                  Pair 3: <strong>D</strong> and <strong>d</strong> → Same
-                  letter (match)
-                </span>
-              </div>
-              <div className="flex items-center">
-                <div className="w-4 h-4 bg-green-500 rounded-full mr-3"></div>
-                <span>
-                  Pair 4: <strong>R</strong> and <strong>r</strong> → Same
-                  letter (match)
-                </span>
-              </div>
-            </div>
-
-            {/* Answer */}
-            <div className="mt-4 p-3 bg-green-100 border border-green-300 rounded-lg">
-              <div className="flex items-center justify-center">
-                <span className="text-green-800 font-medium mr-3 text-sm">
-                  Total matching pairs:
-                </span>
-                <div className="w-8 h-8 bg-green-600 text-white rounded flex items-center justify-center font-bold text-lg">
-                  3
-                </div>
-              </div>
-              <p className="text-center text-green-700 text-xs mt-2">
-                You would select <strong>3</strong> as your answer
-              </p>
-            </div>
-          </div>
-
-          {/* Second Example */}
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-            <h4 className="font-medium text-gray-900 mb-4 text-center">
-              Another Example:
-            </h4>
-
-            {/* Example Letter Pairs Display */}
-            <div className="bg-white border-2 border-gray-300 rounded-lg p-2 sm:p-3 md:p-4 mb-4 max-w-xs sm:max-w-sm md:max-w-md mx-auto">
-              {/* Top Row */}
-              <div className="grid grid-cols-4 gap-2 sm:gap-3 mb-3 sm:mb-4">
-                <div className="text-center">
-                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 font-mono">
-                    X
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 font-mono">
-                    M
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 font-mono">
-                    P
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 font-mono">
-                    K
-                  </div>
-                </div>
-              </div>
-
-              {/* Divider */}
-              <div className="h-px bg-gray-300 mb-3 sm:mb-4"></div>
-
-              {/* Bottom Row */}
-              <div className="grid grid-cols-4 gap-2 sm:gap-3">
-                <div className="text-center">
-                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 font-mono">
-                    Y
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 font-mono">
-                    m
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 font-mono">
-                    Q
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 font-mono">
-                    k
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Analysis */}
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="space-y-2">
-                <div className="flex items-center">
-                  <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
-                  <span>X ≠ Y</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                  <span>M = m</span>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center">
-                  <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
-                  <span>P ≠ Q</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                  <span>K = k</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-4 p-2 bg-orange-100 border border-orange-300 rounded-lg text-center">
-              <span className="text-orange-800 font-medium text-sm">
-                Answer:{" "}
-              </span>
-              <span className="inline-flex items-center justify-center w-6 h-6 bg-orange-600 text-white rounded font-bold ml-2 text-sm">
-                2
-              </span>
-              <span className="text-orange-700 text-xs ml-2">
-                (2 matching pairs)
-              </span>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
+    // Fallback content if no API instructions
     return (
       <div className="space-y-4">
         <p className="text-gray-700">{exam.description}</p>
@@ -785,19 +518,28 @@ export default function MILInstructions({
     );
   };
 
-  if (showPractice) {
+
+
+  // Handle Practice Step
+  if (currentStep === 'practice') {
     return (
       <MILPracticeExamples
         examId={exam.id as any}
-        onComplete={onStart}
-        onBack={() => setShowPractice(false)}
+        onComplete={() => setCurrentStep('test')}
+        onBack={() => setCurrentStep('instructions')}
       />
     );
   }
 
+  // Handle Test Step
+  if (currentStep === 'test') {
+    onStart();
+    return null;
+  }
+
+  // Instructions Step (default)
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Fixed Header */}
       <div className="bg-white shadow-sm border-b px-4 sm:px-6 lg:px-8 py-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
@@ -819,7 +561,6 @@ export default function MILInstructions({
         </div>
       </div>
 
-      {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <motion.div
@@ -828,7 +569,6 @@ export default function MILInstructions({
             transition={{ duration: 0.2 }}
             className="bg-white rounded-lg shadow-sm border p-6"
           >
-            {/* Speed Challenge Warning */}
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
               <h3 className="text-lg font-semibold text-red-900 mb-2">
                 ⏱️ Speed Challenge:
@@ -838,12 +578,17 @@ export default function MILInstructions({
                 <strong>{exam.totalQuestions} questions</strong>
               </p>
               <p className="text-red-700 text-sm mt-2">
-                That's only <strong>3 seconds per question</strong>! Work
-                quickly and trust your first instinct.
+                That's only{" "}
+                <strong>
+                  {Math.round(
+                    (exam.timeLimitMinutes * 60) / exam.totalQuestions
+                  )}{" "}
+                  seconds per question
+                </strong>
+                ! Work quickly and trust your first instinct.
               </p>
             </div>
 
-            {/* Instructions Content */}
             <div className="mb-8">
               {loading ? (
                 <div className="text-center py-8">
@@ -855,49 +600,32 @@ export default function MILInstructions({
               )}
             </div>
 
-            {/* Important Notes */}
+
+
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-8">
               <h4 className="font-medium text-yellow-900 mb-2">Important:</h4>
               <ul className="text-sm text-yellow-800 space-y-1">
                 <li>• You cannot go back to previous questions</li>
                 <li>• Each answer is automatically saved when you continue</li>
-                <li>
-                  • If you leave the tab or lose internet connection, the test
-                  will restart
-                </li>
-                <li>
-                  • Complete the practice examples before starting the actual
-                  test
-                </li>
+                <li>• Complete practice examples before starting the actual test</li>
               </ul>
             </div>
-          </motion.div>
-        </div>
-      </div>
 
-      {/* Fixed Footer with Continue Button */}
-      <div className="bg-white border-t px-4 sm:px-6 lg:px-8 py-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
-            <button
-              onClick={onBack}
-              className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors order-2 sm:order-1"
-            >
-              ← Back to Overview
-            </button>
-
-            <div className="text-center order-1 sm:order-2">
+            <div className="flex flex-col sm:flex-row justify-between gap-4 mt-8">
               <button
-                onClick={() => setShowPractice(true)}
-                className="w-full sm:w-auto bg-blue-600 text-white px-8 sm:px-12 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold text-lg shadow-lg"
+                onClick={onBack}
+                className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors"
               >
-                Continue to Practice →
+                Back to Test List
               </button>
-              <p className="text-xs text-gray-500 mt-2">
-                Next: Practice examples to ensure you understand
-              </p>
+              <button
+                onClick={() => setCurrentStep('practice')}
+                className="px-8 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              >
+                Continue to Practice
+              </button>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>

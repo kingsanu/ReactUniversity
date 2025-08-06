@@ -1115,80 +1115,6 @@
           ]
         },
         {
-          "name": "Visual Rotation Exam",
-          "item": [
-            {
-              "name": "Get Visual Rotation Exam",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/visual-rotation-001",
-                  "protocol": "https",
-                  "host": [
-                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
-                  ],
-                  "path": ["api", "PCAExam", "exams", "visual-rotation-001"]
-                },
-                "description": "Get Visual Rotation exam with 60 questions"
-              }
-            },
-            {
-              "name": "Start Visual Rotation Exam",
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": ""
-                },
-                "url": {
-                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/visual-rotation-001/start",
-                  "protocol": "https",
-                  "host": [
-                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
-                  ],
-                  "path": [
-                    "api",
-                    "PCAExam",
-                    "exams",
-                    "visual-rotation-001",
-                    "start"
-                  ]
-                },
-                "description": "Start Visual Rotation exam session"
-              }
-            },
-            {
-              "name": "Get Visual Rotation Instructions",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/visual-rotation-001/instructions",
-                  "protocol": "https",
-                  "host": [
-                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
-                  ],
-                  "path": [
-                    "api",
-                    "PCAExam",
-                    "exams",
-                    "visual-rotation-001",
-                    "instructions"
-                  ]
-                },
-                "description": "Get Visual Rotation exam instructions and examples"
-              }
-            }
-          ]
-        },
-        {
           "name": "Numeric Velocity Exam",
           "item": [
             {
@@ -1258,6 +1184,80 @@
                   ]
                 },
                 "description": "Get Numeric Velocity exam instructions and examples"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Visual Rotation Exam",
+          "item": [
+            {
+              "name": "Get Visual Rotation Exam",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/visual-rotation-001",
+                  "protocol": "https",
+                  "host": [
+                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "PCAExam", "exams", "visual-rotation-001"]
+                },
+                "description": "Get Visual Rotation exam with 16 questions featuring rotated 'R' letters"
+              }
+            },
+            {
+              "name": "Start Visual Rotation Exam",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/visual-rotation-001/start",
+                  "protocol": "https",
+                  "host": [
+                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": [
+                    "api",
+                    "PCAExam",
+                    "exams",
+                    "visual-rotation-001",
+                    "start"
+                  ]
+                },
+                "description": "Start Visual Rotation exam session"
+              }
+            },
+            {
+              "name": "Get Visual Rotation Instructions",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/visual-rotation-001/instructions",
+                  "protocol": "https",
+                  "host": [
+                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": [
+                    "api",
+                    "PCAExam",
+                    "exams",
+                    "visual-rotation-001",
+                    "instructions"
+                  ]
+                },
+                "description": "Get Visual Rotation exam instructions and examples"
               }
             }
           ]
@@ -1506,7 +1506,7 @@
     {
       "key": "examId",
       "value": "pattern-recognition-001",
-      "description": "Available exam IDs: pattern-recognition-001, verbal-reasoning-001, working-memory-001, numeric-velocity-001, visual-rotation-001"
+      "description": "Available exam IDs: pattern-recognition-001, verbal-reasoning-001, working-memory-001, numeric-velocity-001"
     },
     {
       "key": "sessionId",

@@ -1,4 +1,4 @@
-// MIL Assessment Service
+// MIL Assessment Service - Integrated with PCA API
 
 export interface MILQuestion {
   questionNumber: number;
@@ -14,12 +14,20 @@ export interface MILQuestion {
     letters?: string[] | null;
     middleLetterIndex?: number | null;
     numbers?: number[] | null;
-    figurePairs?: any[] | null;
+    figurePairs?: Array<{
+      topFigure: string;
+      bottomFigure: string;
+    }> | null;
     letterSequence?: {
       letters: string[];
       outerLetters: string[];
       middleLetter: string;
     } | null;
+    visualRotationItems?: Array<{
+      letter: string;
+      rotationDegree: number;
+      isMirrored: boolean;
+    }> | null;
   };
   explanation: string;
   correctAnswer?: number | string; // Index of the correct answer or actual value (for letters/numbers)
@@ -61,11 +69,11 @@ export interface MILSession {
 
 // Available MIL Exams
 export const MIL_EXAMS = {
-  PATTERN_RECOGNITION: "pattern-recognition-001",
+  FEATURE_DETECTION: "feature-detection-001",
   VERBAL_REASONING: "verbal-reasoning-001",
   WORKING_MEMORY: "working-memory-001",
-  NUMERIC_VELOCITY: "numeric-velocity-001",
-  VISUAL_ROTATION: "visual-rotation-001",
+  NUMERICAL_SPEED_ACCURACY: "numerical-speed-accuracy-001",
+  SPATIAL_ORIENTATION: "spatial-orientation-001",
 } as const;
 
 export type MILExamId = (typeof MIL_EXAMS)[keyof typeof MIL_EXAMS];

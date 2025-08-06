@@ -118,10 +118,96 @@ export default function MILPracticeExamples({
 
     if (examId.includes("pattern-recognition")) {
       console.log("📐 [LIA PRACTICE] Using Pattern Recognition questions");
-      return baseQuestions.filter((q) => q.type === 1);
+      return [
+        {
+          questionNumber: 1,
+          questionText: "How many letter pairs match? (Case doesn't matter)",
+          type: 1,
+          data: {
+            letterPairs: [
+              { topLetter: "D", bottomLetter: "a" }, // From official example 1
+              { topLetter: "F", bottomLetter: "g" },
+              { topLetter: "H", bottomLetter: "t" },
+              { topLetter: "R", bottomLetter: "r" },
+            ],
+          },
+          explanation:
+            "Only R matches r (case doesn't matter). D≠a, F≠g, H≠t. So 1 pair matches.",
+          correctAnswer: 1,
+        },
+        {
+          questionNumber: 2,
+          questionText: "How many letter pairs match? (Case doesn't matter)",
+          type: 1,
+          data: {
+            letterPairs: [
+              { topLetter: "q", bottomLetter: "Q" }, // From official example 2
+              { topLetter: "a", bottomLetter: "A" },
+              { topLetter: "l", bottomLetter: "L" },
+              { topLetter: "b", bottomLetter: "B" },
+            ],
+          },
+          explanation:
+            "All pairs match: q=Q, a=A, l=L, b=B (case doesn't matter). So 4 pairs match.",
+          correctAnswer: 4,
+        },
+        {
+          questionNumber: 3,
+          questionText: "How many letter pairs match? (Case doesn't matter)",
+          type: 1,
+          data: {
+            letterPairs: [
+              { topLetter: "M", bottomLetter: "w" }, // From official example 3
+              { topLetter: "N", bottomLetter: "f" },
+              { topLetter: "D", bottomLetter: "t" },
+              { topLetter: "E", bottomLetter: "h" },
+            ],
+          },
+          explanation:
+            "None of the pairs match: M≠w, N≠f, D≠t, E≠h. So 0 pairs match.",
+          correctAnswer: 0,
+        },
+      ];
     } else if (examId.includes("verbal-reasoning")) {
       console.log("💬 [LIA PRACTICE] Using Verbal Reasoning questions");
-      return baseQuestions.filter((q) => q.type === 2);
+      return [
+        {
+          questionNumber: 1,
+          questionText:
+            "Anna is taller than Mary. Mary is taller than Olivia. Who is the tallest?",
+          type: 2,
+          data: {
+            options: ["Anna", "Mary", "Olivia"],
+          },
+          explanation:
+            "Since Anna > Mary > Olivia in height, Anna is the tallest.",
+          correctAnswer: 0, // Anna
+        },
+        {
+          questionNumber: 2,
+          questionText:
+            "Liam is faster than James. James is faster than Henry. Who is the slowest?",
+          type: 2,
+          data: {
+            options: ["Liam", "James", "Henry"],
+          },
+          explanation:
+            "Since Liam > James > Henry in speed, Henry is the slowest.",
+          correctAnswer: 2, // Henry
+        },
+        {
+          questionNumber: 3,
+          questionText:
+            "Leo is nicer than David. Owen is meaner than David. Who is the meanest?",
+          type: 2,
+          data: {
+            options: ["Leo", "David", "Owen"],
+          },
+          explanation:
+            "Since Owen is meaner than David, and Leo is nicer than David, Owen is the meanest.",
+          correctAnswer: 2, // Owen
+        },
+      ];
     } else if (examId.includes("working-memory")) {
       console.log("🧠 [LIA PRACTICE] Using Working Memory questions");
       return [
@@ -132,14 +218,14 @@ export default function MILPracticeExamples({
           type: 2,
           data: {
             letterSequence: {
-              letters: ["K", "N", "R"],
-              outerLetters: ["K", "R"],
-              middleLetter: "N",
+              letters: ["F", "H", "K"], // From official example
+              outerLetters: ["F", "K"],
+              middleLetter: "H",
             },
           },
           explanation:
-            "K is 3 positions before N, R is 4 positions after N. R is further from N alphabetically.",
-          correctAnswer: "R",
+            "These letters are arranged in the correct alphabetical order. F comes first, followed by H, then K — just as in the alphabet. Which letter, F or K, is further from the middle letter H? F is 2 positions before H, K is 3 positions after H. K is further from H alphabetically.",
+          correctAnswer: "K",
         },
         {
           questionNumber: 2,
@@ -148,14 +234,30 @@ export default function MILPracticeExamples({
           type: 2,
           data: {
             letterSequence: {
-              letters: ["D", "H", "L"],
-              outerLetters: ["D", "L"],
-              middleLetter: "H",
+              letters: ["P", "S", "U"], // From official example
+              outerLetters: ["P", "U"],
+              middleLetter: "S",
             },
           },
           explanation:
-            "D is 4 positions before H, L is 4 positions after H. Both are equally distant, but D comes first alphabetically.",
-          correctAnswer: "D",
+            "P is 3 positions before S, U is 2 positions after S. P is further from S alphabetically.",
+          correctAnswer: "P",
+        },
+        {
+          questionNumber: 3,
+          questionText:
+            "Which outer letter is alphabetically furthest from the middle letter?",
+          type: 2,
+          data: {
+            letterSequence: {
+              letters: ["C", "E", "H"], // From official example
+              outerLetters: ["C", "H"],
+              middleLetter: "E",
+            },
+          },
+          explanation:
+            "C is 2 positions before E, H is 3 positions after E. H is further from E alphabetically.",
+          correctAnswer: "H",
         },
       ];
     } else if (examId.includes("numeric-velocity")) {
@@ -167,11 +269,11 @@ export default function MILPracticeExamples({
             "Find the highest and lowest numbers, then determine which extreme is furthest from the middle number.",
           type: 3,
           data: {
-            numbers: [6, 11, 17],
+            numbers: [7, 1, 3], // From official example: 7 [A] 1 [B] 3 [C]
           },
           explanation:
-            "Lowest: 6, Highest: 17, Middle: 11. 6 is 5 away from 11, 17 is 6 away from 11. So 17 is furthest.",
-          correctAnswer: 17,
+            "In this case, the numbers are ordered from lowest to highest. The number 1 is the lowest, and the number 7 is the highest. The middle number is 3. The number 7 is furthest from 3. Therefore, the correct answer is letter A, which corresponds to the number 7.",
+          correctAnswer: 7, // Answer A = 7
         },
         {
           questionNumber: 2,
@@ -179,11 +281,11 @@ export default function MILPracticeExamples({
             "Find the highest and lowest numbers, then determine which extreme is furthest from the middle number.",
           type: 3,
           data: {
-            numbers: [8, 15, 12],
+            numbers: [21, 29, 17], // From official example: 21 [A] 29 [B] 17 [C]
           },
           explanation:
-            "Lowest: 8, Highest: 15, Middle: 12. 8 is 4 away from 12, 15 is 3 away from 12. So 8 is furthest.",
-          correctAnswer: 8,
+            "In this case, the numbers are not in order from lowest to highest. Identify the lowest number (17) and the highest number (29). The middle number is 21. Now, determine which of the extremes (17 or 29) is furthest from the number 21. The number 29 is furthest from 21. Therefore, the correct answer is letter B, which corresponds to the number 29.",
+          correctAnswer: 29, // Answer B = 29
         },
       ];
     } else if (examId.includes("visual-rotation")) {
@@ -191,24 +293,66 @@ export default function MILPracticeExamples({
       return [
         {
           questionNumber: 1,
-          questionText: "Which option shows the same L-shape rotated?",
-          type: 5,
+          questionText:
+            "How many of the bottom figures are identical to the ones directly above them, after rotating them in any direction?",
+          type: 4,
           data: {
-            options: ["⅃", "Γ", "⅂", "⌐"],
+            visualRotationItems: [
+              // Top row: R, R, R (all normal)
+              { letter: "R", rotationDegree: 0, isMirrored: false },
+              { letter: "R", rotationDegree: 0, isMirrored: false },
+              { letter: "R", rotationDegree: 0, isMirrored: false },
+              // Bottom row: R (180°), R (mirrored), R (normal)
+              { letter: "R", rotationDegree: 180, isMirrored: false },
+              { letter: "R", rotationDegree: 0, isMirrored: true },
+              { letter: "R", rotationDegree: 0, isMirrored: false },
+            ],
           },
-          explanation: "The L-shape rotated 90° clockwise becomes a Γ shape.",
-          correctAnswer: 1,
+          explanation:
+            "After rotation: First pair (R vs R rotated 180°) = MATCH, Second pair (R vs R mirrored) = NO MATCH, Third pair (R vs R normal) = MATCH. Answer: 2 pairs match.",
+          correctAnswer: 2,
         },
         {
           questionNumber: 2,
           questionText:
-            "If you rotate this shape ⌐ 90° counterclockwise, what do you get?",
-          type: 5,
+            "How many of the bottom figures are identical to the ones directly above them, after rotating them in any direction?",
+          type: 4,
           data: {
-            options: ["L", "⅃", "Γ", "⅂"],
+            visualRotationItems: [
+              // Top row: R, R (all normal)
+              { letter: "R", rotationDegree: 0, isMirrored: false },
+              { letter: "R", rotationDegree: 0, isMirrored: false },
+              // Bottom row: R (90°), R (270°)
+              { letter: "R", rotationDegree: 90, isMirrored: false },
+              { letter: "R", rotationDegree: 270, isMirrored: false },
+            ],
           },
-          explanation: "Rotating ⌐ 90° counterclockwise gives you ⅂.",
-          correctAnswer: 3,
+          explanation:
+            "After rotation: First pair (R vs R rotated 90°) = MATCH, Second pair (R vs R rotated 270°) = MATCH. Both can be rotated to match the top. Answer: 2 pairs match.",
+          correctAnswer: 2,
+        },
+        {
+          questionNumber: 3,
+          questionText:
+            "How many of the bottom figures are identical to the ones directly above them, after rotating them in any direction?",
+          type: 4,
+          data: {
+            visualRotationItems: [
+              // Top row: R, R, R, R (all normal)
+              { letter: "R", rotationDegree: 0, isMirrored: false },
+              { letter: "R", rotationDegree: 0, isMirrored: false },
+              { letter: "R", rotationDegree: 0, isMirrored: false },
+              { letter: "R", rotationDegree: 0, isMirrored: false },
+              // Bottom row: R (normal), R (mirrored), R (180°), R (mirrored + 90°)
+              { letter: "R", rotationDegree: 0, isMirrored: false },
+              { letter: "R", rotationDegree: 0, isMirrored: true },
+              { letter: "R", rotationDegree: 180, isMirrored: false },
+              { letter: "R", rotationDegree: 90, isMirrored: true },
+            ],
+          },
+          explanation:
+            "After rotation: First pair (R vs R normal) = MATCH, Second pair (R vs R mirrored) = NO MATCH, Third pair (R vs R rotated 180°) = MATCH, Fourth pair (R vs R mirrored + 90°) = NO MATCH. Answer: 2 pairs match.",
+          correctAnswer: 2,
         },
       ];
     }
@@ -278,6 +422,15 @@ export default function MILPracticeExamples({
         correctAnswer: question.correctAnswer,
       });
       return selectedNumber === question.correctAnswer;
+    }
+
+    // Handle visual rotation questions
+    if (question.data.visualRotationItems) {
+      console.log("🔄 [LIA PRACTICE] Visual rotation validation:", {
+        answer,
+        correctAnswer: question.correctAnswer,
+      });
+      return answer === question.correctAnswer;
     }
 
     // Handle options-based questions (Verbal Reasoning, etc.)
@@ -470,6 +623,87 @@ export default function MILPracticeExamples({
     );
   };
 
+  const renderVisualRotation = (question: MILQuestion) => {
+    if (!question.data.visualRotationItems) return null;
+
+    const items = question.data.visualRotationItems;
+    // Group items into pairs (top and bottom)
+    const pairs = [];
+    for (let i = 0; i < items.length; i += 2) {
+      if (i + 1 < items.length) {
+        pairs.push({
+          top: items[i],
+          bottom: items[i + 1],
+        });
+      }
+    }
+
+    const getTransform = (item: any) => {
+      let transform = "";
+
+      if (item.rotationDegree !== 0) {
+        transform += `rotate(${item.rotationDegree}deg)`;
+      }
+
+      if (item.isMirrored) {
+        transform += " scaleX(-1)";
+      }
+
+      return transform || "none";
+    };
+
+    return (
+      <div className="max-w-lg mx-auto mb-6 sm:mb-8">
+        <div className="relative bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 border-2 border-indigo-200/60 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-xl backdrop-blur-sm">
+          {/* Top Row */}
+          <div
+            className={`grid gap-2 sm:gap-4 md:gap-6 mb-4 sm:mb-6`}
+            style={{ gridTemplateColumns: `repeat(${pairs.length}, 1fr)` }}
+          >
+            {pairs.map((pair, index) => (
+              <div key={`top-${index}`} className="text-center">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white border-2 border-indigo-300 rounded-lg flex items-center justify-center shadow-sm">
+                  <span
+                    className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 font-mono inline-block transition-transform duration-200"
+                    style={{
+                      transform: getTransform(pair.top),
+                    }}
+                  >
+                    {pair.top.letter}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Divider */}
+          <div className="h-px bg-gradient-to-r from-transparent via-indigo-300 to-transparent mb-4 sm:mb-6"></div>
+
+          {/* Bottom Row */}
+          <div
+            className={`grid gap-2 sm:gap-4 md:gap-6`}
+            style={{ gridTemplateColumns: `repeat(${pairs.length}, 1fr)` }}
+          >
+            {pairs.map((pair, index) => (
+              <div key={`bottom-${index}`} className="text-center">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white border-2 border-indigo-300 rounded-lg flex items-center justify-center shadow-sm">
+                  <span
+                    className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 font-mono inline-block transition-transform duration-200"
+                    style={{
+                      transform: getTransform(pair.bottom),
+                    }}
+                  >
+                    {pair.bottom.letter}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderAnswerOptions = (question: MILQuestion) => {
     // Check if question has API-provided options (for Verbal Reasoning, etc.)
     if (question.data.options && question.data.options.length > 0) {
@@ -538,13 +772,43 @@ export default function MILPracticeExamples({
           key={index}
           onClick={() => handleAnswerSelect(index)}
           disabled={showFeedback}
-          className={`w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-xl sm:rounded-2xl font-bold text-xl sm:text-2xl md:text-3xl transition-all duration-100 ${
+          className={`w-14 h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 rounded-lg sm:rounded-xl font-bold text-lg sm:text-xl md:text-2xl transition-all duration-100 ${
             selectedAnswer === index
-              ? "bg-gradient-to-br from-orange-600 to-red-600 text-white shadow-2xl transform scale-105 sm:scale-110 ring-2 sm:ring-4 ring-orange-200/50"
+              ? "bg-gradient-to-br from-orange-600 to-red-600 text-white shadow-2xl transform scale-105 ring-2 sm:ring-4 ring-orange-200/50"
               : "bg-white border-2 border-gray-200 text-gray-700 hover:border-orange-300 hover:bg-orange-50 shadow-lg hover:shadow-xl"
           } font-mono ${showFeedback ? "cursor-not-allowed opacity-50" : ""}`}
         >
           {number}
+        </button>
+      ));
+    }
+
+    // Check if question has visual rotation items
+    if (question.data.visualRotationItems) {
+      const items = question.data.visualRotationItems;
+      const numPairs = Math.floor(items.length / 2);
+      const maxOptions = Math.min(numPairs, 4); // Cap at 4 for UI reasons
+      const options = Array.from({ length: maxOptions + 1 }, (_, i) => i); // 0 to maxOptions
+
+      console.log("🔄 [LIA PRACTICE] Using visual rotation options:", {
+        totalItems: items.length,
+        numPairs,
+        maxOptions,
+        options,
+      });
+
+      return options.map((option) => (
+        <button
+          key={option}
+          onClick={() => handleAnswerSelect(option)}
+          disabled={showFeedback}
+          className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-lg font-bold text-base sm:text-lg md:text-xl transition-all ${
+            selectedAnswer === option
+              ? "bg-indigo-600 text-white shadow-lg transform scale-105"
+              : "bg-indigo-500 text-white hover:bg-indigo-600 hover:shadow-md"
+          } ${showFeedback ? "cursor-not-allowed opacity-50" : ""}`}
+        >
+          {option}
         </button>
       ));
     }
@@ -656,6 +920,7 @@ export default function MILPracticeExamples({
             {renderLetterPairs(currentQ)}
             {renderLetterSequence(currentQ)}
             {renderNumberSequence(currentQ)}
+            {renderVisualRotation(currentQ)}
 
             {/* Answer Options */}
             <div className="flex justify-center flex-wrap gap-2 sm:gap-3 mb-4 sm:mb-6 max-w-4xl mx-auto px-2">
@@ -736,7 +1001,7 @@ export default function MILPracticeExamples({
                     if (
                       currentQ.data.options &&
                       currentQ.correctAnswer !== undefined &&
-                      typeof currentQ.correctAnswer === 'number' &&
+                      typeof currentQ.correctAnswer === "number" &&
                       currentQ.data.options[currentQ.correctAnswer]
                     ) {
                       return `"${

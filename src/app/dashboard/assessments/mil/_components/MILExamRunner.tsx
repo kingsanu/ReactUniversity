@@ -240,6 +240,9 @@ export default function MILExamRunner({
       const sortedNumbers = [...numbers].sort((a, b) => a - b);
       const extremes = [sortedNumbers[0], sortedNumbers[2]]; // [lowest, highest]
       optionText = `Number: ${extremes[answer]}`;
+    } else if (currentQuestion?.data.visualRotationItems) {
+      // Visual Rotation questions use numeric answers (0-4)
+      optionText = `Count: ${answer}`;
     }
 
     console.log("✅ [LIA RUNNER] Answer selected:", {
@@ -248,6 +251,9 @@ export default function MILExamRunner({
       hasOptions: currentQuestion?.data.options ? true : false,
       hasLetterSequence: currentQuestion?.data.letterSequence ? true : false,
       hasNumbers: currentQuestion?.data.numbers ? true : false,
+      hasVisualRotationItems: currentQuestion?.data.visualRotationItems
+        ? true
+        : false,
       optionText,
     });
     setSelectedAnswer(answer);
@@ -547,6 +553,122 @@ export default function MILExamRunner({
     );
   };
 
+  const renderVisualRotation = (question: MILQuestion) => {
+    if (!question.data.visualRotationItems) return null;
+
+    const items = question.data.visualRotationItems;
+    // Group items into pairs (top and bottom)
+    const pairs = [];
+    for (let i = 0; i < items.length; i += 2) {
+      if (i + 1 < items.length) {
+        pairs.push({
+          top: items[i],
+          bottom: items[i + 1],
+        });
+      }
+    }
+
+    const getTransform = (item: any) => {
+      let transform = "";
+
+      if (item.rotationDegree !== 0) {
+        transform += `rotate(${item.rotationDegree}deg)`;
+      }
+
+      if (item.isMirrored) {
+        transform += " scaleX(-1)";
+      }
+
+      return transform || "none";
+    };
+
+    return (
+      <div className="max-w-2xl mx-auto mb-6 sm:mb-8">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.1 }}
+          className="relative bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 border-2 border-indigo-200/60 rounded-xl sm:rounded-2xl p-3 sm:p-6 shadow-xl backdrop-blur-sm"
+        >
+          {/* Top Row */}
+          <div
+            className={`grid gap-2 sm:gap-4 md:gap-8 mb-4 sm:mb-8`}
+            style={{ gridTemplateColumns: `repeat(${pairs.length}, 1fr)` }}
+          >
+            {pairs.map((pair, index) => (
+              <motion.div
+                key={`top-${index}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: index * 0.02, duration: 0.05 }}
+                className="text-center"
+              >
+                <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-white border-2 border-indigo-300 rounded-lg flex items-center justify-center shadow-sm">
+                  <span
+                    className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 font-mono inline-block transition-transform duration-200"
+                    style={{
+                      transform: getTransform(pair.top),
+                    }}
+                  >
+                    {pair.top.letter}
+                  </span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Divider */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.05, duration: 0.1 }}
+            className="h-px bg-gradient-to-r from-transparent via-indigo-300 to-transparent mb-4 sm:mb-8"
+          />
+
+          {/* Bottom Row */}
+          <div
+            className={`grid gap-2 sm:gap-4 md:gap-8`}
+            style={{ gridTemplateColumns: `repeat(${pairs.length}, 1fr)` }}
+          >
+            {pairs.map((pair, index) => (
+              <motion.div
+                key={`bottom-${index}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.1 + index * 0.02, duration: 0.1 }}
+                className="text-center"
+              >
+                <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-white border-2 border-indigo-300 rounded-lg flex items-center justify-center shadow-sm">
+                  <span
+                    className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 font-mono inline-block transition-transform duration-200"
+                    style={{
+                      transform: getTransform(pair.bottom),
+                    }}
+                  >
+                    {pair.bottom.letter}
+                  </span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Helper text */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.2 }}
+            className="text-center mt-4 sm:mt-6"
+          >
+            <p className="text-xs sm:text-sm text-gray-600">
+              How many bottom figures are identical to the ones directly above
+              them, after rotating them in any direction?
+            </p>
+          </motion.div>
+        </motion.div>
+      </div>
+    );
+  };
+
   const renderAnswerOptions = (question: MILQuestion) => {
     // Check if question has API-provided options (for Verbal Reasoning, etc.)
     if (question.data.options && question.data.options.length > 0) {
@@ -612,13 +734,43 @@ export default function MILExamRunner({
           key={index}
           onClick={() => handleAnswerSelect(index)}
           disabled={isSubmitting}
-          className={`w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-xl sm:rounded-2xl font-bold text-xl sm:text-2xl md:text-3xl transition-all duration-100 ${
+          className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-lg sm:rounded-xl font-bold text-base sm:text-lg md:text-xl transition-all duration-100 ${
             selectedAnswer === index
-              ? "bg-gradient-to-br from-orange-600 to-red-600 text-white shadow-2xl transform scale-105 sm:scale-110 ring-2 sm:ring-4 ring-orange-200/50"
+              ? "bg-gradient-to-br from-orange-600 to-red-600 text-white shadow-2xl transform scale-105 ring-2 sm:ring-4 ring-orange-200/50"
               : "bg-white border-2 border-gray-200 text-gray-700 hover:border-orange-300 hover:bg-orange-50 shadow-lg hover:shadow-xl"
           } disabled:opacity-50 disabled:cursor-not-allowed font-mono`}
         >
           {number}
+        </button>
+      ));
+    }
+
+    // Check if question has visual rotation items
+    if (question.data.visualRotationItems) {
+      const items = question.data.visualRotationItems;
+      const numPairs = Math.floor(items.length / 2);
+      const maxOptions = Math.min(numPairs, 4); // Cap at 4 for UI reasons
+      const options = Array.from({ length: maxOptions + 1 }, (_, i) => i); // 0 to maxOptions
+
+      console.log("🔄 [LIA RUNNER] Using visual rotation options:", {
+        totalItems: items.length,
+        numPairs,
+        maxOptions,
+        options,
+      });
+
+      return options.map((option) => (
+        <button
+          key={option}
+          onClick={() => handleAnswerSelect(option)}
+          disabled={isSubmitting}
+          className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-lg sm:rounded-xl font-bold text-lg sm:text-xl md:text-2xl transition-all duration-100 ${
+            selectedAnswer === option
+              ? "bg-gradient-to-br from-indigo-600 to-purple-600 text-white shadow-2xl transform scale-105 sm:scale-110 ring-2 sm:ring-4 ring-indigo-200/50"
+              : "bg-white border-2 border-gray-200 text-gray-700 hover:border-indigo-300 hover:bg-indigo-50 shadow-lg hover:shadow-xl"
+          } disabled:opacity-50 disabled:cursor-not-allowed`}
+        >
+          {option}
         </button>
       ));
     }
@@ -1020,6 +1172,7 @@ export default function MILExamRunner({
               {renderLetterPairs(currentQuestion)}
               {renderLetterSequence(currentQuestion)}
               {renderNumberSequence(currentQuestion)}
+              {renderVisualRotation(currentQuestion)}
             </div>
 
             {/* Answer Options */}
