@@ -1,14 +1,15 @@
 "use client";
-import { useGlobalStore } from '@/store/useGlobalStore';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { motion } from 'motion/react';
-import { Sparkles } from 'lucide-react';
-import { careerFields } from './resumeData';
+import { useGlobalStore } from "@/store/useGlobalStore";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { motion } from "motion/react";
+import { Sparkles } from "lucide-react";
+import { careerFields } from "./resumeData";
 
 export function PersonalInfoStep() {
-  const { resumeBuilder, updatePersonalInfo, populateWithDummyContent } = useGlobalStore();
+  const { resumeBuilder, updatePersonalInfo, populateWithDummyContent } =
+    useGlobalStore();
   const { personalInfo, careerField } = resumeBuilder.data;
 
   const handleInputChange = (field: string, value: string) => {
@@ -21,7 +22,7 @@ export function PersonalInfoStep() {
     }
   };
 
-  const selectedCareerField = careerFields.find(f => f.id === careerField);
+  const selectedCareerField = careerFields.find((f) => f.id === careerField);
 
   return (
     <motion.div
@@ -31,9 +32,12 @@ export function PersonalInfoStep() {
     >
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Personal Information</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Personal Information
+          </h2>
           <p className="text-sm text-gray-600">
-            Start with your basic contact information and a professional summary.
+            Start with your basic contact information and a professional
+            summary.
           </p>
         </div>
 
@@ -55,7 +59,7 @@ export function PersonalInfoStep() {
           <Input
             id="fullName"
             value={personalInfo.fullName}
-            onChange={(e) => handleInputChange('fullName', e.target.value)}
+            onChange={(e) => handleInputChange("fullName", e.target.value)}
             placeholder="John Doe"
             required
           />
@@ -67,7 +71,7 @@ export function PersonalInfoStep() {
             id="email"
             type="email"
             value={personalInfo.email}
-            onChange={(e) => handleInputChange('email', e.target.value)}
+            onChange={(e) => handleInputChange("email", e.target.value)}
             placeholder="john.doe@email.com"
             required
           />
@@ -79,7 +83,7 @@ export function PersonalInfoStep() {
             id="phone"
             type="tel"
             value={personalInfo.phone}
-            onChange={(e) => handleInputChange('phone', e.target.value)}
+            onChange={(e) => handleInputChange("phone", e.target.value)}
             placeholder="+1 (555) 123-4567"
           />
         </div>
@@ -89,7 +93,7 @@ export function PersonalInfoStep() {
           <Input
             id="location"
             value={personalInfo.location}
-            onChange={(e) => handleInputChange('location', e.target.value)}
+            onChange={(e) => handleInputChange("location", e.target.value)}
             placeholder="City, State"
           />
         </div>
@@ -99,7 +103,7 @@ export function PersonalInfoStep() {
           <Input
             id="linkedin"
             value={personalInfo.linkedin}
-            onChange={(e) => handleInputChange('linkedin', e.target.value)}
+            onChange={(e) => handleInputChange("linkedin", e.target.value)}
             placeholder="linkedin.com/in/johndoe"
           />
         </div>
@@ -109,7 +113,7 @@ export function PersonalInfoStep() {
           <Input
             id="website"
             value={personalInfo.website}
-            onChange={(e) => handleInputChange('website', e.target.value)}
+            onChange={(e) => handleInputChange("website", e.target.value)}
             placeholder="www.johndoe.com"
           />
         </div>
@@ -120,19 +124,25 @@ export function PersonalInfoStep() {
         <textarea
           id="summary"
           value={personalInfo.summary}
-          onChange={(e) => handleInputChange('summary', e.target.value)}
+          onChange={(e) => handleInputChange("summary", e.target.value)}
           placeholder="A brief 2-3 sentence overview highlighting your key skills, education, and career goals. For freshers: mention your degree, relevant skills, and what type of role you're seeking..."
           rows={4}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
         />
         <div className="text-xs text-gray-500 space-y-1">
-          <p><strong>Tip:</strong> Keep it concise and highlight your most relevant skills.</p>
-          <p><strong>For freshers:</strong> Focus on your education, skills, projects, and career aspirations rather than work experience.</p>
+          <p>
+            <strong>Tip:</strong> Keep it concise and highlight your most
+            relevant skills.
+          </p>
+          <p>
+            <strong>For freshers:</strong> Focus on your education, skills,
+            projects, and career aspirations rather than work experience.
+          </p>
         </div>
       </div>
 
       {/* Sample Content Option */}
-      {careerField && selectedCareerField && (
+      {/* {careerField && selectedCareerField && (
         <motion.div
           className="mt-8 p-6 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-200"
           initial={{ opacity: 0, y: 20 }}
@@ -161,7 +171,7 @@ export function PersonalInfoStep() {
             <p><strong>Note:</strong> This will populate all sections with sample data appropriate for your career field. You can edit or replace any content afterward.</p>
           </div>
         </motion.div>
-      )}
+      )} */}
     </motion.div>
   );
 }

@@ -1,10 +1,10 @@
 "use client";
-import { useGlobalStore } from '@/store/useGlobalStore';
-import { resumeSteps } from './resumeData';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { validateAllSteps } from './validation';
-import { ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
+import { useGlobalStore } from "@/store/useGlobalStore";
+import { resumeSteps } from "./resumeData";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { validateAllSteps } from "./validation";
+import { ChevronLeft, ChevronRight, AlertTriangle } from "lucide-react";
 
 export function NavigationButtons() {
   const { resumeBuilder, setResumeStep } = useGlobalStore();
@@ -15,7 +15,9 @@ export function NavigationButtons() {
   // Get validation for current step
   const validation = validateAllSteps(resumeBuilder.data);
   const currentStepValidation = validation[currentStep];
-  const hasWarnings = !currentStepValidation.isValid && currentStepValidation.missingFields.length > 0;
+  const hasWarnings =
+    !currentStepValidation.isValid &&
+    currentStepValidation.missingFields.length > 0;
 
   const handlePrevious = () => {
     if (!isFirstStep) {
@@ -51,7 +53,7 @@ export function NavigationButtons() {
   };
 
   return (
-    <div className="space-y-4 pt-6 border-t border-gray-200">
+    <div className="space-y-4 pt-6 border-t  mt-10 border-gray-200 ">
       {/* Validation Warning */}
       {hasWarnings && (
         <div className="flex items-start space-x-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
@@ -59,7 +61,7 @@ export function NavigationButtons() {
           <div className="text-sm">
             <p className="text-amber-800 font-medium">Missing information:</p>
             <p className="text-amber-700">
-              {currentStepValidation.missingFields.join(', ')}
+              {currentStepValidation.missingFields.join(", ")}
             </p>
             <p className="text-amber-600 text-xs mt-1">
               You can continue and come back to complete this later.
@@ -69,7 +71,7 @@ export function NavigationButtons() {
       )}
 
       {/* Navigation Buttons */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between ">
         <Button
           variant="outline"
           onClick={handlePrevious}
@@ -112,7 +114,7 @@ export function NavigationButtons() {
             (isLastStep || isNextDisabled()) && "opacity-50 cursor-not-allowed"
           )}
         >
-          <span>{isLastStep ? 'Complete' : 'Next'}</span>
+          <span>{isLastStep ? "Complete" : "Next"}</span>
           {!isLastStep && <ChevronRight className="w-4 h-4" />}
         </Button>
       </div>

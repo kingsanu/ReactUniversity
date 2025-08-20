@@ -14,10 +14,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/authapi/test",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/authapi/test",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["authapi", "test"]
             }
@@ -38,10 +38,10 @@
               "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"Password123\",\n  \"roleId\": \"{{roleId}}\"\n}"
             },
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/authapi/signup",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/authapi/signup",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["authapi", "signup"]
             }
@@ -62,10 +62,10 @@
               "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"Password123\"\n}"
             },
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/authapi/login",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/authapi/login",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["authapi", "login"]
             }
@@ -86,10 +86,10 @@
               "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"roleId\": \"{{roleId}}\"\n}"
             },
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/authapi/change-role",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/authapi/change-role",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["authapi", "change-role"]
             }
@@ -110,10 +110,10 @@
               "raw": ""
             },
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/authapi/activate-all-members",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/authapi/activate-all-members",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["authapi", "activate-all-members"]
             }
@@ -130,10 +130,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/roleapi",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/roleapi",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "roleapi"]
             }
@@ -145,10 +145,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/roleapi/active",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/roleapi/active",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "roleapi", "active"]
             }
@@ -160,10 +160,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/roleapi/{{roleId}}",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/roleapi/{{roleId}}",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "roleapi", "{{roleId}}"]
             }
@@ -175,10 +175,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/roleapi/name/{{roleName}}",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/roleapi/name/{{roleName}}",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "roleapi", "name", "{{roleName}}"]
             }
@@ -199,10 +199,10 @@
               "raw": "{\n  \"name\": \"Admin\",\n  \"description\": \"Administrator role with full access\"\n}"
             },
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/roleapi",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/roleapi",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "roleapi"]
             }
@@ -223,10 +223,10 @@
               "raw": "{\n  \"name\": \"SuperAdmin\",\n  \"description\": \"Super administrator role with enhanced privileges\",\n  \"isActive\": true\n}"
             },
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/roleapi/{{roleId}}",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/roleapi/{{roleId}}",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "roleapi", "{{roleId}}"]
             }
@@ -238,10 +238,10 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/roleapi/{{roleId}}",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/roleapi/{{roleId}}",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "roleapi", "{{roleId}}"]
             }
@@ -253,10 +253,10 @@
             "method": "PATCH",
             "header": [],
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/roleapi/{{roleId}}/activate",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/roleapi/{{roleId}}/activate",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "roleapi", "{{roleId}}", "activate"]
             }
@@ -268,10 +268,10 @@
             "method": "PATCH",
             "header": [],
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/roleapi/{{roleId}}/deactivate",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/roleapi/{{roleId}}/deactivate",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "roleapi", "{{roleId}}", "deactivate"]
             }
@@ -292,10 +292,10 @@
               "raw": "{\n  \"personal\": {\n    \"fullName\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"+1 123 456 7890\",\n    \"location\": \"St. Louis, MO\",\n    \"linkedIn\": \"https://linkedin.com/in/johndoe\",\n    \"website\": \"https://johndoe.com\"\n  },\n  \"summary\": \"Experienced Salesforce Admin...\",\n  \"skills\": {\n    \"skills\": {\n      \"Programming Languages\": [\"C#\", \"JavaScript\"],\n      \"Frameworks\": [\"React\", \"ASP.NET\"],\n      \"Soft Skills\": [\"Leadership\", \"Teamwork\"]\n    }\n  },\n  \"experience\": [\n    {\n      \"company\": \"Qualcomm\",\n      \"location\": \"USA\",\n      \"title\": \"Salesforce Admin\",\n      \"startDate\": \"Aug 2024\",\n      \"endDate\": \"Present\",\n      \"descriptions\": [\"Configured and maintained...\"]\n    }\n  ],\n  \"education\": [\n    {\n      \"degree\": \"Masters in Information Systems\",\n      \"institution\": \"Saint Louis University\",\n      \"location\": \"St. Louis, MO\",\n      \"startDate\": \"Aug 2023\",\n      \"endDate\": \"May 2025\"\n    }\n  ]\n}"
             },
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/resume",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/resume",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "resume"]
             }
@@ -311,10 +311,10 @@
               "raw": "{\n  \"personal\": {\n    \"fullName\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"+1 123 456 7890\",\n    \"location\": \"St. Louis, MO\",\n    \"linkedIn\": \"https://linkedin.com/in/johndoe\",\n    \"website\": \"https://johndoe.com\"\n  },\n  \"summary\": \"Updated summary...\",\n  \"skills\": {\n    \"skills\": {\n      \"Programming Languages\": [\"C#\", \"JavaScript\"],\n      \"Frameworks\": [\"React\", \"ASP.NET\"],\n      \"Soft Skills\": [\"Leadership\", \"Teamwork\"]\n    }\n  },\n  \"experience\": [\n    {\n      \"company\": \"Qualcomm\",\n      \"location\": \"USA\",\n      \"title\": \"Salesforce Admin\",\n      \"startDate\": \"Aug 2024\",\n      \"endDate\": \"Present\",\n      \"descriptions\": [\"Configured and maintained...\"]\n    }\n  ],\n  \"education\": [\n    {\n      \"degree\": \"Masters in Information Systems\",\n      \"institution\": \"Saint Louis University\",\n      \"location\": \"St. Louis, MO\",\n      \"startDate\": \"Aug 2023\",\n      \"endDate\": \"May 2025\"\n    }\n  ]\n}"
             },
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/resume/{{resumeId}}",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/resume/{{resumeId}}",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "resume", "{{resumeId}}"]
             }
@@ -326,10 +326,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/resume",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/resume",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "resume"]
             }
@@ -341,10 +341,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/resume/{{resumeId}}",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/resume/{{resumeId}}",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "resume", "{{resumeId}}"]
             }
@@ -356,10 +356,10 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/resume/{{resumeId}}",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/resume/{{resumeId}}",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "resume", "{{resumeId}}"]
             }
@@ -376,10 +376,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/stripe/config",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/stripe/config",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "stripe", "config"]
             }
@@ -400,10 +400,10 @@
               "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"amount\": 2000,\n  \"currency\": \"usd\",\n  \"description\": \"Test payment for resume builder\"\n}"
             },
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/stripe/create-payload",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/stripe/create-payload",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "stripe", "create-payload"]
             }
@@ -424,10 +424,10 @@
               "raw": "{\n  \"paymentIntentId\": \"{{paymentIntentId}}\",\n  \"paymentMethodId\": \"pm_card_visa\",\n  \"returnUrl\": \"https://example.com/success\"\n}"
             },
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/stripe/create-payment",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/stripe/create-payment",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "stripe", "create-payment"]
             }
@@ -439,10 +439,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/stripe/status/{{sessionId}}",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/stripe/status/{{sessionId}}",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "stripe", "status", "{{sessionId}}"]
             },
@@ -464,10 +464,10 @@
               "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"amount\": 2000,\n  \"currency\": \"usd\",\n  \"productName\": \"Resume Builder Premium\",\n  \"successUrl\": \"https://your-frontend-domain/payment-success?session_id={CHECKOUT_SESSION_ID}\",\n  \"cancelUrl\": \"https://your-frontend-domain/payment-cancelled\"\n}"
             },
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/stripe/create-checkout-session",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/stripe/create-checkout-session",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "stripe", "create-checkout-session"]
             },
@@ -480,10 +480,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/stripe/user/{{userId}}",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/stripe/user/{{userId}}",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "stripe", "user", "{{userId}}"]
             }
@@ -504,10 +504,10 @@
               "raw": ""
             },
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/payment/activate-all-payments",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/payment/activate-all-payments",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "payment", "activate-all-payments"]
             }
@@ -524,10 +524,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/subscriptionplan",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/subscriptionplan",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "subscriptionplan"]
             }
@@ -539,10 +539,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/subscriptionplan/{{subscriptionPlanId}}",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/subscriptionplan/{{subscriptionPlanId}}",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "subscriptionplan", "{{subscriptionPlanId}}"]
             }
@@ -561,10 +561,10 @@
               "raw": "{\n  \"name\": \"Pro Plan\",\n  \"price\": 29.99,\n  \"interval\": \"monthly\",\n  \"features\": [\"Unlimited Projects\", \"Priority Support\"]\n}\n\n// Note: CreatedBy is set automatically from the authenticated user."
             },
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/subscriptionplan",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/subscriptionplan",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "subscriptionplan"]
             }
@@ -583,10 +583,10 @@
               "raw": "{\n  \"name\": \"Pro Plan Updated\",\n  \"price\": 39.99,\n  \"interval\": \"monthly\",\n  \"features\": [\"Unlimited Projects\", \"Priority Support\", \"Custom Reports\"],\n  \"isActive\": true\n}\n\n// Note: UpdatedBy is set automatically from the authenticated user."
             },
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/subscriptionplan/{{subscriptionPlanId}}",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/subscriptionplan/{{subscriptionPlanId}}",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "subscriptionplan", "{{subscriptionPlanId}}"]
             }
@@ -600,10 +600,10 @@
               { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
             ],
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/subscriptionplan/{{subscriptionPlanId}}",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/subscriptionplan/{{subscriptionPlanId}}",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "subscriptionplan", "{{subscriptionPlanId}}"]
             }
@@ -622,10 +622,10 @@
               { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
             ],
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/usersubscription",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/usersubscription",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "usersubscription"]
             }
@@ -639,10 +639,10 @@
               { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
             ],
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/usersubscription/{{userSubscriptionId}}",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/usersubscription/{{userSubscriptionId}}",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "usersubscription", "{{userSubscriptionId}}"]
             }
@@ -661,10 +661,10 @@
               "raw": "{\n  \"planId\": \"{{subscriptionPlanId}}\",\n  \"nextBillingDate\": \"2024-08-01T00:00:00Z\"\n}\n\n// Note: UserId is set automatically from the authenticated user."
             },
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/usersubscription",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/usersubscription",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "usersubscription"]
             }
@@ -683,10 +683,10 @@
               "raw": "{\n  \"status\": \"active\",\n  \"nextBillingDate\": \"2024-09-01T00:00:00Z\"\n}\n\n// Note: UserId and UpdatedBy are set automatically from the authenticated user."
             },
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/usersubscription/{{userSubscriptionId}}",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/usersubscription/{{userSubscriptionId}}",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "usersubscription", "{{userSubscriptionId}}"]
             }
@@ -700,10 +700,10 @@
               { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
             ],
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/usersubscription/{{userSubscriptionId}}",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/usersubscription/{{userSubscriptionId}}",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "usersubscription", "{{userSubscriptionId}}"]
             }
@@ -729,10 +729,10 @@
               "raw": "{\n  \"CoKey\": \"8A38EEAA-9B94-474D-BE6A-0AB193DDD98D\"\n}"
             },
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/pcaapi/authenticate",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/pcaapi/authenticate",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "pcaapi", "authenticate"]
             },
@@ -754,10 +754,10 @@
               "raw": "{\n  \"CoKey\": \"NXDAPS\",\n  \"PerNom\": \"John\",\n  \"PerApe\": \"Doe\",\n  \"PerNumIde\": \"12345678\",\n  \"PerGen\": \"M\",\n  \"permail\": \"john.doe@example.com\",\n  \"JcaCod\": \"GTCML\",\n  \"BillingCenter\": \"\",\n  \"UserMail\": \"admin@example.com\"\n}"
             },
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/pcaapi/add-evaluation",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/pcaapi/add-evaluation",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "pcaapi", "add-evaluation"]
             },
@@ -779,10 +779,10 @@
               "raw": "{\n  \"CoKey\": \"8A38EEAA-9B94-474D-BE6A-0AB193DDD98D\",\n  \"PcaCod\": \"{{pcaCode}}\"\n}"
             },
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/pcaapi/get-result",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/pcaapi/get-result",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "pcaapi", "get-result"]
             },
@@ -804,10 +804,10 @@
               "raw": "{\n  \"CoKey\": \"8A38EEAA-9B94-474D-BE6A-0AB193DDD98D\",\n  \"PcaCod\": \"{{pcaCode}}\",\n  \"CmpTims\": \"1\"\n}"
             },
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/pcaapi/get-competences",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/pcaapi/get-competences",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "pcaapi", "get-competences"]
             },
@@ -829,10 +829,10 @@
               "raw": "{\n  \"CoKey\": \"8A38EEAA-9B94-474D-BE6A-0AB193DDD98D\",\n  \"PcaCod\": \"{{pcaCode}}\",\n  \"JcaCodExt\": \"GTCML\",\n  \"AnlsTip\": \"g\"\n}"
             },
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/pcaapi/get-pca-vs-jca",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/pcaapi/get-pca-vs-jca",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "pcaapi", "get-pca-vs-jca"]
             },
@@ -845,10 +845,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/pcaapi/jca-codes",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/pcaapi/jca-codes",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "pcaapi", "jca-codes"]
             },
@@ -861,10 +861,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/pcaapi/health",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/pcaapi/health",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "pcaapi", "health"]
             },
@@ -882,10 +882,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams",
               "protocol": "https",
               "host": [
-                "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "PCAExam", "exams"]
             },
@@ -901,10 +901,10 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/pattern-recognition-001",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/pattern-recognition-001",
                   "protocol": "https",
                   "host": [
-                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
                   "path": ["api", "PCAExam", "exams", "pattern-recognition-001"]
                 },
@@ -926,10 +926,10 @@
                   "raw": ""
                 },
                 "url": {
-                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/pattern-recognition-001/start",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/pattern-recognition-001/start",
                   "protocol": "https",
                   "host": [
-                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
                   "path": [
                     "api",
@@ -948,10 +948,10 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/pattern-recognition-001/instructions",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/pattern-recognition-001/instructions",
                   "protocol": "https",
                   "host": [
-                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
                   "path": [
                     "api",
@@ -975,10 +975,10 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/verbal-reasoning-001",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/verbal-reasoning-001",
                   "protocol": "https",
                   "host": [
-                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
                   "path": ["api", "PCAExam", "exams", "verbal-reasoning-001"]
                 },
@@ -1000,10 +1000,10 @@
                   "raw": ""
                 },
                 "url": {
-                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/verbal-reasoning-001/start",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/verbal-reasoning-001/start",
                   "protocol": "https",
                   "host": [
-                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
                   "path": [
                     "api",
@@ -1022,10 +1022,10 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/verbal-reasoning-001/instructions",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/verbal-reasoning-001/instructions",
                   "protocol": "https",
                   "host": [
-                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
                   "path": [
                     "api",
@@ -1049,10 +1049,10 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/working-memory-001",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/working-memory-001",
                   "protocol": "https",
                   "host": [
-                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
                   "path": ["api", "PCAExam", "exams", "working-memory-001"]
                 },
@@ -1074,10 +1074,10 @@
                   "raw": ""
                 },
                 "url": {
-                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/working-memory-001/start",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/working-memory-001/start",
                   "protocol": "https",
                   "host": [
-                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
                   "path": [
                     "api",
@@ -1096,10 +1096,10 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/working-memory-001/instructions",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/working-memory-001/instructions",
                   "protocol": "https",
                   "host": [
-                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
                   "path": [
                     "api",
@@ -1123,10 +1123,10 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/numeric-velocity-001",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/numeric-velocity-001",
                   "protocol": "https",
                   "host": [
-                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
                   "path": ["api", "PCAExam", "exams", "numeric-velocity-001"]
                 },
@@ -1148,10 +1148,10 @@
                   "raw": ""
                 },
                 "url": {
-                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/numeric-velocity-001/start",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/numeric-velocity-001/start",
                   "protocol": "https",
                   "host": [
-                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
                   "path": [
                     "api",
@@ -1170,10 +1170,10 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/numeric-velocity-001/instructions",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/numeric-velocity-001/instructions",
                   "protocol": "https",
                   "host": [
-                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
                   "path": [
                     "api",
@@ -1197,10 +1197,10 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/visual-rotation-001",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/visual-rotation-001",
                   "protocol": "https",
                   "host": [
-                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
                   "path": ["api", "PCAExam", "exams", "visual-rotation-001"]
                 },
@@ -1222,10 +1222,10 @@
                   "raw": ""
                 },
                 "url": {
-                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/visual-rotation-001/start",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/visual-rotation-001/start",
                   "protocol": "https",
                   "host": [
-                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
                   "path": [
                     "api",
@@ -1244,10 +1244,10 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/visual-rotation-001/instructions",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/visual-rotation-001/instructions",
                   "protocol": "https",
                   "host": [
-                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
                   "path": [
                     "api",
@@ -1271,10 +1271,10 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/{{examId}}",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/{{examId}}",
                   "protocol": "https",
                   "host": [
-                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
                   "path": ["api", "PCAExam", "exams", "{{examId}}"]
                 },
@@ -1296,10 +1296,10 @@
                   "raw": ""
                 },
                 "url": {
-                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/{{examId}}/start",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/{{examId}}/start",
                   "protocol": "https",
                   "host": [
-                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
                   "path": ["api", "PCAExam", "exams", "{{examId}}", "start"]
                 },
@@ -1312,10 +1312,10 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/exams/{{examId}}/instructions",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/{{examId}}/instructions",
                   "protocol": "https",
                   "host": [
-                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
                   "path": [
                     "api",
@@ -1348,10 +1348,10 @@
                   "raw": "{\n  \"examId\": \"pattern-recognition-001\",\n  \"userId\": \"{{userId}}\",\n  \"startTime\": \"2024-01-15T10:00:00Z\",\n  \"endTime\": \"2024-01-15T10:03:00Z\",\n  \"isTimeExpired\": false,\n  \"answers\": [\n    {\n      \"questionNumber\": 1,\n      \"selectedAnswer\": \"3\",\n      \"isAnswered\": true,\n      \"timeSpent\": \"00:00:30\"\n    },\n    {\n      \"questionNumber\": 2,\n      \"selectedAnswer\": \"2\",\n      \"isAnswered\": true,\n      \"timeSpent\": \"00:00:45\"\n    },\n    {\n      \"questionNumber\": 3,\n      \"selectedAnswer\": \"1\",\n      \"isAnswered\": true,\n      \"timeSpent\": \"00:00:20\"\n    }\n  ]\n}"
                 },
                 "url": {
-                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/submit",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/submit",
                   "protocol": "https",
                   "host": [
-                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
                   "path": ["api", "PCAExam", "submit"]
                 },
@@ -1373,10 +1373,10 @@
                   "raw": "{\n  \"examId\": \"pattern-recognition-001\",\n  \"userId\": \"{{userId}}\",\n  \"startTime\": \"2024-01-15T10:00:00Z\",\n  \"endTime\": \"2024-01-15T10:03:00Z\",\n  \"isTimeExpired\": true,\n  \"isCompleted\": false,\n  \"answers\": [\n    {\n      \"questionNumber\": 1,\n      \"selectedAnswer\": \"3\",\n      \"isAnswered\": true,\n      \"timeSpent\": \"00:00:30\"\n    },\n    {\n      \"questionNumber\": 2,\n      \"selectedAnswer\": \"2\",\n      \"isAnswered\": true,\n      \"timeSpent\": \"00:00:45\"\n    }\n  ]\n}"
                 },
                 "url": {
-                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/complete",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/complete",
                   "protocol": "https",
                   "host": [
-                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
                   "path": ["api", "PCAExam", "complete"]
                 },
@@ -1389,10 +1389,10 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/session/{{sessionId}}",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/session/{{sessionId}}",
                   "protocol": "https",
                   "host": [
-                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
                   "path": ["api", "PCAExam", "session", "{{sessionId}}"]
                 },
@@ -1405,10 +1405,10 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/history/{{userId}}",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/history/{{userId}}",
                   "protocol": "https",
                   "host": [
-                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
                   "path": ["api", "PCAExam", "history", "{{userId}}"]
                 },
@@ -1421,10 +1421,10 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/statistics/{{examId}}",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/statistics/{{examId}}",
                   "protocol": "https",
                   "host": [
-                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
                   "path": ["api", "PCAExam", "statistics", "{{examId}}"]
                 },
@@ -1437,17 +1437,235 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net/api/PCAExam/all-results",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/all-results",
                   "protocol": "https",
                   "host": [
-                    "university-hjevd3cgbwgydzf2.canadacentral-01.azurewebsites.net"
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
                   "path": ["api", "PCAExam", "all-results"]
                 },
                 "description": "Get all completed exam results with detailed information including:\n- Username (retrieved from User entity)\n- Exam name and type\n- Comprehensive result summary (score percentage, accuracy, correct/incorrect answers)\n- Start and end dates\n- Total time spent\n- Detailed answers for each question (user answer, correct answer, time spent, explanations)\n- Time expiration and completion status\n\nReturns all exam sessions that are marked as completed, sorted by start time (most recent first)."
               }
+            },
+            {
+              "name": "Get Score Calculation Details",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/score-calculation/{{examId}}/{{sessionId}}",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": [
+                    "api",
+                    "PCAExam",
+                    "score-calculation",
+                    "{{examId}}",
+                    "{{sessionId}}"
+                  ]
+                },
+                "description": "Get detailed scoring breakdown for an exam session including:\n- Right and wrong answers\n- Penalty calculation\n- Error calculation\n- Raw score before rounding\n- Rounded score after applying rounding rules\n- Percentile mapping\n- Rounding method used\n\nShows the complete scoring calculation process with penalty-based formulas."
+              }
+            },
+            {
+              "name": "Get Percentile Mapping",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/percentile-mapping/{{examId}}",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "PCAExam", "percentile-mapping", "{{examId}}"]
+                },
+                "description": "Get the complete score-to-percentile mapping table for an exam.\n\nReturns all score ranges and their corresponding percentiles:\n- Range formats: < N, <= N, > N, >= N, A - B, N (exact)\n- Percentile values from 1 to 99\n- Used for professional assessment reporting"
+              }
+            },
+            {
+              "name": "Get Exam Configuration",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exam-config/{{examId}}",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "PCAExam", "exam-config", "{{examId}}"]
+                },
+                "description": "Get exam configuration details including:\n- Penalty value used for scoring\n- Rounding method (half_up, none)\n- Scoring rules and parameters\n\nConfiguration follows the Label Intelligence Assessment specification."
+              }
             }
           ]
+        }
+      ]
+    },
+    {
+      "name": "360° Evaluation",
+      "item": [
+        {
+          "name": "Create Evaluation Group",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"evaluatorName\": \"John Smith\",\n  \"evaluatorEmail\": \"john.smith@example.com\",\n  \"relation\": \"father\",\n  \"groupType\": \"Parent\",\n  \"evaluatedUserId\": \"{{userId}}\"\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/evaluation/create-group",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["evaluation", "create-group"]
+            },
+            "description": "Creates a new evaluation group for Parent, Teacher, or Sibling/Friend evaluators.\n\nGroup Types:\n- Parent: For parent evaluators\n- Teacher: For teacher evaluators\n- SiblingFriend: For sibling or friend evaluators\n\nReturns:\n- Evaluation group details\n- Invitation token (32-character secure token)\n- Invitation URL\n- Token expiry date (2 days from creation)\n- Status flags (isTokenUsed, isEvaluationCompleted)"
+          }
+        },
+        {
+          "name": "Validate Token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/evaluation/validate-token?token={{invitationToken}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["evaluation", "validate-token"],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{invitationToken}}"
+                }
+              ]
+            },
+            "description": "Validates an invitation token and returns evaluator information.\n\nChecks:\n- Token existence\n- Token expiry (2-day validity)\n- Token usage status\n\nReturns:\n- Token validity status\n- Evaluator details (name, email, relation, group type)\n- Evaluated user ID\n- Token expiry date"
+          }
+        },
+        {
+          "name": "Get User Evaluation Groups",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/evaluation/user/{{userId}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["evaluation", "user", "{{userId}}"]
+            },
+            "description": "Retrieves all evaluation groups for a specific user.\n\nReturns:\n- List of all evaluation groups\n- Each group includes:\n  - Evaluator details (name, email, relation, group type)\n  - Invitation token and URL\n  - Token expiry date\n  - Status flags (isTokenUsed, isEvaluationCompleted)\n  - Creation date\n\nUse this for dashboard tracking and monitoring evaluation progress."
+          }
+        },
+        {
+          "name": "Create Parent Evaluator",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"evaluatorName\": \"Sarah Johnson\",\n  \"evaluatorEmail\": \"sarah.johnson@example.com\",\n  \"relation\": \"mother\",\n  \"groupType\": \"Parent\",\n  \"evaluatedUserId\": \"{{userId}}\"\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/evaluation/create-group",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["evaluation", "create-group"]
+            },
+            "description": "Example: Create evaluation group for a parent (mother)"
+          }
+        },
+        {
+          "name": "Create Teacher Evaluator",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"evaluatorName\": \"Dr. Michael Brown\",\n  \"evaluatorEmail\": \"michael.brown@school.edu\",\n  \"relation\": \"math teacher\",\n  \"groupType\": \"Teacher\",\n  \"evaluatedUserId\": \"{{userId}}\"\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/evaluation/create-group",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["evaluation", "create-group"]
+            },
+            "description": "Example: Create evaluation group for a teacher"
+          }
+        },
+        {
+          "name": "Create Sibling/Friend Evaluator",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"evaluatorName\": \"Alex Wilson\",\n  \"evaluatorEmail\": \"alex.wilson@example.com\",\n  \"relation\": \"best friend\",\n  \"groupType\": \"SiblingFriend\",\n  \"evaluatedUserId\": \"{{userId}}\"\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/evaluation/create-group",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["evaluation", "create-group"]
+            },
+            "description": "Example: Create evaluation group for a sibling or friend"
+          }
         }
       ]
     }
@@ -1512,6 +1730,11 @@
       "key": "sessionId",
       "value": "your-session-id-here",
       "description": "Replace with actual exam session ID for testing"
+    },
+    {
+      "key": "invitationToken",
+      "value": "your-invitation-token-here",
+      "description": "Replace with actual invitation token returned from create-group endpoint"
     }
   ]
 }

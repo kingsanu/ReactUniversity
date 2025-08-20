@@ -206,9 +206,9 @@ export default function ResumeBuilderPage() {
         </div>
       </div>
 
-      {/* Enhanced Step Indicator */}
+      {/* Enhanced Step Indicator - More Compact */}
       <div className="bg-white/60 backdrop-blur-sm border-b border-white/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <StepIndicator />
         </div>
       </div>
@@ -224,7 +224,7 @@ export default function ResumeBuilderPage() {
         >
           {/* Form Section */}
           <div
-            className={`bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 p-8 ${
+            className={`bg-white/70 backdrop-blur-xl rounded-2xl  shadow-xl border border-white/20 p-8 ${
               currentStep === 1 || currentStep === 2 ? "max-w-4xl mx-auto" : ""
             }`}
           >

@@ -11,6 +11,7 @@ import { Benchmarks } from "./_components/Benchmarks";
 import { Milestones } from "./_components/Milestones";
 import { PCAResults } from "./_components/PCAResults";
 import { MILResults } from "./_components/MILResults";
+import { AssessmentProgressCard } from "@/components/dashboard/AssessmentProgressCard";
 import "@/utils/adminTestUtils"; // Make admin test functions available globally
 import "@/utils/milTestUtils"; // Make MIL test functions available globally
 
@@ -24,9 +25,23 @@ export default function DashboardPage() {
       <div className="flex-1 flex flex-col overflow-hidden lg:ml-0">
         <TopNav onMenuClick={() => setSidebarOpen(true)} />
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
           {/* Action Cards */}
           <ActionCards />
+
+          {/* Top Row - Assessment Progress and Key Metrics */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Assessment Progress */}
+            <div className="lg:col-span-1">
+              <AssessmentProgressCard />
+            </div>
+
+            {/* Key Results */}
+            <div className="lg:col-span-1 grid grid-cols-1 md:grid-cols-1 gap-6">
+              {/* <PCAResults /> */}
+              <MILResults />
+            </div>
+          </div>
 
           {/* Main Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -35,15 +50,8 @@ export default function DashboardPage() {
               <CompetencyChart />
             </div>
 
-            {/* Right Column */}
-            <div className="space-y-6">
-              {/* PCA Results */}
-              <PCAResults />
-
-              {/* MIL Results */}
-              <MILResults />
-
-              {/* Career Matches */}
+            {/* Right: Career Matches */}
+            <div>
               <CareerMatches />
             </div>
           </div>

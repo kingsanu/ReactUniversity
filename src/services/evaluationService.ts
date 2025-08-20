@@ -1,0 +1,1100 @@
+// 360-Degree Evaluation Service - Educational/Vocational Assessment
+
+export interface CompetencyDimension {
+  id: string;
+  name: string;
+  description: string;
+  category:
+    | "interests"
+    | "talents"
+    | "strengths"
+    | "emotional_intelligence"
+    | "leadership"
+    | "responsibility"
+    | "communication";
+  isActive: boolean;
+  order: number;
+  weight: number;
+}
+
+export interface RatingScale {
+  id: string;
+  name: string;
+  description: string;
+  type: "likert" | "emotive";
+  minValue: number;
+  maxValue: number;
+  labels: {
+    value: number;
+    label: string;
+    description?: string;
+    emoji?: string;
+  }[];
+  options: {
+    value: number;
+    label: string;
+    description?: string;
+    emoji?: string;
+  }[];
+}
+
+export interface EvaluatorGroup {
+  id: string;
+  name: string;
+  type: "self" | "parent" | "teacher" | "sibling_friend";
+  minRequired: number;
+  maxAllowed: number;
+  description?: string;
+  evaluators: Evaluator[];
+}
+
+export interface EvaluatorRequirement {
+  self: { minimum: number; maximum: number };
+  parent: { minimum: number; maximum: number };
+  teacher: { minimum: number; maximum: number };
+  peer: { minimum: number; maximum: number };
+}
+
+export interface Evaluator {
+  id: string;
+  name: string;
+  email: string;
+  phone: string; // Required with country code (e.g., +1234567890)
+  relationship: string;
+  groupType: EvaluatorGroup["type"];
+  groupId?: string;
+  invitationToken: string;
+  invitationSent: boolean;
+  invitationSentAt?: string;
+  responseReceived: boolean;
+  responseReceivedAt?: string;
+  isActive: boolean;
+}
+
+export interface EvaluationQuestion {
+  id: string;
+  competencyId: string;
+  questionText: string;
+  questionType: "rating" | "open_ended" | "both";
+  isRequired: boolean;
+  order: number;
+  helpText?: string;
+}
+
+export interface EvaluationResponse {
+  id: string;
+  evaluationId: string;
+  evaluatorId: string;
+  questionId: string;
+  ratingValue?: number;
+  textResponse?: string;
+  submittedAt: string;
+}
+
+export interface EvaluationSession {
+  id: string;
+  evaluatedPersonId: string;
+  evaluatedPersonName: string;
+  title: string;
+  description: string;
+  status: "draft" | "active" | "completed" | "archived";
+  createdBy: string;
+  createdAt: string;
+  startDate: string;
+  endDate: string;
+  competencyDimensions: CompetencyDimension[];
+  ratingScale: RatingScale;
+  evaluatorGroups: EvaluatorGroup[];
+  evaluators: Evaluator[];
+  questions: EvaluationQuestion[];
+  responses: EvaluationResponse[];
+  configuration: EvaluationConfiguration;
+  evaluatorRequirements: EvaluatorRequirement;
+}
+
+export interface EvaluationConfiguration {
+  id: string;
+  name: string;
+  description: string;
+  competencyDimensions: CompetencyDimension[];
+  ratingScale: RatingScale;
+  evaluatorRequirements: EvaluatorRequirement;
+  evaluatorGroups: EvaluatorGroup[];
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  allowAnonymousResponses?: boolean;
+  requireAllQuestions?: boolean;
+  allowPartialSubmissions?: boolean;
+  sendReminders?: boolean;
+  reminderIntervalDays?: number;
+  maxReminders?: number;
+  showProgressToEvaluated?: boolean;
+  generateReportAutomatically?: boolean;
+}
+
+export interface EvaluationInvitation {
+  id: string;
+  evaluationId: string;
+  evaluatorId: string;
+  token: string;
+  expiresAt: string;
+  isUsed: boolean;
+  usedAt?: string;
+}
+
+export interface EvaluationReport {
+  id: string;
+  evaluationId: string;
+  generatedAt: string;
+  summary: {
+    totalEvaluators: number;
+    responseRate: number;
+    completionRate: number;
+    averageRatings: { [competencyId: string]: number };
+  };
+  competencyAnalysis: {
+    competencyId: string;
+    competencyName: string;
+    overallRating: number;
+    ratingsByGroup: { [groupType: string]: number };
+    strengths: string[];
+    developmentAreas: string[];
+    keyFeedback: string[];
+  }[];
+  recommendations: string[];
+  detailedFeedback: {
+    groupType: string;
+    feedback: {
+      competencyId: string;
+      rating: number;
+      comments: string[];
+    }[];
+  }[];
+}
+
+// Default competency dimensions for educational/vocational assessment
+export const DEFAULT_COMPETENCY_DIMENSIONS: CompetencyDimension[] = [
+  {
+    id: "interests-001",
+    name: "Academic Interests",
+    description: "Shows curiosity and engagement in learning activities",
+    category: "interests",
+    isActive: true,
+    order: 1,
+    weight: 1,
+  },
+  {
+    id: "interests-002",
+    name: "Career Interests",
+    description: "Demonstrates interest in specific career paths or industries",
+    category: "interests",
+    isActive: true,
+    order: 2,
+    weight: 1,
+  },
+  {
+    id: "talents-001",
+    name: "Analytical Thinking",
+    description: "Ability to break down complex problems and think logically",
+    category: "talents",
+    isActive: true,
+    order: 3,
+    weight: 1,
+  },
+  {
+    id: "talents-002",
+    name: "Creative Expression",
+    description: "Shows creativity and original thinking in various contexts",
+    category: "talents",
+    isActive: true,
+    order: 4,
+    weight: 1,
+  },
+  {
+    id: "strengths-001",
+    name: "Perseverance",
+    description: "Demonstrates persistence when facing challenges",
+    category: "strengths",
+    isActive: true,
+    order: 5,
+    weight: 1,
+  },
+  {
+    id: "strengths-002",
+    name: "Adaptability",
+    description: "Adjusts well to new situations and changes",
+    category: "strengths",
+    isActive: true,
+    order: 6,
+    weight: 1,
+  },
+  {
+    id: "emotional_intelligence-001",
+    name: "Self-Awareness",
+    description: "Understands own emotions and their impact on others",
+    category: "emotional_intelligence",
+    isActive: true,
+    order: 7,
+    weight: 1,
+  },
+  {
+    id: "emotional_intelligence-002",
+    name: "Empathy",
+    description: "Shows understanding and consideration for others feelings",
+    category: "emotional_intelligence",
+    isActive: true,
+    order: 8,
+    weight: 1,
+  },
+  {
+    id: "leadership-001",
+    name: "Initiative",
+    description: "Takes action and shows leadership in group settings",
+    category: "leadership",
+    isActive: true,
+    order: 9,
+    weight: 1,
+  },
+  {
+    id: "leadership-002",
+    name: "Collaboration",
+    description: "Works effectively with others towards common goals",
+    category: "leadership",
+    isActive: true,
+    order: 10,
+    weight: 1,
+  },
+  {
+    id: "responsibility-001",
+    name: "Accountability",
+    description: "Takes ownership of actions and commitments",
+    category: "responsibility",
+    isActive: true,
+    order: 11,
+    weight: 1,
+  },
+  {
+    id: "responsibility-002",
+    name: "Time Management",
+    description: "Manages time effectively and meets deadlines",
+    category: "responsibility",
+    isActive: true,
+    order: 12,
+    weight: 1,
+  },
+  {
+    id: "communication-001",
+    name: "Verbal Communication",
+    description: "Expresses ideas clearly and effectively in speech",
+    category: "communication",
+    isActive: true,
+    order: 13,
+    weight: 1,
+  },
+  {
+    id: "communication-002",
+    name: "Written Communication",
+    description: "Communicates effectively through writing",
+    category: "communication",
+    isActive: true,
+    order: 14,
+    weight: 1,
+  },
+];
+
+// Default rating scale (5-point Likert)
+export const DEFAULT_RATING_SCALE: RatingScale = {
+  id: "likert-5-point",
+  name: "5-Point Likert Scale",
+  description: "Standard 5-point rating scale for evaluations",
+  type: "likert",
+  minValue: 1,
+  maxValue: 5,
+  labels: [
+    {
+      value: 1,
+      label: "Strongly Disagree",
+      description: "This does not describe the person at all",
+    },
+    {
+      value: 2,
+      label: "Disagree",
+      description: "This rarely describes the person",
+    },
+    {
+      value: 3,
+      label: "Neutral",
+      description: "This sometimes describes the person",
+    },
+    {
+      value: 4,
+      label: "Agree",
+      description: "This often describes the person",
+    },
+    {
+      value: 5,
+      label: "Strongly Agree",
+      description: "This always describes the person",
+    },
+  ],
+  options: [
+    {
+      value: 1,
+      label: "Strongly Disagree",
+      description: "This does not describe the person at all",
+    },
+    {
+      value: 2,
+      label: "Disagree",
+      description: "This rarely describes the person",
+    },
+    {
+      value: 3,
+      label: "Neutral",
+      description: "This sometimes describes the person",
+    },
+    {
+      value: 4,
+      label: "Agree",
+      description: "This often describes the person",
+    },
+    {
+      value: 5,
+      label: "Strongly Agree",
+      description: "This always describes the person",
+    },
+  ],
+};
+
+// Default evaluator groups
+export const DEFAULT_EVALUATOR_GROUPS: EvaluatorGroup[] = [
+  {
+    id: "self-group",
+    name: "Self-Evaluation",
+    type: "self",
+    minRequired: 1,
+    maxAllowed: 1,
+    description: "The person being evaluated completes a self-assessment",
+    evaluators: [],
+  },
+  {
+    id: "parent-group",
+    name: "Parents/Guardians",
+    type: "parent",
+    minRequired: 1,
+    maxAllowed: 2,
+    description: "Parents or guardians who know the person well",
+    evaluators: [],
+  },
+  {
+    id: "teacher-group",
+    name: "Teachers/Educators",
+    type: "teacher",
+    minRequired: 2,
+    maxAllowed: 4,
+    description: "Teachers, instructors, or educational professionals",
+    evaluators: [],
+  },
+  {
+    id: "peer-group",
+    name: "Siblings/Friends",
+    type: "sibling_friend",
+    minRequired: 1,
+    maxAllowed: 3,
+    description: "Siblings, close friends, or peers who interact regularly",
+    evaluators: [],
+  },
+];
+
+/**
+ * Evaluation Group Progress Interface
+ */
+export interface EvaluationGroupProgress {
+  evaluatorName: string;
+  evaluatorEmail: string;
+  relation: string;
+  groupType: "Parent" | "Teacher" | "SiblingFriend";
+  evaluatedUserId: string;
+  invitationToken: string;
+  invitationUrl: string;
+  tokenExpiryDate: string;
+  isTokenUsed: boolean;
+  isEvaluationCompleted: boolean;
+  createdAt: string;
+}
+
+export interface UserEvaluationProgress {
+  userId: string;
+  evaluationGroups: EvaluationGroupProgress[];
+  summary: {
+    totalGroups: number;
+    completedEvaluations: number;
+    pendingEvaluations: number;
+    expiredInvitations: number;
+    groupsByType: {
+      Parent: number;
+      Teacher: number;
+      SiblingFriend: number;
+    };
+  };
+}
+
+// API Base URL
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net";
+
+/**
+ * Get user evaluation groups and progress
+ */
+export async function getUserEvaluationGroups(
+  userId: string
+): Promise<EvaluationGroupProgress[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/evaluation/user/${userId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch user evaluation groups");
+    }
+
+    const result = await response.json();
+    return result.data || [];
+  } catch (error) {
+    console.error("Error fetching user evaluation groups:", error);
+    throw error;
+  }
+}
+
+/**
+ * Create evaluation group with enhanced data
+ */
+export async function createEvaluationGroup(groupData: {
+  evaluatorName: string;
+  evaluatorEmail: string;
+  evaluatorPhone: string; // Required with country code
+  relation: string;
+  groupType: "Parent" | "Teacher" | "SiblingFriend";
+  evaluatedUserId: string;
+}): Promise<EvaluationGroupProgress> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/evaluation/create-group`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify(groupData),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create evaluation group");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error creating evaluation group:", error);
+    throw error;
+  }
+}
+
+/**
+ * Delete evaluation group
+ */
+export async function deleteEvaluationGroup(groupId: string): Promise<void> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/evaluation/group/${groupId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to delete evaluation group");
+    }
+  } catch (error) {
+    console.error("Error deleting evaluation group:", error);
+    throw error;
+  }
+}
+
+/**
+ * Resend invitation link
+ */
+export async function resendInvitationLink(groupId: string): Promise<void> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/evaluation/group/${groupId}/resend-invitation`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to resend invitation link");
+    }
+  } catch (error) {
+    console.error("Error resending invitation link:", error);
+    throw error;
+  }
+}
+
+/**
+ * Validate phone number with country code
+ */
+export function validatePhoneNumber(phone: string): {
+  isValid: boolean;
+  error?: string;
+} {
+  // Remove spaces and special characters except + and numbers
+  const cleanPhone = phone.replace(/[^\d+]/g, "");
+
+  // Check if it starts with + and has country code
+  if (!cleanPhone.startsWith("+")) {
+    return {
+      isValid: false,
+      error: "Phone number must include country code (e.g., +1234567890)",
+    };
+  }
+
+  // Check minimum length (country code + number should be at least 8 digits)
+  if (cleanPhone.length < 8) {
+    return { isValid: false, error: "Phone number is too short" };
+  }
+
+  // Check maximum length (international standard)
+  if (cleanPhone.length > 15) {
+    return { isValid: false, error: "Phone number is too long" };
+  }
+
+  // Check if contains only digits after the +
+  const phoneDigits = cleanPhone.substring(1);
+  if (!/^\d+$/.test(phoneDigits)) {
+    return {
+      isValid: false,
+      error: "Phone number can only contain digits after country code",
+    };
+  }
+
+  return { isValid: true };
+}
+
+/**
+ * Check for duplicate evaluator (email or phone)
+ */
+export async function checkDuplicateEvaluator(
+  email: string,
+  phone: string
+): Promise<{
+  isDuplicate: boolean;
+  duplicateField?: "email" | "phone" | "both";
+  existingEvaluator?: {
+    name: string;
+    email: string;
+    phone: string;
+    groupType: string;
+  };
+}> {
+  try {
+    const params = new URLSearchParams({ email, phone });
+
+    const response = await fetch(
+      `${API_BASE_URL}/evaluation/check-duplicate?${params.toString()}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to check for duplicate evaluator");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error checking duplicate evaluator:", error);
+    throw error;
+  }
+}
+
+/**
+ * Validate evaluation invitation token
+ */
+export async function validateEvaluationToken(token: string): Promise<{
+  isValid: boolean;
+  evaluatorData?: EvaluationGroupProgress;
+  error?: string;
+}> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/evaluation/validate-token?token=${token}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      return {
+        isValid: false,
+        error: "Invalid or expired token",
+      };
+    }
+
+    const result = await response.json();
+    return {
+      isValid: true,
+      evaluatorData: result,
+    };
+  } catch (error) {
+    console.error("Error validating evaluation token:", error);
+    return {
+      isValid: false,
+      error: "Failed to validate token",
+    };
+  }
+}
+
+/**
+ * Get user evaluation progress summary
+ */
+export function getUserEvaluationProgressSummary(
+  evaluationGroups: EvaluationGroupProgress[]
+): UserEvaluationProgress["summary"] {
+  const now = new Date();
+
+  const summary = {
+    totalGroups: evaluationGroups.length,
+    completedEvaluations: 0,
+    pendingEvaluations: 0,
+    expiredInvitations: 0,
+    groupsByType: {
+      Parent: 0,
+      Teacher: 0,
+      SiblingFriend: 0,
+    },
+  };
+
+  evaluationGroups.forEach((group) => {
+    // Count by type
+    summary.groupsByType[group.groupType]++;
+
+    // Check status
+    const expiryDate = new Date(group.tokenExpiryDate);
+
+    if (group.isEvaluationCompleted) {
+      summary.completedEvaluations++;
+    } else if (expiryDate < now && !group.isTokenUsed) {
+      summary.expiredInvitations++;
+    } else {
+      summary.pendingEvaluations++;
+    }
+  });
+
+  return summary;
+}
+
+/**
+ * Create a new 360-degree evaluation session
+ */
+export async function createEvaluationSession(
+  sessionData: Partial<EvaluationSession>
+): Promise<EvaluationSession> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/evaluation/sessions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify(sessionData),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create evaluation session");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error creating evaluation session:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get all evaluation sessions for the current user
+ */
+export async function getEvaluationSessions(): Promise<EvaluationSession[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/evaluation/sessions`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch evaluation sessions");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching evaluation sessions:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get a specific evaluation session by ID
+ */
+export async function getEvaluationSession(
+  sessionId: string
+): Promise<EvaluationSession> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/evaluation/sessions/${sessionId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch evaluation session");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching evaluation session:", error);
+    throw error;
+  }
+}
+
+/**
+ * Add evaluators to an evaluation session
+ */
+export async function addEvaluators(
+  sessionId: string,
+  evaluators: Partial<Evaluator>[]
+): Promise<Evaluator[]> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/evaluation/sessions/${sessionId}/evaluators`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ evaluators }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to add evaluators");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error adding evaluators:", error);
+    throw error;
+  }
+}
+
+/**
+ * Send invitations to evaluators
+ */
+export async function sendEvaluationInvitations(
+  sessionId: string,
+  evaluatorIds: string[]
+): Promise<EvaluationInvitation[]> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/evaluation/sessions/${sessionId}/invitations`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ evaluatorIds }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to send invitations");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error sending invitations:", error);
+    throw error;
+  }
+}
+
+/**
+ * Submit evaluation responses
+ */
+export async function submitEvaluationResponses(
+  sessionId: string,
+  evaluatorToken: string,
+  responses: Partial<EvaluationResponse>[]
+): Promise<void> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/evaluation/sessions/${sessionId}/responses`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${evaluatorToken}`,
+        },
+        body: JSON.stringify({ responses }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to submit evaluation responses");
+    }
+  } catch (error) {
+    console.error("Error submitting evaluation responses:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get evaluation report
+ */
+export async function getEvaluationReport(
+  sessionId: string
+): Promise<EvaluationReport> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/evaluation/sessions/${sessionId}/report`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch evaluation report");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching evaluation report:", error);
+    throw error;
+  }
+}
+
+/**
+ * Validate evaluator requirements
+ */
+export function validateEvaluatorRequirements(
+  evaluators: Evaluator[],
+  groups: EvaluatorGroup[]
+): { isValid: boolean; errors: string[] } {
+  const errors: string[] = [];
+
+  for (const group of groups) {
+    const groupEvaluators = evaluators.filter(
+      (e) => e.groupType === group.type
+    );
+
+    if (groupEvaluators.length < group.minRequired) {
+      errors.push(
+        `${group.name} requires at least ${group.minRequired} evaluator(s), but only ${groupEvaluators.length} provided.`
+      );
+    }
+
+    if (groupEvaluators.length > group.maxAllowed) {
+      errors.push(
+        `${group.name} allows maximum ${group.maxAllowed} evaluator(s), but ${groupEvaluators.length} provided.`
+      );
+    }
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
+
+/**
+ * Generate unique invitation token
+ */
+export function generateInvitationToken(): string {
+  return (
+    Math.random().toString(36).substring(2, 15) +
+    Math.random().toString(36).substring(2, 15) +
+    Date.now().toString(36)
+  );
+}
+
+/**
+ * Calculate competency averages from responses
+ */
+export function calculateCompetencyAverages(
+  responses: EvaluationResponse[],
+  competencies: CompetencyDimension[]
+): { [competencyId: string]: number } {
+  const averages: { [competencyId: string]: number } = {};
+
+  for (const competency of competencies) {
+    const competencyResponses = responses.filter((r) => {
+      // Find questions related to this competency
+      return r.ratingValue !== undefined;
+    });
+
+    if (competencyResponses.length > 0) {
+      const sum = competencyResponses.reduce(
+        (acc, r) => acc + (r.ratingValue || 0),
+        0
+      );
+      averages[competency.id] = sum / competencyResponses.length;
+    } else {
+      averages[competency.id] = 0;
+    }
+  }
+
+  return averages;
+}
+
+/**
+ * Generate evaluation questions from competency dimensions
+ */
+export function generateEvaluationQuestions(
+  competencies: CompetencyDimension[]
+): EvaluationQuestion[] {
+  const questions: EvaluationQuestion[] = [];
+
+  competencies.forEach((competency, index) => {
+    // Rating question
+    questions.push({
+      id: `${competency.id}-rating`,
+      competencyId: competency.id,
+      questionText: `How would you rate this person's ${competency.name.toLowerCase()}?`,
+      questionType: "rating",
+      isRequired: true,
+      order: index * 2 + 1,
+      helpText: competency.description,
+    });
+
+    // Open-ended question
+    questions.push({
+      id: `${competency.id}-feedback`,
+      competencyId: competency.id,
+      questionText: `Please provide specific examples or feedback about this person's ${competency.name.toLowerCase()}.`,
+      questionType: "open_ended",
+      isRequired: false,
+      order: index * 2 + 2,
+      helpText:
+        "Share specific observations, examples, or suggestions for development.",
+    });
+  });
+
+  return questions;
+}
+
+/**
+ * Mock data for development and testing
+ */
+export function createMockEvaluationSession(): EvaluationSession {
+  const sessionId = `eval-${Date.now()}`;
+
+  return {
+    id: sessionId,
+    evaluatedPersonId: "student-001",
+    evaluatedPersonName: "John Doe",
+    title: "360-Degree Educational Assessment",
+    description:
+      "Comprehensive evaluation for career guidance and personal development",
+    status: "draft",
+    createdBy: "admin-001",
+    createdAt: new Date().toISOString(),
+    startDate: new Date().toISOString(),
+    endDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(), // 14 days from now
+    competencyDimensions: DEFAULT_COMPETENCY_DIMENSIONS,
+    ratingScale: DEFAULT_RATING_SCALE,
+    evaluatorGroups: DEFAULT_EVALUATOR_GROUPS,
+    evaluators: [],
+    questions: generateEvaluationQuestions(DEFAULT_COMPETENCY_DIMENSIONS),
+    responses: [],
+    configuration: {
+      id: "default-config",
+      name: "Default Configuration",
+      description: "Standard evaluation configuration",
+      competencyDimensions: DEFAULT_COMPETENCY_DIMENSIONS,
+      ratingScale: DEFAULT_RATING_SCALE,
+      evaluatorRequirements: {
+        self: { minimum: 1, maximum: 1 },
+        parent: { minimum: 1, maximum: 2 },
+        teacher: { minimum: 1, maximum: 3 },
+        peer: { minimum: 1, maximum: 3 },
+      },
+      evaluatorGroups: DEFAULT_EVALUATOR_GROUPS,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      allowAnonymousResponses: false,
+      requireAllQuestions: true,
+      allowPartialSubmissions: false,
+      sendReminders: true,
+      reminderIntervalDays: 3,
+      maxReminders: 3,
+      showProgressToEvaluated: true,
+      generateReportAutomatically: true,
+    },
+    evaluatorRequirements: {
+      self: { minimum: 1, maximum: 1 },
+      parent: { minimum: 1, maximum: 2 },
+      teacher: { minimum: 1, maximum: 3 },
+      peer: { minimum: 1, maximum: 3 },
+    },
+  };
+}
+
+/**
+ * Creates a default evaluation configuration
+ */
+export function createDefaultConfiguration(): EvaluationConfiguration {
+  return {
+    id: `config-${Date.now()}`,
+    name: "Default Configuration",
+    description: "Standard evaluation configuration",
+    competencyDimensions: DEFAULT_COMPETENCY_DIMENSIONS,
+    ratingScale: DEFAULT_RATING_SCALE,
+    evaluatorRequirements: {
+      self: { minimum: 1, maximum: 1 },
+      parent: { minimum: 1, maximum: 2 },
+      teacher: { minimum: 1, maximum: 3 },
+      peer: { minimum: 1, maximum: 3 },
+    },
+    evaluatorGroups: DEFAULT_EVALUATOR_GROUPS,
+    isActive: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+}

@@ -78,8 +78,180 @@ export const MIL_EXAMS = {
 
 export type MILExamId = (typeof MIL_EXAMS)[keyof typeof MIL_EXAMS];
 
+/**
+ * User progress and results interfaces
+ */
+export interface UserExamResult {
+  sessionId: string;
+  username: string;
+  examName: string;
+  examType: number;
+  result: {
+    scorePercentage: number;
+    accuracyPercentage: number;
+    totalQuestions: number;
+    correctAnswers: number;
+    incorrectAnswers: number;
+    unansweredQuestions: number;
+    isTimeExpired: boolean;
+    isCompleted: boolean;
+  };
+  date: string;
+  endDate: string;
+  totalTimeSpent: string;
+  answers: Array<{
+    questionNumber: number;
+    userAnswer: string | number;
+    correctAnswer: string | number;
+    isCorrect: boolean;
+    isAnswered: boolean;
+    timeSpent: string;
+    explanation: string;
+  }>;
+}
+
+export interface UserProgressSummary {
+  totalAttempts: number;
+  completedExams: number;
+  averageScore: number;
+  bestScore: number;
+  examResults: UserExamResult[];
+  examTypes: {
+    [key: string]: {
+      name: string;
+      attempts: number;
+      bestScore: number;
+      lastAttempt?: string;
+    };
+  };
+}
+
 // API Base URL
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net";
+
+/**
+ * Get all user exam results and progress
+ */
+export async function getAllUserExamResults(): Promise<UserExamResult[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/PCAExam/all-results`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch user exam results: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Get User Exam Results Error:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get user exam history for specific user
+ */
+export async function getUserExamHistory(
+  userId: string
+): Promise<UserExamResult[]> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/PCAExam/history/${userId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch user exam history: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Get User Exam History Error:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get user progress summary from exam results
+ */
+export function getUserProgressSummary(
+  examResults: UserExamResult[]
+): UserProgressSummary {
+  if (!examResults || !examResults.length) {
+    return {
+      totalAttempts: 0,
+      completedExams: 0,
+      averageScore: 0,
+      bestScore: 0,
+      examResults: [],
+      examTypes: {},
+    };
+  }
+
+  // Filter out invalid results and ensure result property exists
+  const validResults = examResults.filter(
+    (r) => r && r.result && typeof r.result === "object"
+  );
+  const completedExams = validResults.filter((r) => r.result.isCompleted);
+  const scores = completedExams
+    .map((r) => r.result.scorePercentage)
+    .filter((s) => typeof s === "number" && s > 0);
+
+  const examTypeMap: { [key: number]: string } = {
+    0: "Pattern Recognition",
+    1: "Verbal Reasoning",
+    2: "Working Memory",
+    3: "Numeric Velocity",
+    4: "Visual Rotation",
+  };
+
+  const examTypes: { [key: string]: any } = {};
+
+  validResults.forEach((result) => {
+    const typeName =
+      examTypeMap[result.examType] || `Exam Type ${result.examType}`;
+    if (!examTypes[typeName]) {
+      examTypes[typeName] = {
+        name: typeName,
+        attempts: 0,
+        bestScore: 0,
+        lastAttempt: result.date,
+      };
+    }
+
+    examTypes[typeName].attempts++;
+    examTypes[typeName].bestScore = Math.max(
+      examTypes[typeName].bestScore,
+      result.result.scorePercentage
+    );
+
+    if (new Date(result.date) > new Date(examTypes[typeName].lastAttempt)) {
+      examTypes[typeName].lastAttempt = result.date;
+    }
+  });
+
+  return {
+    totalAttempts: validResults.length,
+    completedExams: completedExams.length,
+    averageScore: scores.length
+      ? scores.reduce((a, b) => a + b, 0) / scores.length
+      : 0,
+    bestScore: scores.length ? Math.max(...scores) : 0,
+    examResults: validResults,
+    examTypes,
+  };
+}
 
 /**
  * Get all available MIL exams
@@ -92,6 +264,7 @@ export async function getAllMILExams(): Promise<MILExamMetadata[]> {
         "Content-Type": "application/json",
       },
     });
+    console.log(response);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch MIL exams: ${response.status}`);

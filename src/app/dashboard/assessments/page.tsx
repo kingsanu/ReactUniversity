@@ -3,10 +3,36 @@
 import { motion } from "motion/react";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { usePCAData } from "@/hooks/usePCAData";
+import { useEvaluationData } from "@/hooks/useEvaluationData";
+import { useState, useEffect } from "react";
+import { getDashboardAssessmentSummary } from "@/services/assessmentProgressService";
 
 export default function AssessmentsPage() {
   const { user } = useGlobalStore();
   const { pcaData, hasPCA, isCompleted } = usePCAData();
+  const { createNewEvaluationSession, isLoading } = useEvaluationData();
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [assessmentProgress, setAssessmentProgress] = useState<any>(null);
+  const [loadingProgress, setLoadingProgress] = useState(true);
+
+  useEffect(() => {
+    if (user?.id) {
+      loadAssessmentProgress();
+    }
+  }, [user]);
+
+  const loadAssessmentProgress = async () => {
+    try {
+      if (!user?.id) return;
+      setLoadingProgress(true);
+      const progress = await getDashboardAssessmentSummary(user.id);
+      setAssessmentProgress(progress);
+    } catch (error) {
+      console.error("Error loading assessment progress:", error);
+    } finally {
+      setLoadingProgress(false);
+    }
+  };
 
   const getPCAStatus = () => {
     if (!hasPCA) return "not_started";
@@ -15,6 +41,21 @@ export default function AssessmentsPage() {
   };
 
   const pcaStatus = getPCAStatus();
+
+  const handleInviteEvaluators = async () => {
+    try {
+      // Create a new evaluation session
+      await createNewEvaluationSession({
+        title: "360 Degree Evaluation",
+        description: "Comprehensive evaluation from multiple perspectives",
+      });
+
+      // Navigate to the evaluator invitation page
+      window.location.href = "/dashboard/assessments/evaluators";
+    } catch (error) {
+      console.error("Error creating evaluation session:", error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -91,70 +132,128 @@ export default function AssessmentsPage() {
           </p>
         </div>
 
-        {/* Progress Overview */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-6 mb-8"
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <div className="bg-white rounded-lg p-3 mr-4 shadow-sm">
-                <svg
-                  className="w-6 h-6 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
+        {/* Progress Overview - API Driven */}
+        {!loadingProgress && assessmentProgress && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-6 mb-8"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="bg-white rounded-lg p-3 mr-4 shadow-sm">
+                  <svg
+                    className="w-6 h-6 text-blue-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-1">
+                    {user.name
+                      ? `Welcome back, ${user.name.split(" ")[0]}!`
+                      : "Welcome!"}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Complete all assessments to unlock your full professional
+                    profile
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1">
-                  {user.name
-                    ? `Welcome back, ${user.name.split(" ")[0]}!`
-                    : "Welcome!"}
-                </h3>
-                <p className="text-sm text-gray-600">
-                  Complete all assessments to unlock your full professional
-                  profile
-                </p>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-blue-600">
+                  {assessmentProgress.completedAssessments}/
+                  {assessmentProgress.totalAssessments}
+                </div>
+                <div className="text-xs text-gray-500">Completed</div>
               </div>
             </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-blue-600">
-                {pcaStatus === "completed" ? "1" : "0"}/3
-              </div>
-              <div className="text-xs text-gray-500">Completed</div>
-            </div>
-          </div>
 
-          {/* Progress Bar */}
-          <div className="mt-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-gray-700">
-                Overall Progress
-              </span>
-              <span className="text-sm text-gray-600">
-                {Math.round(((pcaStatus === "completed" ? 1 : 0) / 3) * 100)}%
-              </span>
+            {/* Progress Bar */}
+            <div className="mt-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-gray-700">
+                  Overall Progress
+                </span>
+                <span className="text-sm text-gray-600">
+                  {assessmentProgress.overallCompletion}%
+                </span>
+              </div>
+              <div className="w-full bg-white rounded-full h-2 shadow-inner">
+                <div
+                  className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-500"
+                  style={{
+                    width: `${assessmentProgress.overallCompletion}%`,
+                  }}
+                />
+              </div>
             </div>
-            <div className="w-full bg-white rounded-full h-2 shadow-inner">
-              <div
-                className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-500"
-                style={{
-                  width: `${((pcaStatus === "completed" ? 1 : 0) / 3) * 100}%`,
-                }}
-              />
+
+            {/* Individual Assessment Status */}
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+              {assessmentProgress.assessments.map((assessment: any) => (
+                <div
+                  key={assessment.type}
+                  className="bg-white rounded-lg p-3 shadow-sm"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-medium text-gray-900 text-sm">
+                      {assessment.name}
+                    </h4>
+                    <div
+                      className={`w-3 h-3 rounded-full ${
+                        assessment.status === "completed"
+                          ? "bg-green-500"
+                          : assessment.status === "in_progress"
+                          ? "bg-yellow-500"
+                          : "bg-gray-300"
+                      }`}
+                    />
+                  </div>
+                  <div className="text-xs text-gray-600 capitalize mb-1">
+                    {assessment.status.replace("_", " ")}
+                  </div>
+                  {assessment.stats &&
+                    Object.keys(assessment.stats).length > 0 && (
+                      <div className="text-xs text-gray-500">
+                        {assessment.type === "mil" &&
+                          assessment.stats.totalAttempts > 0 &&
+                          `${assessment.stats.totalAttempts} attempts, ${assessment.stats.bestScore}% best`}
+                        {assessment.type === "evaluation" &&
+                          assessment.stats.totalEvaluators > 0 &&
+                          `${assessment.stats.totalEvaluators} evaluators, ${assessment.stats.completedEvaluations} completed`}
+                      </div>
+                    )}
+                </div>
+              ))}
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        )}
+
+        {loadingProgress && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-6 mb-8"
+          >
+            <div className="flex items-center justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
+              <p className="text-gray-600">
+                Loading your assessment progress...
+              </p>
+            </div>
+          </motion.div>
+        )}
 
         {/* Assessment Cards */}
         <div className="space-y-6">
@@ -261,17 +360,15 @@ export default function AssessmentsPage() {
                   prompting the user to perform a self-assessment.
                 </p>
               </div>
-              <span className="bg-gray-100 text-gray-600 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                Coming Soon
-              </span>
             </div>
 
             <div className="space-y-3">
               <button
-                disabled
-                className="w-full bg-gray-400 text-white py-3 px-6 rounded-lg cursor-not-allowed font-medium"
+                onClick={handleInviteEvaluators}
+                disabled={isLoading}
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-3 px-6 rounded-lg font-medium transition-colors"
               >
-                Invite Evaluators
+                {isLoading ? "Loading..." : "Invite Evaluators"}
               </button>
               <button
                 disabled

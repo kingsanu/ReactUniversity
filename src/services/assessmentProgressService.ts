@@ -1,0 +1,245 @@
+// Assessment Progress Service - Combines all assessment data
+import {
+  getAllUserExamResults,
+  getUserProgressSummary,
+  UserExamResult,
+  UserProgressSummary,
+} from "./milService";
+import {
+  getUserEvaluationGroups,
+  getUserEvaluationProgressSummary,
+  EvaluationGroupProgress,
+  UserEvaluationProgress,
+} from "./evaluationService";
+
+export interface AssessmentOverallProgress {
+  milAssessment: {
+    status: "not_started" | "in_progress" | "completed";
+    progress: UserProgressSummary;
+    lastActivity?: string;
+  };
+  evaluationAssessment: {
+    status: "not_started" | "in_progress" | "completed";
+    progress: UserEvaluationProgress["summary"];
+    evaluationGroups: EvaluationGroupProgress[];
+    lastActivity?: string;
+  };
+  pcaAssessment: {
+    status: "not_started" | "in_progress" | "completed";
+    progress?: any; // Will be filled when PCA API is available
+    lastActivity?: string;
+  };
+  overallCompletion: {
+    totalAssessments: number;
+    completedAssessments: number;
+    percentageComplete: number;
+  };
+}
+
+/**
+ * Get comprehensive assessment progress for a user
+ */
+export async function getUserAssessmentProgress(
+  userId: string
+): Promise<AssessmentOverallProgress> {
+  try {
+    // Fetch MIL Assessment Progress
+    let milProgress: UserProgressSummary;
+    let milStatus: "not_started" | "in_progress" | "completed" = "not_started";
+    let milLastActivity: string | undefined;
+
+    try {
+      const milResults = await getAllUserExamResults();
+      // Filter by username since there's no user.id property
+      const userMilResults = milResults.filter(
+        (r) => r.username === userId || r.sessionId.includes(userId)
+      );
+      milProgress = getUserProgressSummary(userMilResults);
+
+      if (milProgress.totalAttempts > 0) {
+        milStatus =
+          milProgress.completedExams > 0 ? "completed" : "in_progress";
+        const latestResult = userMilResults.sort(
+          (a, b) =>
+            new Date(b.endDate).getTime() - new Date(a.endDate).getTime()
+        )[0];
+        milLastActivity = latestResult?.endDate;
+      }
+    } catch (error) {
+      console.warn("MIL assessment data not available:", error);
+      milProgress = {
+        totalAttempts: 0,
+        completedExams: 0,
+        averageScore: 0,
+        bestScore: 0,
+        examResults: [],
+        examTypes: {},
+      };
+    }
+
+    // Fetch 360° Evaluation Progress
+    let evaluationProgress: UserEvaluationProgress["summary"];
+    let evaluationGroups: EvaluationGroupProgress[] = [];
+    let evaluationStatus: "not_started" | "in_progress" | "completed" =
+      "not_started";
+    let evaluationLastActivity: string | undefined;
+
+    try {
+      evaluationGroups = await getUserEvaluationGroups(userId);
+      evaluationProgress = getUserEvaluationProgressSummary(evaluationGroups);
+
+      if (evaluationGroups.length > 0) {
+        evaluationStatus =
+          evaluationProgress.completedEvaluations > 0
+            ? "completed"
+            : "in_progress";
+        const latestGroup = evaluationGroups.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )[0];
+        evaluationLastActivity = latestGroup?.createdAt;
+      }
+    } catch (error) {
+      console.warn("360° Evaluation data not available:", error);
+      evaluationProgress = {
+        totalGroups: 0,
+        completedEvaluations: 0,
+        pendingEvaluations: 0,
+        expiredInvitations: 0,
+        groupsByType: {
+          Parent: 0,
+          Teacher: 0,
+          SiblingFriend: 0,
+        },
+      };
+    }
+
+    // PCA Assessment (placeholder - API not implemented yet)
+    const pcaStatus: "not_started" | "in_progress" | "completed" =
+      "not_started";
+
+    // Calculate overall completion
+    const assessmentStatuses = [milStatus, evaluationStatus, pcaStatus];
+    const completedCount = assessmentStatuses.filter(
+      (status) => status === "completed"
+    ).length;
+    const inProgressCount = assessmentStatuses.filter(
+      (status) => status === "in_progress"
+    ).length;
+
+    let overallPercentage = 0;
+    if (completedCount > 0) {
+      overallPercentage = (completedCount / 3) * 100;
+    } else if (inProgressCount > 0) {
+      overallPercentage = (inProgressCount / 3) * 30; // 30% for in progress
+    }
+
+    return {
+      milAssessment: {
+        status: milStatus,
+        progress: milProgress,
+        lastActivity: milLastActivity,
+      },
+      evaluationAssessment: {
+        status: evaluationStatus,
+        progress: evaluationProgress,
+        evaluationGroups,
+        lastActivity: evaluationLastActivity,
+      },
+      pcaAssessment: {
+        status: pcaStatus,
+        progress: undefined,
+        lastActivity: undefined,
+      },
+      overallCompletion: {
+        totalAssessments: 3,
+        completedAssessments: completedCount,
+        percentageComplete: Math.round(overallPercentage),
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching user assessment progress:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get assessment progress summary for dashboard
+ */
+export async function getDashboardAssessmentSummary(userId: string) {
+  try {
+    const progress = await getUserAssessmentProgress(userId);
+
+    return {
+      // Overall progress
+      overallCompletion: progress.overallCompletion.percentageComplete,
+      completedAssessments: progress.overallCompletion.completedAssessments,
+      totalAssessments: progress.overallCompletion.totalAssessments,
+
+      // Individual assessment summaries
+      assessments: [
+        {
+          name: "MIL Assessment",
+          type: "mil",
+          status: progress.milAssessment.status,
+          completion:
+            progress.milAssessment.status === "completed"
+              ? 100
+              : progress.milAssessment.status === "in_progress"
+              ? 50
+              : 0,
+          lastActivity: progress.milAssessment.lastActivity,
+          stats: {
+            totalAttempts: progress.milAssessment.progress.totalAttempts,
+            bestScore: progress.milAssessment.progress.bestScore,
+          },
+        },
+        {
+          name: "360° Evaluation",
+          type: "evaluation",
+          status: progress.evaluationAssessment.status,
+          completion:
+            progress.evaluationAssessment.status === "completed"
+              ? 100
+              : progress.evaluationAssessment.status === "in_progress"
+              ? 50
+              : 0,
+          lastActivity: progress.evaluationAssessment.lastActivity,
+          stats: {
+            totalEvaluators: progress.evaluationAssessment.progress.totalGroups,
+            completedEvaluations:
+              progress.evaluationAssessment.progress.completedEvaluations,
+            pendingEvaluations:
+              progress.evaluationAssessment.progress.pendingEvaluations,
+          },
+        },
+        {
+          name: "PCA Assessment",
+          type: "pca",
+          status: progress.pcaAssessment.status,
+          completion:
+            progress.pcaAssessment.status === "completed"
+              ? 100
+              : progress.pcaAssessment.status === "in_progress"
+              ? 50
+              : 0,
+          lastActivity: progress.pcaAssessment.lastActivity,
+          stats: {},
+        },
+      ],
+
+      // Recent activity
+      recentActivity: [
+        progress.milAssessment.lastActivity,
+        progress.evaluationAssessment.lastActivity,
+        progress.pcaAssessment.lastActivity,
+      ]
+        .filter(Boolean)
+        .sort((a, b) => new Date(b!).getTime() - new Date(a!).getTime())
+        .slice(0, 3),
+    };
+  } catch (error) {
+    console.error("Error getting dashboard assessment summary:", error);
+    throw error;
+  }
+}
