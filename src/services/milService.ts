@@ -79,7 +79,40 @@ export const MIL_EXAMS = {
 export type MILExamId = (typeof MIL_EXAMS)[keyof typeof MIL_EXAMS];
 
 /**
- * User progress and results interfaces
+ * Enhanced API response interfaces matching actual API structure
+ */
+export interface EnhancedUserExamHistory {
+  userId: string;
+  username: string;
+  totalExams: number;
+  completedExams: number;
+  inProgressExams: number;
+  notStartedExams: number;
+  completionPercentage: number;
+  examStatus: ExamStatus[];
+}
+
+export interface ExamStatus {
+  examId: string;
+  examName: string;
+  examType: number;
+  status: "completed" | "in_progress" | "not_started";
+  startDate?: string;
+  completionDate?: string;
+  scorePercentage: number;
+  accuracyPercentage: number;
+  totalQuestions: number;
+  correctAnswers: number;
+  incorrectAnswers: number;
+  totalTimeSpent: string;
+  isTimeExpired: boolean;
+  sessionId?: string;
+  timeLimitMinutes: number;
+  description: string;
+}
+
+/**
+ * Legacy interfaces for backward compatibility
  */
 export interface UserExamResult {
   sessionId: string;
@@ -155,11 +188,11 @@ export async function getAllUserExamResults(): Promise<UserExamResult[]> {
 }
 
 /**
- * Get user exam history for specific user
+ * Get user exam history for specific user (Enhanced API)
  */
 export async function getUserExamHistory(
   userId: string
-): Promise<UserExamResult[]> {
+): Promise<EnhancedUserExamHistory> {
   try {
     const response = await fetch(
       `${API_BASE_URL}/api/PCAExam/history/${userId}`,

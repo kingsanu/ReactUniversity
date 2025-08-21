@@ -424,6 +424,10 @@ export interface EvaluationGroupProgress {
   createdAt: string;
 }
 
+export interface EvaluationGroupWithId extends EvaluationGroupProgress {
+  id: string;
+}
+
 export interface UserEvaluationProgress {
   userId: string;
   evaluationGroups: EvaluationGroupProgress[];
@@ -478,7 +482,6 @@ export async function getUserEvaluationGroups(
 export async function createEvaluationGroup(groupData: {
   evaluatorName: string;
   evaluatorEmail: string;
-  evaluatorPhone: string; // Required with country code
   relation: string;
   groupType: "Parent" | "Teacher" | "SiblingFriend";
   evaluatedUserId: string;
@@ -505,24 +508,63 @@ export async function createEvaluationGroup(groupData: {
 }
 
 /**
- * Delete evaluation group
+ * Update evaluation group with enhanced validation
  */
-export async function deleteEvaluationGroup(groupId: string): Promise<void> {
+export async function updateEvaluationGroup(
+  groupId: string,
+  groupData: {
+    evaluatorName: string;
+    evaluatorEmail: string;
+    relation: string;
+    groupType: "Parent" | "Teacher" | "SiblingFriend";
+    evaluatedUserId: string;
+  }
+): Promise<EvaluationGroupProgress> {
   try {
-    const response = await fetch(
-      `${API_BASE_URL}/evaluation/group/${groupId}`,
-      {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
+    const response = await fetch(`${API_BASE_URL}/evaluation/${groupId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify(groupData),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update evaluation group");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error updating evaluation group:", error);
+    throw error;
+  }
+}
+
+/**
+ * Delete evaluation group (soft delete)
+ */
+export async function deleteEvaluationGroup(groupId: string): Promise<{
+  success: boolean;
+  message: string;
+  evaluatorName: string;
+  evaluatorEmail: string;
+  deletedAt: string;
+}> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/evaluation/${groupId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
 
     if (!response.ok) {
       throw new Error("Failed to delete evaluation group");
     }
+
+    return await response.json();
   } catch (error) {
     console.error("Error deleting evaluation group:", error);
     throw error;
@@ -552,6 +594,131 @@ export async function resendInvitationLink(groupId: string): Promise<void> {
     console.error("Error resending invitation link:", error);
     throw error;
   }
+}
+
+/**
+ * Validate evaluation group update constraints
+ */
+export function canUpdateEvaluationGroup(evaluationGroup: EvaluationGroupProgress): {
+  canUpdate: boolean;
+  reason?: string;
+} {
+  if (evaluationGroup.isTokenUsed) {
+    return {
+      canUpdate: false,
+      reason: "Cannot edit evaluation group after token is used",
+    };
+  }
+
+  if (evaluationGroup.isEvaluationCompleted) {
+    return {
+      canUpdate: false,
+      reason: "Cannot edit completed evaluation group",
+    };
+  }
+
+  // Check if token is expired (2-day validity)
+  const expiryDate = new Date(evaluationGroup.tokenExpiryDate);
+  const currentDate = new Date();
+  
+  if (currentDate > expiryDate) {
+    return {
+      canUpdate: false,
+      reason: "Cannot edit evaluation group with expired token",
+    };
+  }
+
+  return { canUpdate: true };
+}
+
+/**
+ * Validate evaluation group deletion constraints
+ */
+export function canDeleteEvaluationGroup(evaluationGroup: EvaluationGroupProgress): {
+  canDelete: boolean;
+  reason?: string;
+} {
+  if (evaluationGroup.isTokenUsed) {
+    return {
+      canDelete: false,
+      reason: "Cannot delete evaluation group after token is used",
+    };
+  }
+
+  if (evaluationGroup.isEvaluationCompleted) {
+    return {
+      canDelete: false,
+      reason: "Cannot delete completed evaluation group",
+    };
+  }
+
+  return { canDelete: true };
+}
+
+/**
+ * Check for duplicate relations and emails in evaluation groups
+ */
+export function validateEvaluationGroupUniqueness(
+  existingGroups: EvaluationGroupWithId[],
+  newGroupData: {
+    evaluatorEmail: string;
+    relation: string;
+    groupType: "Parent" | "Teacher" | "SiblingFriend";
+    evaluatedUserId: string;
+  },
+  excludeGroupId?: string
+): {
+  isValid: boolean;
+  duplicateType?: "email" | "relation" | "both";
+  existingGroup?: EvaluationGroupWithId;
+} {
+  // Filter out the group being updated if excludeGroupId is provided
+  const groupsToCheck = excludeGroupId 
+    ? existingGroups.filter(group => group.id !== excludeGroupId)
+    : existingGroups;
+
+  // Check for same evaluatedUserId and groupType
+  const sameUserGroups = groupsToCheck.filter(
+    group => 
+      group.evaluatedUserId === newGroupData.evaluatedUserId &&
+      group.groupType === newGroupData.groupType
+  );
+
+  // Check for duplicate email
+  const duplicateEmail = sameUserGroups.find(
+    group => group.evaluatorEmail.toLowerCase() === newGroupData.evaluatorEmail.toLowerCase()
+  );
+
+  // Check for duplicate relation
+  const duplicateRelation = sameUserGroups.find(
+    group => group.relation.toLowerCase() === newGroupData.relation.toLowerCase()
+  );
+
+  if (duplicateEmail && duplicateRelation) {
+    return {
+      isValid: false,
+      duplicateType: "both",
+      existingGroup: duplicateEmail,
+    };
+  }
+
+  if (duplicateEmail) {
+    return {
+      isValid: false,
+      duplicateType: "email",
+      existingGroup: duplicateEmail,
+    };
+  }
+
+  if (duplicateRelation) {
+    return {
+      isValid: false,
+      duplicateType: "relation",
+      existingGroup: duplicateRelation,
+    };
+  }
+
+  return { isValid: true };
 }
 
 /**
@@ -636,11 +803,18 @@ export async function checkDuplicateEvaluator(
 }
 
 /**
- * Validate evaluation invitation token
+ * Validate evaluation invitation token with enhanced validation
  */
 export async function validateEvaluationToken(token: string): Promise<{
   isValid: boolean;
-  evaluatorData?: EvaluationGroupProgress;
+  evaluatorName?: string;
+  evaluatorEmail?: string;
+  relation?: string;
+  groupType?: "Parent" | "Teacher" | "SiblingFriend";
+  evaluatedUserId?: string;
+  tokenExpiryDate?: string;
+  isTokenUsed?: boolean;
+  isEvaluationCompleted?: boolean;
   error?: string;
 }> {
   try {
@@ -655,16 +829,24 @@ export async function validateEvaluationToken(token: string): Promise<{
     );
 
     if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
       return {
         isValid: false,
-        error: "Invalid or expired token",
+        error: errorData.message || "Invalid or expired token",
       };
     }
 
     const result = await response.json();
     return {
       isValid: true,
-      evaluatorData: result,
+      evaluatorName: result.evaluatorName,
+      evaluatorEmail: result.evaluatorEmail,
+      relation: result.relation,
+      groupType: result.groupType,
+      evaluatedUserId: result.evaluatedUserId,
+      tokenExpiryDate: result.tokenExpiryDate,
+      isTokenUsed: result.isTokenUsed,
+      isEvaluationCompleted: result.isEvaluationCompleted,
     };
   } catch (error) {
     console.error("Error validating evaluation token:", error);

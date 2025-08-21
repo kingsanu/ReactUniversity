@@ -1400,7 +1400,7 @@
               }
             },
             {
-              "name": "Get User Exam History",
+              "name": "Get User Exam History (Enhanced)",
               "request": {
                 "method": "GET",
                 "header": [],
@@ -1412,7 +1412,23 @@
                   ],
                   "path": ["api", "PCAExam", "history", "{{userId}}"]
                 },
-                "description": "Get user's completed exam history with scores and performance data."
+                "description": "Get comprehensive user exam status including:\n- Completed exams with scores and performance data\n- In-progress exams with start time and session details\n- Not started exams with exam information\n- Overall completion statistics and percentages\n- Sorted by status (completed, in-progress, not started) then by exam name"
+              }
+            },
+            {
+              "name": "Get User Completed Exams Only",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/completed-exams/{{userId}}",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "PCAExam", "completed-exams", "{{userId}}"]
+                },
+                "description": "Get user's completed exams only (for backward compatibility). Returns list of completed exams with scores and performance data."
               }
             },
             {
@@ -1666,6 +1682,56 @@
             },
             "description": "Example: Create evaluation group for a sibling or friend"
           }
+        },
+        {
+          "name": "Update Evaluation Group",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"evaluatorName\": \"John Smith Updated\",\n  \"evaluatorEmail\": \"john.updated@example.com\",\n  \"relation\": \"father\",\n  \"groupType\": \"Parent\",\n  \"evaluatedUserId\": \"{{userId}}\"\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/evaluation/{{evaluationGroupId}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["evaluation", "{{evaluationGroupId}}"]
+            },
+            "description": "Updates an existing evaluation group.\n\nValidation Rules:\n- Cannot edit if token is already used\n- Cannot have duplicate relations for same user\n- Cannot use same email in same group type\n- Evaluated user must exist\n\nReturns:\n- Updated evaluation group details\n- Invitation token (preserved)\n- Invitation URL\n- Token expiry date\n- Status flags"
+          }
+        },
+        {
+          "name": "Delete Evaluation Group",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/evaluation/{{evaluationGroupId}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["evaluation", "{{evaluationGroupId}}"]
+            },
+            "description": "Deletes an evaluation group (soft delete).\n\nValidation Rules:\n- Cannot delete if token is already used\n- Evaluation group must exist and be active\n\nReturns:\n- Deletion confirmation\n- Evaluator details (name, email)\n- Deletion timestamp\n\nNote: This performs a soft delete by setting IsActive to false."
+          }
         }
       ]
     }
@@ -1735,6 +1801,11 @@
       "key": "invitationToken",
       "value": "your-invitation-token-here",
       "description": "Replace with actual invitation token returned from create-group endpoint"
+    },
+    {
+      "key": "evaluationGroupId",
+      "value": "your-evaluation-group-id-here",
+      "description": "Replace with actual evaluation group ID for update/delete operations"
     }
   ]
 }

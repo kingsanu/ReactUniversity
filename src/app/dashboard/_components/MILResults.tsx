@@ -8,8 +8,18 @@ interface MILResultsProps {
 }
 
 export function MILResults({ className }: MILResultsProps) {
-  const { progress, loading, error, hasMIL, isCompleted, getOverallScore } =
-    useMILData();
+  const { 
+    progress, 
+    loading, 
+    error, 
+    hasMIL, 
+    isCompleted, 
+    getOverallScore,
+    getSubtestScores,
+    getCompletionStats,
+    hasEnhancedData,
+    completionStats
+  } = useMILData();
 
   if (loading) {
     return (
@@ -67,14 +77,8 @@ export function MILResults({ className }: MILResultsProps) {
     ? (progress.completedExams.length / progress.totalExams) * 100
     : 0;
 
-  // Mock subtest scores - replace with actual data when available
-  const subtestScores = [
-    { name: "Pattern Recognition", score: 85, color: "#8B5CF6" },
-    { name: "Verbal Reasoning", score: 78, color: "#06B6D4" },
-    { name: "Working Memory", score: 72, color: "#10B981" },
-    { name: "Numeric Velocity", score: 68, color: "#F59E0B" },
-    { name: "Visual Rotation", score: 75, color: "#EF4444" },
-  ].slice(0, progress?.completedExams.length || 0);
+  // Use enhanced API data for subtest scores
+  const subtestScores = getSubtestScores();
 
   return (
     <motion.div
@@ -89,11 +93,11 @@ export function MILResults({ className }: MILResultsProps) {
           <p className="text-sm text-gray-600">Labor Intelligence Assessment</p>
         </div>
         <div className="text-right">
-          <div className="text-2xl font-bold text-purple-600">
-            {overallScore}%
+          <div className="text-2xl font-bold text-green-600">
+            {hasEnhancedData ? `${completionStats.completed}/${completionStats.total}` : `${progress?.completedExams.length || 0}/${progress?.totalExams || 5}`}
           </div>
           <div className="text-xs text-gray-500">
-            {isCompleted ? "Complete" : "In Progress"}
+            {isCompleted ? "All Complete" : "Exams Completed"}
           </div>
         </div>
       </div>
@@ -103,7 +107,10 @@ export function MILResults({ className }: MILResultsProps) {
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium text-gray-700">Progress</span>
           <span className="text-sm text-gray-600">
-            {progress?.completedExams.length}/{progress?.totalExams} subtests
+            {hasEnhancedData 
+              ? `${completionStats.completed}/${completionStats.total} completed`
+              : `${progress?.completedExams.length}/${progress?.totalExams} subtests`
+            }
           </span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
@@ -114,9 +121,14 @@ export function MILResults({ className }: MILResultsProps) {
             className="bg-purple-600 h-2 rounded-full"
           />
         </div>
+        {hasEnhancedData && completionStats.inProgress > 0 && (
+          <div className="mt-2 text-xs text-orange-600">
+            {completionStats.inProgress} exam(s) in progress
+          </div>
+        )}
       </div>
 
-      {/* Subtest Scores */}
+      {/* Subtest Completion Status */}
       {subtestScores.length > 0 && (
         <div className="space-y-3 mb-6">
           {subtestScores.map((subtest, index) => (
@@ -126,19 +138,22 @@ export function MILResults({ className }: MILResultsProps) {
                   <span className="text-sm font-medium text-gray-700">
                     {subtest.name}
                   </span>
-                  <span className="text-sm text-gray-600">
-                    {subtest.score}%
-                  </span>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm text-green-600 font-medium">
+                      ✅ Complete
+                    </span>
+                  </div>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-1.5">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${subtest.score}%` }}
-                    transition={{ delay: index * 0.1, duration: 0.6 }}
-                    className="h-1.5 rounded-full"
-                    style={{ backgroundColor: subtest.color }}
+                  <div
+                    className="h-1.5 rounded-full bg-green-500 w-full"
                   />
                 </div>
+                {hasEnhancedData && (subtest as any).timeSpent && (
+                  <div className="mt-1 text-xs text-gray-500">
+                    Time: {(subtest as any).timeSpent.split('.')[0]}
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -151,7 +166,7 @@ export function MILResults({ className }: MILResultsProps) {
           href="/dashboard/assessments/mil"
           className="flex-1 text-center py-2 px-4 bg-purple-50 text-purple-600 text-sm font-medium rounded-lg hover:bg-purple-100 transition-colors"
         >
-          {isCompleted ? "View Results" : "Continue"}
+          {isCompleted ? "View Assessments" : "Continue"}
         </a>
         <button
           onClick={() => window.location.reload()}
@@ -166,17 +181,24 @@ export function MILResults({ className }: MILResultsProps) {
         <div className="flex items-center justify-between text-xs text-gray-500">
           <span>
             {isCompleted
-              ? "Assessment Complete"
-              : `${progress?.completedExams.length || 0} of ${
+              ? "✅ All Assessments Complete"
+              : `🔄 ${progress?.completedExams.length || 0} of ${
                   progress?.totalExams || 5
                 } completed`}
           </span>
-          <span>
-            Updated:{" "}
-            {progress?.lastUpdated
-              ? new Date(progress.lastUpdated).toLocaleDateString()
-              : "Today"}
-          </span>
+          <div className="flex items-center space-x-2">
+            <span>
+              Updated:{" "}
+              {progress?.lastUpdated
+                ? new Date(progress.lastUpdated).toLocaleDateString()
+                : "Today"}
+            </span>
+            {hasEnhancedData && (
+              <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-medium">
+                Live Data
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </motion.div>

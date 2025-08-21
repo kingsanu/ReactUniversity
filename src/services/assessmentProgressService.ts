@@ -2,6 +2,7 @@
 import {
   getAllUserExamResults,
   getUserProgressSummary,
+  getUserExamHistory,
   UserExamResult,
   UserProgressSummary,
 } from "./milService";
@@ -17,6 +18,7 @@ export interface AssessmentOverallProgress {
     status: "not_started" | "in_progress" | "completed";
     progress: UserProgressSummary;
     lastActivity?: string;
+    enhancedData?: any; // Enhanced API data
   };
   evaluationAssessment: {
     status: "not_started" | "in_progress" | "completed";
@@ -43,30 +45,79 @@ export async function getUserAssessmentProgress(
   userId: string
 ): Promise<AssessmentOverallProgress> {
   try {
-    // Fetch MIL Assessment Progress
+    // Fetch LIA Assessment Progress
     let milProgress: UserProgressSummary;
     let milStatus: "not_started" | "in_progress" | "completed" = "not_started";
     let milLastActivity: string | undefined;
+    let enhancedMilData: any = null;
 
     try {
-      const milResults = await getAllUserExamResults();
-      // Filter by username since there's no user.id property
-      const userMilResults = milResults.filter(
-        (r) => r.username === userId || r.sessionId.includes(userId)
-      );
-      milProgress = getUserProgressSummary(userMilResults);
+      // Try to get enhanced API data first
+      try {
+        enhancedMilData = await getUserExamHistory(userId);
+        
+        if (enhancedMilData && enhancedMilData.examStatus.length > 0) {
+          const completedExams = enhancedMilData.examStatus.filter(
+            (exam: any) => exam.status === "completed"
+          );
+          const inProgressExams = enhancedMilData.examStatus.filter(
+            (exam: any) => exam.status === "in_progress"
+          );
+          
+          // Use enhanced data for status calculation
+          if (enhancedMilData.completionPercentage === 100) {
+            milStatus = "completed";
+          } else if (completedExams.length > 0 || inProgressExams.length > 0) {
+            milStatus = "in_progress";
+          }
+          
+          // Get latest activity from enhanced data
+          const allExams = enhancedMilData.examStatus
+            .filter((exam: any) => exam.completionDate)
+            .sort((a: any, b: any) => 
+              new Date(b.completionDate).getTime() - new Date(a.completionDate).getTime()
+            );
+          
+          if (allExams.length > 0) {
+            milLastActivity = allExams[0].completionDate;
+          }
+          
+          // Create progress summary from enhanced data
+          milProgress = {
+            totalAttempts: enhancedMilData.completedExams,
+            completedExams: completedExams.length,
+            averageScore: completedExams.length > 0 
+              ? completedExams.reduce((sum: number, exam: any) => sum + exam.scorePercentage, 0) / completedExams.length
+              : 0,
+            bestScore: completedExams.length > 0 
+              ? Math.max(...completedExams.map((exam: any) => exam.scorePercentage))
+              : 0,
+            examResults: [],
+            examTypes: {},
+          };
+        } else {
+          throw new Error("No enhanced data available");
+        }
+      } catch (enhancedError) {
+        console.warn("Enhanced LIA data not available, falling back to legacy:", enhancedError);
+        
+        // Fallback to legacy MIL data
+        const milResults = await getAllUserExamResults();
+        const userMilResults = milResults.filter(
+          (r) => r.username === userId || r.sessionId.includes(userId)
+        );
+        milProgress = getUserProgressSummary(userMilResults);
 
-      if (milProgress.totalAttempts > 0) {
-        milStatus =
-          milProgress.completedExams > 0 ? "completed" : "in_progress";
-        const latestResult = userMilResults.sort(
-          (a, b) =>
-            new Date(b.endDate).getTime() - new Date(a.endDate).getTime()
-        )[0];
-        milLastActivity = latestResult?.endDate;
+        if (milProgress.totalAttempts > 0) {
+          milStatus = milProgress.completedExams > 0 ? "completed" : "in_progress";
+          const latestResult = userMilResults.sort(
+            (a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime()
+          )[0];
+          milLastActivity = latestResult?.endDate;
+        }
       }
     } catch (error) {
-      console.warn("MIL assessment data not available:", error);
+      console.warn("LIA assessment data not available:", error);
       milProgress = {
         totalAttempts: 0,
         completedExams: 0,
@@ -139,6 +190,7 @@ export async function getUserAssessmentProgress(
         status: milStatus,
         progress: milProgress,
         lastActivity: milLastActivity,
+        enhancedData: enhancedMilData,
       },
       evaluationAssessment: {
         status: evaluationStatus,
@@ -179,15 +231,16 @@ export async function getDashboardAssessmentSummary(userId: string) {
       // Individual assessment summaries
       assessments: [
         {
-          name: "MIL Assessment",
+          name: "LIA Assessment",
           type: "mil",
           status: progress.milAssessment.status,
-          completion:
-            progress.milAssessment.status === "completed"
-              ? 100
-              : progress.milAssessment.status === "in_progress"
-              ? 50
-              : 0,
+          completion: progress.milAssessment.enhancedData
+            ? Math.round(progress.milAssessment.enhancedData.completionPercentage)
+            : progress.milAssessment.status === "completed"
+            ? 100
+            : progress.milAssessment.status === "in_progress"
+            ? 50
+            : 0,
           lastActivity: progress.milAssessment.lastActivity,
           stats: {
             totalAttempts: progress.milAssessment.progress.totalAttempts,
