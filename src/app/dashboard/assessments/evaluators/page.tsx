@@ -329,7 +329,6 @@ export default function EvaluatorsPage() {
           const apiResult = await createEvaluationGroup({
             evaluatorName: newEvaluator.name,
             evaluatorEmail: newEvaluator.email,
-            evaluatorPhone: newEvaluator.phone,
             relation: relationValue,
             groupType: apiGroupType as any,
             evaluatedUserId: user.id,

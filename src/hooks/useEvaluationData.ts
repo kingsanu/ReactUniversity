@@ -168,7 +168,7 @@ export function useEvaluationData() {
           id: `evaluator-${Date.now()}-${index}`,
           name: evaluator.name || '',
           email: evaluator.email || '',
-          phone: evaluator.phone,
+          phone: evaluator.phone || '',
           relationship: evaluator.relationship || '',
           groupType: evaluator.groupType || 'parent',
           invitationToken: Math.random().toString(36).substring(2, 15),
