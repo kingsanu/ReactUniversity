@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { UserProfileDropdown } from "@/components/ui/user-profile-dropdown";
 
 const topNavItems = [
   { name: "Dashboard", active: true },
@@ -121,10 +122,8 @@ export function TopNav({ className, onMenuClick }: TopNavProps) {
             </svg>
           </button>
 
-          {/* User Avatar */}
-          <button className="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-full text-white text-sm font-medium">
-            U
-          </button>
+          {/* User Profile Dropdown */}
+          <UserProfileDropdown />
         </div>
       </div>
     </header>

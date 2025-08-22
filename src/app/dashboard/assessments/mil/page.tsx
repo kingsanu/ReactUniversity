@@ -291,7 +291,7 @@ export default function MILAssessmentPage() {
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between">
                             <span className="text-gray-600">
-                              Total Attempts:
+                              Total Sub Assessments:
                             </span>
                             <span className="font-medium">
                               {liaProgress.totalAttempts}

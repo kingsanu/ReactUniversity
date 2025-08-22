@@ -751,7 +751,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"CoKey\": \"NXDAPS\",\n  \"PerNom\": \"John\",\n  \"PerApe\": \"Doe\",\n  \"PerNumIde\": \"12345678\",\n  \"PerGen\": \"M\",\n  \"permail\": \"john.doe@example.com\",\n  \"JcaCod\": \"GTCML\",\n  \"BillingCenter\": \"\",\n  \"UserMail\": \"admin@example.com\"\n}"
+              "raw": "{\n  \"UserId\": \"{{userId}}\",\n  \"CoKey\": \"NXDAPS\",\n  \"PerNom\": \"John\",\n  \"PerApe\": \"Doe\",\n  \"PerNumIde\": \"12345678\",\n  \"PerGen\": \"M\",\n  \"permail\": \"john.doe@example.com\",\n  \"JcaCod\": \"GTCML\",\n  \"BillingCenter\": \"\",\n  \"UserMail\": \"admin@example.com\"\n}"
             },
             "url": {
               "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/pcaapi/add-evaluation",
@@ -761,7 +761,7 @@
               ],
               "path": ["api", "pcaapi", "add-evaluation"]
             },
-            "description": "Add a new PCA evaluation. Use NXDAPS for Spanish or NXDAPI for English format"
+            "description": "Add a new PCA evaluation. Requires UserId for database storage. Use NXDAPS for Spanish or NXDAPI for English format."
           }
         },
         {
@@ -776,7 +776,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"CoKey\": \"8A38EEAA-9B94-474D-BE6A-0AB193DDD98D\",\n  \"PcaCod\": \"{{pcaCode}}\"\n}"
+              "raw": "{\n  \"UserId\": \"{{userId}}\"\n}"
             },
             "url": {
               "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/pcaapi/get-result",
@@ -786,7 +786,7 @@
               ],
               "path": ["api", "pcaapi", "get-result"]
             },
-            "description": "Get PCA result by PCA code"
+            "description": "Get PCA result by UserId (retrieves CoKey and PcaCod from database)"
           }
         },
         {
@@ -801,7 +801,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"CoKey\": \"8A38EEAA-9B94-474D-BE6A-0AB193DDD98D\",\n  \"PcaCod\": \"{{pcaCode}}\",\n  \"CmpTims\": \"1\"\n}"
+              "raw": "{\n  \"UserId\": \"{{userId}}\",\n  \"CmpTims\": \"1\"\n}"
             },
             "url": {
               "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/pcaapi/get-competences",
@@ -811,7 +811,7 @@
               ],
               "path": ["api", "pcaapi", "get-competences"]
             },
-            "description": "Get PCA competences. Use CmpTims=1 for TIMS or CmpTims=0 for ORG"
+            "description": "Get PCA competences by UserId (retrieves CoKey and PcaCod from database). Use CmpTims=1 for TIMS or CmpTims=0 for ORG"
           }
         },
         {
@@ -826,7 +826,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"CoKey\": \"8A38EEAA-9B94-474D-BE6A-0AB193DDD98D\",\n  \"PcaCod\": \"{{pcaCode}}\",\n  \"JcaCodExt\": \"GTCML\",\n  \"AnlsTip\": \"g\"\n}"
+              "raw": "{\n  \"UserId\": \"{{userId}}\",\n  \"JcaCodExt\": \"GTCML\",\n  \"AnlsTip\": \"g\"\n}"
             },
             "url": {
               "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/pcaapi/get-pca-vs-jca",
@@ -836,7 +836,23 @@
               ],
               "path": ["api", "pcaapi", "get-pca-vs-jca"]
             },
-            "description": "Get PCA vs JCA gap analysis. JCA codes: GTCML (Gerente Comercial), ASCML (Asesor Comercial), GEFCR (Gerente Financiero)"
+            "description": "Get PCA vs JCA gap analysis by UserId (retrieves CoKey and PcaCod from database). JCA codes: GTCML (Gerente Comercial), ASCML (Asesor Comercial), GEFCR (Gerente Financiero)"
+          }
+        },
+        {
+          "name": "Get All PCA Evaluations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/pcaapi/evaluations",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "pcaapi", "evaluations"]
+            },
+            "description": "Get all saved PCA evaluations from the database"
           }
         },
         {

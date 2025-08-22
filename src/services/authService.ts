@@ -231,15 +231,34 @@ export async function login(
     // Try to parse error as JSON for better error messages
     try {
       const errorJson = JSON.parse(errorText);
-      if (errorJson.errors) {
+      
+      // Handle different error response formats
+      if (errorJson.message) {
+        // Use the message field if available
+        throw new Error(errorJson.message);
+      } else if (errorJson.errorMessage) {
+        // Use errorMessage field if available
+        throw new Error(errorJson.errorMessage);
+      } else if (errorJson.errors) {
+        // Handle validation errors
         const errorMessages = Object.values(errorJson.errors).flat();
-        throw new Error(`Login failed: ${errorMessages.join(", ")}`);
+        throw new Error(errorMessages.join(", "));
+      } else {
+        // Fallback to a generic message
+        throw new Error("Invalid email or password. Please try again.");
       }
     } catch (parseError) {
-      // If JSON parsing fails, use the raw error text
+      // If JSON parsing fails, provide a user-friendly message
+      if (response.status === 401) {
+        throw new Error("Invalid email or password. Please try again.");
+      } else if (response.status === 404) {
+        throw new Error("Account not found. Please check your email address.");
+      } else if (response.status >= 500) {
+        throw new Error("Server error. Please try again later.");
+      } else {
+        throw new Error("Login failed. Please try again.");
+      }
     }
-
-    throw new Error(`Login failed: ${errorText}`);
   }
 
   const result = await response.json();

@@ -4,35 +4,22 @@ import { motion } from "motion/react";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { usePCAData } from "@/hooks/usePCAData";
 import { useEvaluationData } from "@/hooks/useEvaluationData";
-import { useState, useEffect } from "react";
-import { getDashboardAssessmentSummary } from "@/services/assessmentProgressService";
+import { useDashboardAssessmentSummary } from "@/hooks/useAssessmentQueries";
+import { useAssessmentCache } from "@/contexts/AssessmentCacheContext";
+import { useState } from "react";
 
 export default function AssessmentsPage() {
   const { user } = useGlobalStore();
   const { pcaData, hasPCA, isCompleted } = usePCAData();
   const { createNewEvaluationSession, isLoading } = useEvaluationData();
   const [showInviteModal, setShowInviteModal] = useState(false);
-  const [assessmentProgress, setAssessmentProgress] = useState<any>(null);
-  const [loadingProgress, setLoadingProgress] = useState(true);
-
-  useEffect(() => {
-    if (user?.id) {
-      loadAssessmentProgress();
-    }
-  }, [user]);
-
-  const loadAssessmentProgress = async () => {
-    try {
-      if (!user?.id) return;
-      setLoadingProgress(true);
-      const progress = await getDashboardAssessmentSummary(user.id);
-      setAssessmentProgress(progress);
-    } catch (error) {
-      console.error("Error loading assessment progress:", error);
-    } finally {
-      setLoadingProgress(false);
-    }
-  };
+  const { invalidateSpecificAssessment } = useAssessmentCache();
+  // Use React Query for assessment progress
+  const { 
+    data: assessmentProgress, 
+    isLoading: loadingProgress, 
+    error: progressError 
+  } = useDashboardAssessmentSummary(user?.id || '');
 
   const getPCAStatus = () => {
     if (!hasPCA) return "not_started";
@@ -227,7 +214,7 @@ export default function AssessmentsPage() {
                       <div className="text-xs text-gray-500">
                         {assessment.type === "mil" &&
                           assessment.stats.totalAttempts > 0 &&
-                          `${assessment.stats.totalAttempts} attempts, ${assessment.stats.bestScore}% best`}
+                          `${assessment.stats.totalAttempts} sub assessments, ${assessment.stats.bestScore}% best`}
                         {assessment.type === "evaluation" &&
                           assessment.stats.totalEvaluators > 0 &&
                           `${assessment.stats.totalEvaluators} evaluators, ${assessment.stats.completedEvaluations} completed`}
@@ -335,12 +322,51 @@ export default function AssessmentsPage() {
               </div>
             </div>
 
-            <a
-              href="/dashboard/assessments/mil"
-              className="inline-flex items-center justify-center w-full bg-purple-600 text-white py-3 px-6 rounded-lg hover:bg-purple-700 transition-colors font-medium"
-            >
-              Start LIA Assessment
-            </a>
+            {(() => {
+              const liaAssessment = assessmentProgress?.assessments?.find(
+                (a: any) => a.type === 'mil'
+              );
+              const isCompleted = liaAssessment?.status === 'completed';
+              
+              if (isCompleted) {
+                return (
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <svg
+                        className="w-6 h-6 text-green-600"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <p className="text-green-700 font-medium mb-2">Assessment Completed!</p>
+                    <p className="text-sm text-gray-600 mb-4">
+                      You have successfully completed the LIA Assessment.
+                    </p>
+                    <a
+                      href="/dashboard/assessments/mil/results"
+                      className="inline-flex items-center justify-center w-full bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors font-medium"
+                    >
+                      View Results
+                    </a>
+                  </div>
+                );
+              }
+              
+              return (
+                <a
+                  href="/dashboard/assessments/mil"
+                  className="inline-flex items-center justify-center w-full bg-purple-600 text-white py-3 px-6 rounded-lg hover:bg-purple-700 transition-colors font-medium"
+                >
+                  {liaAssessment?.status === 'in_progress' ? 'Continue LIA Assessment' : 'Start LIA Assessment'}
+                </a>
+              );
+            })()}
           </motion.div>
 
           {/* 3. 360 Evaluation */}
@@ -362,21 +388,64 @@ export default function AssessmentsPage() {
               </div>
             </div>
 
-            <div className="space-y-3">
-              <button
-                onClick={handleInviteEvaluators}
-                disabled={isLoading}
-                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-3 px-6 rounded-lg font-medium transition-colors"
-              >
-                {isLoading ? "Loading..." : "Invite Evaluators"}
-              </button>
-              <button
-                disabled
-                className="w-full bg-gray-400 text-white py-3 px-6 rounded-lg cursor-not-allowed font-medium"
-              >
-                Start 360 Evaluation
-              </button>
-            </div>
+            {(() => {
+              const evaluationAssessment = assessmentProgress?.assessments?.find(
+                (a: any) => a.type === 'evaluation'
+              );
+              const isCompleted = evaluationAssessment?.status === 'completed';
+              
+              if (isCompleted) {
+                return (
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <svg
+                        className="w-6 h-6 text-green-600"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <p className="text-green-700 font-medium mb-2">360 Evaluation Completed!</p>
+                    <p className="text-sm text-gray-600 mb-4">
+                      You have successfully completed the 360 Evaluation.
+                    </p>
+                    <a
+                      href="/dashboard/assessments/evaluation/results"
+                      className="inline-flex items-center justify-center w-full bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors font-medium"
+                    >
+                      View Results
+                    </a>
+                  </div>
+                );
+              }
+              
+              return (
+                <div className="space-y-3">
+                  <button
+                    onClick={handleInviteEvaluators}
+                    disabled={isLoading}
+                    className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-3 px-6 rounded-lg font-medium transition-colors"
+                  >
+                    {isLoading ? "Loading..." : "Invite Evaluators"}
+                  </button>
+                  <button
+                    disabled={evaluationAssessment?.status !== 'in_progress'}
+                    className={`w-full py-3 px-6 rounded-lg font-medium transition-colors ${
+                      evaluationAssessment?.status === 'in_progress'
+                        ? 'bg-orange-600 hover:bg-orange-700 text-white'
+                        : 'bg-gray-400 text-white cursor-not-allowed'
+                    }`}
+                  >
+                    {evaluationAssessment?.status === 'in_progress' ? 'Start 360 Evaluation' : 'Start 360 Evaluation'}
+                  </button>
+                </div>
+              );
+            })()}
           </motion.div>
         </div>
 

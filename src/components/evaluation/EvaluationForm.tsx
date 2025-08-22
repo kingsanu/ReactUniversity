@@ -9,6 +9,7 @@ import {
   RatingScale,
   EvaluatorGroup 
 } from '@/services/evaluationService';
+import { ValidationErrorMessage } from '@/components/ui/error-message';
 
 interface EvaluationFormProps {
   session: EvaluationSession;
@@ -265,14 +266,11 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6"
+            className="mb-6"
           >
-            <h3 className="text-red-800 font-medium mb-2">Please complete the following:</h3>
-            <ul className="text-red-700 text-sm space-y-1">
-              {validationErrors.map((error, index) => (
-                <li key={index}>• {error}</li>
-              ))}
-            </ul>
+            <ValidationErrorMessage 
+              message={`Please complete the following: ${validationErrors.join(', ')}`}
+            />
           </motion.div>
         )}
       </AnimatePresence>

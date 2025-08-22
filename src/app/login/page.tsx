@@ -20,6 +20,7 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
+import { AuthErrorMessage } from "@/components/ui/error-message";
 
 // define schema
 const loginSchema = z.object({
@@ -323,11 +324,7 @@ export default function LoginPage() {
 
                   {/* API Error */}
                   {apiError && (
-                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                      <p className="text-sm text-red-600 font-medium">
-                        {apiError}
-                      </p>
-                    </div>
+                    <AuthErrorMessage message={apiError} />
                   )}
 
                   <Button

@@ -1,33 +1,18 @@
 "use client";
 
 import { motion } from "motion/react";
-import { useState, useEffect } from "react";
 import { useGlobalStore } from "@/store/useGlobalStore";
-import { getDashboardAssessmentSummary } from "@/services/assessmentProgressService";
+import { useDashboardAssessmentSummary } from "@/hooks/useAssessmentQueries";
 
 export function AssessmentProgressCard() {
   const { user } = useGlobalStore();
-  const [assessmentData, setAssessmentData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (user?.id) {
-      loadAssessmentData();
-    }
-  }, [user]);
-
-  const loadAssessmentData = async () => {
-    try {
-      if (!user?.id) return;
-      setLoading(true);
-      const data = await getDashboardAssessmentSummary(user.id);
-      setAssessmentData(data);
-    } catch (error) {
-      console.error("Error loading assessment data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  
+  // Use React Query for assessment data
+  const { 
+    data: assessmentData, 
+    isLoading: loading, 
+    error 
+  } = useDashboardAssessmentSummary(user?.id || '');
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -162,7 +147,7 @@ export function AssessmentProgressCard() {
                 <div className="text-xs text-gray-500">
                   {assessment.type === "mil" &&
                     assessment.stats.totalAttempts > 0 &&
-                    `${assessment.stats.totalAttempts} attempts`}
+                    `${assessment.stats.totalAttempts} sub assessments`}
                   {assessment.type === "evaluation" &&
                     assessment.stats.totalEvaluators > 0 &&
                     `${assessment.stats.totalEvaluators} evaluators`}
