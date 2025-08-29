@@ -12,7 +12,12 @@ import {
   DocumentDuplicateIcon
 } from '@heroicons/react/24/outline';
 import { useEvaluationData } from '@/hooks/useEvaluationData';
-import { EvaluationSession, Evaluator } from '@/services/evaluationService';
+import { 
+  EvaluationSession, 
+  Evaluator, 
+  resendEmailInvitation, 
+  sendBulkEmailInvitations 
+} from '@/services/evaluationService';
 
 interface EvaluationInvitationsProps {
   sessionId: string;
@@ -81,7 +86,20 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
   const [selectedGroup, setSelectedGroup] = useState<string>('all');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [sendingBulk, setSendingBulk] = useState(false);
   const [showTemplateEditor, setShowTemplateEditor] = useState(false);
+  const [emailResults, setEmailResults] = useState<{
+    successful: number;
+    failed: number;
+    details: Array<{
+      evaluatorId: string;
+      evaluatorName: string;
+      email: string;
+      status: 'sent' | 'failed';
+      error?: string;
+    }>;
+  } | null>(null);
+  const [resendingEmails, setResendingEmails] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     loadInvitationData();
@@ -163,19 +181,21 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
       for (const evaluatorId of selectedEvaluators) {
         const evaluator = evaluators.find(e => e.id === evaluatorId);
         if (evaluator) {
-          const template = defaultTemplates[evaluator.groupType] || customTemplate;
-          const invitationLink = generateInvitationLink(evaluator);
+          // Use resend email invitation for individual evaluators
+          const result = await resendEmailInvitation(evaluator.id);
           
-          await sendInvitations(sessionId, [evaluator.id]);
-          
-          // Update status
-          setInvitationStatuses(prev => 
-            prev.map(status => 
-              status.evaluatorId === evaluatorId
-                ? { ...status, status: 'sent' as const, sentAt: new Date() }
-                : status
-            )
-          );
+          if (result.success) {
+            // Update status
+            setInvitationStatuses(prev => 
+              prev.map(status => 
+                status.evaluatorId === evaluatorId
+                  ? { ...status, status: 'sent' as const, sentAt: new Date() }
+                  : status
+              )
+            );
+          } else {
+            console.error(`Failed to send invitation to ${evaluator.name}:`, result.message);
+          }
         }
       }
       
@@ -184,6 +204,69 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
       console.error('Error sending invitations:', error);
     } finally {
       setSending(false);
+    }
+  };
+
+  const handleSendBulkInvitations = async () => {
+    if (!session?.evaluatedPersonId) return;
+    
+    try {
+      setSendingBulk(true);
+      
+      const result = await sendBulkEmailInvitations(session.evaluatedPersonId);
+      
+      if (result.success && result.results) {
+        setEmailResults(result.results);
+        
+        // Update invitation statuses for successful sends
+        setInvitationStatuses(prev => 
+          prev.map(status => {
+            const detail = result.results?.details.find(d => d.evaluatorId === status.evaluatorId);
+            if (detail && detail.status === 'sent') {
+              return { ...status, status: 'sent' as const, sentAt: new Date() };
+            }
+            return status;
+          })
+        );
+      } else {
+        console.error('Failed to send bulk invitations:', result.message);
+      }
+    } catch (error) {
+      console.error('Error sending bulk invitations:', error);
+    } finally {
+      setSendingBulk(false);
+    }
+  };
+
+  const handleResendEmail = async (evaluatorId: string) => {
+    try {
+      setResendingEmails(prev => new Set(prev).add(evaluatorId));
+      
+      const result = await resendEmailInvitation(evaluatorId);
+      
+      if (result.success) {
+        // Update invitation status
+        setInvitationStatuses(prev => 
+          prev.map(status => 
+            status.evaluatorId === evaluatorId
+              ? { ...status, status: 'sent' as const, sentAt: new Date() }
+              : status
+          )
+        );
+        
+        // Show success message or update UI as needed
+        console.log('Email resent successfully');
+      } else {
+        console.error('Failed to resend email:', result.message);
+      }
+    } catch (error) {
+      console.error('Error resending email:', error);
+    } finally {
+      setResendingEmails(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(evaluatorId);
+        return newSet;
+      });
     }
   };
 
@@ -381,12 +464,21 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
             </button>
             
             <button
+              onClick={handleSendBulkInvitations}
+              disabled={sendingBulk}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+            >
+              <EnvelopeIcon className="w-4 h-4" />
+              <span>{sendingBulk ? 'Sending...' : 'Send All via Email'}</span>
+            </button>
+            
+            <button
               onClick={handleSendInvitations}
               disabled={sending || selectedEvaluators.length === 0}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
             >
               <PaperAirplaneIcon className="w-4 h-4" />
-              <span>{sending ? 'Sending...' : 'Send Invitations'}</span>
+              <span>{sending ? 'Sending...' : 'Send Selected'}</span>
             </button>
           </div>
         </div>
@@ -531,13 +623,25 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
                       {status?.reminderCount || 0}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <button
-                        onClick={() => copyInvitationLink(evaluator)}
-                        className="text-blue-600 hover:text-blue-800 transition-colors"
-                        title="Copy invitation link"
-                      >
-                        <DocumentDuplicateIcon className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center space-x-2">
+                        {status?.status === 'sent' && (
+                           <button
+                             onClick={() => handleResendEmail(evaluator.id)}
+                             disabled={resendingEmails.has(evaluator.id)}
+                             className="text-green-600 hover:text-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                             title={resendingEmails.has(evaluator.id) ? 'Resending...' : 'Resend email invitation'}
+                           >
+                             <EnvelopeIcon className={`w-4 h-4 ${resendingEmails.has(evaluator.id) ? 'animate-pulse' : ''}`} />
+                           </button>
+                         )}
+                        <button
+                          onClick={() => copyInvitationLink(evaluator)}
+                          className="text-blue-600 hover:text-blue-800 transition-colors"
+                          title="Copy invitation link"
+                        >
+                          <DocumentDuplicateIcon className="w-4 h-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -546,6 +650,55 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
           </table>
         </div>
       </div>
+
+      {/* Email Results Display */}
+      {emailResults && (
+        <div className="mt-6 bg-gray-50 rounded-lg p-4">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Email Invitation Results</h3>
+          
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="bg-green-100 rounded-lg p-3">
+              <div className="text-green-800 font-semibold">Successful</div>
+              <div className="text-2xl font-bold text-green-900">{emailResults.successful}</div>
+            </div>
+            <div className="bg-red-100 rounded-lg p-3">
+              <div className="text-red-800 font-semibold">Failed</div>
+              <div className="text-2xl font-bold text-red-900">{emailResults.failed}</div>
+            </div>
+          </div>
+
+          {emailResults.details.length > 0 && (
+            <div className="space-y-2">
+              <h4 className="font-medium text-gray-900">Details:</h4>
+              <div className="max-h-40 overflow-y-auto space-y-1">
+                {emailResults.details.map((detail, index) => (
+                  <div
+                    key={index}
+                    className={`flex items-center justify-between p-2 rounded text-sm ${
+                      detail.status === 'sent'
+                        ? 'bg-green-50 text-green-800'
+                        : 'bg-red-50 text-red-800'
+                    }`}
+                  >
+                    <span>{detail.evaluatorName} ({detail.email})</span>
+                    <span className="font-medium">
+                      {detail.status === 'sent' ? '✓ Sent' : '✗ Failed'}
+                      {detail.error && `: ${detail.error}`}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          <button
+            onClick={() => setEmailResults(null)}
+            className="mt-4 px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+          >
+            Close Results
+          </button>
+        </div>
+      )}
     </div>
   );
 };

@@ -118,6 +118,31 @@
               "path": ["authapi", "activate-all-members"]
             }
           }
+        },
+        {
+          "name": "Convert Emails to Lowercase",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/authapi/convert-emails-to-lowercase",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["authapi", "convert-emails-to-lowercase"]
+            },
+            "description": "Convert all existing users' email addresses to lowercase for consistency"
+          }
         }
       ]
     },
@@ -869,6 +894,22 @@
               "path": ["api", "pcaapi", "jca-codes"]
             },
             "description": "Get available JCA codes and language options for PCA evaluations"
+          }
+        },
+        {
+          "name": "Update All CoKey",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/pcaapi/update-cokey",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "pcaapi", "update-cokey"]
+            },
+            "description": "Update all PCA evaluation records' CoKey to the correct value (8A38EEAA-9B94-474D-BE6A-0AB193DDD98D)"
           }
         },
         {
@@ -1747,6 +1788,157 @@
               "path": ["evaluation", "{{evaluationGroupId}}"]
             },
             "description": "Deletes an evaluation group (soft delete).\n\nValidation Rules:\n- Cannot delete if token is already used\n- Evaluation group must exist and be active\n\nReturns:\n- Deletion confirmation\n- Evaluator details (name, email)\n- Deletion timestamp\n\nNote: This performs a soft delete by setting IsActive to false."
+          }
+        },
+        {
+          "name": "Resend Email Invitation",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/evaluation/resend-email/{{evaluationGroupId}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["evaluation", "resend-email", "{{evaluationGroupId}}"]
+            },
+            "description": "Resends email invitation to a specific evaluator.\n\nFeatures:\n- Sends personalized reminder email to individual evaluator\n- Updates TokenUsedDate when email is successfully sent\n- Validates token expiry before sending\n- Professional HTML email template with invitation link\n\nUse Case:\n- When evaluator hasn't responded to initial invitation\n- When user clicks 'Resend via Email' in the UI dropdown menu\n- For follow-up reminders to complete evaluations\n\nReturns:\n- Email sending status\n- Evaluator details\n- Sent timestamp\n- Invitation URL used"
+          }
+        },
+        {
+          "name": "Send Email Invitations (Bulk)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/evaluation/send-email-invitations/{{userId}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["evaluation", "send-email-invitations", "{{userId}}"]
+            },
+            "description": "Sends email invitations to all evaluators for a specific user.\n\nFeatures:\n- Sends invitations to all active evaluators for the user\n- Professional HTML email template\n- Updates TokenUsedDate for each successful send\n- Comprehensive error handling and logging\n- Detailed results for each evaluator\n\nUse Case:\n- When user clicks 'Send Email Invitations' button in UI\n- Bulk invitation sending for all evaluators\n- Initial invitation round for new evaluation setup\n\nReturns:\n- Summary of email sending results\n- Individual results for each evaluator\n- Success/failure counts\n- Invitation URL used"
+          }
+        },
+        {
+          "name": "Get Evaluation Progress",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/evaluation/progress/{{userId}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["evaluation", "progress", "{{userId}}"]
+            },
+            "description": "Gets evaluation progress summary for a specific user.\n\nFeatures:\n- Groups evaluators by type (Parent, Teacher, Sibling/Friend)\n- Shows completion status for each group\n- Tracks invitations sent vs evaluations completed\n- Provides overall progress metrics\n- Includes evaluator details and status\n\nUse Case:\n- Dashboard progress tracking\n- Monitoring evaluation completion rates\n- Group-based progress visualization\n- Status reporting for administrators\n\nReturns:\n- Overall progress summary\n- Group-wise progress breakdown\n- Individual evaluator status\n- Completion requirements and counts"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Email API",
+      "item": [
+        {
+          "name": "Test Email API",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/emailapi/test",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["emailapi", "test"]
+            },
+            "description": "Test if the Gmail SMTP email API is properly configured"
+          }
+        },
+        {
+          "name": "Test SMTP Connection",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/emailapi/test-connection",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["emailapi", "test-connection"]
+            },
+            "description": "Test Gmail SMTP connection and authentication"
+          }
+        },
+        {
+          "name": "Send Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"toEmail\": \"kvaidya221@gmail.com\",\n  \"toName\": \"Test Recipient\",\n  \"subject\": \"Test Email from Gmail SMTP\",\n  \"content\": \"<h1>Hello from Gmail SMTP!</h1><p>This is a test email sent via the Gmail SMTP integration.</p>\"\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/emailapi/send",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["emailapi", "send"]
+            },
+            "description": "Send a transactional email via Gmail SMTP"
+          }
+        },
+        {
+          "name": "Test SMS API",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/emailapi/sms-test",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["emailapi", "sms-test"]
+            },
+            "description": "Test if the Twilio SMS API is properly configured"
+          }
+        },
+        {
+          "name": "Send SMS",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"toPhoneNumber\": \"+1234567890\",\n  \"message\": \"Hello! This is a test SMS sent via Twilio API.\",\n  \"recipientName\": \"Test Recipient\"\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/emailapi/send-sms",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["emailapi", "send-sms"]
+            },
+            "description": "Send an SMS message via Twilio API"
           }
         }
       ]

@@ -12,6 +12,10 @@ import {
   EvaluationGroupProgress,
   UserEvaluationProgress,
 } from "./evaluationService";
+import {
+  checkPCAStatus,
+  getPCAResultByUserId,
+} from "./pcaService";
 
 export interface AssessmentOverallProgress {
   milAssessment: {
@@ -28,7 +32,7 @@ export interface AssessmentOverallProgress {
   };
   pcaAssessment: {
     status: "not_started" | "in_progress" | "completed";
-    progress?: any; // Will be filled when PCA API is available
+    progress?: any; // PCA results data when available
     lastActivity?: string;
   };
   overallCompletion: {
@@ -165,9 +169,11 @@ export async function getUserAssessmentProgress(
       };
     }
 
-    // PCA Assessment (placeholder - API not implemented yet)
-    const pcaStatus: "not_started" | "in_progress" | "completed" =
-      "not_started";
+    // PCA Assessment - fetch actual status
+    const pcaStatusData = await checkPCAStatus(userId);
+    const pcaStatus = pcaStatusData.status;
+    const pcaProgress = pcaStatusData.hasResults ? await getPCAResultByUserId(userId).catch(() => null) : null;
+    const pcaLastActivity = pcaStatusData.lastActivity;
 
     // Calculate overall completion
     const assessmentStatuses = [milStatus, evaluationStatus, pcaStatus];
@@ -200,8 +206,8 @@ export async function getUserAssessmentProgress(
       },
       pcaAssessment: {
         status: pcaStatus,
-        progress: undefined,
-        lastActivity: undefined,
+        progress: pcaProgress,
+        lastActivity: pcaLastActivity,
       },
       overallCompletion: {
         totalAssessments: 3,

@@ -5,12 +5,10 @@ import { motion } from "motion/react";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { usePCAData } from "@/hooks/usePCAData";
 import {
-  authenticateNexaAPI,
-  addPCAAssessmentSpanish,
-  addPCAAssessmentEnglish,
+  addPCAEvaluation,
+  JCACode,
   JCA_CODES,
   JCA_CODES_ENGLISH,
-  JCACode,
 } from "@/services/pcaService";
 import PCAResultsPanel from "../_components/PCAResultsPanel";
 
@@ -37,9 +35,6 @@ export default function PCAAssessmentPage() {
 
     setIsCreating(true);
     try {
-      // Authenticate first
-      await authenticateNexaAPI();
-
       const userData = {
         PerNom: user.name.split(" ")[0] || "User",
         PerApe: user.name.split(" ").slice(1).join(" ") || "Name",
@@ -51,10 +46,12 @@ export default function PCAAssessmentPage() {
         UserMail: user.email,
       };
 
-      const result =
-        selectedLanguage === "spanish"
-          ? await addPCAAssessmentSpanish(userData)
-          : await addPCAAssessmentEnglish(userData);
+      // Use the new backend API integration
+      const result = await addPCAEvaluation(
+        user.id,
+        userData,
+        selectedLanguage
+      );
 
       if (result.success && result.assessmentUrl) {
         // Set the assessment URL to render in iframe

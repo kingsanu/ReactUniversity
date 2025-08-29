@@ -51,6 +51,9 @@ export interface PCAAPIResponse {
 const NEXA_API_BASE_URL = "https://timshr.com/core/api";
 const NEXA_COKEY = "8A38EEAA-9B94-474D-BE6A-0AB193DDD98D"; // Nexa Developments CoKey
 
+// Backend API Configuration
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net";
+
 /**
  * Authenticate with Nexa Developments API
  */
@@ -246,6 +249,189 @@ export async function getPCAVsJCAAnalysis(
   } catch (error) {
     console.error("Get PCA vs JCA Analysis Error:", error);
     throw error;
+  }
+}
+
+// ===== Backend API Functions =====
+
+/**
+ * Get PCA Result by UserId (Backend API)
+ */
+export async function getPCAResultByUserId(userId: string): Promise<any> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/pcaapi/get-result`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        UserId: userId,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to get PCA result: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Get PCA Result by UserId Error:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get PCA Competences by UserId (Backend API)
+ */
+export async function getPCACompetencesByUserId(
+  userId: string,
+  cmpTims: "1" | "0" = "1"
+): Promise<any> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/pcaapi/get-competences`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        UserId: userId,
+        CmpTims: cmpTims,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to get PCA competences: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Get PCA Competences by UserId Error:", error);
+    throw error;
+  }
+}
+
+/**
+ * Add PCA Evaluation (Backend API)
+ */
+export async function addPCAEvaluation(
+  userId: string,
+  userData: Omit<PCAAssessmentRequest, "CoKey">,
+  language: "spanish" | "english" = "spanish"
+): Promise<PCAAssessmentResponse> {
+  try {
+    const coKey = language === "spanish" ? "NXDAPS" : "NXDAPI";
+    
+    const response = await fetch(`${API_BASE_URL}/api/pcaapi/add-evaluation`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        UserId: userId,
+        CoKey: coKey,
+        ...userData,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to add PCA evaluation: ${response.status}`);
+    }
+
+    const result = await response.json();
+    
+    if (result.success && result.data) {
+      // Extract surveyLink from the response data
+      const surveyLink = result.data.surveyLink?.trim().replace(/`/g, '') || '';
+      
+      return {
+        success: true,
+        data: result.data,
+        assessmentUrl: surveyLink,
+        pcaCod: result.data.PcaCod || result.data.pcaCod,
+        message: "PCA evaluation created successfully",
+      };
+    } else {
+      return {
+        success: false,
+        message: result.message || "Failed to add PCA evaluation",
+      };
+    }
+  } catch (error) {
+    console.error("Add PCA Evaluation Error:", error);
+    return {
+      success: false,
+      message:
+        error instanceof Error ? error.message : "Failed to add PCA evaluation",
+    };
+  }
+}
+
+/**
+ * Get All PCA Evaluations (Backend API)
+ */
+export async function getAllPCAEvaluations(): Promise<any> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/pcaapi/evaluations`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to get PCA evaluations: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Get All PCA Evaluations Error:", error);
+    throw error;
+  }
+}
+
+/**
+ * Check PCA Status by UserId
+ */
+export async function checkPCAStatus(userId: string): Promise<{
+  status: "not_started" | "in_progress" | "completed";
+  pcaCod?: string;
+  hasResults?: boolean;
+  lastActivity?: string;
+}> {
+  try {
+    // First, check if user has any PCA evaluations
+    const allEvaluations = await getAllPCAEvaluations();
+    const userEvaluation = allEvaluations.find((evaluation: any) => evaluation.userId === userId);
+    
+    if (!userEvaluation) {
+      return { status: "not_started" };
+    }
+
+    // User has a PCA evaluation, check if they have results
+    try {
+      const result = await getPCAResultByUserId(userId);
+      if (result && Object.keys(result).length > 0) {
+        return {
+          status: "completed",
+          pcaCod: userEvaluation.pcaCod,
+          hasResults: true,
+          lastActivity: userEvaluation.createdAt || new Date().toISOString(),
+        };
+      }
+    } catch (error) {
+      // No results yet, but evaluation exists
+      console.log("PCA evaluation exists but no results yet:", error);
+    }
+
+    return {
+      status: "in_progress",
+      pcaCod: userEvaluation.pcaCod,
+      hasResults: false,
+      lastActivity: userEvaluation.createdAt || new Date().toISOString(),
+    };
+  } catch (error) {
+    console.error("Check PCA Status Error:", error);
+    return { status: "not_started" };
   }
 }
 
