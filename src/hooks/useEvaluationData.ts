@@ -12,7 +12,7 @@ import {
   getEvaluationReport,
   validateEvaluatorRequirements,
   DEFAULT_EVALUATOR_GROUPS,
-  createMockEvaluationSession
+  createMockEvaluationSession,
 } from "@/services/evaluationService";
 
 export interface EvaluationProgress {
@@ -26,7 +26,8 @@ export interface EvaluationProgress {
 
 export function useEvaluationData() {
   const [sessions, setSessions] = useState<EvaluationSession[]>([]);
-  const [currentSession, setCurrentSession] = useState<EvaluationSession | null>(null);
+  const [currentSession, setCurrentSession] =
+    useState<EvaluationSession | null>(null);
   const [progress, setProgress] = useState<EvaluationProgress | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -37,24 +38,27 @@ export function useEvaluationData() {
       setError(null);
 
       // For development, use mock data if API is not available
-      const isDevelopment = process.env.NODE_ENV === 'development';
-      
+      const isDevelopment = process.env.NODE_ENV === "development";
+
       if (isDevelopment) {
         // Load mock data from localStorage or create new
-        const savedSessions = localStorage.getItem('evaluation_sessions');
+        const savedSessions = localStorage.getItem("evaluation_sessions");
         let sessionData: EvaluationSession[] = [];
-        
+
         if (savedSessions) {
           sessionData = JSON.parse(savedSessions);
         } else {
           // Create a mock session for development
           const mockSession = createMockEvaluationSession();
           sessionData = [mockSession];
-          localStorage.setItem('evaluation_sessions', JSON.stringify(sessionData));
+          localStorage.setItem(
+            "evaluation_sessions",
+            JSON.stringify(sessionData)
+          );
         }
-        
+
         setSessions(sessionData);
-        
+
         // Calculate progress
         const progressData = calculateProgress(sessionData);
         setProgress(progressData);
@@ -62,40 +66,51 @@ export function useEvaluationData() {
         // Load from API in production
         const sessionData = await getEvaluationSessions();
         setSessions(sessionData);
-        
+
         const progressData = calculateProgress(sessionData);
         setProgress(progressData);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load evaluation data");
+      setError(
+        err instanceof Error ? err.message : "Failed to load evaluation data"
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  const calculateProgress = (sessionData: EvaluationSession[]): EvaluationProgress => {
+  const calculateProgress = (
+    sessionData: EvaluationSession[]
+  ): EvaluationProgress => {
     const totalSessions = sessionData.length;
-    const activeSessions = sessionData.filter(s => s.status === 'active').length;
-    const completedSessions = sessionData.filter(s => s.status === 'completed').length;
-    
+    const activeSessions = sessionData.filter(
+      (s) => s.status === "active"
+    ).length;
+    const completedSessions = sessionData.filter(
+      (s) => s.status === "completed"
+    ).length;
+
     let totalEvaluators = 0;
     let totalResponses = 0;
-    
-    sessionData.forEach(session => {
+
+    sessionData.forEach((session) => {
       totalEvaluators += session.evaluators.length;
-      totalResponses += session.evaluators.filter(e => e.responseReceived).length;
+      totalResponses += session.evaluators.filter(
+        (e) => e.responseReceived
+      ).length;
     });
-    
-    const responseRate = totalEvaluators > 0 ? (totalResponses / totalEvaluators) * 100 : 0;
+
+    const responseRate =
+      totalEvaluators > 0 ? (totalResponses / totalEvaluators) * 100 : 0;
     const pendingResponses = totalEvaluators - totalResponses;
-    
+
     return {
       totalSessions,
       activeSessions,
       completedSessions,
       pendingResponses,
       responseRate,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     };
   };
 
@@ -104,42 +119,51 @@ export function useEvaluationData() {
   ): Promise<EvaluationSession> => {
     try {
       setError(null);
-      
-      const isDevelopment = process.env.NODE_ENV === 'development';
-      
+
+      const isDevelopment = process.env.NODE_ENV === "development";
+
       if (isDevelopment) {
         // Create mock session for development
         const newSession: EvaluationSession = {
           ...createMockEvaluationSession(),
           ...sessionData,
           id: `eval-${Date.now()}`,
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
         };
-        
+
         const updatedSessions = [...sessions, newSession];
         setSessions(updatedSessions);
-        localStorage.setItem('evaluation_sessions', JSON.stringify(updatedSessions));
-        
+        localStorage.setItem(
+          "evaluation_sessions",
+          JSON.stringify(updatedSessions)
+        );
+
         return newSession;
       } else {
         const newSession = await createEvaluationSession(sessionData);
-        setSessions(prev => [...prev, newSession]);
+        setSessions((prev) => [...prev, newSession]);
         return newSession;
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create evaluation session");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to create evaluation session"
+      );
       throw err;
     }
   };
 
-  const loadSession = async (sessionId: string): Promise<EvaluationSession | null> => {
+  const loadSession = async (
+    sessionId: string
+  ): Promise<EvaluationSession | null> => {
     try {
       setError(null);
-      
-      const isDevelopment = process.env.NODE_ENV === 'development';
-      
+
+      const isDevelopment = process.env.NODE_ENV === "development";
+
       if (isDevelopment) {
-        const session = sessions.find(s => s.id === sessionId) || null;
+        const session = sessions.find((s) => s.id === sessionId) || null;
         setCurrentSession(session);
         return session;
       } else {
@@ -148,7 +172,9 @@ export function useEvaluationData() {
         return session;
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load evaluation session");
+      setError(
+        err instanceof Error ? err.message : "Failed to load evaluation session"
+      );
       return null;
     }
   };
@@ -159,53 +185,60 @@ export function useEvaluationData() {
   ): Promise<Evaluator[]> => {
     try {
       setError(null);
-      
-      const isDevelopment = process.env.NODE_ENV === 'development';
-      
+
+      const isDevelopment = process.env.NODE_ENV === "development";
+
       if (isDevelopment) {
         // Mock implementation for development
-        const newEvaluators: Evaluator[] = evaluators.map((evaluator, index) => ({
-          id: `evaluator-${Date.now()}-${index}`,
-          name: evaluator.name || '',
-          email: evaluator.email || '',
-          phone: evaluator.phone || '',
-          relationship: evaluator.relationship || '',
-          groupType: evaluator.groupType || 'parent',
-          invitationToken: Math.random().toString(36).substring(2, 15),
-          invitationSent: false,
-          responseReceived: false,
-          isActive: true
-        }));
-        
+        const newEvaluators: Evaluator[] = evaluators.map(
+          (evaluator, index) => ({
+            id: `evaluator-${Date.now()}-${index}`,
+            name: evaluator.name || "",
+            email: evaluator.email || "",
+            phone: evaluator.phone || "",
+            relationship: evaluator.relationship || "",
+            groupType: evaluator.groupType || "parent",
+            invitationToken: Math.random().toString(36).substring(2, 15),
+            invitationSent: false,
+            responseReceived: false,
+            isActive: true,
+          })
+        );
+
         // Update session in localStorage
-        const updatedSessions = sessions.map(session => {
+        const updatedSessions = sessions.map((session) => {
           if (session.id === sessionId) {
             return {
               ...session,
-              evaluators: [...session.evaluators, ...newEvaluators]
+              evaluators: [...session.evaluators, ...newEvaluators],
             };
           }
           return session;
         });
-        
+
         setSessions(updatedSessions);
-        localStorage.setItem('evaluation_sessions', JSON.stringify(updatedSessions));
-        
+        localStorage.setItem(
+          "evaluation_sessions",
+          JSON.stringify(updatedSessions)
+        );
+
         return newEvaluators;
       } else {
         const newEvaluators = await addEvaluators(sessionId, evaluators);
-        
+
         // Update local state
-        setSessions(prev => prev.map(session => {
-          if (session.id === sessionId) {
-            return {
-              ...session,
-              evaluators: [...session.evaluators, ...newEvaluators]
-            };
-          }
-          return session;
-        }));
-        
+        setSessions((prev) =>
+          prev.map((session) => {
+            if (session.id === sessionId) {
+              return {
+                ...session,
+                evaluators: [...session.evaluators, ...newEvaluators],
+              };
+            }
+            return session;
+          })
+        );
+
         return newEvaluators;
       }
     } catch (err) {
@@ -220,76 +253,85 @@ export function useEvaluationData() {
   ): Promise<void> => {
     try {
       setError(null);
-      
-      const isDevelopment = process.env.NODE_ENV === 'development';
-      
+
+      const isDevelopment = process.env.NODE_ENV === "development";
+
       if (isDevelopment) {
         // Mock implementation for development
-        const updatedSessions = sessions.map(session => {
+        const updatedSessions = sessions.map((session) => {
           if (session.id === sessionId) {
-            const updatedEvaluators = session.evaluators.map(evaluator => {
+            const updatedEvaluators = session.evaluators.map((evaluator) => {
               if (evaluatorIds.includes(evaluator.id)) {
                 return {
                   ...evaluator,
                   invitationSent: true,
-                  invitationSentAt: new Date().toISOString()
+                  invitationSentAt: new Date().toISOString(),
                 };
               }
               return evaluator;
             });
-            
+
             return {
               ...session,
-              evaluators: updatedEvaluators
+              evaluators: updatedEvaluators,
             };
           }
           return session;
         });
-        
+
         setSessions(updatedSessions);
-        localStorage.setItem('evaluation_sessions', JSON.stringify(updatedSessions));
+        localStorage.setItem(
+          "evaluation_sessions",
+          JSON.stringify(updatedSessions)
+        );
       } else {
         await sendEvaluationInvitations(sessionId, evaluatorIds);
-        
+
         // Update local state
-        setSessions(prev => prev.map(session => {
-          if (session.id === sessionId) {
-            const updatedEvaluators = session.evaluators.map(evaluator => {
-              if (evaluatorIds.includes(evaluator.id)) {
-                return {
-                  ...evaluator,
-                  invitationSent: true,
-                  invitationSentAt: new Date().toISOString()
-                };
-              }
-              return evaluator;
-            });
-            
-            return {
-              ...session,
-              evaluators: updatedEvaluators
-            };
-          }
-          return session;
-        }));
+        setSessions((prev) =>
+          prev.map((session) => {
+            if (session.id === sessionId) {
+              const updatedEvaluators = session.evaluators.map((evaluator) => {
+                if (evaluatorIds.includes(evaluator.id)) {
+                  return {
+                    ...evaluator,
+                    invitationSent: true,
+                    invitationSentAt: new Date().toISOString(),
+                  };
+                }
+                return evaluator;
+              });
+
+              return {
+                ...session,
+                evaluators: updatedEvaluators,
+              };
+            }
+            return session;
+          })
+        );
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to send invitations");
+      setError(
+        err instanceof Error ? err.message : "Failed to send invitations"
+      );
       throw err;
     }
   };
 
-  const getSessionReport = async (sessionId: string): Promise<EvaluationReport | null> => {
+  const getSessionReport = async (
+    sessionId: string
+  ): Promise<EvaluationReport | null> => {
     try {
       setError(null);
-      
-      const isDevelopment = process.env.NODE_ENV === 'development';
-      
+
+      const isDevelopment = process.env.NODE_ENV === "development";
+
       if (isDevelopment) {
         // Mock report for development
-        const session = sessions.find(s => s.id === sessionId);
+        const session = sessions.find((s) => s.id === sessionId);
         if (!session) return null;
-        
+
         const mockReport: EvaluationReport = {
           id: `report-${sessionId}`,
           evaluationId: sessionId,
@@ -299,113 +341,145 @@ export function useEvaluationData() {
             responseRate: 75,
             completionRate: 80,
             averageRatings: {
-              'interests-001': 4.2,
-              'talents-001': 3.8,
-              'strengths-001': 4.5,
-              'emotional_intelligence-001': 4.0,
-              'leadership-001': 3.9,
-              'responsibility-001': 4.3,
-              'communication-001': 4.1
-            }
+              "interests-001": 4.2,
+              "talents-001": 3.8,
+              "strengths-001": 4.5,
+              "emotional_intelligence-001": 4.0,
+              "leadership-001": 3.9,
+              "responsibility-001": 4.3,
+              "communication-001": 4.1,
+            },
           },
           competencyAnalysis: [
             {
-              competencyId: 'strengths-001',
-              competencyName: 'Perseverance',
+              competencyId: "strengths-001",
+              competencyName: "Perseverance",
               overallRating: 4.5,
               ratingsByGroup: {
-                'self': 4.0,
-                'parent': 5.0,
-                'teacher': 4.5,
-                'sibling_friend': 4.0
+                self: 4.0,
+                parent: 5.0,
+                teacher: 4.5,
+                sibling_friend: 4.0,
               },
-              strengths: ['Shows determination when facing challenges', 'Doesn\'t give up easily'],
-              developmentAreas: ['Could benefit from asking for help when stuck'],
-              keyFeedback: ['Consistently works through difficult problems', 'Great resilience']
-            }
+              strengths: [
+                "Shows determination when facing challenges",
+                "Doesn't give up easily",
+              ],
+              developmentAreas: [
+                "Could benefit from asking for help when stuck",
+              ],
+              keyFeedback: [
+                "Consistently works through difficult problems",
+                "Great resilience",
+              ],
+            },
           ],
           recommendations: [
-            'Continue to build on strong perseverance skills',
-            'Develop collaborative problem-solving approaches',
-            'Consider leadership opportunities that leverage determination'
+            "Continue to build on strong perseverance skills",
+            "Develop collaborative problem-solving approaches",
+            "Consider leadership opportunities that leverage determination",
           ],
           detailedFeedback: [
             {
-              groupType: 'parent',
+              groupType: "parent",
               feedback: [
                 {
-                  competencyId: 'strengths-001',
+                  competencyId: "strengths-001",
                   rating: 5,
-                  comments: ['Always finishes what they start', 'Very determined child']
-                }
-              ]
-            }
-          ]
+                  comments: [
+                    "Always finishes what they start",
+                    "Very determined child",
+                  ],
+                },
+              ],
+            },
+          ],
         };
-        
+
         return mockReport;
       } else {
         return await getEvaluationReport(sessionId);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to get evaluation report");
+      setError(
+        err instanceof Error ? err.message : "Failed to get evaluation report"
+      );
       return null;
     }
   };
 
-  const validateEvaluators = (sessionId: string): { isValid: boolean; errors: string[] } => {
-    const session = sessions.find(s => s.id === sessionId);
+  const validateEvaluators = (
+    sessionId: string
+  ): { isValid: boolean; errors: string[] } => {
+    const session = sessions.find((s) => s.id === sessionId);
     if (!session) {
-      return { isValid: false, errors: ['Session not found'] };
+      return { isValid: false, errors: ["Session not found"] };
     }
-    
-    return validateEvaluatorRequirements(session.evaluators, DEFAULT_EVALUATOR_GROUPS);
+
+    return validateEvaluatorRequirements(
+      session.evaluators,
+      DEFAULT_EVALUATOR_GROUPS
+    );
   };
 
   const getSessionProgress = (sessionId: string) => {
-    const session = sessions.find(s => s.id === sessionId);
+    const session = sessions.find((s) => s.id === sessionId);
     if (!session) return null;
-    
+
     const totalEvaluators = session.evaluators.length;
-    const respondedEvaluators = session.evaluators.filter(e => e.responseReceived).length;
-    const invitedEvaluators = session.evaluators.filter(e => e.invitationSent).length;
-    
+    const respondedEvaluators = session.evaluators.filter(
+      (e) => e.responseReceived
+    ).length;
+    const invitedEvaluators = session.evaluators.filter(
+      (e) => e.invitationSent
+    ).length;
+
     return {
       totalEvaluators,
       invitedEvaluators,
       respondedEvaluators,
-      responseRate: totalEvaluators > 0 ? (respondedEvaluators / totalEvaluators) * 100 : 0,
-      isComplete: respondedEvaluators === totalEvaluators && totalEvaluators > 0
+      responseRate:
+        totalEvaluators > 0 ? (respondedEvaluators / totalEvaluators) * 100 : 0,
+      isComplete:
+        respondedEvaluators === totalEvaluators && totalEvaluators > 0,
     };
   };
 
-  const submitResponses = async (sessionId: string, responses: EvaluationResponse[]): Promise<void> => {
+  const submitResponses = async (
+    sessionId: string,
+    responses: EvaluationResponse[]
+  ): Promise<void> => {
     try {
       setError(null);
-      
-      const isDevelopment = process.env.NODE_ENV === 'development';
-      
+
+      const isDevelopment = process.env.NODE_ENV === "development";
+
       if (isDevelopment) {
         // Mock implementation for development
-        const updatedSessions = sessions.map(session => {
+        const updatedSessions = sessions.map((session) => {
           if (session.id === sessionId) {
             return {
               ...session,
-              responses: [...session.responses, ...responses]
+              responses: [...session.responses, ...responses],
             };
           }
           return session;
         });
-        
+
         setSessions(updatedSessions);
-        localStorage.setItem('evaluation_sessions', JSON.stringify(updatedSessions));
+        localStorage.setItem(
+          "evaluation_sessions",
+          JSON.stringify(updatedSessions)
+        );
       } else {
         // In production, this would call the API
         // await submitEvaluationResponses(sessionId, evaluatorToken, responses);
-        console.log('Submitting responses to API:', { sessionId, responses });
+        console.log("Submitting responses to API:", { sessionId, responses });
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to submit responses");
+      setError(
+        err instanceof Error ? err.message : "Failed to submit responses"
+      );
       throw err;
     }
   };
@@ -414,15 +488,20 @@ export function useEvaluationData() {
     loadEvaluationData();
   }, []);
 
-  const updateEvaluationSession = async (sessionId: string, updates: Partial<EvaluationSession>) => {
+  const updateEvaluationSession = async (
+    sessionId: string,
+    updates: Partial<EvaluationSession>
+  ) => {
     try {
       setLoading(true);
       // Update session in state
-      setSessions(prev => prev.map(s => s.id === sessionId ? { ...s, ...updates } : s));
-      
+      setSessions((prev) =>
+        prev.map((s) => (s.id === sessionId ? { ...s, ...updates } : s))
+      );
+
       // Update current session if it's the one being updated
       if (currentSession?.id === sessionId) {
-        setCurrentSession(prev => prev ? { ...prev, ...updates } : null);
+        setCurrentSession((prev) => (prev ? { ...prev, ...updates } : null));
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update session");
@@ -449,6 +528,6 @@ export function useEvaluationData() {
     getSessionProgress,
     submitResponses,
     hasEvaluations: sessions.length > 0,
-    activeSessionsCount: sessions.filter(s => s.status === 'active').length
+    activeSessionsCount: sessions.filter((s) => s.status === "active").length,
   };
 }

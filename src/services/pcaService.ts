@@ -52,7 +52,9 @@ const NEXA_API_BASE_URL = "https://timshr.com/core/api";
 const NEXA_COKEY = "8A38EEAA-9B94-474D-BE6A-0AB193DDD98D"; // Nexa Developments CoKey
 
 // Backend API Configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net";
 
 /**
  * Authenticate with Nexa Developments API
@@ -320,7 +322,7 @@ export async function addPCAEvaluation(
 ): Promise<PCAAssessmentResponse> {
   try {
     const coKey = language === "spanish" ? "NXDAPS" : "NXDAPI";
-    
+
     const response = await fetch(`${API_BASE_URL}/api/pcaapi/add-evaluation`, {
       method: "POST",
       headers: {
@@ -338,11 +340,11 @@ export async function addPCAEvaluation(
     }
 
     const result = await response.json();
-    
+
     if (result.success && result.data) {
       // Extract surveyLink from the response data
-      const surveyLink = result.data.surveyLink?.trim().replace(/`/g, '') || '';
-      
+      const surveyLink = result.data.surveyLink?.trim().replace(/`/g, "") || "";
+
       return {
         success: true,
         data: result.data,
@@ -401,8 +403,13 @@ export async function checkPCAStatus(userId: string): Promise<{
   try {
     // First, check if user has any PCA evaluations
     const allEvaluations = await getAllPCAEvaluations();
-    const userEvaluation = allEvaluations.find((evaluation: any) => evaluation.userId === userId);
-    
+    console.log("All PCA Evaluations:", allEvaluations);
+    console.log("User ID:", userId);
+    const userEvaluation = allEvaluations.data.find(
+      (evaluation: any) => evaluation.userId === userId
+    );
+    console.log("User Evaluation:", userEvaluation);
+
     if (!userEvaluation) {
       return { status: "not_started" };
     }

@@ -5,8 +5,14 @@ import { useGlobalStore } from "@/store/useGlobalStore";
 import { usePCAData } from "@/hooks/usePCAData";
 import { useEvaluationData } from "@/hooks/useEvaluationData";
 import { useDashboardAssessmentSummary } from "@/hooks/useAssessmentQueries";
+import { useEvaluationGroups } from "@/hooks/useAssessmentQueries";
 import { useAssessmentCache } from "@/contexts/AssessmentCacheContext";
 import { useState } from "react";
+import { toast } from "sonner";
+import {
+  getUserEvaluationGroups,
+  createEvaluationGroup,
+} from "@/services/evaluationService";
 
 export default function AssessmentsPage() {
   const { user } = useGlobalStore();
@@ -14,12 +20,20 @@ export default function AssessmentsPage() {
   const { createNewEvaluationSession, isLoading } = useEvaluationData();
   const [showInviteModal, setShowInviteModal] = useState(false);
   const { invalidateSpecificAssessment } = useAssessmentCache();
+  const [isStartingEvaluation, setIsStartingEvaluation] = useState(false);
   // Use React Query for assessment progress
-  const { 
-    data: assessmentProgress, 
-    isLoading: loadingProgress, 
-    error: progressError 
-  } = useDashboardAssessmentSummary(user?.id || '');
+  const {
+    data: assessmentProgress,
+    isLoading: loadingProgress,
+    error: progressError,
+  } = useDashboardAssessmentSummary(user?.id || "");
+
+  // Fetch evaluation groups for evaluators
+  const {
+    data: evaluationGroups,
+    isLoading: loadingGroups,
+    error: groupsError,
+  } = useEvaluationGroups(user?.id || "");
 
   const getPCAStatus = () => {
     if (!hasPCA) return "not_started";
@@ -41,6 +55,52 @@ export default function AssessmentsPage() {
       window.location.href = "/dashboard/assessments/evaluators";
     } catch (error) {
       console.error("Error creating evaluation session:", error);
+    }
+  };
+
+  const handleStart360Evaluation = async () => {
+    try {
+      setIsStartingEvaluation(true);
+      // Use the already fetched evaluation groups or fetch if not available
+      let groups = evaluationGroups;
+      if (!groups) {
+        groups = await getUserEvaluationGroups(user?.id || "");
+      }
+      console.log("User evaluation groups:", groups);
+
+      // Find or create self-evaluation group
+      let selfGroup = groups?.find(
+        (group) => group.groupType === "Parent" && group.relation === "Self"
+      );
+      console.log("Found self group:", selfGroup);
+
+      if (!selfGroup || !selfGroup.id) {
+        // Create self-evaluation group if it doesn't exist or doesn't have a token
+        console.log("Creating self evaluation group for user:", user);
+        selfGroup = await createEvaluationGroup({
+          evaluatorName: user?.name || "Self",
+          evaluatorEmail: user?.email || "",
+          relation: "Self",
+          groupType: "Parent",
+          evaluatedUserId: user?.id || "",
+        });
+        console.log("Self evaluation group created:", selfGroup);
+      }
+
+      // Redirect to evaluator page with the ID (for self-assessment)
+      if (selfGroup && selfGroup.id) {
+        // Invalidate evaluation groups cache to refresh data
+        invalidateSpecificAssessment(user?.id || "", "evaluation");
+        window.location.href = `/evaluation/evaluator?id=${selfGroup.id}`;
+      } else {
+        console.error("Self evaluation group created but no ID received:", selfGroup);
+        toast.error("Failed to create self evaluation. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error starting 360 evaluation:", error);
+      toast.error("Failed to start evaluation. Please try again.");
+    } finally {
+      setIsStartingEvaluation(false);
     }
   };
 
@@ -285,16 +345,64 @@ export default function AssessmentsPage() {
                 : "Start PCA"}
             </a>
 
-            {pcaStatus === "completed" && pcaData?.pcaCod && (
+            {pcaStatus === "completed" && pcaData?.results?.data && (
+              <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <h4 className="text-sm font-semibold text-green-900 mb-3">
+                  Assessment Summary
+                </h4>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-green-700">Dominance:</span>
+                    <span className="font-semibold text-green-900">
+                      {pcaData.results.data.pcaD1 || 0}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-green-700">Influence:</span>
+                    <span className="font-semibold text-green-900">
+                      {pcaData.results.data.pcaI1 || 0}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-green-700">Steadiness:</span>
+                    <span className="font-semibold text-green-900">
+                      {pcaData.results.data.pcaS1 || 0}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-green-700">Conscientiousness:</span>
+                    <span className="font-semibold text-green-900">
+                      {pcaData.results.data.pcaC1 || 0}%
+                    </span>
+                  </div>
+                </div>
+                <div className="mt-3 pt-3 border-t border-green-200">
+                  <p className="text-xs text-green-700">
+                    PCA Code:{" "}
+                    <code className="bg-green-200 px-1 rounded text-green-900">
+                      {pcaData?.pcaCod?.slice(0, 8)}...
+                    </code>
+                    <span className="ml-2">
+                      Completed:{" "}
+                      {pcaData?.lastUpdated
+                        ? new Date(pcaData.lastUpdated).toLocaleDateString()
+                        : "Recently"}
+                    </span>
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {pcaStatus === "completed" && !pcaData?.results?.data && (
               <div className="mt-4 p-3 bg-gray-50 rounded-lg">
                 <p className="text-xs text-gray-600">
                   PCA Code:{" "}
                   <code className="bg-gray-200 px-1 rounded">
-                    {pcaData.pcaCod.slice(0, 8)}...
+                    {pcaData?.pcaCod?.slice(0, 8)}...
                   </code>
                   <span className="ml-2">
                     Completed:{" "}
-                    {pcaData.lastUpdated
+                    {pcaData?.lastUpdated
                       ? new Date(pcaData.lastUpdated).toLocaleDateString()
                       : "Recently"}
                   </span>
@@ -324,10 +432,10 @@ export default function AssessmentsPage() {
 
             {(() => {
               const liaAssessment = assessmentProgress?.assessments?.find(
-                (a: any) => a.type === 'mil'
+                (a: any) => a.type === "mil"
               );
-              const isCompleted = liaAssessment?.status === 'completed';
-              
+              const isCompleted = liaAssessment?.status === "completed";
+
               if (isCompleted) {
                 return (
                   <div className="text-center">
@@ -344,7 +452,9 @@ export default function AssessmentsPage() {
                         />
                       </svg>
                     </div>
-                    <p className="text-green-700 font-medium mb-2">Assessment Completed!</p>
+                    <p className="text-green-700 font-medium mb-2">
+                      Assessment Completed!
+                    </p>
                     <p className="text-sm text-gray-600 mb-4">
                       You have successfully completed the LIA Assessment.
                     </p>
@@ -357,13 +467,15 @@ export default function AssessmentsPage() {
                   </div>
                 );
               }
-              
+
               return (
                 <a
                   href="/dashboard/assessments/mil"
                   className="inline-flex items-center justify-center w-full bg-purple-600 text-white py-3 px-6 rounded-lg hover:bg-purple-700 transition-colors font-medium"
                 >
-                  {liaAssessment?.status === 'in_progress' ? 'Continue LIA Assessment' : 'Start LIA Assessment'}
+                  {liaAssessment?.status === "in_progress"
+                    ? "Continue LIA Assessment"
+                    : "Start LIA Assessment"}
                 </a>
               );
             })()}
@@ -389,11 +501,12 @@ export default function AssessmentsPage() {
             </div>
 
             {(() => {
-              const evaluationAssessment = assessmentProgress?.assessments?.find(
-                (a: any) => a.type === 'evaluation'
-              );
-              const isCompleted = evaluationAssessment?.status === 'completed';
-              
+              const evaluationAssessment =
+                assessmentProgress?.assessments?.find(
+                  (a: any) => a.type === "evaluation"
+                );
+              const isCompleted = evaluationAssessment?.status === "completed";
+
               if (isCompleted) {
                 return (
                   <div className="text-center">
@@ -410,7 +523,9 @@ export default function AssessmentsPage() {
                         />
                       </svg>
                     </div>
-                    <p className="text-green-700 font-medium mb-2">360 Evaluation Completed!</p>
+                    <p className="text-green-700 font-medium mb-2">
+                      360 Evaluation Completed!
+                    </p>
                     <p className="text-sm text-gray-600 mb-4">
                       You have successfully completed the 360 Evaluation.
                     </p>
@@ -423,7 +538,7 @@ export default function AssessmentsPage() {
                   </div>
                 );
               }
-              
+
               return (
                 <div className="space-y-3">
                   <button
@@ -434,14 +549,19 @@ export default function AssessmentsPage() {
                     {isLoading ? "Loading..." : "Invite Evaluators"}
                   </button>
                   <button
-                    disabled={evaluationAssessment?.status !== 'in_progress'}
+                    disabled={evaluationAssessment?.status !== "in_progress" || isStartingEvaluation || loadingGroups}
                     className={`w-full py-3 px-6 rounded-lg font-medium transition-colors ${
-                      evaluationAssessment?.status === 'in_progress'
-                        ? 'bg-orange-600 hover:bg-orange-700 text-white'
-                        : 'bg-gray-400 text-white cursor-not-allowed'
+                      evaluationAssessment?.status === "in_progress" && !isStartingEvaluation && !loadingGroups
+                        ? "bg-orange-600 hover:bg-orange-700 text-white"
+                        : "bg-gray-400 text-white cursor-not-allowed"
                     }`}
+                    onClick={handleStart360Evaluation}
                   >
-                    {evaluationAssessment?.status === 'in_progress' ? 'Start 360 Evaluation' : 'Start 360 Evaluation'}
+                    {isStartingEvaluation || loadingGroups
+                      ? "Loading..."
+                      : evaluationAssessment?.status === "in_progress"
+                      ? "Start 360 Evaluation"
+                      : "Start 360 Evaluation"}
                   </button>
                 </div>
               );

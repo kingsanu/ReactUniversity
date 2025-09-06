@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { useEvaluationData } from "@/hooks/useEvaluationData";
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import {
   EvaluatorGroup,
   Evaluator,
@@ -11,9 +12,11 @@ import {
   getUserEvaluationGroups,
   deleteEvaluationGroup,
   resendInvitationLink,
+  sendBulkEmailInvitations,
   checkDuplicateEvaluator,
   validatePhoneNumber,
   EvaluationGroupProgress,
+  EvaluationGroupWithId,
 } from "@/services/evaluationService";
 import {
   Dialog,
@@ -73,7 +76,7 @@ export default function EvaluatorsPage() {
     relationship: "",
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [apiEvaluators, setApiEvaluators] = useState<EvaluationGroupProgress[]>(
+  const [apiEvaluators, setApiEvaluators] = useState<EvaluationGroupWithId[]>(
     []
   );
   const [loading, setLoading] = useState(false);
@@ -118,10 +121,10 @@ export default function EvaluatorsPage() {
     }
   };
 
-  const mergeApiDataIntoGroups = (apiData: EvaluationGroupProgress[]) => {
+  const mergeApiDataIntoGroups = (apiData: EvaluationGroupWithId[]) => {
     const updatedGroups = [...DEFAULT_EVALUATOR_GROUPS];
 
-    apiData.forEach((apiEvaluator: EvaluationGroupProgress) => {
+    apiData.forEach((apiEvaluator: EvaluationGroupWithId) => {
       const groupType = apiEvaluator.groupType?.toLowerCase();
       let targetGroupId = "";
 
@@ -160,14 +163,15 @@ export default function EvaluatorsPage() {
 
         if (!existsInGroup) {
           const newEvaluator: Evaluator = {
-            id: `api-${Date.now()}-${Math.random()}`, // Generate ID since API doesn't provide one
+            id: apiEvaluator.id, // Use the actual group ID from API
             name: apiEvaluator.evaluatorName,
             email: apiEvaluator.evaluatorEmail,
             phone: "Not provided", // API doesn't return phone number
             relationship: apiEvaluator.relation || "",
             groupType: targetGroup.type,
+            groupId: apiEvaluator.id, // Set groupId to the same as id since each evaluator is a group
             invitationToken: apiEvaluator.invitationToken || "",
-            invitationSent: !!apiEvaluator.invitationToken,
+            invitationSent: false, // Don't assume sent status - let API track this
             responseReceived: apiEvaluator.isEvaluationCompleted || false,
             isActive: !apiEvaluator.isTokenUsed,
           };
@@ -321,7 +325,7 @@ export default function EvaluatorsPage() {
         if (isEditing) {
           // TODO: Implement update evaluator API when available
           console.log("Editing evaluator:", selectedEvaluator, newEvaluator);
-          alert(
+          toast.success(
             "Evaluator details updated successfully! Note: API update functionality will be implemented soon."
           );
         } else {
@@ -391,7 +395,7 @@ export default function EvaluatorsPage() {
         groupType: selectedGroupType,
         groupId: selectedGroup,
         invitationToken: "",
-        invitationSent: true, // API handles this
+        invitationSent: false, // Invitation not sent yet
         responseReceived: false,
         isActive: true,
       };
@@ -418,9 +422,10 @@ export default function EvaluatorsPage() {
     evaluatorId: string
   ) => {
     try {
-      // Delete from API if needed
-      // await deleteEvaluationGroup(evaluatorId);
+      // TODO: Implement delete evaluator API endpoint
+      // await deleteEvaluator(evaluatorId);
 
+      // For now, just update the UI locally
       const updatedGroups = evaluatorGroups.map((g) =>
         g.id === groupId
           ? {
@@ -433,22 +438,24 @@ export default function EvaluatorsPage() {
 
       // Reload API evaluators
       await loadApiEvaluators();
+
+      toast.success("Evaluator removed successfully!");
     } catch (error) {
       console.error("Error removing evaluator:", error);
-      alert("Error removing evaluator. Please try again.");
+      toast.error("Error removing evaluator. Please try again.");
     }
   };
 
   const handleResendLink = async (evaluatorId: string) => {
     try {
       await resendInvitationLink(evaluatorId);
-      alert("Invitation link resent successfully!");
+      toast.success("Invitation link resent successfully!");
 
       // Reload API evaluators to update status
       await loadApiEvaluators();
     } catch (error) {
       console.error("Error resending invitation link:", error);
-      alert("Error resending invitation link. Please try again.");
+      toast.error("Error resending invitation link. Please try again.");
     }
   };
 
@@ -479,13 +486,13 @@ export default function EvaluatorsPage() {
   const handleResendEmailLink = async (evaluatorId: string) => {
     try {
       await resendInvitationLink(evaluatorId);
-      alert("Email invitation sent successfully!");
+      toast.success("Email invitation sent successfully!");
 
       // Reload API evaluators to update status
       await loadApiEvaluators();
     } catch (error) {
       console.error("Error sending email invitation:", error);
-      alert("Error sending email invitation. Please try again.");
+      toast.error("Error sending email invitation. Please try again.");
     }
   };
 
@@ -494,69 +501,59 @@ export default function EvaluatorsPage() {
     phoneNumber: string
   ) => {
     if (!phoneNumber || phoneNumber === "Not provided") {
-      alert("Phone number is not available for this evaluator.");
+      toast.error("Phone number is not available for this evaluator.");
       return;
     }
 
     try {
       // TODO: Implement SMS invitation API when available
       // For now, show a placeholder message
-      alert(
+      toast.info(
         `SMS invitation would be sent to ${phoneNumber}. SMS functionality coming soon!`
       );
 
       // When SMS API is available, uncomment and implement:
       // await sendSMSInvitation(evaluatorId, phoneNumber);
-      // alert("SMS invitation sent successfully!");
+      // toast.success("SMS invitation sent successfully!");
       // await loadApiEvaluators();
     } catch (error) {
       console.error("Error sending SMS invitation:", error);
-      alert("Error sending SMS invitation. Please try again.");
+      toast.error("Error sending SMS invitation. Please try again.");
     }
   };
 
   const handleSendEmailInvitations = async () => {
-    if (getTotalEvaluators() === 0) return;
+    if (getTotalEvaluators() === 0) {
+      setLoading(false);
+      return;
+    }
 
     if (!areAllGroupsComplete()) {
-      alert(
+      toast.error(
         "Please complete all evaluator groups before sending invitations. Each group must have at least the minimum required evaluators."
       );
+      setLoading(false);
       return;
     }
 
     try {
       setLoading(true);
-      const allEvaluators = evaluatorGroups.flatMap((g) => g.evaluators);
-      const evaluatorsToEmail = allEvaluators.filter((e) => !e.invitationSent);
 
-      if (evaluatorsToEmail.length === 0) {
-        alert("All evaluators have already been sent email invitations.");
-        setLoading(false);
-        return;
+      // Use the bulk email invitation API - let the API decide what needs to be sent
+      const result = await sendBulkEmailInvitations(user?.id || "");
+
+      if (result.success) {
+        toast.success(result.message || `Email invitations sent successfully!`);
+      } else {
+        toast.warning(
+          "Some invitations may not have been sent. Please check the results."
+        );
       }
 
-      // For now, we'll use the resendInvitationLink function for each evaluator
-      let successCount = 0;
-      for (const evaluator of evaluatorsToEmail) {
-        try {
-          await resendInvitationLink(evaluator.id);
-          successCount++;
-        } catch (error) {
-          console.error(
-            `Error sending invitation to ${evaluator.email}:`,
-            error
-          );
-        }
-      }
-
-      alert(
-        `Email invitations sent to ${successCount} evaluators successfully!`
-      );
       await loadApiEvaluators();
     } catch (error) {
       console.error("Error sending email invitations:", error);
-      alert("Error sending email invitations. Please try again.");
+      toast.error("Error sending email invitations. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -566,7 +563,7 @@ export default function EvaluatorsPage() {
     if (getTotalEvaluators() === 0) return;
 
     if (!areAllGroupsComplete()) {
-      alert(
+      toast.error(
         "Please complete all evaluator groups before sending invitations. Each group must have at least the minimum required evaluators."
       );
       return;
@@ -580,7 +577,7 @@ export default function EvaluatorsPage() {
       );
 
       if (evaluatorsWithPhone.length === 0) {
-        alert(
+        toast.warning(
           "No evaluators have phone numbers available for SMS invitations."
         );
         setLoading(false);
@@ -588,12 +585,12 @@ export default function EvaluatorsPage() {
       }
 
       // TODO: Implement SMS invitation API when available
-      alert(
+      toast.info(
         `SMS invitations would be sent to ${evaluatorsWithPhone.length} evaluators. SMS functionality coming soon!`
       );
     } catch (error) {
       console.error("Error sending SMS invitations:", error);
-      alert("Error sending SMS invitations. Please try again.");
+      toast.error("Error sending SMS invitations. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -742,7 +739,7 @@ export default function EvaluatorsPage() {
           transition={{ delay: 0.1 }}
           className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6 mb-8"
         >
-          <div className="flex items-center justify-between">
+          <div className="flex items-center flex-col md:flex-row gap-4 justify-between">
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-1">
                 Evaluation Progress
@@ -752,7 +749,7 @@ export default function EvaluatorsPage() {
                 {evaluatorGroups.length} groups
               </p>
             </div>
-            <div className="flex space-x-3">
+            <div className="flex flex-col md:flex-row gap-4 space-x-3">
               <button
                 onClick={handleSendEmailInvitations}
                 disabled={getTotalEvaluators() === 0 || !areAllGroupsComplete()}
@@ -857,9 +854,9 @@ export default function EvaluatorsPage() {
                 </button>
               </div>
 
-              {group.evaluators.length > 0 ? (
+              {group.evaluators.filter(evaluator => evaluator.relationship !== "Self").length > 0 ? (
                 <div className="space-y-3">
-                  {group.evaluators.map((evaluator) => (
+                  {group.evaluators.filter(evaluator => evaluator.relationship !== "Self").map((evaluator) => (
                     <div
                       key={evaluator.id}
                       className="relative p-4 bg-gradient-to-r from-gray-50 to-blue-50/30 rounded-xl border border-gray-100 hover:shadow-md transition-all duration-200"
@@ -886,7 +883,7 @@ export default function EvaluatorsPage() {
                                       d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
                                     />
                                   </svg>
-                                  {evaluator.email}
+                                  {evaluator.email || (user?.email && evaluator.relationship === "Self" ? user.email : "No email provided")}
                                 </span>
                               </p>
                               <p className="text-sm text-gray-600">

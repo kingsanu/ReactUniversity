@@ -79,7 +79,10 @@ export function useMILData() {
 
           examStatuses = { completed, inProgress, notStarted };
         } catch (apiError) {
-          console.warn("Failed to load enhanced exam history, falling back to localStorage:", apiError);
+          console.warn(
+            "Failed to load enhanced exam history, falling back to localStorage:",
+            apiError
+          );
         }
       }
 
@@ -89,7 +92,7 @@ export function useMILData() {
       );
 
       // Use API data if available, otherwise use localStorage
-      const completedExams = enhancedData?.examStatus 
+      const completedExams = enhancedData?.examStatus
         ? enhancedData.examStatus
             .filter((exam) => exam.status === "completed")
             .map((exam) => exam.examId)
@@ -98,7 +101,7 @@ export function useMILData() {
       const progressData: MILProgress = {
         completedExams,
         totalExams: enhancedData?.totalExams || examData.length,
-        isCompleted: enhancedData 
+        isCompleted: enhancedData
           ? enhancedData.completionPercentage === 100
           : completedExams.length === examData.length,
         lastUpdated: new Date().toISOString(),
@@ -162,7 +165,7 @@ export function useMILData() {
       const completedExams = progress.enhancedData.examStatus.filter(
         (exam) => exam.status === "completed"
       );
-      
+
       if (completedExams.length > 0) {
         const totalScore = completedExams.reduce((sum, exam) => {
           return sum + exam.scorePercentage;
@@ -189,7 +192,8 @@ export function useMILData() {
       return {
         completed: progress?.completedExams.length || 0,
         inProgress: 0,
-        notStarted: (progress?.totalExams || 0) - (progress?.completedExams.length || 0),
+        notStarted:
+          (progress?.totalExams || 0) - (progress?.completedExams.length || 0),
         total: progress?.totalExams || 0,
       };
     }
@@ -207,20 +211,45 @@ export function useMILData() {
     if (!progress?.enhancedData?.examStatus) {
       // Fallback to mock data for display purposes based on completed exams
       const mockScores = [
-        { name: "Pattern Recognition", score: 85, color: "#8B5CF6", examId: "pattern-recognition-001" },
-        { name: "Verbal Reasoning", score: 78, color: "#06B6D4", examId: "verbal-reasoning-001" },
-        { name: "Working Memory", score: 72, color: "#10B981", examId: "working-memory-001" },
-        { name: "Numeric Velocity", score: 68, color: "#F59E0B", examId: "numeric-velocity-001" },
-        { name: "Visual Rotation", score: 75, color: "#EF4444", examId: "visual-rotation-001" },
+        {
+          name: "Pattern Recognition",
+          score: 85,
+          color: "#8B5CF6",
+          examId: "pattern-recognition-001",
+        },
+        {
+          name: "Verbal Reasoning",
+          score: 78,
+          color: "#06B6D4",
+          examId: "verbal-reasoning-001",
+        },
+        {
+          name: "Working Memory",
+          score: 72,
+          color: "#10B981",
+          examId: "working-memory-001",
+        },
+        {
+          name: "Numeric Velocity",
+          score: 68,
+          color: "#F59E0B",
+          examId: "numeric-velocity-001",
+        },
+        {
+          name: "Visual Rotation",
+          score: 75,
+          color: "#EF4444",
+          examId: "visual-rotation-001",
+        },
       ];
-      
+
       return mockScores.slice(0, progress?.completedExams.length || 0);
     }
 
     // Use real API data - map exam names to colors
     const examColorMap: { [key: string]: string } = {
       "Pattern Recognition": "#8B5CF6",
-      "Verbal Reasoning": "#06B6D4", 
+      "Verbal Reasoning": "#06B6D4",
       "Working Memory": "#10B981",
       "Numeric Velocity": "#F59E0B",
       "Visual Rotation": "#EF4444",
@@ -260,7 +289,8 @@ export function useMILData() {
     hasMIL: !!progress && progress.completedExams.length > 0,
     isCompleted: progress?.isCompleted || false,
     // Enhanced properties for better dashboard display
-    hasEnhancedData: !!progress?.enhancedData && progress.enhancedData.examStatus.length > 0,
+    hasEnhancedData:
+      !!progress?.enhancedData && progress.enhancedData.examStatus.length > 0,
     completionStats: getCompletionStats(),
   };
 }

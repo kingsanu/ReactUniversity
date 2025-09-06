@@ -8,17 +8,17 @@ interface MILResultsProps {
 }
 
 export function MILResults({ className }: MILResultsProps) {
-  const { 
-    progress, 
-    loading, 
-    error, 
-    hasMIL, 
-    isCompleted, 
+  const {
+    progress,
+    loading,
+    error,
+    hasMIL,
+    isCompleted,
     getOverallScore,
     getSubtestScores,
     getCompletionStats,
     hasEnhancedData,
-    completionStats
+    completionStats,
   } = useMILData();
 
   if (loading) {
@@ -94,7 +94,11 @@ export function MILResults({ className }: MILResultsProps) {
         </div>
         <div className="text-right">
           <div className="text-2xl font-bold text-green-600">
-            {hasEnhancedData ? `${completionStats.completed}/${completionStats.total}` : `${progress?.completedExams.length || 0}/${progress?.totalExams || 5}`}
+            {hasEnhancedData
+              ? `${completionStats.completed}/${completionStats.total}`
+              : `${progress?.completedExams.length || 0}/${
+                  progress?.totalExams || 5
+                }`}
           </div>
           <div className="text-xs text-gray-500">
             {isCompleted ? "All Complete" : "Exams Completed"}
@@ -107,10 +111,9 @@ export function MILResults({ className }: MILResultsProps) {
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium text-gray-700">Progress</span>
           <span className="text-sm text-gray-600">
-            {hasEnhancedData 
+            {hasEnhancedData
               ? `${completionStats.completed}/${completionStats.total} completed`
-              : `${progress?.completedExams.length}/${progress?.totalExams} subtests`
-            }
+              : `${progress?.completedExams.length}/${progress?.totalExams} subtests`}
           </span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
@@ -145,13 +148,11 @@ export function MILResults({ className }: MILResultsProps) {
                   </div>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-1.5">
-                  <div
-                    className="h-1.5 rounded-full bg-green-500 w-full"
-                  />
+                  <div className="h-1.5 rounded-full bg-green-500 w-full" />
                 </div>
                 {hasEnhancedData && (subtest as any).timeSpent && (
                   <div className="mt-1 text-xs text-gray-500">
-                    Time: {(subtest as any).timeSpent.split('.')[0]}
+                    Time: {(subtest as any).timeSpent.split(".")[0]}
                   </div>
                 )}
               </div>

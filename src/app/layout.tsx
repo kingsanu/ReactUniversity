@@ -5,6 +5,7 @@ import { AuthWrapper } from "@/components/AuthWrapper";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { QueryProvider } from "@/components/QueryProvider";
 import { AssessmentCacheProvider } from "@/contexts/AssessmentCacheContext";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,12 +35,11 @@ export default function RootLayout({
         <ErrorBoundary>
           <QueryProvider>
             <AssessmentCacheProvider>
-              <AuthWrapper>
-                {children}
-              </AuthWrapper>
+              <AuthWrapper>{children}</AuthWrapper>
             </AssessmentCacheProvider>
           </QueryProvider>
         </ErrorBoundary>
+        <Toaster />
       </body>
     </html>
   );

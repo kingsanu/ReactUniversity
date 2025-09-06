@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { 
-  getPCAResult, 
-  getPCACompetences, 
-  checkPCAStatus, 
-  getPCAResultByUserId, 
-  getPCACompetencesByUserId 
+import {
+  getPCAResult,
+  getPCACompetences,
+  checkPCAStatus,
+  getPCAResultByUserId,
+  getPCACompetencesByUserId,
 } from "@/services/pcaService";
 import { useGlobalStore } from "@/store/useGlobalStore";
 
@@ -14,7 +14,7 @@ export interface PCAData {
   competences?: any;
   lastUpdated?: string;
   isCompleted: boolean;
-  status?: 'not_started' | 'in_progress' | 'completed' | 'not_found';
+  status?: "not_started" | "in_progress" | "completed" | "not_found";
   overallScore?: number;
   totalScore?: number;
   score?: number;
@@ -37,9 +37,9 @@ export function usePCAData() {
       setError(null);
 
       // Check PCA status using the new backend API
-      const statusData = await checkPCAStatus(user?.id || 'unknown');
-      
-      if (statusData.status === 'not_started') {
+      const statusData = await checkPCAStatus(user?.id || "unknown");
+
+      if (statusData.status === "not_started") {
         setPcaData(null);
         setLoading(false);
         return;
@@ -48,7 +48,7 @@ export function usePCAData() {
       // If user has PCA evaluation, try to get results and competences
       let results = null;
       let competences = null;
-      
+
       if (statusData.hasResults && user?.id) {
         try {
           [results, competences] = await Promise.all([
@@ -56,18 +56,30 @@ export function usePCAData() {
             getPCACompetencesByUserId(user.id).catch(() => null),
           ]);
         } catch (err) {
-          console.log('Error fetching PCA results/competences:', err);
+          console.log("Error fetching PCA results/competences:", err);
         }
       }
 
       const data: PCAData = {
-        pcaCod: statusData.pcaCod || 'unknown',
+        pcaCod: statusData.pcaCod || "unknown",
         results,
         competences,
         lastUpdated: statusData.lastActivity || new Date().toISOString(),
-        isCompleted: statusData.status === 'completed',
+        isCompleted: statusData.status === "completed",
         status: statusData.status,
-        overallScore: results?.overallScore || results?.totalScore || results?.score,
+        // Calculate overall score from PCA dimensions if available
+        overallScore: results?.data
+          ? (() => {
+              const d = results.data.pcaD1 || 0;
+              const i = results.data.pcaI1 || 0;
+              const s = results.data.pcaS1 || 0;
+              const c = results.data.pcaC1 || 0;
+              const scores = [d, i, s, c].filter((score) => score > 0);
+              return scores.length > 0
+                ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
+                : 0;
+            })()
+          : results?.overallScore || results?.totalScore || results?.score || 0,
         totalScore: results?.totalScore,
         score: results?.score,
       };
@@ -87,20 +99,20 @@ export function usePCAData() {
 
   const savePCACode = (pcaCod: string) => {
     if (!user?.id) return;
-    
+
     const data: PCAData = {
       pcaCod,
       isCompleted: false,
-      status: 'in_progress',
+      status: "in_progress",
     };
-    
+
     setPcaData(data);
     localStorage.setItem(`pcaData_${user.id}`, JSON.stringify(data));
   };
 
   const clearPCAData = () => {
     if (!user?.id) return;
-    
+
     localStorage.removeItem(`pcaData_${user.id}`);
     setPcaData(null);
   };
@@ -110,7 +122,7 @@ export function usePCAData() {
       loadPCAData();
       return;
     }
-    
+
     const cachedData = localStorage.getItem(`pcaData_${user.id}`);
     if (cachedData) {
       try {

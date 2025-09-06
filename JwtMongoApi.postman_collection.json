@@ -1607,7 +1607,36 @@
               ],
               "path": ["evaluation", "create-group"]
             },
-            "description": "Creates a new evaluation group for Parent, Teacher, or Sibling/Friend evaluators.\n\nGroup Types:\n- Parent: For parent evaluators\n- Teacher: For teacher evaluators\n- SiblingFriend: For sibling or friend evaluators\n\nReturns:\n- Evaluation group details\n- Invitation token (32-character secure token)\n- Invitation URL\n- Token expiry date (2 days from creation)\n- Status flags (isTokenUsed, isEvaluationCompleted)"
+            "description": "Creates a new evaluation group for Parent, Teacher, or Sibling/Friend evaluators.\n\nGroup Types:\n- Parent: For parent evaluators\n- Teacher: For teacher evaluators\n- SiblingFriend: For sibling or friend evaluators\n\nReturns:\n- Evaluation group details\n- Invitation token (32-character secure token)\n- Invitation URL\n- Token expiry date (2 days from creation)\n- Status flags (isTokenUsed, isEvaluationCompleted)\n- **Email tracking fields (isEmailSent: false, emailSentDate: null)**"
+          }
+        },
+        {
+          "name": "Create Self-Evaluation Group",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"evaluatorName\": \"Sarah Johnson\",\n  \"evaluatorEmail\": \"sarah.johnson@university.edu\",\n  \"relation\": \"Self\",\n  \"groupType\": \"Self\",\n  \"evaluatedUserId\": \"{{userId}}\"\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/evaluation/create-group",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["evaluation", "create-group"]
+            },
+            "description": "Creates a self-evaluation group where the user evaluates themselves.\n\n**Self-Assignment Configuration:**\n- **EvaluatorName**: User's own name\n- **EvaluatorEmail**: User's own email\n- **Relation**: \"Self\" (indicates self-evaluation)\n- **GroupType**: \"Self\" (indicates self-evaluation group type)\n- **EvaluatedUserId**: User's own ID\n\n**Features:**\n- Access to all 64 self-assessment questions\n- Random selection of 20 questions per session\n- Comprehensive coverage of academic, creative, social, and career interests\n- Work style, motivators, and university preferences\n\n**Returns:**\n- Evaluation group details with self-assignment configuration\n- Invitation token and URL (for consistency with existing flow)\n- Token expiry date (2 days from creation)\n- Status flags (isTokenUsed, isEvaluationCompleted)\n- **Email tracking fields (isEmailSent: false, emailSentDate: null)**\n\n**Use Case:** Students can create self-evaluations to assess their own interests, motivators, and career preferences using the comprehensive 360-degree self-assessment questionnaire."
           }
         },
         {
@@ -1633,6 +1662,71 @@
           }
         },
         {
+          "name": "Get 360 Evaluation Questions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/evaluation/360evolutor/{{evolutorGroupId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["evaluation", "360evolutor", "{{evolutorGroupId}}"]
+            },
+            "description": "Get 360 evaluation questions for a specific evolutor group. The questions are dynamically retrieved based on the Relation property of the EvaluationGroup entity. **Returns random 20 questions out of the total available questions** categorized by the relation type (Parent, Teacher, Other, or Self).\n\nFeatures:\n- **Random question selection for variety**\n- Questions based on evaluator relation type\n- Limited to 20 questions for better user experience\n- All questions remain available for future development\n- **Returns comprehensive user and evaluator information**\n\nReturns:\n- Random 20 questions\n- Total available questions count\n- Relation type information\n- **Evaluated user details (ID, name, email)**\n- **Evaluator details (name, email)**\n- **Evaluation group information (relation, group type)**\n- Note about question limitation"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Self-Evaluation Questions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/evaluation/360evolutor/{{selfEvalGroupId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["evaluation", "360evolutor", "{{selfEvalGroupId}}"]
+            },
+            "description": "Get self-evaluation questions for a self-assessment session. **Returns random 20 questions out of 64 total self-assessment questions** covering comprehensive personal and career interests.\n\n**Self-Assessment Question Categories:**\n- **Academic & Professional Interests** (Q1-Q19): Mathematics, science, humanities, business, engineering, etc.\n- **Creative & Technological Interests** (Q20-Q24): Visual art, music, programming, multimedia\n- **Social & Sports Interests** (Q25-Q29): Team sports, individual sports, recreational activities\n- **Motivators & Work Style** (Q30-Q37): Recognition, leadership, precision, autonomy, goal orientation\n- **Future Career Vision** (Q38a-Q41): 5-10 year career aspirations, company preferences, leadership goals\n- **Work Environment Preferences** (Q42-Q47): Office types, remote work, flexibility, autonomy\n- **Professional Area Development** (Q48-Q53): Engineering, health, arts, business, technology, law\n- **University Preferences** (Q54-Q64): Campus types, academic focus, student life, prestige\n\n**Features:**\n- **64 comprehensive self-assessment questions**\n- **Random selection of 20 questions per session**\n- **First-person perspective** (\"How would I rate...\", \"To what extent am I...\")\n- **Completion tracking** - returns empty questions array when completed\n- **Detailed categorization** for analysis\n\n**Returns:**\n- Random 20 self-assessment questions\n- Total available questions count (64)\n- Relation type: \"Self\"\n- **User details** (same person as evaluator and evaluated)\n- **Evaluation completion status**\n- **Note about question limitation or completion status**\n\n**Use Case:** Students can assess their own interests, motivators, work style, and career preferences to gain insights for academic and career planning."
+          },
+          "response": []
+        },
+        {
+          "name": "Send Invitation Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/evaluation/send-invitation-email/{{evaluationGroupId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "evaluation",
+                "send-invitation-email",
+                "{{evaluationGroupId}}"
+              ]
+            },
+            "description": "Sends evaluation invitation email to the evaluator and updates email tracking status.\n\n**Features:**\n- **Email Tracking**: Sets isEmailSent to true and records emailSentDate\n- **Duplicate Prevention**: Cannot send email twice to the same evaluation group\n- **Professional Email Template**: HTML-formatted invitation with evaluation details\n- **Comprehensive Information**: Includes student details, evaluator role, and expiration info\n\n**Email Content Includes:**\n- Student name and email\n- Evaluator role (Parent, Teacher, Sibling/Friend, Self)\n- Group type information\n- Token expiration date\n- Direct link to start evaluation\n- Professional formatting with call-to-action button\n\n**Response Includes:**\n- Email sending confirmation\n- Updated email tracking status (isEmailSent: true)\n- Email sent timestamp\n- Invitation URL for reference\n\n**Use Cases:**\n- Send initial invitation emails\n- Track email delivery status\n- Monitor communication with evaluators\n- Ensure proper invitation workflow"
+          },
+          "response": []
+        },
+
+        {
           "name": "Get User Evaluation Groups",
           "request": {
             "method": "GET",
@@ -1650,7 +1744,7 @@
               ],
               "path": ["evaluation", "user", "{{userId}}"]
             },
-            "description": "Retrieves all evaluation groups for a specific user.\n\nReturns:\n- List of all evaluation groups\n- Each group includes:\n  - Evaluator details (name, email, relation, group type)\n  - Invitation token and URL\n  - Token expiry date\n  - Status flags (isTokenUsed, isEvaluationCompleted)\n  - Creation date\n\nUse this for dashboard tracking and monitoring evaluation progress."
+            "description": "Retrieves all evaluation groups for a specific user.\n\nReturns:\n- List of all evaluation groups\n- Each group includes:\n  - Evaluator details (name, email, relation, group type)\n  - Invitation token and URL\n  - Token expiry date\n  - Status flags (isTokenUsed, isEvaluationCompleted)\n  - **Email tracking status (isEmailSent, emailSentDate)**\n  - Creation date\n\nUse this for dashboard tracking and monitoring evaluation progress, including email delivery status."
           }
         },
         {
@@ -1803,7 +1897,7 @@
               ],
               "path": ["evaluation", "resend-email", "{{evaluationGroupId}}"]
             },
-            "description": "Resends email invitation to a specific evaluator.\n\nFeatures:\n- Sends personalized reminder email to individual evaluator\n- Updates TokenUsedDate when email is successfully sent\n- Validates token expiry before sending\n- Professional HTML email template with invitation link\n\nUse Case:\n- When evaluator hasn't responded to initial invitation\n- When user clicks 'Resend via Email' in the UI dropdown menu\n- For follow-up reminders to complete evaluations\n\nReturns:\n- Email sending status\n- Evaluator details\n- Sent timestamp\n- Invitation URL used"
+            "description": "Resends email invitation to a specific evaluator.\n\nFeatures:\n- Sends personalized reminder email to individual evaluator\n- Updates TokenUsedDate when email is successfully sent\n- **NEW: Automatically extends expired tokens by 7 days before resending**\n- Professional HTML email template with invitation link\n- Enhanced email content when token is extended\n\nUse Case:\n- When evaluator hasn't responded to initial invitation\n- When user clicks 'Resend via Email' in the UI dropdown menu\n- For follow-up reminders to complete evaluations\n- **When tokens have expired (auto-extension)**\n\nReturns:\n- Email sending status\n- Evaluator details\n- Sent timestamp\n- Invitation URL used\n- **Token extension information (if applicable)**\n- **New token expiry date (if extended)**"
           }
         },
         {
@@ -1837,6 +1931,113 @@
             },
             "description": "Gets evaluation progress summary for a specific user.\n\nFeatures:\n- Groups evaluators by type (Parent, Teacher, Sibling/Friend)\n- Shows completion status for each group\n- Tracks invitations sent vs evaluations completed\n- Provides overall progress metrics\n- Includes evaluator details and status\n\nUse Case:\n- Dashboard progress tracking\n- Monitoring evaluation completion rates\n- Group-based progress visualization\n- Status reporting for administrators\n\nReturns:\n- Overall progress summary\n- Group-wise progress breakdown\n- Individual evaluator status\n- Completion requirements and counts"
           }
+        },
+        {
+          "name": "Get All Evaluation Groups",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/evaluation/all",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["evaluation", "all"]
+            },
+            "description": "Gets all evaluation groups in the system (for data checking purposes).\n\nFeatures:\n- Returns all active evaluation groups across all users\n- No user ID filtering - shows data from all users\n- Includes all relevant information: evaluator details, relation, group type, token status, etc.\n- Generates invitation URLs for each evaluation group\n- Proper error handling and logging\n\nUse Case:\n- Data verification and checking\n- Administrative oversight\n- System monitoring\n- Debugging purposes\n- Overall system data analysis\n\nReturns:\n- List of all evaluation groups\n- Each group includes:\n  - Evaluator details (name, email, relation, group type)\n  - Evaluated user ID\n  - Invitation token and URL\n  - Token expiry date\n  - Status flags (isTokenUsed, isEvaluationCompleted)\n  - Creation date"
+          }
+        },
+        {
+          "name": "Extend Token Expiry",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/evaluation/extend-token/{{evaluationGroupId}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["evaluation", "extend-token", "{{evaluationGroupId}}"]
+            },
+            "description": "Extends token expiry for a specific evaluation group (temporary endpoint for testing).\n\nFeatures:\n- Extends token expiry by 7 days from current time\n- Updates the evaluation group record\n- Returns updated evaluation group details\n- Useful for testing and development purposes\n\nUse Case:\n- When tokens have expired during testing\n- Extending token validity for development purposes\n- Resolving token expiry issues\n\nReturns:\n- Updated evaluation group details\n- New token expiry date (7 days from now)\n- Invitation URL\n- Success confirmation message"
+          }
+        },
+        {
+          "name": "Submit Feedback",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"evaluationGroupId\": \"{{evaluationGroupId}}\",\n  \"evaluatorEmail\": \"{{evaluatorEmail}}\",\n  \"answers\": [\n    {\n      \"questionNumber\": 1,\n      \"questionText\": \"How well does the student communicate their ideas?\",\n      \"rating\": 4,\n      \"comment\": \"Good communication skills, but could improve clarity\"\n    },\n    {\n      \"questionNumber\": 2,\n      \"questionText\": \"How motivated is the student in their studies?\",\n      \"rating\": 5,\n      \"comment\": \"Very motivated and enthusiastic about learning\"\n    },\n    {\n      \"questionNumber\": 3,\n      \"questionText\": \"How well does the student work in teams?\",\n      \"rating\": null,\n      \"comment\": \"I don't have enough information to rate this\"\n    }\n  ],\n  \"comment\": \"Overall, this student shows great potential and dedication to their studies.\"\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/evaluation/submit-feedback",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["evaluation", "submit-feedback"]
+            },
+            "description": "Submit evaluation feedback responses from an evaluator using the 5-point Likert scale.\n\n**Rating Scale:**\n- **1** = Not at all\n- **2** = A little\n- **3** = Moderate\n- **4** = Quite a lot\n- **5** = Very much\n- **null** = I don't know / Prefer not to answer (N/A)\n\n**Features:**\n- Submit answers for multiple questions\n- Optional comments for each question\n- General comment for the entire evaluation\n- Automatic calculation of statistics\n- Validation of evaluator email and evaluation group\n- Prevents duplicate submissions\n- Updates evaluation group completion status\n\n**Returns:**\n- Feedback submission confirmation\n- Statistics (answered questions, average rating, skipped questions)\n- Completion timestamp\n- Success message\n\n**Use Case:**\n- After evaluators view questions via Get 360 Evaluation Questions\n- Complete the 360° evaluation process\n- Save responses for analysis and reporting"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Feedback",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{baseUrl}}/evaluation/all-feedback",
+              "protocol": "http",
+              "host": ["{{baseUrl}}"],
+              "path": ["evaluation", "all-feedback"]
+            },
+            "description": "Retrieves all evaluation feedback records from the system without any parameters.\n\n**Features:**\n- Returns all feedback records across all users\n- No authentication or filtering required\n- Includes complete feedback details\n- Useful for administrative oversight and data analysis\n\n**Returns:**\n- List of all evaluation feedback records\n- Each record includes:\n  - Evaluation group details\n  - Evaluator information\n- Question responses and ratings\n  - Statistics (answered questions, average rating)\n  - Completion timestamps\n  - Status information\n\n**Use Case:**\n- Administrative data review\n- System-wide feedback analysis\n- Data export and reporting\n- Quality assurance monitoring\n- Overall system performance assessment"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete All Feedback",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://{{baseUrl}}/evaluation/all-feedback",
+              "protocol": "http",
+              "host": ["{{baseUrl}}"],
+              "path": ["evaluation", "all-feedback"]
+            },
+            "description": "Deletes all evaluation feedback records from the system. **⚠️ WARNING: This operation is irreversible and will permanently remove all feedback data.**\n\n**Features:**\n- Permanently deletes all evaluation feedback records\n- Returns count of deleted records\n- No authentication required\n- Comprehensive error handling\n- Detailed logging for audit purposes\n\n**Returns:**\n- Deletion confirmation\n- Count of deleted records\n- Success message\n- Timestamp of deletion\n\n**Use Case:**\n- System reset and cleanup\n- Data privacy compliance (GDPR, etc.)\n- Development and testing environment cleanup\n- Administrative data management\n- **⚠️ Use with extreme caution in production environments**\n\n**Security Note:**\nThis endpoint should be protected in production environments to prevent accidental data loss."
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Evaluation Completion",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "http://{{baseUrl}}/evaluation/reset-completion/{{evaluationGroupId}}",
+              "protocol": "http",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "evaluation",
+                "reset-completion",
+                "{{evaluationGroupId}}"
+              ]
+            },
+            "description": "Resets the evaluation completion status for a specific evaluation group, allowing the evaluation to be submitted again. This is useful for testing and development purposes.\n\n**Features:**\n- Resets IsEvaluationCompleted to false\n- Clears EvaluationCompletedDate\n- Allows re-submission of feedback\n- Comprehensive validation and error handling\n- Detailed logging for audit purposes\n- Smart validation (only resets if actually completed)\n\n**Parameters:**\n- evaluationGroupId (path): The ID of the evaluation group to reset\n\n**Returns:**\n- Reset confirmation with evaluation group details\n- Evaluator information (name, email)\n- Relation and group type\n- Updated completion status\n- Reset timestamp\n\n**Use Case:**\n- Testing and development\n- Re-submitting feedback\n- Debugging evaluation issues\n- Demo purposes\n- Quality assurance testing\n\n**Error Responses:**\n- 400: Invalid evaluation group ID or evaluation not completed\n- 404: Evaluation group not found\n- 500: Server error (database issues)\n\n**Example Usage:**\n1. Reset: PATCH /evaluation/reset-completion/68b82a1df84892f7f22fc171\n2. Re-submit: POST /evaluation/submit-feedback with same evaluationGroupId"
+          },
+          "response": []
         }
       ]
     },
@@ -2014,6 +2215,16 @@
       "key": "evaluationGroupId",
       "value": "your-evaluation-group-id-here",
       "description": "Replace with actual evaluation group ID for update/delete operations"
+    },
+    {
+      "key": "evolutorGroupId",
+      "value": "your-evaluation-group-id-here",
+      "description": "Replace with actual evaluation group ID for 360 evaluation questions endpoint"
+    },
+    {
+      "key": "evaluatorEmail",
+      "value": "evaluator@example.com",
+      "description": "Replace with actual evaluator email for feedback submission"
     }
   ]
 }

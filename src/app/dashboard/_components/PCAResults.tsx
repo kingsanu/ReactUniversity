@@ -12,56 +12,42 @@ export function PCAResults({ className }: PCAResultsProps) {
     usePCAData();
 
   const getTopCompetencies = () => {
-    if (!pcaData?.competences) {
-      // Mock competency data structure for demonstration
-      const mockCompetencies = [
-        { name: "Leadership", score: 85, color: "#3B82F6" },
-        { name: "Communication", score: 78, color: "#10B981" },
-        { name: "Problem Solving", score: 72, color: "#8B5CF6" },
-        { name: "Teamwork", score: 68, color: "#F59E0B" },
-      ];
-      return mockCompetencies.slice(0, 4);
+    if (!pcaData?.results?.data) {
+      return [];
     }
 
-    // Parse actual competences data from API
-    try {
-      const competences = pcaData.competences;
-      if (Array.isArray(competences)) {
-        return competences.slice(0, 4).map((comp: any, index: number) => ({
-          name: comp.name || comp.competence || `Competence ${index + 1}`,
-          score: comp.score || comp.value || Math.floor(Math.random() * 100),
-          color: [`#3B82F6`, `#10B981`, `#8B5CF6`, `#F59E0B`][index % 4]
-        }));
-      } else if (typeof competences === 'object') {
-        // Handle object format
-        return Object.entries(competences).slice(0, 4).map(([key, value]: [string, any], index: number) => ({
-          name: key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()),
-          score: typeof value === 'number' ? value : (value?.score || Math.floor(Math.random() * 100)),
-          color: [`#3B82F6`, `#10B981`, `#8B5CF6`, `#F59E0B`][index % 4]
-        }));
-      }
-    } catch (error) {
-      console.log('Error parsing competences:', error);
-    }
+    const data = pcaData.results.data;
 
-    return [];
+    // Map the PCA scores to competencies based on the API response structure
+    const competencies = [
+      { name: "Dominance", score: data.pcaD1 || 0, color: "#3B82F6" },
+      { name: "Influence", score: data.pcaI1 || 0, color: "#10B981" },
+      { name: "Steadiness", score: data.pcaS1 || 0, color: "#8B5CF6" },
+      { name: "Conscientiousness", score: data.pcaC1 || 0, color: "#F59E0B" },
+    ];
+
+    // Sort by score descending and return top 4
+    return competencies.sort((a, b) => b.score - a.score).slice(0, 4);
   };
 
   const getOverallScore = () => {
-    if (!pcaData) return 0;
-    
-    // If we have a direct overall score from API
-    if (pcaData.overallScore || pcaData.totalScore || pcaData.score) {
-      return Math.round(pcaData.overallScore || pcaData.totalScore || pcaData.score || 0);
-    }
-    
-    // Calculate from competencies
-    const competencies = getTopCompetencies();
-    if (competencies.length === 0) return 0;
-    
+    if (!pcaData?.results?.data) return 0;
+
+    const data = pcaData.results.data;
+
+    // Calculate average of the four main DISC dimensions
+    const scores = [
+      data.pcaD1 || 0,
+      data.pcaI1 || 0,
+      data.pcaS1 || 0,
+      data.pcaC1 || 0,
+    ];
+
+    const validScores = scores.filter((score) => score > 0);
+    if (validScores.length === 0) return 0;
+
     return Math.round(
-      competencies.reduce((sum, comp) => sum + comp.score, 0) /
-        competencies.length
+      validScores.reduce((sum, score) => sum + score, 0) / validScores.length
     );
   };
 
@@ -110,9 +96,9 @@ export function PCAResults({ className }: PCAResultsProps) {
             No PCA Assessment Found
           </h3>
           <p className="text-gray-600 mb-4">
-            {pcaData?.status === 'not_found' 
-              ? 'No PCA assessment has been created for your account yet.'
-              : 'You haven\'t completed a PCA assessment yet.'}
+            {pcaData?.status === "not_found"
+              ? "No PCA assessment has been created for your account yet."
+              : "You haven't completed a PCA assessment yet."}
           </p>
           <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
             Start Assessment
@@ -132,17 +118,18 @@ export function PCAResults({ className }: PCAResultsProps) {
             PCA Assessment In Progress
           </h3>
           <p className="text-gray-600 mb-4">
-            {pcaData?.status === 'in_progress' 
-              ? 'Your PCA assessment is currently being processed.'
-              : 'Your PCA assessment has been started but not yet completed.'}
+            {pcaData?.status === "in_progress"
+              ? "Your PCA assessment is currently being processed."
+              : "Your PCA assessment has been started but not yet completed."}
           </p>
           {pcaData?.pcaCod && (
             <p className="text-sm text-gray-500 mb-4">
-              Assessment Code: <span className="font-mono">{pcaData.pcaCod}</span>
+              Assessment Code:{" "}
+              <span className="font-mono">{pcaData.pcaCod}</span>
             </p>
           )}
           <div className="flex gap-2 justify-center">
-            <button 
+            <button
               onClick={refreshPCAData}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
             >
@@ -185,7 +172,10 @@ export function PCAResults({ className }: PCAResultsProps) {
       {/* Competencies */}
       <div className="space-y-4 mb-6">
         {competencies.map((competency, index) => (
-          <div key={`${competency.name}-${index}`} className="flex items-center">
+          <div
+            key={`${competency.name}-${index}`}
+            className="flex items-center"
+          >
             <div className="flex-1">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-sm font-medium text-gray-700">
@@ -231,12 +221,16 @@ export function PCAResults({ className }: PCAResultsProps) {
           <div className="flex items-center space-x-4">
             <span>PCA Code: {pcaData?.pcaCod || "N/A"}</span>
             {pcaData?.status && (
-              <span className={`px-2 py-1 rounded-full text-xs ${
-                pcaData.status === 'completed' ? 'bg-green-100 text-green-800' :
-                pcaData.status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' :
-                'bg-gray-100 text-gray-800'
-              }`}>
-                {pcaData.status.replace('_', ' ').toUpperCase()}
+              <span
+                className={`px-2 py-1 rounded-full text-xs ${
+                  pcaData.status === "completed"
+                    ? "bg-green-100 text-green-800"
+                    : pcaData.status === "in_progress"
+                    ? "bg-yellow-100 text-yellow-800"
+                    : "bg-gray-100 text-gray-800"
+                }`}
+              >
+                {pcaData.status.replace("_", " ").toUpperCase()}
               </span>
             )}
           </div>
@@ -248,7 +242,12 @@ export function PCAResults({ className }: PCAResultsProps) {
                 clipRule="evenodd"
               />
             </svg>
-            <span>Last updated: {pcaData?.lastUpdated ? new Date(pcaData.lastUpdated).toLocaleDateString() : new Date().toLocaleDateString()}</span>
+            <span>
+              Last updated:{" "}
+              {pcaData?.lastUpdated
+                ? new Date(pcaData.lastUpdated).toLocaleDateString()
+                : new Date().toLocaleDateString()}
+            </span>
           </div>
         </div>
       </div>

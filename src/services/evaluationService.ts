@@ -414,7 +414,7 @@ export interface EvaluationGroupProgress {
   evaluatorName: string;
   evaluatorEmail: string;
   relation: string;
-  groupType: "Parent" | "Teacher" | "SiblingFriend";
+  groupType: "Parent" | "Teacher" | "SiblingFriend" | "Self";
   evaluatedUserId: string;
   invitationToken: string;
   invitationUrl: string;
@@ -440,6 +440,7 @@ export interface UserEvaluationProgress {
       Parent: number;
       Teacher: number;
       SiblingFriend: number;
+      Self: number;
     };
   };
 }
@@ -454,7 +455,7 @@ const API_BASE_URL =
  */
 export async function getUserEvaluationGroups(
   userId: string
-): Promise<EvaluationGroupProgress[]> {
+): Promise<EvaluationGroupWithId[]> {
   try {
     const response = await fetch(`${API_BASE_URL}/evaluation/user/${userId}`, {
       method: "GET",
@@ -483,9 +484,9 @@ export async function createEvaluationGroup(groupData: {
   evaluatorName: string;
   evaluatorEmail: string;
   relation: string;
-  groupType: "Parent" | "Teacher" | "SiblingFriend";
+  groupType: "Parent" | "Teacher" | "SiblingFriend" | "Self";
   evaluatedUserId: string;
-}): Promise<EvaluationGroupProgress> {
+}): Promise<EvaluationGroupWithId> {
   try {
     const response = await fetch(`${API_BASE_URL}/evaluation/create-group`, {
       method: "POST",
@@ -500,7 +501,11 @@ export async function createEvaluationGroup(groupData: {
       throw new Error("Failed to create evaluation group");
     }
 
-    return await response.json();
+    const responseData = await response.json();
+    console.log("Create evaluation group response:", responseData);
+    
+    // Handle different response structures
+    return responseData.data || responseData;
   } catch (error) {
     console.error("Error creating evaluation group:", error);
     throw error;
@@ -577,7 +582,7 @@ export async function deleteEvaluationGroup(groupId: string): Promise<{
 export async function resendInvitationLink(groupId: string): Promise<void> {
   try {
     const response = await fetch(
-      `${API_BASE_URL}/evaluation/group/${groupId}/resend-invitation`,
+      `${API_BASE_URL}/evaluation/resend-email/${groupId}`,
       {
         method: "POST",
         headers: {
@@ -597,9 +602,42 @@ export async function resendInvitationLink(groupId: string): Promise<void> {
 }
 
 /**
+ * Send bulk email invitations to all evaluators for a user
+ */
+export async function sendBulkEmailInvitations(userId: string): Promise<{
+  success: boolean;
+  message: string;
+  results?: any[];
+}> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/evaluation/send-email-invitations/${userId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to send bulk email invitations");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error sending bulk email invitations:", error);
+    throw error;
+  }
+}
+
+/**
  * Validate evaluation group update constraints
  */
-export function canUpdateEvaluationGroup(evaluationGroup: EvaluationGroupProgress): {
+export function canUpdateEvaluationGroup(
+  evaluationGroup: EvaluationGroupProgress
+): {
   canUpdate: boolean;
   reason?: string;
 } {
@@ -620,7 +658,7 @@ export function canUpdateEvaluationGroup(evaluationGroup: EvaluationGroupProgres
   // Check if token is expired (2-day validity)
   const expiryDate = new Date(evaluationGroup.tokenExpiryDate);
   const currentDate = new Date();
-  
+
   if (currentDate > expiryDate) {
     return {
       canUpdate: false,
@@ -634,7 +672,9 @@ export function canUpdateEvaluationGroup(evaluationGroup: EvaluationGroupProgres
 /**
  * Validate evaluation group deletion constraints
  */
-export function canDeleteEvaluationGroup(evaluationGroup: EvaluationGroupProgress): {
+export function canDeleteEvaluationGroup(
+  evaluationGroup: EvaluationGroupProgress
+): {
   canDelete: boolean;
   reason?: string;
 } {
@@ -673,25 +713,28 @@ export function validateEvaluationGroupUniqueness(
   existingGroup?: EvaluationGroupWithId;
 } {
   // Filter out the group being updated if excludeGroupId is provided
-  const groupsToCheck = excludeGroupId 
-    ? existingGroups.filter(group => group.id !== excludeGroupId)
+  const groupsToCheck = excludeGroupId
+    ? existingGroups.filter((group) => group.id !== excludeGroupId)
     : existingGroups;
 
   // Check for same evaluatedUserId and groupType
   const sameUserGroups = groupsToCheck.filter(
-    group => 
+    (group) =>
       group.evaluatedUserId === newGroupData.evaluatedUserId &&
       group.groupType === newGroupData.groupType
   );
 
   // Check for duplicate email
   const duplicateEmail = sameUserGroups.find(
-    group => group.evaluatorEmail.toLowerCase() === newGroupData.evaluatorEmail.toLowerCase()
+    (group) =>
+      group.evaluatorEmail.toLowerCase() ===
+      newGroupData.evaluatorEmail.toLowerCase()
   );
 
   // Check for duplicate relation
   const duplicateRelation = sameUserGroups.find(
-    group => group.relation.toLowerCase() === newGroupData.relation.toLowerCase()
+    (group) =>
+      group.relation.toLowerCase() === newGroupData.relation.toLowerCase()
   );
 
   if (duplicateEmail && duplicateRelation) {
@@ -874,6 +917,7 @@ export function getUserEvaluationProgressSummary(
       Parent: 0,
       Teacher: 0,
       SiblingFriend: 0,
+      Self: 0,
     },
   };
 
@@ -1031,104 +1075,6 @@ export async function sendEvaluationInvitations(
   } catch (error) {
     console.error("Error sending invitations:", error);
     throw error;
-  }
-}
-
-/**
- * Resend email invitation to a specific evaluator
- */
-export async function resendEmailInvitation(
-  evaluationGroupId: string
-): Promise<{
-  success: boolean;
-  message: string;
-  evaluator?: any;
-  sentTimestamp?: string;
-  invitationUrl?: string;
-}> {
-  try {
-    const response = await fetch(
-      `${API_BASE_URL}/evaluation/resend-email/${evaluationGroupId}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    return {
-      success: true,
-      message: result.message || "Email invitation resent successfully",
-      evaluator: result.evaluator,
-      sentTimestamp: result.sentTimestamp,
-      invitationUrl: result.invitationUrl,
-    };
-  } catch (error) {
-    console.error("Error resending email invitation:", error);
-    return {
-      success: false,
-      message: "Failed to resend email invitation. Please try again.",
-    };
-  }
-}
-
-/**
- * Send bulk email invitations to all evaluators for a specific user
- */
-export async function sendBulkEmailInvitations(
-  userId: string
-): Promise<{
-  success: boolean;
-  message: string;
-  results?: {
-    successful: number;
-    failed: number;
-    details: Array<{
-      evaluatorId: string;
-      evaluatorName: string;
-      email: string;
-      status: 'sent' | 'failed';
-      error?: string;
-    }>;
-  };
-  invitationUrl?: string;
-}> {
-  try {
-    const response = await fetch(
-      `${API_BASE_URL}/evaluation/send-email-invitations/${userId}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    return {
-      success: true,
-      message: result.message || "Bulk email invitations sent successfully",
-      results: result.results,
-      invitationUrl: result.invitationUrl,
-    };
-  } catch (error) {
-    console.error("Error sending bulk email invitations:", error);
-    return {
-      success: false,
-      message: "Failed to send bulk email invitations. Please try again.",
-    };
   }
 }
 

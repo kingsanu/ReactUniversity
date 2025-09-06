@@ -12,10 +12,7 @@ import {
   EvaluationGroupProgress,
   UserEvaluationProgress,
 } from "./evaluationService";
-import {
-  checkPCAStatus,
-  getPCAResultByUserId,
-} from "./pcaService";
+import { checkPCAStatus } from "./pcaService";
 
 export interface AssessmentOverallProgress {
   milAssessment: {
@@ -32,7 +29,7 @@ export interface AssessmentOverallProgress {
   };
   pcaAssessment: {
     status: "not_started" | "in_progress" | "completed";
-    progress?: any; // PCA results data when available
+    progress?: any; // Will be filled when PCA API is available
     lastActivity?: string;
   };
   overallCompletion: {
@@ -59,7 +56,7 @@ export async function getUserAssessmentProgress(
       // Try to get enhanced API data first
       try {
         enhancedMilData = await getUserExamHistory(userId);
-        
+
         if (enhancedMilData && enhancedMilData.examStatus.length > 0) {
           const completedExams = enhancedMilData.examStatus.filter(
             (exam: any) => exam.status === "completed"
@@ -67,35 +64,44 @@ export async function getUserAssessmentProgress(
           const inProgressExams = enhancedMilData.examStatus.filter(
             (exam: any) => exam.status === "in_progress"
           );
-          
+
           // Use enhanced data for status calculation
           if (enhancedMilData.completionPercentage === 100) {
             milStatus = "completed";
           } else if (completedExams.length > 0 || inProgressExams.length > 0) {
             milStatus = "in_progress";
           }
-          
+
           // Get latest activity from enhanced data
           const allExams = enhancedMilData.examStatus
             .filter((exam: any) => exam.completionDate)
-            .sort((a: any, b: any) => 
-              new Date(b.completionDate).getTime() - new Date(a.completionDate).getTime()
+            .sort(
+              (a: any, b: any) =>
+                new Date(b.completionDate).getTime() -
+                new Date(a.completionDate).getTime()
             );
-          
+
           if (allExams.length > 0) {
             milLastActivity = allExams[0].completionDate;
           }
-          
+
           // Create progress summary from enhanced data
           milProgress = {
             totalAttempts: enhancedMilData.completedExams,
             completedExams: completedExams.length,
-            averageScore: completedExams.length > 0 
-              ? completedExams.reduce((sum: number, exam: any) => sum + exam.scorePercentage, 0) / completedExams.length
-              : 0,
-            bestScore: completedExams.length > 0 
-              ? Math.max(...completedExams.map((exam: any) => exam.scorePercentage))
-              : 0,
+            averageScore:
+              completedExams.length > 0
+                ? completedExams.reduce(
+                    (sum: number, exam: any) => sum + exam.scorePercentage,
+                    0
+                  ) / completedExams.length
+                : 0,
+            bestScore:
+              completedExams.length > 0
+                ? Math.max(
+                    ...completedExams.map((exam: any) => exam.scorePercentage)
+                  )
+                : 0,
             examResults: [],
             examTypes: {},
           };
@@ -103,8 +109,11 @@ export async function getUserAssessmentProgress(
           throw new Error("No enhanced data available");
         }
       } catch (enhancedError) {
-        console.warn("Enhanced LIA data not available, falling back to legacy:", enhancedError);
-        
+        console.warn(
+          "Enhanced LIA data not available, falling back to legacy:",
+          enhancedError
+        );
+
         // Fallback to legacy MIL data
         const milResults = await getAllUserExamResults();
         const userMilResults = milResults.filter(
@@ -113,9 +122,11 @@ export async function getUserAssessmentProgress(
         milProgress = getUserProgressSummary(userMilResults);
 
         if (milProgress.totalAttempts > 0) {
-          milStatus = milProgress.completedExams > 0 ? "completed" : "in_progress";
+          milStatus =
+            milProgress.completedExams > 0 ? "completed" : "in_progress";
           const latestResult = userMilResults.sort(
-            (a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime()
+            (a, b) =>
+              new Date(b.endDate).getTime() - new Date(a.endDate).getTime()
           )[0];
           milLastActivity = latestResult?.endDate;
         }
@@ -144,10 +155,32 @@ export async function getUserAssessmentProgress(
       evaluationProgress = getUserEvaluationProgressSummary(evaluationGroups);
 
       if (evaluationGroups.length > 0) {
+        // Check if 360° evaluation is complete:
+        // - Self-evaluation must be completed
+        // - At least one from each group type (Parent, Teacher, SiblingFriend) must be completed
+        const selfCompleted = evaluationGroups.some(
+          (group) => group.groupType === "Self" && group.isEvaluationCompleted
+        );
+        const parentCompleted = evaluationGroups.some(
+          (group) => group.groupType === "Parent" && group.isEvaluationCompleted
+        );
+        const teacherCompleted = evaluationGroups.some(
+          (group) =>
+            group.groupType === "Teacher" && group.isEvaluationCompleted
+        );
+        const siblingFriendCompleted = evaluationGroups.some(
+          (group) =>
+            group.groupType === "SiblingFriend" && group.isEvaluationCompleted
+        );
+
         evaluationStatus =
-          evaluationProgress.completedEvaluations > 0
+          selfCompleted &&
+          parentCompleted &&
+          teacherCompleted &&
+          siblingFriendCompleted
             ? "completed"
             : "in_progress";
+
         const latestGroup = evaluationGroups.sort(
           (a, b) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -165,15 +198,34 @@ export async function getUserAssessmentProgress(
           Parent: 0,
           Teacher: 0,
           SiblingFriend: 0,
+          Self: 0,
         },
       };
     }
 
-    // PCA Assessment - fetch actual status
-    const pcaStatusData = await checkPCAStatus(userId);
-    const pcaStatus = pcaStatusData.status;
-    const pcaProgress = pcaStatusData.hasResults ? await getPCAResultByUserId(userId).catch(() => null) : null;
-    const pcaLastActivity = pcaStatusData.lastActivity;
+    // Get PCA assessment data
+    let pcaStatus: "not_started" | "in_progress" | "completed" = "not_started";
+    let pcaProgress = 0;
+    let pcaLastActivity = undefined;
+    let pcaHasResults = false;
+    let pcaCod = null;
+
+    try {
+      const pcaData = await checkPCAStatus(userId);
+      pcaStatus = pcaData.status;
+      pcaProgress =
+        pcaData.status === "completed"
+          ? 100
+          : pcaData.status === "in_progress"
+          ? 50
+          : 0;
+      pcaLastActivity = pcaData.lastActivity;
+      pcaHasResults = pcaData.hasResults ?? false;
+      pcaCod = pcaData.pcaCod;
+    } catch (error) {
+      console.warn("PCA data not available:", error);
+      // Keep default values
+    }
 
     // Calculate overall completion
     const assessmentStatuses = [milStatus, evaluationStatus, pcaStatus];
@@ -241,7 +293,9 @@ export async function getDashboardAssessmentSummary(userId: string) {
           type: "mil",
           status: progress.milAssessment.status,
           completion: progress.milAssessment.enhancedData
-            ? Math.round(progress.milAssessment.enhancedData.completionPercentage)
+            ? Math.round(
+                progress.milAssessment.enhancedData.completionPercentage
+              )
             : progress.milAssessment.status === "completed"
             ? 100
             : progress.milAssessment.status === "in_progress"
