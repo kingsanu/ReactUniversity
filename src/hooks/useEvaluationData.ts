@@ -13,6 +13,8 @@ import {
   validateEvaluatorRequirements,
   DEFAULT_EVALUATOR_GROUPS,
   createMockEvaluationSession,
+  getUserEvaluationGroupsForSessions,
+  EvaluationGroupWithId,
 } from "@/services/evaluationService";
 
 export interface EvaluationProgress {
@@ -64,7 +66,47 @@ export function useEvaluationData() {
         setProgress(progressData);
       } else {
         // Load from API in production
-        const sessionData = await getEvaluationSessions();
+        // TODO: Get userId from context or props
+        const userId = "current-user-id"; // Replace with actual user ID retrieval
+        const evaluationGroups = await getUserEvaluationGroupsForSessions(userId);
+
+        // Group evaluators by evaluated user to create sessions
+        const sessionMap = new Map<string, EvaluationSession>();
+
+        evaluationGroups.forEach((group) => {
+          const evaluatedUserId = group.evaluatedUserId;
+          if (!sessionMap.has(evaluatedUserId)) {
+            // Create a minimal session structure
+            const mockSession = createMockEvaluationSession();
+            sessionMap.set(evaluatedUserId, {
+              ...mockSession,
+              id: evaluatedUserId,
+              evaluatedPersonId: evaluatedUserId,
+              evaluatedPersonName: group.evaluatorName,
+              title: `Evaluation for ${group.evaluatorName}`,
+              status: group.isEvaluationCompleted ? "completed" : "active",
+              evaluators: [],
+            });
+          }
+
+          const session = sessionMap.get(evaluatedUserId)!;
+          // Add this evaluator to the session
+          const evaluator: Evaluator = {
+            id: group.id,
+            name: group.evaluatorName,
+            email: group.evaluatorEmail,
+            phone: "", // Not available in group data
+            relationship: group.relation,
+            groupType: group.groupType.toLowerCase() as "self" | "parent" | "teacher" | "sibling_friend",
+            invitationToken: group.invitationToken,
+            invitationSent: true,
+            responseReceived: group.isEvaluationCompleted,
+            isActive: true,
+          };
+          session.evaluators.push(evaluator);
+        });
+
+        const sessionData = Array.from(sessionMap.values());
         setSessions(sessionData);
 
         const progressData = calculateProgress(sessionData);

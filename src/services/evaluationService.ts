@@ -503,7 +503,7 @@ export async function createEvaluationGroup(groupData: {
 
     const responseData = await response.json();
     console.log("Create evaluation group response:", responseData);
-    
+
     // Handle different response structures
     return responseData.data || responseData;
   } catch (error) {
@@ -968,25 +968,39 @@ export async function createEvaluationSession(
 }
 
 /**
- * Get all evaluation sessions for the current user
+ * Get all evaluation groups for the current user
+ * Note: This replaces the non-existent getEvaluationSessions function
  */
-export async function getEvaluationSessions(): Promise<EvaluationSession[]> {
+export async function getUserEvaluationGroupsForSessions(
+  userId: string
+): Promise<EvaluationGroupWithId[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/evaluation/sessions`, {
+    const response = await fetch(`${API_BASE_URL}/evaluation/user/${userId}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
 
     if (!response.ok) {
-      throw new Error("Failed to fetch evaluation sessions");
+      throw new Error("Failed to fetch evaluation groups");
     }
 
     return await response.json();
   } catch (error) {
-    console.error("Error fetching evaluation sessions:", error);
+    console.error("Error fetching evaluation groups:", error);
     throw error;
   }
+}
+
+/**
+ * Get all evaluation sessions for the current user
+ * DEPRECATED: This function calls a non-existent endpoint
+ * Use getUserEvaluationGroupsForSessions instead
+ */
+export async function getEvaluationSessions(): Promise<EvaluationSession[]> {
+  throw new Error(
+    "This function calls a non-existent endpoint. Use getUserEvaluationGroupsForSessions instead."
+  );
 }
 
 /**
