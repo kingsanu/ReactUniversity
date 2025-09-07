@@ -16,7 +16,7 @@ export default function TestPCAPage() {
     // Capture console logs
     const originalLog = console.log;
     const originalError = console.error;
-    let logs: string[] = [];
+    const logs: string[] = [];
     
     console.log = (...args) => {
       logs.push(args.map(arg => 
@@ -58,7 +58,7 @@ export default function TestPCAPage() {
     // Capture console logs
     const originalLog = console.log;
     const originalError = console.error;
-    let logs: string[] = [];
+    const logs: string[] = [];
     
     console.log = (...args) => {
       logs.push(args.map(arg => 

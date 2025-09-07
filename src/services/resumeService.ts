@@ -53,7 +53,7 @@ export interface CreateResumePayload {
   education: ResumeEducation[];
 }
 
-export interface UpdateResumePayload extends Partial<CreateResumePayload> {}
+export type UpdateResumePayload = Partial<CreateResumePayload>;
 
 export async function createResume(
   payload: CreateResumePayload

@@ -57,7 +57,7 @@ export function clearTokens(): void {
 }
 
 // Get authorization header for API calls
-export function getAuthHeader(): { Authorization: string } | {} {
+export function getAuthHeader(): { Authorization: string } | object {
   const token = getCurrentToken();
 
   if (!token) {

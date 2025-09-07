@@ -726,7 +726,7 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${
                           evaluator.groupType === "parent" &&
-                          evaluator.relation === "Self"
+                          evaluator.relationship === "Self"
                             ? "bg-purple-100 text-purple-800"
                             : evaluator.groupType === "parent"
                             ? "bg-green-100 text-green-800"
@@ -736,7 +736,7 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
                         }`}
                       >
                         {evaluator.groupType === "parent" &&
-                        evaluator.relation === "Self"
+                        evaluator.relationship === "Self"
                           ? "Self"
                           : evaluator.groupType.charAt(0).toUpperCase() +
                             evaluator.groupType.slice(1)}
