@@ -4,7 +4,6 @@ import {
   EvaluationReport,
   Evaluator,
   EvaluationResponse,
-  getEvaluationSessions,
   getEvaluationSession,
   createEvaluationSession,
   addEvaluators,
@@ -86,6 +85,7 @@ export function useEvaluationData() {
               title: `Evaluation for ${group.evaluatorName}`,
               status: group.isEvaluationCompleted ? "completed" : "active",
               evaluators: [],
+              evaluatorGroups: DEFAULT_EVALUATOR_GROUPS, // Add default evaluator groups
             });
           }
 
