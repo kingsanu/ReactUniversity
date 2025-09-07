@@ -5,7 +5,6 @@ import {
   Evaluator,
   EvaluationResponse,
   getEvaluationSession,
-  createEvaluationSession,
   addEvaluators,
   sendEvaluationInvitations,
   getEvaluationReport,
@@ -67,7 +66,9 @@ export function useEvaluationData() {
         // Load from API in production
         // TODO: Get userId from context or props
         const userId = "current-user-id"; // Replace with actual user ID retrieval
-        const evaluationGroups = await getUserEvaluationGroupsForSessions(userId);
+        const evaluationGroups = await getUserEvaluationGroupsForSessions(
+          userId
+        );
 
         // Group evaluators by evaluated user to create sessions
         const sessionMap = new Map<string, EvaluationSession>();
@@ -97,7 +98,11 @@ export function useEvaluationData() {
             email: group.evaluatorEmail,
             phone: "", // Not available in group data
             relationship: group.relation,
-            groupType: group.groupType.toLowerCase() as "self" | "parent" | "teacher" | "sibling_friend",
+            groupType: group.groupType.toLowerCase() as
+              | "self"
+              | "parent"
+              | "teacher"
+              | "sibling_friend",
             invitationToken: group.invitationToken,
             invitationSent: true,
             responseReceived: group.isEvaluationCompleted,
@@ -154,46 +159,6 @@ export function useEvaluationData() {
       responseRate,
       lastUpdated: new Date().toISOString(),
     };
-  };
-
-  const createNewEvaluationSession = async (
-    sessionData: Partial<EvaluationSession>
-  ): Promise<EvaluationSession> => {
-    try {
-      setError(null);
-
-      const isDevelopment = process.env.NODE_ENV === "development";
-
-      if (isDevelopment) {
-        // Create mock session for development
-        const newSession: EvaluationSession = {
-          ...createMockEvaluationSession(),
-          ...sessionData,
-          id: `eval-${Date.now()}`,
-          createdAt: new Date().toISOString(),
-        };
-
-        const updatedSessions = [...sessions, newSession];
-        setSessions(updatedSessions);
-        localStorage.setItem(
-          "evaluation_sessions",
-          JSON.stringify(updatedSessions)
-        );
-
-        return newSession;
-      } else {
-        const newSession = await createEvaluationSession(sessionData);
-        setSessions((prev) => [...prev, newSession]);
-        return newSession;
-      }
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to create evaluation session"
-      );
-      throw err;
-    }
   };
 
   const loadSession = async (
@@ -560,7 +525,6 @@ export function useEvaluationData() {
     isLoading: loading,
     error,
     loadEvaluationData,
-    createNewEvaluationSession,
     updateEvaluationSession,
     loadSession,
     addEvaluatorsToSession,

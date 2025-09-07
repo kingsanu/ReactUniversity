@@ -17,7 +17,7 @@ import {
 export default function AssessmentsPage() {
   const { user } = useGlobalStore();
   const { pcaData, hasPCA, isCompleted } = usePCAData();
-  const { createNewEvaluationSession, isLoading } = useEvaluationData();
+  const { isLoading } = useEvaluationData();
   const [showInviteModal, setShowInviteModal] = useState(false);
   const { invalidateSpecificAssessment } = useAssessmentCache();
   const [isStartingEvaluation, setIsStartingEvaluation] = useState(false);
@@ -45,12 +45,6 @@ export default function AssessmentsPage() {
 
   const handleInviteEvaluators = async () => {
     try {
-      // Create a new evaluation session
-      await createNewEvaluationSession({
-        title: "360 Degree Evaluation",
-        description: "Comprehensive evaluation from multiple perspectives",
-      });
-
       // Navigate to the evaluator invitation page
       window.location.href = "/dashboard/assessments/evaluators";
     } catch (error) {
