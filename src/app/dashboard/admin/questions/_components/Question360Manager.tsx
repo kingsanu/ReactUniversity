@@ -263,6 +263,10 @@ export function Question360Manager() {
     setEditingQuestion(null);
     resetForm();
     setShowCreateModal(false);
+    // If Dialog uses onOpenChange, ensure it closes
+    if (typeof handleDialogOpenChange === "function") {
+      handleDialogOpenChange(false);
+    }
   };
 
   // Filter questions
