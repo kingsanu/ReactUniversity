@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import { useMILData } from "@/hooks/useMILData";
+import { useTranslation } from "react-i18next";
 
 interface MILResultsProps {
   className?: string;
@@ -20,6 +21,7 @@ export function MILResults({ className }: MILResultsProps) {
     hasEnhancedData,
     completionStats,
   } = useMILData();
+  const { t } = useTranslation();
 
   if (loading) {
     return (
@@ -56,16 +58,16 @@ export function MILResults({ className }: MILResultsProps) {
             </svg>
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            Take LIA Assessment
+            {t("dashboard.takeLIAAssessment")}
           </h3>
           <p className="text-gray-600 text-sm mb-4">
-            Measure your cognitive abilities through various intelligence tasks
+            {t("dashboard.measureCognitiveAbilities")}
           </p>
           <a
             href="/dashboard/assessments/mil"
             className="inline-flex items-center px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors"
           >
-            Start Assessment
+            {t("dashboard.startAssessment")}
           </a>
         </div>
       </div>
@@ -89,8 +91,12 @@ export function MILResults({ className }: MILResultsProps) {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">LIA Results</h3>
-          <p className="text-sm text-gray-600">Labor Intelligence Assessment</p>
+          <h3 className="text-lg font-semibold text-gray-900">
+            {t("dashboard.liaResults")}
+          </h3>
+          <p className="text-sm text-gray-600">
+            {t("dashboard.laborIntelligenceAssessment")}
+          </p>
         </div>
         <div className="text-right">
           <div className="text-2xl font-bold text-green-600">
@@ -101,7 +107,9 @@ export function MILResults({ className }: MILResultsProps) {
                 }`}
           </div>
           <div className="text-xs text-gray-500">
-            {isCompleted ? "All Complete" : "Exams Completed"}
+            {isCompleted
+              ? t("dashboard.allComplete")
+              : t("dashboard.examsCompleted")}
           </div>
         </div>
       </div>
@@ -109,11 +117,17 @@ export function MILResults({ className }: MILResultsProps) {
       {/* Progress Bar */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-gray-700">Progress</span>
+          <span className="text-sm font-medium text-gray-700">
+            {t("common.progress")}
+          </span>
           <span className="text-sm text-gray-600">
             {hasEnhancedData
-              ? `${completionStats.completed}/${completionStats.total} completed`
-              : `${progress?.completedExams.length}/${progress?.totalExams} subtests`}
+              ? `${completionStats.completed}/${completionStats.total} ${t(
+                  "dashboard.completed"
+                )}`
+              : `${progress?.completedExams.length}/${progress?.totalExams} ${t(
+                  "dashboard.subtests"
+                )}`}
           </span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
@@ -126,7 +140,7 @@ export function MILResults({ className }: MILResultsProps) {
         </div>
         {hasEnhancedData && completionStats.inProgress > 0 && (
           <div className="mt-2 text-xs text-orange-600">
-            {completionStats.inProgress} exam(s) in progress
+            {completionStats.inProgress} {t("dashboard.examsInProgress")}
           </div>
         )}
       </div>
@@ -143,7 +157,7 @@ export function MILResults({ className }: MILResultsProps) {
                   </span>
                   <div className="flex items-center space-x-2">
                     <span className="text-sm text-green-600 font-medium">
-                      ✅ Complete
+                      ✅ {t("dashboard.complete")}
                     </span>
                   </div>
                 </div>
@@ -152,7 +166,8 @@ export function MILResults({ className }: MILResultsProps) {
                 </div>
                 {hasEnhancedData && (subtest as any).timeSpent && (
                   <div className="mt-1 text-xs text-gray-500">
-                    Time: {(subtest as any).timeSpent.split(".")[0]}
+                    {t("dashboard.time")}:{" "}
+                    {(subtest as any).timeSpent.split(".")[0]}
                   </div>
                 )}
               </div>
@@ -167,7 +182,7 @@ export function MILResults({ className }: MILResultsProps) {
           href="/dashboard/assessments/mil"
           className="flex-1 text-center py-2 px-4 bg-purple-50 text-purple-600 text-sm font-medium rounded-lg hover:bg-purple-100 transition-colors"
         >
-          {isCompleted ? "View Assessments" : "Continue"}
+          {isCompleted ? t("dashboard.viewAssessments") : t("common.next")}
         </a>
         <button
           onClick={() => window.location.reload()}
@@ -182,21 +197,21 @@ export function MILResults({ className }: MILResultsProps) {
         <div className="flex items-center justify-between text-xs text-gray-500">
           <span>
             {isCompleted
-              ? "✅ All Assessments Complete"
+              ? `✅ ${t("dashboard.allAssessmentsComplete")}`
               : `🔄 ${progress?.completedExams.length || 0} of ${
                   progress?.totalExams || 5
                 } completed`}
           </span>
           <div className="flex items-center space-x-2">
             <span>
-              Updated:{" "}
+              {t("dashboard.updated")}:{" "}
               {progress?.lastUpdated
                 ? new Date(progress.lastUpdated).toLocaleDateString()
                 : "Today"}
             </span>
             {hasEnhancedData && (
               <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-medium">
-                Live Data
+                {t("dashboard.liveData")}
               </span>
             )}
           </div>

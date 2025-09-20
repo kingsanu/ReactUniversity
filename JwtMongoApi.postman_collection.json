@@ -2143,6 +2143,226 @@
           }
         }
       ]
+    },
+    {
+      "name": "Question360 Management",
+      "item": [
+        {
+          "name": "Get All Questions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/Question360/all",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "Question360", "all"]
+            },
+            "description": "Get all active questions from the database"
+          }
+        },
+        {
+          "name": "Get Question by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/Question360/{{questionId}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "Question360", "{{questionId}}"]
+            },
+            "description": "Get a specific question by its ID"
+          }
+        },
+        {
+          "name": "Get Questions by Category",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/Question360/category/{{category}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "Question360", "category", "{{category}}"]
+            },
+            "description": "Get questions filtered by category"
+          }
+        },
+        {
+          "name": "Get Sub-Questions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/Question360/sub-questions/{{parentQuestionId}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": [
+                "api",
+                "Question360",
+                "sub-questions",
+                "{{parentQuestionId}}"
+              ]
+            },
+            "description": "Get all sub-questions for a parent question"
+          }
+        },
+        {
+          "name": "Get Questions by Relation Type",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/Question360/GetQuestions?relationType={{relationType}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "Question360", "GetQuestions"],
+              "query": [
+                {
+                  "key": "relationType",
+                  "value": "{{relationType}}",
+                  "description": "Parent, Teacher, Other, Self"
+                }
+              ]
+            },
+            "description": "Get questions filtered by relation type (Parent, Teacher, Other, Self)"
+          }
+        },
+        {
+          "name": "Create Question",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionEnglishText\": \"How well does this person communicate effectively?\",\n  \"questionSpanishText\": \"¿Qué tan bien se comunica efectivamente esta persona?\",\n  \"category\": \"Communication\",\n  \"relationType\": \"Parent\",\n  \"questionNumber\": 1,\n  \"isSubQuestion\": false,\n  \"parentQuestionId\": null\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/Question360",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "Question360"]
+            },
+            "description": "Create a new question"
+          }
+        },
+        {
+          "name": "Update Question",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionEnglishText\": \"Updated question text\",\n  \"questionSpanishText\": \"Texto de pregunta actualizado\",\n  \"category\": \"Updated Category\",\n  \"relationType\": \"Parent\",\n  \"questionNumber\": 1,\n  \"isSubQuestion\": false,\n  \"parentQuestionId\": null,\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/Question360/{{questionId}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "Question360", "{{questionId}}"]
+            },
+            "description": "Update an existing question"
+          }
+        },
+        {
+          "name": "Delete Question",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/Question360/{{questionId}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "Question360", "{{questionId}}"]
+            },
+            "description": "Soft delete a question (deactivate)"
+          }
+        },
+        {
+          "name": "Activate Question",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/Question360/{{questionId}}/activate",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "Question360", "{{questionId}}", "activate"]
+            },
+            "description": "Activate a question"
+          }
+        },
+        {
+          "name": "Deactivate Question",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/Question360/{{questionId}}/deactivate",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "Question360", "{{questionId}}", "deactivate"]
+            },
+            "description": "Deactivate a question"
+          }
+        },
+        {
+          "name": "Bulk Create Questions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"questionEnglishText\": \"How well does this person demonstrate leadership skills?\",\n    \"questionSpanishText\": \"¿Qué tan bien demuestra esta persona habilidades de liderazgo?\",\n    \"category\": \"Leadership\",\n    \"relationType\": \"Parent\",\n    \"questionNumber\": 1,\n    \"isSubQuestion\": false,\n    \"parentQuestionId\": null\n  },\n  {\n    \"questionEnglishText\": \"How effectively does this person communicate?\",\n    \"questionSpanishText\": \"¿Qué tan efectivamente se comunica esta persona?\",\n    \"category\": \"Communication\",\n    \"relationType\": \"Parent\",\n    \"questionNumber\": 2,\n    \"isSubQuestion\": false,\n    \"parentQuestionId\": null\n  }\n]"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/Question360/bulk-create",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "Question360", "bulk-create"]
+            },
+            "description": "Create multiple questions at once"
+          }
+        }
+      ]
     }
   ],
   "variable": [
@@ -2225,6 +2445,26 @@
       "key": "evaluatorEmail",
       "value": "evaluator@example.com",
       "description": "Replace with actual evaluator email for feedback submission"
+    },
+    {
+      "key": "questionId",
+      "value": "your-question-id-here",
+      "description": "Replace with actual question ID for testing"
+    },
+    {
+      "key": "category",
+      "value": "Leadership",
+      "description": "Question category for filtering (Leadership, Communication, etc.)"
+    },
+    {
+      "key": "relationType",
+      "value": "Parent",
+      "description": "Relation type for filtering (Parent, Teacher, Other, Self)"
+    },
+    {
+      "key": "parentQuestionId",
+      "value": "your-parent-question-id-here",
+      "description": "Parent question ID for sub-questions"
     }
   ]
 }

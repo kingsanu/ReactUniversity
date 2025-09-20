@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   getPCAResult,
   getPCACompetences,
@@ -18,6 +19,7 @@ export default function PCAResultsPanel({
   pcaCod,
   onClose,
 }: PCAResultsPanelProps) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<any>(null);
   const [competences, setCompetences] = useState<any>(null);
@@ -111,9 +113,9 @@ export default function PCAResultsPanel({
         <div className="border-b">
           <nav className="flex space-x-8 px-6">
             {[
-              { id: "results", label: "Results" },
-              { id: "competences", label: "Competences" },
-              { id: "analysis", label: "JCA Analysis" },
+              { id: "results", label: t("dashboard.results") },
+              { id: "competences", label: t("dashboard.competences") },
+              { id: "analysis", label: t("dashboard.jcaAnalysis") },
             ].map((tab) => (
               <button
                 key={tab.id}

@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { sidebarData } from "./data";
 import { cn } from "@/lib/utils";
 import { useGlobalStore } from "@/store/useGlobalStore";
+import { useTranslation } from "react-i18next";
 
 // Icon mapping - in a real app, use proper icon library
 const IconMap = {
@@ -28,6 +29,7 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
   const { logout } = useGlobalStore();
   const router = useRouter();
   const pathname = usePathname();
+  const { t } = useTranslation();
 
   const toggleExpanded = (itemId: string) => {
     setExpandedItems((prev) =>
@@ -120,7 +122,7 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
                     <span className="mr-3 text-base">
                       {IconMap[item.icon as keyof typeof IconMap] || "📄"}
                     </span>
-                    <span>{item.name}</span>
+                    <span>{t(item.name)}</span>
                   </Link>
                   {hasSubmenu && (
                     <span
@@ -150,7 +152,7 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
                               : "text-gray-400 hover:text-white hover:bg-gray-800"
                           )}
                         >
-                          {subItem.name}
+                          {t(subItem.name)}
                         </Link>
                       );
                     })}
@@ -168,7 +170,7 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
             className="flex items-center w-full px-3 py-2.5 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
           >
             <span className="mr-3">🚪</span>
-            <span>Logout</span>
+            <span>{t("common.logout")}</span>
           </button>
         </div>
       </aside>

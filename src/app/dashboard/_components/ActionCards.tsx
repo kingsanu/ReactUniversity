@@ -2,6 +2,7 @@ import { motion } from "motion/react";
 import { dashboardData } from "./data";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 
 interface ActionCardsProps {
   className?: string;
@@ -9,6 +10,7 @@ interface ActionCardsProps {
 
 export function ActionCards({ className }: ActionCardsProps) {
   const { actionCards } = dashboardData;
+  const { t } = useTranslation();
 
   return (
     <div
@@ -34,11 +36,10 @@ export function ActionCards({ className }: ActionCardsProps) {
                   card.id === 1 ? "bg-green-600" : "bg-purple-600"
                 )}
               >
-                {card.badge}
+                {t(card.badge)}
               </span>
             </div>
-          )}
-
+          )}{" "}
           {/* Icon */}
           <div
             className={cn(
@@ -48,13 +49,13 @@ export function ActionCards({ className }: ActionCardsProps) {
           >
             <span className="text-2xl">{card.icon}</span>
           </div>
-
           {/* Content */}
           <div className="mb-4">
-            <h3 className="font-semibold text-gray-900 mb-1">{card.title}</h3>
-            <p className="text-sm text-gray-500">{card.subtitle}</p>
+            <h3 className="font-semibold text-gray-900 mb-1">
+              {t(card.title)}
+            </h3>
+            <p className="text-sm text-gray-500">{t(card.subtitle)}</p>
           </div>
-
           {/* Action Button */}
           <Link href={card.link}>
             <button
@@ -65,7 +66,7 @@ export function ActionCards({ className }: ActionCardsProps) {
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               )}
             >
-              {card.action}
+              {t(card.action)}
             </button>
           </Link>
         </motion.div>

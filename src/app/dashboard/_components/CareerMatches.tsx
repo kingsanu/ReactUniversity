@@ -1,6 +1,7 @@
-import { motion } from 'motion/react';
-import { dashboardData } from './data';
-import { cn } from '@/lib/utils';
+import { motion } from "motion/react";
+import { dashboardData } from "./data";
+import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface CareerMatchesProps {
   className?: string;
@@ -8,15 +9,21 @@ interface CareerMatchesProps {
 
 export function CareerMatches({ className }: CareerMatchesProps) {
   const { careerMatches } = dashboardData;
+  const { t } = useTranslation();
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={cn("bg-white rounded-lg border border-gray-200 p-6", className)}
+      className={cn(
+        "bg-white rounded-lg border border-gray-200 p-6",
+        className
+      )}
     >
-      <h3 className="text-lg font-semibold text-gray-900 mb-6">Top 3 Career Match</h3>
-      
+      <h3 className="text-lg font-semibold text-gray-900 mb-6">
+        {t("dashboard.top3CareerMatch")}
+      </h3>
+
       <div className="space-y-4">
         {careerMatches.map((match, index) => (
           <motion.div
@@ -33,7 +40,7 @@ export function CareerMatches({ className }: CareerMatchesProps) {
                   {match.company.charAt(0)}
                 </span>
               </div>
-              
+
               {/* Job Info */}
               <div>
                 <h4 className="font-medium text-gray-900 text-sm">
@@ -42,7 +49,7 @@ export function CareerMatches({ className }: CareerMatchesProps) {
                 <p className="text-xs text-gray-500">{match.company}</p>
               </div>
             </div>
-            
+
             {/* Progress and Action */}
             <div className="flex items-center space-x-3">
               {/* Progress Circle */}
@@ -64,9 +71,14 @@ export function CareerMatches({ className }: CareerMatchesProps) {
                     stroke="#3b82f6"
                     strokeWidth="3"
                     strokeDasharray={`${2 * Math.PI * 16}`}
-                    strokeDashoffset={`${2 * Math.PI * 16 * (1 - match.progress / 100)}`}
+                    strokeDashoffset={`${
+                      2 * Math.PI * 16 * (1 - match.progress / 100)
+                    }`}
                     initial={{ strokeDashoffset: 2 * Math.PI * 16 }}
-                    animate={{ strokeDashoffset: 2 * Math.PI * 16 * (1 - match.progress / 100) }}
+                    animate={{
+                      strokeDashoffset:
+                        2 * Math.PI * 16 * (1 - match.progress / 100),
+                    }}
                     transition={{ delay: index * 0.2, duration: 1 }}
                   />
                 </svg>
@@ -76,20 +88,30 @@ export function CareerMatches({ className }: CareerMatchesProps) {
                   </span>
                 </div>
               </div>
-              
+
               {/* Arrow Button */}
               <button className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors">
-                <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <svg
+                  className="w-4 h-4 text-gray-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               </button>
             </div>
           </motion.div>
         ))}
       </div>
-      
+
       <button className="w-full text-sm text-blue-600 hover:text-blue-700 mt-4 py-2">
-        Show more
+        {t("dashboard.showMore")}
       </button>
     </motion.div>
   );

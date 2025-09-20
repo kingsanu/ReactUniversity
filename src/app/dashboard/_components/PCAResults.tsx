@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import { usePCAData } from "@/hooks/usePCAData";
+import { useTranslation } from "react-i18next";
 
 interface PCAResultsProps {
   className?: string;
@@ -10,6 +11,7 @@ interface PCAResultsProps {
 export function PCAResults({ className }: PCAResultsProps) {
   const { pcaData, loading, error, refreshPCAData, hasPCA, isCompleted } =
     usePCAData();
+  const { t } = useTranslation();
 
   const getTopCompetencies = () => {
     if (!pcaData?.results?.data) {
@@ -73,14 +75,14 @@ export function PCAResults({ className }: PCAResultsProps) {
         <div className="text-center">
           <div className="text-red-500 mb-2">⚠️</div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            Error Loading PCA Results
+            {t("dashboard.pcaErrorTitle")}
           </h3>
           <p className="text-gray-600 mb-4">{error}</p>
           <button
             onClick={refreshPCAData}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
-            Try Again
+            {t("common.tryAgain")}
           </button>
         </div>
       </div>
@@ -93,15 +95,15 @@ export function PCAResults({ className }: PCAResultsProps) {
         <div className="text-center">
           <div className="text-gray-400 mb-2">📊</div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            No PCA Assessment Found
+            {t("dashboard.noPCATitle")}
           </h3>
           <p className="text-gray-600 mb-4">
             {pcaData?.status === "not_found"
-              ? "No PCA assessment has been created for your account yet."
-              : "You haven't completed a PCA assessment yet."}
+              ? t("dashboard.noPCACreated")
+              : t("dashboard.noPCACompleted")}
           </p>
           <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-            Start Assessment
+            {t("dashboard.startAssessment")}
           </button>
         </div>
       </div>
@@ -115,16 +117,16 @@ export function PCAResults({ className }: PCAResultsProps) {
         <div className="text-center">
           <div className="text-yellow-500 mb-2">⏳</div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            PCA Assessment In Progress
+            {t("dashboard.pcaInProgress")}
           </h3>
           <p className="text-gray-600 mb-4">
             {pcaData?.status === "in_progress"
-              ? "Your PCA assessment is currently being processed."
-              : "Your PCA assessment has been started but not yet completed."}
+              ? t("dashboard.pcaProcessing")
+              : t("dashboard.pcaStarted")}
           </p>
           {pcaData?.pcaCod && (
             <p className="text-sm text-gray-500 mb-4">
-              Assessment Code:{" "}
+              {t("dashboard.assessmentCode")}:{" "}
               <span className="font-mono">{pcaData.pcaCod}</span>
             </p>
           )}
@@ -133,10 +135,10 @@ export function PCAResults({ className }: PCAResultsProps) {
               onClick={refreshPCAData}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
             >
-              Check Status
+              {t("dashboard.checkStatus")}
             </button>
             <button className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700">
-              Continue Assessment
+              {t("dashboard.continueAssessment")}
             </button>
           </div>
         </div>
@@ -157,15 +159,19 @@ export function PCAResults({ className }: PCAResultsProps) {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-lg font-semibold text-gray-900">
-            PCA Assessment
+            {t("dashboard.pcaAssessment")}
           </h3>
-          <p className="text-sm text-gray-600">Personal Competence Analysis</p>
+          <p className="text-sm text-gray-600">
+            {t("dashboard.personalCompetenceAnalysis")}
+          </p>
         </div>
         <div className="text-right">
           <div className="text-2xl font-bold text-blue-600">
             {overallScore}%
           </div>
-          <div className="text-xs text-gray-500">Overall Score</div>
+          <div className="text-xs text-gray-500">
+            {t("dashboard.overallScore")}
+          </div>
         </div>
       </div>
 
@@ -205,13 +211,13 @@ export function PCAResults({ className }: PCAResultsProps) {
           href="/dashboard/assessments/pca"
           className="flex-1 text-center py-2 px-4 bg-blue-50 text-blue-600 text-sm font-medium rounded-lg hover:bg-blue-100 transition-colors"
         >
-          View Details
+          {t("common.view")}
         </a>
         <button
           onClick={refreshPCAData}
           className="flex-1 py-2 px-4 bg-gray-50 text-gray-600 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors"
         >
-          Refresh
+          {t("common.refresh")}
         </button>
       </div>
 
@@ -219,7 +225,9 @@ export function PCAResults({ className }: PCAResultsProps) {
       <div className="mt-4 pt-4 border-t border-gray-200">
         <div className="flex items-center justify-between text-sm text-gray-500">
           <div className="flex items-center space-x-4">
-            <span>PCA Code: {pcaData?.pcaCod || "N/A"}</span>
+            <span>
+              {t("dashboard.pcaCode")}: {pcaData?.pcaCod || "N/A"}
+            </span>
             {pcaData?.status && (
               <span
                 className={`px-2 py-1 rounded-full text-xs ${
@@ -243,7 +251,7 @@ export function PCAResults({ className }: PCAResultsProps) {
               />
             </svg>
             <span>
-              Last updated:{" "}
+              {t("dashboard.lastUpdated")}:{" "}
               {pcaData?.lastUpdated
                 ? new Date(pcaData.lastUpdated).toLocaleDateString()
                 : new Date().toLocaleDateString()}

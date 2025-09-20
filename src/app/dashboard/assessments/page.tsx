@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { useTranslation } from "react-i18next";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { usePCAData } from "@/hooks/usePCAData";
 import { useEvaluationData } from "@/hooks/useEvaluationData";
@@ -16,6 +17,7 @@ import {
 
 export default function AssessmentsPage() {
   const { user } = useGlobalStore();
+  const { t } = useTranslation();
   const { pcaData, hasPCA, isCompleted } = usePCAData();
   const { isLoading } = useEvaluationData();
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -87,7 +89,10 @@ export default function AssessmentsPage() {
         invalidateSpecificAssessment(user?.id || "", "evaluation");
         window.location.href = `/evaluation/evaluator?id=${selfGroup.id}`;
       } else {
-        console.error("Self evaluation group created but no ID received:", selfGroup);
+        console.error(
+          "Self evaluation group created but no ID received:",
+          selfGroup
+        );
         toast.error("Failed to create self evaluation. Please try again.");
       }
     } catch (error) {
@@ -116,7 +121,7 @@ export default function AssessmentsPage() {
                 >
                   <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                 </svg>
-                Dashboard
+                {t("nav.dashboard")}
               </a>
             </li>
             <li>
@@ -133,7 +138,7 @@ export default function AssessmentsPage() {
                   />
                 </svg>
                 <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2">
-                  Assessments
+                  {t("dashboard.assessments")}
                 </span>
               </div>
             </li>
@@ -163,13 +168,10 @@ export default function AssessmentsPage() {
             </div>
           </motion.div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Professional Assessments
+            {t("dashboard.professionalAssessments")}
           </h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Complete your professional assessments to unlock personalized
-            insights about your competencies, cognitive abilities, and ideal
-            career path. Each assessment provides valuable data for your
-            professional development.
+            {t("dashboard.assessmentsDescription")}
           </p>
         </div>
 
@@ -543,9 +545,15 @@ export default function AssessmentsPage() {
                     {isLoading ? "Loading..." : "Invite Evaluators"}
                   </button>
                   <button
-                    disabled={evaluationAssessment?.status !== "in_progress" || isStartingEvaluation || loadingGroups}
+                    disabled={
+                      evaluationAssessment?.status !== "in_progress" ||
+                      isStartingEvaluation ||
+                      loadingGroups
+                    }
                     className={`w-full py-3 px-6 rounded-lg font-medium transition-colors ${
-                      evaluationAssessment?.status === "in_progress" && !isStartingEvaluation && !loadingGroups
+                      evaluationAssessment?.status === "in_progress" &&
+                      !isStartingEvaluation &&
+                      !loadingGroups
                         ? "bg-orange-600 hover:bg-orange-700 text-white"
                         : "bg-gray-400 text-white cursor-not-allowed"
                     }`}

@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { useTranslation } from "react-i18next";
 import { useMILData } from "@/hooks/useMILData";
 
 interface MILCompletionProps {
@@ -12,6 +13,7 @@ export default function MILCompletion({
   onViewResults,
   onReturnToDashboard,
 }: MILCompletionProps) {
+  const { t } = useTranslation();
   const { progress, getOverallScore } = useMILData();
 
   const overallScore = getOverallScore();
@@ -21,31 +23,31 @@ export default function MILCompletion({
   const getScoreMessage = (score: number) => {
     if (score >= 90)
       return {
-        title: "Outstanding!",
-        message: "Exceptional cognitive performance",
+        title: t("dashboard.outstanding"),
+        message: t("dashboard.exceptionalPerformance"),
         color: "text-green-600",
       };
     if (score >= 80)
       return {
-        title: "Excellent!",
-        message: "Strong cognitive abilities",
+        title: t("dashboard.excellent"),
+        message: t("dashboard.strongAbilities"),
         color: "text-blue-600",
       };
     if (score >= 70)
       return {
-        title: "Good Work!",
-        message: "Solid cognitive performance",
+        title: t("dashboard.goodWork"),
+        message: t("dashboard.solidPerformance"),
         color: "text-purple-600",
       };
     if (score >= 60)
       return {
-        title: "Well Done!",
-        message: "Developing cognitive skills",
+        title: t("dashboard.wellDone"),
+        message: t("dashboard.developingSkills"),
         color: "text-yellow-600",
       };
     return {
-      title: "Complete!",
-      message: "Assessment finished",
+      title: t("dashboard.milComplete"),
+      message: t("dashboard.assessmentFinished"),
       color: "text-gray-600",
     };
   };

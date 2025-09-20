@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "motion/react";
+import { useTranslation } from "react-i18next";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { usePCAData } from "@/hooks/usePCAData";
 import {
@@ -14,6 +15,7 @@ import PCAResultsPanel from "../_components/PCAResultsPanel";
 
 export default function PCAAssessmentPage() {
   const { user } = useGlobalStore();
+  const { t } = useTranslation();
   const { pcaData, loading, error, refreshPCAData, hasPCA, isCompleted } =
     usePCAData();
 
@@ -27,9 +29,7 @@ export default function PCAAssessmentPage() {
 
   const handleStartAssessment = async () => {
     if (!user?.id || !user?.name || !user?.email) {
-      alert(
-        "User information is incomplete. Please complete your profile first."
-      );
+      alert(t("dashboard.pcaUserInfoIncomplete"));
       return;
     }
 
@@ -231,7 +231,7 @@ export default function PCAAssessmentPage() {
             animate={{ opacity: 1, y: 0 }}
             className="bg-green-50 border border-green-200 rounded-lg p-6 mb-8"
           >
-            <div className="flex items-center">
+            <div className="flex items-center lg:flex-row flex-col gap-3 ">
               <div className="bg-green-100 rounded-full p-2 mr-4">
                 <svg
                   className="w-6 h-6 text-green-600"
@@ -245,7 +245,7 @@ export default function PCAAssessmentPage() {
                   />
                 </svg>
               </div>
-              <div className="flex-1">
+              <div className="flex-1 mx-auto  text-center lg:text-left">
                 <h3 className="text-lg font-semibold text-green-900">
                   Assessment Completed!
                 </h3>

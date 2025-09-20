@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
+import { useTranslation } from "react-i18next";
 import {
   getAllMILExams,
   MILExamMetadata,
@@ -40,6 +41,7 @@ type AssessmentStep =
   | "evaluation-completed";
 
 export default function MILAssessmentPage() {
+  const { t } = useTranslation();
   const [assessmentType, setAssessmentType] = useState<AssessmentType>("mil");
   const [currentStep, setCurrentStep] = useState<AssessmentStep>("overview");
   const [exams, setExams] = useState<MILExamMetadata[]>([]);

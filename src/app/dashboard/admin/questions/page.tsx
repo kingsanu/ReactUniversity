@@ -1,16 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
-import { AdminLayout } from "./_components/AdminLayout";
-import { SubscriptionPlanManager } from "./_components/SubscriptionPlanManager";
-import { AdminStats } from "./_components/AdminStats";
-import { Questions360Stats } from "./_components/Questions360Stats";
-
+import { AdminLayout } from "../_components/AdminLayout";
+import { Question360Manager } from "./_components";
 import { useRouter } from "next/navigation";
 import { useAdminAccess } from "@/hooks/useAdminAccess";
 
-export default function AdminPage() {
+export default function Questions360AdminPage() {
   const router = useRouter();
-
   const { isAdmin, loading } = useAdminAccess();
 
   // Handle admin access check
@@ -44,22 +40,17 @@ export default function AdminPage() {
         <div className="mb-6 md:mb-8">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-              Dashboard Overview
+              360° Questions Management
             </h1>
             <p className="text-gray-600 text-sm md:text-base">
-              Manage subscription plans and system settings
+              Manage evaluation questions for Parent, Teacher, Other, and Self
+              assessments
             </p>
           </div>
         </div>
 
-        {/* Admin Stats */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <AdminStats />
-          <Questions360Stats />
-        </div>
-
-        {/* Subscription Plan Manager */}
-        <SubscriptionPlanManager />
+        {/* Question360 Manager */}
+        <Question360Manager />
       </div>
     </AdminLayout>
   );

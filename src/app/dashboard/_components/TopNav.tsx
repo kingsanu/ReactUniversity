@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { UserProfileDropdown } from "@/components/ui/user-profile-dropdown";
 
@@ -19,6 +20,16 @@ interface TopNavProps {
 
 export function TopNav({ className, onMenuClick }: TopNavProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const { t } = useTranslation();
+
+  const translatedNavItems = [
+    { name: t("nav.dashboard"), active: true },
+    { name: t("nav.analytics"), active: false },
+    { name: t("nav.careerPaths"), active: false },
+    { name: t("nav.jobs"), active: false },
+    { name: t("nav.learning"), active: false },
+    { name: t("nav.community"), active: false },
+  ];
 
   return (
     <header className={cn("bg-white border-b border-gray-200", className)}>
@@ -45,7 +56,7 @@ export function TopNav({ className, onMenuClick }: TopNavProps) {
 
         {/* Navigation Tabs */}
         <nav className="hidden md:flex items-center space-x-8">
-          {topNavItems.map((item) => (
+          {translatedNavItems.map((item) => (
             <button
               key={item.name}
               className={cn(
@@ -81,7 +92,7 @@ export function TopNav({ className, onMenuClick }: TopNavProps) {
             </div>
             <input
               type="text"
-              placeholder="Search here"
+              placeholder={t("common.search")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="block w-48 md:w-64 pl-10 pr-3 py-2 border border-gray-300 rounded-full leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm"
