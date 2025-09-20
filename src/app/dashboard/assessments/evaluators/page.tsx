@@ -37,7 +37,7 @@ import {
 export default function EvaluatorsPage() {
   const { user } = useGlobalStore();
   const { t } = useTranslation();
-  const { isLoading } = useEvaluationData();
+  const { isLoading, currentSession } = useEvaluationData();
 
   const DEFAULT_EVALUATOR_GROUPS: EvaluatorGroup[] = [
     {
