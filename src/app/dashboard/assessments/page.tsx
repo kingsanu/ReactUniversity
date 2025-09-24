@@ -87,7 +87,7 @@ export default function AssessmentsPage() {
       if (selfGroup && selfGroup.id) {
         // Invalidate evaluation groups cache to refresh data
         invalidateSpecificAssessment(user?.id || "", "evaluation");
-        window.location.href = `/evaluation/evaluator?id=${selfGroup.id}`;
+        window.location.href = `/evaluation/evaluator?t=${selfGroup.id}`;
       } else {
         console.error(
           "Self evaluation group created but no ID received:",
