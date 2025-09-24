@@ -273,15 +273,21 @@ export function Question360Manager() {
   const filteredQuestions = (Array.isArray(questions) ? questions : []).filter(
     (question) => {
       // Relation Type filter
-      if (filters.relationType !== "all" && question.relationType !== filters.relationType) {
+      if (
+        filters.relationType !== "all" &&
+        question.relationType !== filters.relationType
+      ) {
         return false;
       }
-      
+
       // Category filter
-      if (filters.category !== "all" && question.category !== filters.category) {
+      if (
+        filters.category !== "all" &&
+        question.category !== filters.category
+      ) {
         return false;
       }
-      
+
       // Active status filter
       if (filters.isActive !== "all") {
         const isActive = filters.isActive === "true";
@@ -289,7 +295,7 @@ export function Question360Manager() {
           return false;
         }
       }
-      
+
       return true;
     }
   );
@@ -426,7 +432,11 @@ export function Question360Manager() {
               variant="ghost"
               size="sm"
               onClick={() =>
-                setFilters({ relationType: "all", category: "all", isActive: "all" })
+                setFilters({
+                  relationType: "all",
+                  category: "all",
+                  isActive: "all",
+                })
               }
               className="text-red-600 hover:text-red-700 h-auto p-0"
             >
