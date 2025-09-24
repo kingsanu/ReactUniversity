@@ -272,29 +272,34 @@ export function Question360Manager() {
   // Filter questions
   const filteredQuestions = (Array.isArray(questions) ? questions : []).filter(
     (question) => {
-      if (
-        filters.relationType &&
-        filters.relationType !== "all" &&
-        question.relationType !== filters.relationType
-      ) {
+      // Relation Type filter
+      if (filters.relationType !== "all" && question.relationType !== filters.relationType) {
         return false;
       }
-      if (
-        filters.category &&
-        filters.category !== "all" &&
-        question.category !== filters.category
-      ) {
+      
+      // Category filter
+      if (filters.category !== "all" && question.category !== filters.category) {
         return false;
       }
+      
+      // Active status filter
       if (filters.isActive !== "all") {
         const isActive = filters.isActive === "true";
         if (question.isActive !== isActive) {
           return false;
         }
       }
+      
       return true;
     }
   );
+
+  // Debug filter changes
+  useEffect(() => {
+    console.log("Filters changed:", filters);
+    console.log("Total questions:", questions.length);
+    console.log("Filtered questions:", filteredQuestions.length);
+  }, [filters, questions.length, filteredQuestions.length]);
 
   useEffect(() => {
     fetchQuestions();
@@ -413,15 +418,15 @@ export function Question360Manager() {
             </Select>
           </div>
         </div>
-        {(filters.relationType ||
-          filters.category ||
+        {(filters.relationType !== "all" ||
+          filters.category !== "all" ||
           filters.isActive !== "all") && (
           <div className="mt-3 pt-3 border-t border-gray-200 flex items-center justify-between">
             <Button
               variant="ghost"
               size="sm"
               onClick={() =>
-                setFilters({ relationType: "", category: "", isActive: "all" })
+                setFilters({ relationType: "all", category: "all", isActive: "all" })
               }
               className="text-red-600 hover:text-red-700 h-auto p-0"
             >
