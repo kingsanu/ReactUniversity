@@ -629,14 +629,16 @@ export default function EvaluatorPage() {
       console.log("Evaluator data:", evaluatorData); // Debug log to see evaluator data
 
       // Map API question structure to component expected structure
-      const mappedQuestions = questions.map((q: ApiQuestion, index: number) => ({
-        id: q.id || `q${index}`,
-        questionText: q.question,
-        questionType: "rating" as const, // Default to rating type
-        isRequired: false, // Default to not required
-        order: q.questionNumber || index + 1,
-        helpText: undefined, // Remove category display
-      }));
+      const mappedQuestions = questions.map(
+        (q: ApiQuestion, index: number) => ({
+          id: q.id || `q${index}`,
+          questionText: q.question,
+          questionType: "rating" as const, // Default to rating type
+          isRequired: false, // Default to not required
+          order: q.questionNumber || index + 1,
+          helpText: undefined, // Remove category display
+        })
+      );
 
       console.log("Mapped questions:", mappedQuestions); // Debug log to see mapped questions
 
@@ -878,8 +880,18 @@ export default function EvaluatorPage() {
             </CardDescription>
             <div className="text-center">
               <div className="inline-flex items-center px-4 py-2 bg-blue-50 rounded-lg border border-blue-200">
-                <svg className="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                <svg
+                  className="w-4 h-4 text-blue-600 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                  />
                 </svg>
                 <p className="text-sm text-blue-800 font-medium">
                   Please contact your administrator
