@@ -49,6 +49,70 @@ interface EvaluationGroup {
   isEvaluationCompleted: boolean;
 }
 
+// API Response interfaces
+interface ApiQuestion {
+  id: string;
+  question: string;
+  questionNumber: number;
+  category?: string;
+}
+
+interface ApiEvaluatorData {
+  evaluatorName: string;
+  evaluatorEmail: string;
+  relation: string;
+  groupType: string;
+  evaluatedUserId: string;
+  expiresAt: string;
+  isTokenUsed: boolean;
+  isEvaluationCompleted: boolean;
+  responseScale?: ResponseScale;
+  totalQuestions?: number;
+}
+
+interface ApiResponse {
+  success: boolean;
+  data?: {
+    questions: ApiQuestion[];
+    evaluatorData: ApiEvaluatorData;
+    responseScale?: ResponseScale;
+    totalQuestions?: number;
+  };
+  questions?: ApiQuestion[];
+  evaluatorData?: ApiEvaluatorData;
+  responseScale?: ResponseScale;
+  totalQuestions?: number;
+  message?: string;
+  errorMessage?: string;
+}
+
+interface ResponseScale {
+  minValue: number;
+  maxValue: number;
+  labels: Array<{
+    value: number;
+    label: string;
+  }>;
+}
+
+interface SubmitAnswer {
+  questionNumber: number;
+  questionText: string;
+  rating?: number;
+  comment: string;
+}
+
+interface SubmitData {
+  evaluationGroupId: string;
+  evaluatorEmail: string;
+  answers: SubmitAnswer[];
+  comment: string;
+}
+
+interface ErrorResponse {
+  message?: string;
+}
+
 interface EvaluationData {
   evaluationGroup: EvaluationGroup;
   questions: EvaluationQuestion[];
@@ -526,7 +590,7 @@ export default function EvaluatorPage() {
       const response = await fetch(
         `https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/evaluation/360evolutor/${groupId}`
       );
-      const data = await response.json();
+      const data: ApiResponse = await response.json();
 
       console.log("API Response:", data); // Debug log to see response structure
       console.log("Data object:", data.data); // Debug log to see what's inside data
@@ -544,19 +608,17 @@ export default function EvaluatorPage() {
       }
 
       // Handle different possible response structures
-      let questions = [];
-      let evaluatorData = null;
+      let questions: ApiQuestion[] = [];
+      let evaluatorData: ApiEvaluatorData | null = null;
 
       if (data.data && data.data.questions) {
         questions = data.data.questions;
-        evaluatorData = data.data;
+        evaluatorData = data.data.evaluatorData || null;
       } else if (data.data && Array.isArray(data.data)) {
-        questions = data.data;
+        questions = data.data as ApiQuestion[];
       } else if (data.questions) {
         questions = data.questions;
-        evaluatorData = data;
-      } else if (Array.isArray(data)) {
-        questions = data;
+        evaluatorData = data.evaluatorData || null;
       } else {
         console.error("Unexpected API response structure:", data);
         setError("Invalid response format from server");
@@ -567,7 +629,7 @@ export default function EvaluatorPage() {
       console.log("Evaluator data:", evaluatorData); // Debug log to see evaluator data
 
       // Map API question structure to component expected structure
-      const mappedQuestions = questions.map((q: any, index: number) => ({
+      const mappedQuestions = questions.map((q: ApiQuestion, index: number) => ({
         id: q.id || `q${index}`,
         questionText: q.question,
         questionType: "rating" as const, // Default to rating type
@@ -625,7 +687,7 @@ export default function EvaluatorPage() {
       if (mockEvaluationGroup.isEvaluationCompleted) {
         setAlreadySubmitted(true);
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Fetch error:", err);
       setError("Failed to load evaluation questions");
     } finally {
@@ -701,8 +763,8 @@ export default function EvaluatorPage() {
     setError(null);
 
     try {
-      const submitData = {
-        evaluationGroupId: token, // Use token directly as group ID
+      const submitData: SubmitData = {
+        evaluationGroupId: token || "", // Use token directly as group ID
         evaluatorEmail: evaluationData.evaluationGroup.evaluatorEmail, // Use actual email from API
         answers: Object.entries(responses).map(([questionId, response]) => {
           const question = evaluationData.questions.find(
@@ -734,10 +796,10 @@ export default function EvaluatorPage() {
       if (response.ok) {
         setSuccess(true);
       } else {
-        const errorData = await response.json();
+        const errorData: ErrorResponse = await response.json();
         setError(errorData.message || "Failed to submit evaluation");
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Submission error:", err);
       setError("Failed to submit evaluation. Please try again.");
     } finally {
