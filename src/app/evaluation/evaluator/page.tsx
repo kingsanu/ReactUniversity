@@ -871,7 +871,7 @@ export default function EvaluatorPage() {
       const submitData: SubmitData = {
         evaluationGroupId: token || "", // Use token directly as group ID
         evaluatorEmail:
-          user?.email || evaluationData.evaluationGroup.evaluatorEmail, // Use authenticated user's email, fallback to API response
+          evaluatorData?.evaluatorEmail || evaluationData.evaluationGroup.evaluatorEmail, // Use evaluator email from API response
         answers: Object.entries(responses).map(([questionId, response]) => {
           const question = evaluationData.questions.find(
             (q) => q.id === questionId
@@ -881,7 +881,7 @@ export default function EvaluatorPage() {
             question
           );
 
-          // Ensure we always have a question text, even if it's a fallback
+          // Use the English question text for submission (API expects English)
           let questionText = question?.questionText || "";
           if (!questionText || questionText.trim() === "") {
             questionText = `Question ${question?.order || questionId}`;
@@ -891,7 +891,7 @@ export default function EvaluatorPage() {
           return {
             questionNumber:
               question?.order || parseInt(questionId.replace("q", "")), // Use order field which maps to questionNumber
-            questionText: questionText,
+            questionText: questionText, // Always send English text to API
             rating: response.rating,
             comment: response.textResponse || "",
           };
@@ -1211,38 +1211,40 @@ export default function EvaluatorPage() {
           {/* <div className="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-3 md:mb-4">
             <Star className="w-6 h-6 md:w-8 md:h-8 text-white" />
           </div> */}
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-            360° Career Evaluation
-          </h1>
-          <p className="text-sm md:text-base text-gray-600 mb-4">
-            Help us understand career preferences and strengths
-          </p>
-
-          {/* Language Toggle */}
-          <div className="flex justify-center">
-            <div className="inline-flex rounded-lg border border-gray-200 bg-white p-1">
+          <div className="flex items-center justify-center gap-4 mb-2">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+              360° {language === "spanish" ? "Evaluación de Carrera" : "Career Evaluation"}
+            </h1>
+            
+            {/* Language Toggle - Compact */}
+            <div className="inline-flex rounded-md border border-gray-300 bg-white">
               <button
                 onClick={() => setLanguage("english")}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                className={`px-3 py-1 text-xs font-medium transition-colors ${
                   language === "english"
                     ? "bg-blue-500 text-white"
-                    : "text-gray-700 hover:text-gray-900"
+                    : "text-gray-700 hover:bg-gray-50"
                 }`}
               >
-                English
+                EN
               </button>
               <button
                 onClick={() => setLanguage("spanish")}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                className={`px-3 py-1 text-xs font-medium transition-colors ${
                   language === "spanish"
                     ? "bg-blue-500 text-white"
-                    : "text-gray-700 hover:text-gray-900"
+                    : "text-gray-700 hover:bg-gray-50"
                 }`}
               >
-                Español
+                ES
               </button>
             </div>
           </div>
+          <p className="text-sm md:text-base text-gray-600">
+            {language === "spanish" 
+              ? "Ayúdanos a comprender las preferencias y fortalezas profesionales"
+              : "Help us understand career preferences and strengths"}
+          </p>
         </motion.div>
 
         {/* Evaluator Information - Collapsible */}
@@ -1256,10 +1258,10 @@ export default function EvaluatorPage() {
             <div className="bg-white rounded-lg shadow-sm border">
               <button
                 onClick={() => setShowEvaluationDetails(!showEvaluationDetails)}
-                className="w-full flex items-center justify-between p-4 md:p-6 text-left hover:bg-gray-50 transition-colors"
+                className="w-full flex items-center justify-between p-3 md:p-4 text-left hover:bg-gray-50 transition-colors"
               >
-                <h2 className="text-lg font-semibold text-gray-900">
-                  Evaluation Details
+                <h2 className="text-base md:text-lg font-semibold text-gray-900">
+                  {language === "spanish" ? "Detalles de la Evaluación" : "Evaluation Details"}
                 </h2>
                 <ChevronDown
                   className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
@@ -1280,7 +1282,7 @@ export default function EvaluatorPage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div>
                           <span className="font-medium text-gray-700">
-                            Evaluator:
+                            {language === "spanish" ? "Evaluador:" : "Evaluator:"}
                           </span>{" "}
                           <span className="text-gray-900">
                             {evaluatorData.evaluatorName}
@@ -1288,7 +1290,7 @@ export default function EvaluatorPage() {
                         </div>
                         <div>
                           <span className="font-medium text-gray-700">
-                            Evaluating:
+                            {language === "spanish" ? "Evaluando a:" : "Evaluating:"}
                           </span>{" "}
                           <span className="text-gray-900">
                             {evaluatorData.evaluatedUserName}
@@ -1296,7 +1298,7 @@ export default function EvaluatorPage() {
                         </div>
                         <div>
                           <span className="font-medium text-gray-700">
-                            Relationship:
+                            {language === "spanish" ? "Relación:" : "Relationship:"}
                           </span>{" "}
                           <span className="text-gray-900">
                             {evaluatorData.relation}
@@ -1304,7 +1306,7 @@ export default function EvaluatorPage() {
                         </div>
                         <div>
                           <span className="font-medium text-gray-700">
-                            Group Type:
+                            {language === "spanish" ? "Tipo de Grupo:" : "Group Type:"}
                           </span>{" "}
                           <span className="text-gray-900">
                             {evaluatorData.groupType}
@@ -1313,7 +1315,7 @@ export default function EvaluatorPage() {
                         {evaluatorData.expiresAt && (
                           <div className="md:col-span-2">
                             <span className="font-medium text-gray-700">
-                              Expires:
+                              {language === "spanish" ? "Expira:" : "Expires:"}
                             </span>{" "}
                             <span className="text-gray-900">
                               {new Date(
@@ -1342,11 +1344,12 @@ export default function EvaluatorPage() {
             <div className="bg-white rounded-lg shadow-sm border p-4 md:p-6">
               <div className="flex justify-between items-center mb-3 md:mb-4">
                 <span className="text-sm font-medium text-gray-700">
-                  Question {currentStep + 1} of{" "}
-                  {evaluationData.questions.length}
+                  {language === "spanish" 
+                    ? `Pregunta ${currentStep + 1} de ${evaluationData.questions.length}`
+                    : `Question ${currentStep + 1} of ${evaluationData.questions.length}`}
                 </span>
                 <span className="text-sm text-gray-500">
-                  {Math.round(progress)}% Complete
+                  {Math.round(progress)}% {language === "spanish" ? "Completo" : "Complete"}
                 </span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2 md:h-3">
@@ -1398,7 +1401,7 @@ export default function EvaluatorPage() {
                         </span>
                       </div>
                       <span className="text-xs md:text-sm text-gray-500">
-                        Question
+                        {language === "spanish" ? "Pregunta" : "Question"}
                       </span>
                     </div>
                   </div>
@@ -1413,7 +1416,9 @@ export default function EvaluatorPage() {
                   {/* Rating Section */}
                   <div>
                     <Label className="text-sm md:text-base font-semibold text-gray-800 mb-2 md:mb-3 block">
-                      How much do you agree with the above statement?
+                      {language === "spanish" 
+                        ? "¿Qué tanto estás de acuerdo con la afirmación anterior?"
+                        : "How much do you agree with the above statement?"}
                     </Label>
 
                     {/* Rating Grid with Comments Button */}
@@ -1474,14 +1479,14 @@ export default function EvaluatorPage() {
                                 <>
                                   <Minus className="w-4 h-4 text-gray-500" />
                                   <span className="text-sm font-medium text-gray-600">
-                                    Hide Comments
+                                    {language === "spanish" ? "Ocultar Comentarios" : "Hide Comments"}
                                   </span>
                                 </>
                               ) : (
                                 <>
                                   <Plus className="w-4 h-4 text-blue-500" />
                                   <span className="text-sm font-medium text-gray-600">
-                                    Add Comments
+                                    {language === "spanish" ? "Agregar Comentarios" : "Add Comments"}
                                   </span>
                                 </>
                               )}
@@ -1506,11 +1511,15 @@ export default function EvaluatorPage() {
                           htmlFor={`text-${currentQuestion.id}`}
                           className="text-sm font-medium text-gray-600 mb-2 block"
                         >
-                          Additional comments (optional)
+                          {language === "spanish" 
+                            ? "Comentarios adicionales (opcional)"
+                            : "Additional comments (optional)"}
                         </Label>
                         <Textarea
                           id={`text-${currentQuestion.id}`}
-                          placeholder="Share any additional thoughts..."
+                          placeholder={language === "spanish" 
+                            ? "Comparte cualquier pensamiento adicional..."
+                            : "Share any additional thoughts..."}
                           value={
                             responses[currentQuestion.id]?.textResponse || ""
                           }
@@ -1553,7 +1562,9 @@ export default function EvaluatorPage() {
                 size="lg"
               >
                 <ChevronLeft className="w-4 h-4" />
-                <span className="hidden md:inline">Previous</span>
+                <span className="hidden md:inline">
+                  {language === "spanish" ? "Anterior" : "Previous"}
+                </span>
               </Button>
 
               {/* Progress Dots - Hidden on mobile, shown on desktop */}
@@ -1587,16 +1598,22 @@ export default function EvaluatorPage() {
                         <div className="w-4 h-4 flex items-center justify-center">
                           <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                         </div>
-                        <span className="hidden md:inline">Submitting...</span>
-                        <span className="md:hidden">Submit</span>
+                        <span className="hidden md:inline">
+                          {language === "spanish" ? "Enviando..." : "Submitting..."}
+                        </span>
+                        <span className="md:hidden">
+                          {language === "spanish" ? "Enviar" : "Submit"}
+                        </span>
                       </>
                     ) : (
                       <>
                         <CheckCircle className="w-4 h-4" />
                         <span className="hidden md:inline">
-                          Submit Evaluation
+                          {language === "spanish" ? "Enviar Evaluación" : "Submit Evaluation"}
                         </span>
-                        <span className="md:hidden">Submit</span>
+                        <span className="md:hidden">
+                          {language === "spanish" ? "Enviar" : "Submit"}
+                        </span>
                       </>
                     )}
                   </Button>
@@ -1606,8 +1623,12 @@ export default function EvaluatorPage() {
                     className="flex items-center justify-center space-x-2 w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 px-4 md:px-6"
                     size="lg"
                   >
-                    <span className="hidden md:inline">Next</span>
-                    <span className="md:hidden">Next</span>
+                    <span className="hidden md:inline">
+                      {language === "spanish" ? "Siguiente" : "Next"}
+                    </span>
+                    <span className="md:hidden">
+                      {language === "spanish" ? "Siguiente" : "Next"}
+                    </span>
                     <ChevronRight className="w-4 h-4" />
                   </Button>
                 )}
