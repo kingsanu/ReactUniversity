@@ -121,6 +121,7 @@ interface ResponseScale {
   labels: Array<{
     value: number;
     label: string;
+    labelSpanish?: string;
   }>;
 }
 
@@ -148,7 +149,7 @@ interface EvaluationData {
   responseScale: {
     minValue: number;
     maxValue: number;
-    labels: { value: number; label: string; description?: string }[];
+    labels: { value: number; label: string; labelSpanish?: string; description?: string }[];
   };
   totalQuestions: number;
 }
@@ -748,11 +749,31 @@ export default function EvaluatorPage() {
         minValue: 1,
         maxValue: 5,
         labels: [
-          { value: 1, label: "Not at all" },
-          { value: 2, label: "A little" },
-          { value: 3, label: "Somewhat" },
-          { value: 4, label: "Quite a lot" },
-          { value: 5, label: "Very much" },
+          { 
+            value: 1, 
+            label: "Not at all",
+            labelSpanish: "Para nada"
+          },
+          { 
+            value: 2, 
+            label: "A little",
+            labelSpanish: "Un poco"
+          },
+          { 
+            value: 3, 
+            label: "Somewhat",
+            labelSpanish: "Algo"
+          },
+          { 
+            value: 4, 
+            label: "Quite a lot",
+            labelSpanish: "Bastante"
+          },
+          { 
+            value: 5, 
+            label: "Very much",
+            labelSpanish: "Mucho"
+          },
         ],
       };
 
@@ -1481,7 +1502,9 @@ export default function EvaluatorPage() {
                                       className="text-blue-600"
                                     />
                                     <span className="flex-1 text-sm md:text-base font-medium text-gray-700">
-                                      {option.label}
+                                      {language === "spanish" && option.labelSpanish
+                                        ? option.labelSpanish
+                                        : option.label}
                                     </span>
                                   </label>
                                 </div>
