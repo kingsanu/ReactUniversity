@@ -52,9 +52,7 @@ interface EvaluationGroup {
 // API Response interfaces
 interface ApiQuestion {
   id?: string;
-  question?: string;
-  questionText?: string;
-  text?: string;
+  question: string;
   questionNumber: number;
   category?: string;
 }
@@ -631,30 +629,14 @@ export default function EvaluatorPage() {
       console.log("Evaluator data:", evaluatorData); // Debug log to see evaluator data
 
       // Map API question structure to component expected structure
-      const mappedQuestions = questions.map((q: ApiQuestion, index: number) => {
-        // Handle different possible field names for question text
-        const questionText =
-          q.question ||
-          q.questionText ||
-          q.text ||
-          `Question ${q.questionNumber || index + 1}`;
-
-        const mappedQuestion = {
-          id: q.id || `q${index}`,
-          questionText: questionText,
-          questionType: "rating" as const, // Default to rating type
-          isRequired: false, // Default to not required
-          order: q.questionNumber || index + 1,
-          helpText: undefined, // Remove category display
-        };
-        console.log(
-          `Debug - mapping question ${index}:`,
-          q,
-          "to:",
-          mappedQuestion
-        );
-        return mappedQuestion;
-      });
+      const mappedQuestions = questions.map((q: ApiQuestion, index: number) => ({
+        id: q.id || `q${index}`,
+        questionText: q.question,
+        questionType: "rating" as const, // Default to rating type
+        isRequired: false, // Default to not required
+        order: q.questionNumber || index + 1,
+        helpText: undefined, // Remove category display
+      }));
 
       console.log("Mapped questions:", mappedQuestions); // Debug log to see mapped questions
 
