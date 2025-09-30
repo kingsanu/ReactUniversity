@@ -629,14 +629,16 @@ export default function EvaluatorPage() {
       console.log("Evaluator data:", evaluatorData); // Debug log to see evaluator data
 
       // Map API question structure to component expected structure
-      const mappedQuestions = questions.map((q: ApiQuestion, index: number) => ({
-        id: q.id || `q${index}`,
-        questionText: q.question,
-        questionType: "rating" as const, // Default to rating type
-        isRequired: false, // Default to not required
-        order: q.questionNumber || index + 1,
-        helpText: undefined, // Remove category display
-      }));
+      const mappedQuestions = questions.map(
+        (q: ApiQuestion, index: number) => ({
+          id: q.id || `q${index}`,
+          questionText: q.question,
+          questionType: "rating" as const, // Default to rating type
+          isRequired: false, // Default to not required
+          order: q.questionNumber || index + 1,
+          helpText: undefined, // Remove category display
+        })
+      );
 
       console.log("Mapped questions:", mappedQuestions); // Debug log to see mapped questions
 
