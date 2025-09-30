@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import Lottie from "react-lottie";
+import { useGlobalStore } from "@/store/useGlobalStore";
 
 interface EvaluationQuestion {
   id: string;
@@ -58,25 +59,42 @@ interface ApiQuestion {
 }
 
 interface ApiEvaluatorData {
+  evolutorGroupId: string;
+  evaluatedUserId: string;
+  evaluatedUserEmail: string;
+  evaluatedUserName: string;
   evaluatorName: string;
   evaluatorEmail: string;
+  relationType: string;
   relation: string;
   groupType: string;
-  evaluatedUserId: string;
-  expiresAt: string;
-  isTokenUsed: boolean;
   isEvaluationCompleted: boolean;
+  totalQuestions: number;
+  limitedQuestions: number;
   responseScale?: ResponseScale;
-  totalQuestions?: number;
+  expiresAt?: string;
+  isTokenUsed?: boolean;
 }
 
 interface ApiResponse {
   success: boolean;
   data?: {
+    evolutorGroupId: string;
+    evaluatedUserId: string;
+    evaluatedUserEmail: string;
+    evaluatedUserName: string;
+    evaluatorName: string;
+    evaluatorEmail: string;
+    relationType: string;
+    relation: string;
+    groupType: string;
+    isEvaluationCompleted: boolean;
+    totalQuestions: number;
+    limitedQuestions: number;
     questions: ApiQuestion[];
-    evaluatorData: ApiEvaluatorData;
     responseScale?: ResponseScale;
-    totalQuestions?: number;
+    expiresAt?: string;
+    isTokenUsed?: boolean;
   };
   questions?: ApiQuestion[];
   evaluatorData?: ApiEvaluatorData;
@@ -127,12 +145,16 @@ interface EvaluationData {
 export default function EvaluatorPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { user } = useGlobalStore();
   const token = searchParams.get("t");
 
   const [isLoading, setIsLoading] = useState(true);
   const [isValidating, setIsValidating] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [evaluationData, setEvaluationData] = useState<EvaluationData | null>(
+    null
+  );
+  const [evaluatorData, setEvaluatorData] = useState<ApiEvaluatorData | null>(
     null
   );
   const [responses, setResponses] = useState<
@@ -612,13 +634,31 @@ export default function EvaluatorPage() {
       let evaluatorData: ApiEvaluatorData | null = null;
 
       if (data.data && data.data.questions) {
+        // Direct data.data structure with all evaluator info
         questions = data.data.questions;
-        evaluatorData = data.data.evaluatorData || null;
-      } else if (data.data && Array.isArray(data.data)) {
-        questions = data.data as ApiQuestion[];
+        evaluatorData = {
+          evolutorGroupId: data.data.evolutorGroupId,
+          evaluatedUserId: data.data.evaluatedUserId,
+          evaluatedUserEmail: data.data.evaluatedUserEmail,
+          evaluatedUserName: data.data.evaluatedUserName,
+          evaluatorName: data.data.evaluatorName,
+          evaluatorEmail: data.data.evaluatorEmail,
+          relationType: data.data.relationType,
+          relation: data.data.relation,
+          groupType: data.data.groupType,
+          isEvaluationCompleted: data.data.isEvaluationCompleted,
+          totalQuestions: data.data.totalQuestions,
+          limitedQuestions: data.data.limitedQuestions,
+          responseScale: data.data.responseScale,
+          expiresAt: data.data.expiresAt,
+          isTokenUsed: data.data.isTokenUsed
+        };
       } else if (data.questions) {
+        // Fallback for old structure
         questions = data.questions;
         evaluatorData = data.evaluatorData || null;
+      } else if (data.data && Array.isArray(data.data)) {
+        questions = data.data as ApiQuestion[];
       } else {
         console.error("Unexpected API response structure:", data);
         setError("Invalid response format from server");
@@ -684,6 +724,9 @@ export default function EvaluatorPage() {
           data.totalQuestions ||
           mappedQuestions.length,
       });
+
+      // Set evaluator data for display
+      setEvaluatorData(evaluatorData);
 
       // Check if evaluation is already completed
       if (mockEvaluationGroup.isEvaluationCompleted) {
@@ -770,7 +813,7 @@ export default function EvaluatorPage() {
     try {
       const submitData: SubmitData = {
         evaluationGroupId: token || "", // Use token directly as group ID
-        evaluatorEmail: evaluationData.evaluationGroup.evaluatorEmail, // Use actual email from API
+        evaluatorEmail: user?.email || evaluationData.evaluationGroup.evaluatorEmail, // Use authenticated user's email, fallback to API response
         answers: Object.entries(responses).map(([questionId, response]) => {
           const question = evaluationData.questions.find(
             (q) => q.id === questionId
@@ -1117,6 +1160,48 @@ export default function EvaluatorPage() {
             Help us understand career preferences and strengths
           </p>
         </motion.div>
+
+        {/* Evaluator Information */}
+        {evaluatorData && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="mb-6 md:mb-8"
+          >
+            <div className="bg-white rounded-lg shadow-sm border p-4 md:p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-3">
+                Evaluation Details
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="font-medium text-gray-700">Evaluator:</span>{" "}
+                  <span className="text-gray-900">{evaluatorData.evaluatorName}</span>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-700">Evaluating:</span>{" "}
+                  <span className="text-gray-900">{evaluatorData.evaluatedUserName}</span>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-700">Relationship:</span>{" "}
+                  <span className="text-gray-900">{evaluatorData.relation}</span>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-700">Group Type:</span>{" "}
+                  <span className="text-gray-900">{evaluatorData.groupType}</span>
+                </div>
+                {evaluatorData.expiresAt && (
+                  <div className="md:col-span-2">
+                    <span className="font-medium text-gray-700">Expires:</span>{" "}
+                    <span className="text-gray-900">
+                      {new Date(evaluatorData.expiresAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         {/* Progress Bar */}
         {evaluationData && (
