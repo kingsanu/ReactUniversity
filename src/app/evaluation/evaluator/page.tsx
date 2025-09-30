@@ -20,6 +20,7 @@ import {
   CheckCircle,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Star,
   Plus,
   Minus,
@@ -31,10 +32,16 @@ import { useGlobalStore } from "@/store/useGlobalStore";
 interface EvaluationQuestion {
   id: string;
   questionText: string;
+  questionTextSpanish?: string;
   questionType: "rating" | "open_ended" | "both";
   isRequired: boolean;
   order: number;
   helpText?: string;
+  hasRealQuestionText?: boolean;
+  category?: string;
+  relationType?: string;
+  isSubQuestion?: boolean;
+  parentQuestionId?: string | null;
 }
 
 interface EvaluationGroup {
@@ -53,9 +60,13 @@ interface EvaluationGroup {
 // API Response interfaces
 interface ApiQuestion {
   id?: string;
-  question: string;
+  questionEnglishText: string;
+  questionSpanishText?: string;
   questionNumber: number;
   category?: string;
+  relationType?: string;
+  isSubQuestion?: boolean;
+  parentQuestionId?: string | null;
 }
 
 interface ApiEvaluatorData {
@@ -166,6 +177,8 @@ export default function EvaluatorPage() {
   const [direction, setDirection] = useState(0);
   const [showComments, setShowComments] = useState(false);
   const [alreadySubmitted, setAlreadySubmitted] = useState(false);
+  const [showEvaluationDetails, setShowEvaluationDetails] = useState(false);
+  const [language, setLanguage] = useState<'english' | 'spanish'>('english');
 
   // Lottie animation options
   const successAnimationOptions = {
@@ -666,19 +679,43 @@ export default function EvaluatorPage() {
       }
 
       console.log("Extracted questions:", questions); // Debug log to see extracted questions
+      console.log("First question object:", questions[0]); // Debug log to see actual question structure
       console.log("Evaluator data:", evaluatorData); // Debug log to see evaluator data
 
       // Map API question structure to component expected structure
       const mappedQuestions = questions.map(
-        (q: ApiQuestion, index: number) => ({
-          id: q.id || `q${index}`,
-          questionText: q.question,
-          questionType: "rating" as const, // Default to rating type
-          isRequired: false, // Default to not required
-          order: q.questionNumber || index + 1,
-          helpText: undefined, // Remove category display
-        })
+        (q: ApiQuestion, index: number) => {
+          console.log(`Question ${index}:`, q); // Debug each question
+          const questionText = q.questionEnglishText || `Question ${q.questionNumber || index + 1}`;
+
+          // Check if we have actual question text (not just generic fallback)
+          const hasRealQuestionText = !!(q.questionEnglishText && q.questionEnglishText.trim() !== '' && !q.questionEnglishText.startsWith('Question '));
+
+          return {
+            id: q.id || `q${index}`,
+            questionText: questionText,
+            questionTextSpanish: q.questionSpanishText,
+            questionType: "rating" as const, // Default to rating type
+            isRequired: false, // Default to not required
+            order: q.questionNumber || index + 1,
+            helpText: undefined, // Remove category display
+            hasRealQuestionText, // Flag to track if we have real question text
+            category: q.category,
+            relationType: q.relationType,
+            isSubQuestion: q.isSubQuestion,
+            parentQuestionId: q.parentQuestionId,
+          };
+        }
       );
+
+      // Check if any questions have real text
+      const hasAnyRealQuestions = mappedQuestions.some(q => q.hasRealQuestionText);
+
+      if (!hasAnyRealQuestions && questions.length > 0) {
+        console.warn("API returned questions but without actual question text content");
+        setError("The evaluation questions are not properly configured. Please contact your administrator.");
+        return;
+      }
 
       console.log("Mapped questions:", mappedQuestions); // Debug log to see mapped questions
 
@@ -789,6 +826,13 @@ export default function EvaluatorPage() {
       evaluationData.questions.length === 0
     ) {
       setError("No evaluation data available");
+      return;
+    }
+
+    // Check if questions have real content
+    const questionsWithoutRealText = evaluationData.questions.filter(q => !q.hasRealQuestionText);
+    if (questionsWithoutRealText.length > 0) {
+      setError("Some evaluation questions are not properly configured. Please contact your administrator.");
       return;
     }
 
@@ -1157,12 +1201,38 @@ export default function EvaluatorPage() {
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
             360° Career Evaluation
           </h1>
-          <p className="text-sm md:text-base text-gray-600">
+          <p className="text-sm md:text-base text-gray-600 mb-4">
             Help us understand career preferences and strengths
           </p>
+
+          {/* Language Toggle */}
+          <div className="flex justify-center">
+            <div className="inline-flex rounded-lg border border-gray-200 bg-white p-1">
+              <button
+                onClick={() => setLanguage('english')}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  language === 'english'
+                    ? 'bg-blue-500 text-white'
+                    : 'text-gray-700 hover:text-gray-900'
+                }`}
+              >
+                English
+              </button>
+              <button
+                onClick={() => setLanguage('spanish')}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  language === 'spanish'
+                    ? 'bg-blue-500 text-white'
+                    : 'text-gray-700 hover:text-gray-900'
+                }`}
+              >
+                Español
+              </button>
+            </div>
+          </div>
         </motion.div>
 
-        {/* Evaluator Information */}
+        {/* Evaluator Information - Collapsible */}
         {evaluatorData && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -1170,46 +1240,70 @@ export default function EvaluatorPage() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="mb-6 md:mb-8"
           >
-            <div className="bg-white rounded-lg shadow-sm border p-4 md:p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-3">
-                Evaluation Details
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="font-medium text-gray-700">Evaluator:</span>{" "}
-                  <span className="text-gray-900">
-                    {evaluatorData.evaluatorName}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Evaluating:</span>{" "}
-                  <span className="text-gray-900">
-                    {evaluatorData.evaluatedUserName}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">
-                    Relationship:
-                  </span>{" "}
-                  <span className="text-gray-900">
-                    {evaluatorData.relation}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Group Type:</span>{" "}
-                  <span className="text-gray-900">
-                    {evaluatorData.groupType}
-                  </span>
-                </div>
-                {evaluatorData.expiresAt && (
-                  <div className="md:col-span-2">
-                    <span className="font-medium text-gray-700">Expires:</span>{" "}
-                    <span className="text-gray-900">
-                      {new Date(evaluatorData.expiresAt).toLocaleDateString()}
-                    </span>
-                  </div>
+            <div className="bg-white rounded-lg shadow-sm border">
+              <button
+                onClick={() => setShowEvaluationDetails(!showEvaluationDetails)}
+                className="w-full flex items-center justify-between p-4 md:p-6 text-left hover:bg-gray-50 transition-colors"
+              >
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Evaluation Details
+                </h2>
+                <ChevronDown
+                  className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
+                    showEvaluationDetails ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
+              <AnimatePresence>
+                {showEvaluationDetails && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="px-4 md:px-6 pb-4 md:pb-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="font-medium text-gray-700">Evaluator:</span>{" "}
+                          <span className="text-gray-900">
+                            {evaluatorData.evaluatorName}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="font-medium text-gray-700">Evaluating:</span>{" "}
+                          <span className="text-gray-900">
+                            {evaluatorData.evaluatedUserName}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="font-medium text-gray-700">
+                            Relationship:
+                          </span>{" "}
+                          <span className="text-gray-900">
+                            {evaluatorData.relation}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="font-medium text-gray-700">Group Type:</span>{" "}
+                          <span className="text-gray-900">
+                            {evaluatorData.groupType}
+                          </span>
+                        </div>
+                        {evaluatorData.expiresAt && (
+                          <div className="md:col-span-2">
+                            <span className="font-medium text-gray-700">Expires:</span>{" "}
+                            <span className="text-gray-900">
+                              {new Date(evaluatorData.expiresAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
                 )}
-              </div>
+              </AnimatePresence>
             </div>
           </motion.div>
         )}
@@ -1286,7 +1380,9 @@ export default function EvaluatorPage() {
                     </div>
                   </div>
                   <CardTitle className="text-lg md:text-xl leading-relaxed  text-gray-900">
-                    {currentQuestion.questionText}
+                    {language === 'spanish' && currentQuestion.questionTextSpanish
+                      ? currentQuestion.questionTextSpanish
+                      : currentQuestion.questionText}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4 md:space-y-6 ">
