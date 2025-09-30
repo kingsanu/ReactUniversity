@@ -51,8 +51,10 @@ interface EvaluationGroup {
 
 // API Response interfaces
 interface ApiQuestion {
-  id: string;
-  question: string;
+  id?: string;
+  question?: string;
+  questionText?: string;
+  text?: string;
   questionNumber: number;
   category?: string;
 }
@@ -630,14 +632,21 @@ export default function EvaluatorPage() {
 
       // Map API question structure to component expected structure
       const mappedQuestions = questions.map(
-        (q: ApiQuestion, index: number) => ({
-          id: q.id || `q${index}`,
-          questionText: q.question,
-          questionType: "rating" as const, // Default to rating type
-          isRequired: false, // Default to not required
-          order: q.questionNumber || index + 1,
-          helpText: undefined, // Remove category display
-        })
+        (q: ApiQuestion, index: number) => {
+          // Handle different possible field names for question text
+          const questionText = q.question || q.questionText || q.text || `Question ${q.questionNumber || index + 1}`;
+          
+          const mappedQuestion = {
+            id: q.id || `q${index}`,
+            questionText: questionText,
+            questionType: "rating" as const, // Default to rating type
+            isRequired: false, // Default to not required
+            order: q.questionNumber || index + 1,
+            helpText: undefined, // Remove category display
+          };
+          console.log(`Debug - mapping question ${index}:`, q, "to:", mappedQuestion);
+          return mappedQuestion;
+        }
       );
 
       console.log("Mapped questions:", mappedQuestions); // Debug log to see mapped questions
@@ -764,6 +773,9 @@ export default function EvaluatorPage() {
     setIsSubmitting(true);
     setError(null);
 
+    console.log("Debug - evaluationData.questions:", evaluationData.questions);
+    console.log("Debug - responses:", responses);
+
     try {
       const submitData: SubmitData = {
         evaluationGroupId: token || "", // Use token directly as group ID
@@ -772,10 +784,19 @@ export default function EvaluatorPage() {
           const question = evaluationData.questions.find(
             (q) => q.id === questionId
           );
+          console.log(`Debug - questionId: ${questionId}, question found:`, question);
+          
+          // Ensure we always have a question text, even if it's a fallback
+          let questionText = question?.questionText || "";
+          if (!questionText || questionText.trim() === "") {
+            questionText = `Question ${question?.order || questionId}`;
+          }
+          
+          console.log(`Debug - questionText for ${questionId}:`, questionText);
           return {
             questionNumber:
               question?.order || parseInt(questionId.replace("q", "")), // Use order field which maps to questionNumber
-            questionText: question?.questionText || "",
+            questionText: questionText,
             rating: response.rating,
             comment: response.textResponse || "",
           };
