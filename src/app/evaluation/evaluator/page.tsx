@@ -651,7 +651,7 @@ export default function EvaluatorPage() {
           limitedQuestions: data.data.limitedQuestions,
           responseScale: data.data.responseScale,
           expiresAt: data.data.expiresAt,
-          isTokenUsed: data.data.isTokenUsed
+          isTokenUsed: data.data.isTokenUsed,
         };
       } else if (data.questions) {
         // Fallback for old structure
@@ -813,7 +813,8 @@ export default function EvaluatorPage() {
     try {
       const submitData: SubmitData = {
         evaluationGroupId: token || "", // Use token directly as group ID
-        evaluatorEmail: user?.email || evaluationData.evaluationGroup.evaluatorEmail, // Use authenticated user's email, fallback to API response
+        evaluatorEmail:
+          user?.email || evaluationData.evaluationGroup.evaluatorEmail, // Use authenticated user's email, fallback to API response
         answers: Object.entries(responses).map(([questionId, response]) => {
           const question = evaluationData.questions.find(
             (q) => q.id === questionId
@@ -1176,19 +1177,29 @@ export default function EvaluatorPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="font-medium text-gray-700">Evaluator:</span>{" "}
-                  <span className="text-gray-900">{evaluatorData.evaluatorName}</span>
+                  <span className="text-gray-900">
+                    {evaluatorData.evaluatorName}
+                  </span>
                 </div>
                 <div>
                   <span className="font-medium text-gray-700">Evaluating:</span>{" "}
-                  <span className="text-gray-900">{evaluatorData.evaluatedUserName}</span>
+                  <span className="text-gray-900">
+                    {evaluatorData.evaluatedUserName}
+                  </span>
                 </div>
                 <div>
-                  <span className="font-medium text-gray-700">Relationship:</span>{" "}
-                  <span className="text-gray-900">{evaluatorData.relation}</span>
+                  <span className="font-medium text-gray-700">
+                    Relationship:
+                  </span>{" "}
+                  <span className="text-gray-900">
+                    {evaluatorData.relation}
+                  </span>
                 </div>
                 <div>
                   <span className="font-medium text-gray-700">Group Type:</span>{" "}
-                  <span className="text-gray-900">{evaluatorData.groupType}</span>
+                  <span className="text-gray-900">
+                    {evaluatorData.groupType}
+                  </span>
                 </div>
                 {evaluatorData.expiresAt && (
                   <div className="md:col-span-2">
