@@ -274,7 +274,6 @@ export default function PCAAssessmentPage() {
             <h2 className="text-xl font-semibold text-gray-900 mb-6">
               Assessment Configuration
             </h2>
-
             {/* Language Selection */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -324,8 +323,7 @@ export default function PCAAssessmentPage() {
                 </button>
               </div>
             </div>
-
-            {/* JCA Selection */}
+            {/* JCA Selection
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-3">
                 Select Job Competency Analysis (JCA)
@@ -343,8 +341,7 @@ export default function PCAAssessmentPage() {
                   </option>
                 ))}
               </select>
-            </div>
-
+            </div> */}
             {/* Start Button */}
             <button
               onClick={handleStartAssessment}

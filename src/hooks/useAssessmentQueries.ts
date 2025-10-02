@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getUserAssessmentProgress, getDashboardAssessmentSummary, AssessmentOverallProgress } from '@/services/assessmentProgressService';
 import { getUserExamHistory, getAllUserExamResults } from '@/services/milService';
 import { getUserEvaluationGroups } from '@/services/evaluationService';
+import { useGlobalStore } from '@/store/useGlobalStore';
 
 // Query Keys
 export const assessmentKeys = {
@@ -18,9 +19,10 @@ export const assessmentKeys = {
 
 // Assessment Progress Hook
 export function useAssessmentProgress(userId: string) {
+  const { language } = useGlobalStore();
   return useQuery({
     queryKey: assessmentKeys.progress(userId),
-    queryFn: () => getUserAssessmentProgress(userId),
+    queryFn: () => getUserAssessmentProgress(userId, language),
     enabled: !!userId,
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000, // 5 minutes
@@ -31,9 +33,10 @@ export function useAssessmentProgress(userId: string) {
 
 // Dashboard Assessment Summary Hook
 export function useDashboardAssessmentSummary(userId: string) {
+  const { language } = useGlobalStore();
   return useQuery({
     queryKey: assessmentKeys.dashboardSummary(userId),
-    queryFn: () => getDashboardAssessmentSummary(userId),
+    queryFn: () => getDashboardAssessmentSummary(userId, language),
     enabled: !!userId,
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000, // 5 minutes
@@ -44,9 +47,10 @@ export function useDashboardAssessmentSummary(userId: string) {
 
 // MIL History Hook
 export function useMILHistory(userId: string) {
+  const { language } = useGlobalStore();
   return useQuery({
     queryKey: assessmentKeys.milHistory(userId),
-    queryFn: () => getUserExamHistory(userId),
+    queryFn: () => getUserExamHistory(userId, language),
     enabled: !!userId,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
@@ -54,18 +58,20 @@ export function useMILHistory(userId: string) {
 
 // All MIL Results Hook
 export function useAllMILResults() {
+  const { language } = useGlobalStore();
   return useQuery({
     queryKey: assessmentKeys.milResults(),
-    queryFn: getAllUserExamResults,
+    queryFn: () => getAllUserExamResults(language),
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
 }
 
 // Evaluation Groups Hook
 export function useEvaluationGroups(userId: string) {
+  const { language } = useGlobalStore();
   return useQuery({
     queryKey: assessmentKeys.evaluationGroups(userId),
-    queryFn: () => getUserEvaluationGroups(userId),
+    queryFn: () => getUserEvaluationGroups(userId, language),
     enabled: !!userId,
     staleTime: 3 * 60 * 1000, // 3 minutes
   });
@@ -73,9 +79,10 @@ export function useEvaluationGroups(userId: string) {
 
 // Enhanced LIA Data Hook
 export function useEnhancedLIAData(userId: string) {
+  const { language } = useGlobalStore();
   return useQuery({
     queryKey: assessmentKeys.enhancedLIA(userId),
-    queryFn: () => getUserExamHistory(userId),
+    queryFn: () => getUserExamHistory(userId, language),
     enabled: !!userId,
     staleTime: 2 * 60 * 1000, // 2 minutes
     retry: 1, // Enhanced data might not always be available
@@ -124,18 +131,19 @@ export function useInvalidateAssessments() {
 // Prefetch helpers
 export function usePrefetchAssessments() {
   const queryClient = useQueryClient();
+  const { language } = useGlobalStore();
   
   return {
     prefetchProgress: (userId: string) => 
       queryClient.prefetchQuery({
         queryKey: assessmentKeys.progress(userId),
-        queryFn: () => getUserAssessmentProgress(userId),
+        queryFn: () => getUserAssessmentProgress(userId, language),
         staleTime: 2 * 60 * 1000,
       }),
     prefetchMILHistory: (userId: string) => 
       queryClient.prefetchQuery({
         queryKey: assessmentKeys.milHistory(userId),
-        queryFn: () => getUserExamHistory(userId),
+        queryFn: () => getUserExamHistory(userId, language),
         staleTime: 5 * 60 * 1000,
       }),
   };

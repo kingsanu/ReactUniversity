@@ -454,10 +454,12 @@ const API_BASE_URL =
  * Get user evaluation groups and progress
  */
 export async function getUserEvaluationGroups(
-  userId: string
+  userId: string,
+  language: "english" | "spanish" = "english"
 ): Promise<EvaluationGroupWithId[]> {
+  const langParam = language === "spanish" ? "sp" : "en";
   try {
-    const response = await fetch(`${API_BASE_URL}/evaluation/user/${userId}`, {
+    const response = await fetch(`${API_BASE_URL}/evaluation/user/${userId}?lang=${langParam}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -809,7 +811,8 @@ export function validatePhoneNumber(phone: string): {
  */
 export async function checkDuplicateEvaluator(
   email: string,
-  phone: string
+  phone: string,
+  language: "english" | "spanish" = "english"
 ): Promise<{
   isDuplicate: boolean;
   duplicateField?: "email" | "phone" | "both";
@@ -822,9 +825,10 @@ export async function checkDuplicateEvaluator(
 }> {
   try {
     const params = new URLSearchParams({ email, phone });
+    const langParam = language === "spanish" ? "sp" : "en";
 
     const response = await fetch(
-      `${API_BASE_URL}/evaluation/check-duplicate?${params.toString()}`,
+      `${API_BASE_URL}/evaluation/check-duplicate?${params.toString()}&lang=${langParam}`,
       {
         method: "GET",
         headers: {
@@ -848,7 +852,7 @@ export async function checkDuplicateEvaluator(
 /**
  * Validate evaluation invitation token with enhanced validation
  */
-export async function validateEvaluationToken(token: string): Promise<{
+export async function validateEvaluationToken(token: string, language: "english" | "spanish" = "english"): Promise<{
   isValid: boolean;
   evaluatorName?: string;
   evaluatorEmail?: string;
@@ -861,8 +865,9 @@ export async function validateEvaluationToken(token: string): Promise<{
   error?: string;
 }> {
   try {
+    const langParam = language === "spanish" ? "sp" : "en";
     const response = await fetch(
-      `${API_BASE_URL}/evaluation/validate-token?token=${token}`,
+      `${API_BASE_URL}/evaluation/validate-token?token=${token}&lang=${langParam}`,
       {
         method: "GET",
         headers: {
@@ -944,10 +949,12 @@ export function getUserEvaluationProgressSummary(
  * Create a new 360-degree evaluation session
  */
 export async function createEvaluationSession(
-  sessionData: Partial<EvaluationSession>
+  sessionData: Partial<EvaluationSession>,
+  language: "english" | "spanish" = "english"
 ): Promise<EvaluationSession> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/evaluation/sessions`, {
+    const langParam = language === "spanish" ? "sp" : "en";
+    const response = await fetch(`${API_BASE_URL}/api/evaluation/sessions?lang=${langParam}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -972,10 +979,12 @@ export async function createEvaluationSession(
  * Note: This replaces the non-existent getEvaluationSessions function
  */
 export async function getUserEvaluationGroupsForSessions(
-  userId: string
+  userId: string,
+  language: "english" | "spanish" = "english"
 ): Promise<EvaluationGroupWithId[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/evaluation/user/${userId}`, {
+    const langParam = language === "spanish" ? "sp" : "en";
+    const response = await fetch(`${API_BASE_URL}/evaluation/user/${userId}?lang=${langParam}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -1007,11 +1016,13 @@ export async function getEvaluationSessions(): Promise<EvaluationSession[]> {
  * Get a specific evaluation session by ID
  */
 export async function getEvaluationSession(
-  sessionId: string
+  sessionId: string,
+  language: "english" | "spanish" = "english"
 ): Promise<EvaluationSession> {
   try {
+    const langParam = language === "spanish" ? "sp" : "en";
     const response = await fetch(
-      `${API_BASE_URL}/api/evaluation/sessions/${sessionId}`,
+      `${API_BASE_URL}/api/evaluation/sessions/${sessionId}?lang=${langParam}`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -1035,11 +1046,13 @@ export async function getEvaluationSession(
  */
 export async function addEvaluators(
   sessionId: string,
-  evaluators: Partial<Evaluator>[]
+  evaluators: Partial<Evaluator>[],
+  language: "english" | "spanish" = "english"
 ): Promise<Evaluator[]> {
   try {
+    const langParam = language === "spanish" ? "sp" : "en";
     const response = await fetch(
-      `${API_BASE_URL}/api/evaluation/sessions/${sessionId}/evaluators`,
+      `${API_BASE_URL}/api/evaluation/sessions/${sessionId}/evaluators?lang=${langParam}`,
       {
         method: "POST",
         headers: {
@@ -1066,11 +1079,13 @@ export async function addEvaluators(
  */
 export async function sendEvaluationInvitations(
   sessionId: string,
-  evaluatorIds: string[]
+  evaluatorIds: string[],
+  language: "english" | "spanish" = "english"
 ): Promise<EvaluationInvitation[]> {
   try {
+    const langParam = language === "spanish" ? "sp" : "en";
     const response = await fetch(
-      `${API_BASE_URL}/api/evaluation/sessions/${sessionId}/invitations`,
+      `${API_BASE_URL}/api/evaluation/sessions/${sessionId}/invitations?lang=${langParam}`,
       {
         method: "POST",
         headers: {
@@ -1098,11 +1113,13 @@ export async function sendEvaluationInvitations(
 export async function submitEvaluationResponses(
   sessionId: string,
   evaluatorToken: string,
-  responses: Partial<EvaluationResponse>[]
+  responses: Partial<EvaluationResponse>[],
+  language: "english" | "spanish" = "english"
 ): Promise<void> {
   try {
+    const langParam = language === "spanish" ? "sp" : "en";
     const response = await fetch(
-      `${API_BASE_URL}/api/evaluation/sessions/${sessionId}/responses`,
+      `${API_BASE_URL}/api/evaluation/sessions/${sessionId}/responses?lang=${langParam}`,
       {
         method: "POST",
         headers: {
@@ -1126,11 +1143,13 @@ export async function submitEvaluationResponses(
  * Get evaluation report
  */
 export async function getEvaluationReport(
-  sessionId: string
+  sessionId: string,
+  language: "english" | "spanish" = "english"
 ): Promise<EvaluationReport> {
   try {
+    const langParam = language === "spanish" ? "sp" : "en";
     const response = await fetch(
-      `${API_BASE_URL}/api/evaluation/sessions/${sessionId}/report`,
+      `${API_BASE_URL}/api/evaluation/sessions/${sessionId}/report?lang=${langParam}`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,

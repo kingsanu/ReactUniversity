@@ -167,9 +167,10 @@ const API_BASE_URL =
 /**
  * Get all user exam results and progress
  */
-export async function getAllUserExamResults(): Promise<UserExamResult[]> {
+export async function getAllUserExamResults(language: "english" | "spanish" = "english"): Promise<UserExamResult[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/PCAExam/all-results`, {
+    const langParam = language === "spanish" ? "sp" : "en";
+    const response = await fetch(`${API_BASE_URL}/api/PCAExam/all-results?lang=${langParam}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -191,11 +192,13 @@ export async function getAllUserExamResults(): Promise<UserExamResult[]> {
  * Get user exam history for specific user (Enhanced API)
  */
 export async function getUserExamHistory(
-  userId: string
+  userId: string,
+  language: "english" | "spanish" = "english"
 ): Promise<EnhancedUserExamHistory> {
   try {
+    const langParam = language === "spanish" ? "sp" : "en";
     const response = await fetch(
-      `${API_BASE_URL}/api/PCAExam/history/${userId}`,
+      `${API_BASE_URL}/api/PCAExam/history/${userId}?lang=${langParam}`,
       {
         method: "GET",
         headers: {
@@ -289,9 +292,10 @@ export function getUserProgressSummary(
 /**
  * Get all available MIL exams
  */
-export async function getAllMILExams(): Promise<MILExamMetadata[]> {
+export async function getAllMILExams(language: "english" | "spanish" = "english"): Promise<MILExamMetadata[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/PCAExam/exams`, {
+    const langParam = language === "spanish" ? "sp" : "en";
+    const response = await fetch(`${API_BASE_URL}/api/PCAExam/exams?lang=${langParam}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -314,10 +318,11 @@ export async function getAllMILExams(): Promise<MILExamMetadata[]> {
 /**
  * Get specific MIL exam by ID
  */
-export async function getMILExamById(examId: MILExamId): Promise<MILExam> {
+export async function getMILExamById(examId: MILExamId, language: "english" | "spanish" = "english"): Promise<MILExam> {
   try {
+    const langParam = language === "spanish" ? "sp" : "en";
     const response = await fetch(
-      `${API_BASE_URL}/api/PCAExam/exams/${examId}`,
+      `${API_BASE_URL}/api/PCAExam/exams/${examId}?lang=${langParam}`,
       {
         method: "GET",
         headers: {
@@ -340,10 +345,11 @@ export async function getMILExamById(examId: MILExamId): Promise<MILExam> {
 /**
  * Start MIL exam session
  */
-export async function startMILExam(examId: MILExamId): Promise<MILExam> {
+export async function startMILExam(examId: MILExamId, language: "english" | "spanish" = "english"): Promise<MILExam> {
   try {
+    const langParam = language === "spanish" ? "sp" : "en";
     const response = await fetch(
-      `${API_BASE_URL}/api/PCAExam/exams/${examId}/start`,
+      `${API_BASE_URL}/api/PCAExam/exams/${examId}/start?lang=${langParam}`,
       {
         method: "POST",
         headers: {
@@ -367,10 +373,11 @@ export async function startMILExam(examId: MILExamId): Promise<MILExam> {
 /**
  * Get exam instructions
  */
-export async function getMILExamInstructions(examId: MILExamId): Promise<any> {
+export async function getMILExamInstructions(examId: MILExamId, language: "english" | "spanish" = "english"): Promise<any> {
   try {
+    const langParam = language === "spanish" ? "sp" : "en";
     const response = await fetch(
-      `${API_BASE_URL}/api/PCAExam/exams/${examId}/instructions`,
+      `${API_BASE_URL}/api/PCAExam/exams/${examId}/instructions?lang=${langParam}`,
       {
         method: "GET",
         headers: {
@@ -386,6 +393,24 @@ export async function getMILExamInstructions(examId: MILExamId): Promise<any> {
     return await response.json();
   } catch (error) {
     console.error("Get MIL Instructions Error:", error);
+
+    // Fallback to local instructions for pattern recognition and numeric velocity
+    if (examId === MIL_EXAMS.FEATURE_DETECTION) {
+      const { getPatternRecognitionInstructions } = await import("@/utils/milTestUtils");
+      return {
+        instructions: getPatternRecognitionInstructions(language),
+        timeLimit: 3,
+        examType: 1,
+      };
+    } else if (examId === MIL_EXAMS.NUMERICAL_SPEED_ACCURACY) {
+      const { getNumericVelocityInstructions } = await import("@/utils/milTestUtils");
+      return {
+        instructions: getNumericVelocityInstructions(language),
+        timeLimit: 4,
+        examType: 4,
+      };
+    }
+
     throw error;
   }
 }
@@ -395,7 +420,8 @@ export async function getMILExamInstructions(examId: MILExamId): Promise<any> {
  */
 export async function submitMILExam(
   session: MILSession,
-  userId: string
+  userId: string,
+  language: "english" | "spanish" = "english"
 ): Promise<any> {
   try {
     console.log("🚀 [LIA SUBMIT] Starting LIA exam submission...");
@@ -440,7 +466,8 @@ export async function submitMILExam(
     });
 
     const startTime = Date.now();
-    const response = await fetch(`${API_BASE_URL}/api/PCAExam/submit`, {
+    const langParam = language === "spanish" ? "sp" : "en";
+    const response = await fetch(`${API_BASE_URL}/api/PCAExam/submit?lang=${langParam}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -499,7 +526,8 @@ export async function submitMILExam(
  */
 export async function completeMILExam(
   session: MILSession,
-  userId: string
+  userId: string,
+  language: "english" | "spanish" = "english"
 ): Promise<any> {
   try {
     const examAnswers = session.answers.map((answer) => ({
@@ -519,7 +547,8 @@ export async function completeMILExam(
       answers: examAnswers,
     };
 
-    const response = await fetch(`${API_BASE_URL}/api/PCAExam/complete`, {
+    const langParam = language === "spanish" ? "sp" : "en";
+    const response = await fetch(`${API_BASE_URL}/api/PCAExam/complete?lang=${langParam}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

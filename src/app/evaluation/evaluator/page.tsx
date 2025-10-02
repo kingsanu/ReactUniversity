@@ -162,7 +162,7 @@ interface EvaluationData {
 export default function EvaluatorPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { user } = useGlobalStore();
+  const { user, language } = useGlobalStore();
   const token = searchParams.get("t");
 
   const [isLoading, setIsLoading] = useState(true);
@@ -184,7 +184,6 @@ export default function EvaluatorPage() {
   const [showComments, setShowComments] = useState(false);
   const [alreadySubmitted, setAlreadySubmitted] = useState(false);
   const [showEvaluationDetails, setShowEvaluationDetails] = useState(false);
-  const [language, setLanguage] = useState<"english" | "spanish">("english");
 
   // Lottie animation options
   const successAnimationOptions = {
@@ -628,8 +627,9 @@ export default function EvaluatorPage() {
   const fetchEvaluationQuestions = async (groupId: string) => {
     try {
       // Use the correct API endpoint from Postman collection - no authorization needed
+      const langParam = language === "spanish" ? "sp" : "en";
       const response = await fetch(
-        `https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/evaluation/360evolutor/${groupId}`
+        `https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/evaluation/360evolutor/${groupId}?lang=${langParam}`
       );
       const data: ApiResponse = await response.json();
 
@@ -927,8 +927,9 @@ export default function EvaluatorPage() {
       };
 
       // Submit to the correct feedback endpoint from Postman collection
+      const langParam = language === "spanish" ? "sp" : "en";
       const response = await fetch(
-        "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/evaluation/submit-feedback",
+        `https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/evaluation/submit-feedback?lang=${langParam}`,
         {
           method: "POST",
           headers: {
@@ -1245,30 +1246,6 @@ export default function EvaluatorPage() {
                 ? "Evaluación de Carrera"
                 : "Career Evaluation"}
             </h1>
-
-            {/* Language Toggle - Compact */}
-            <div className="inline-flex rounded-md border border-gray-300 bg-white">
-              <button
-                onClick={() => setLanguage("english")}
-                className={`px-3 py-1 text-xs font-medium transition-colors ${
-                  language === "english"
-                    ? "bg-blue-500 text-white"
-                    : "text-gray-700 hover:bg-gray-50"
-                }`}
-              >
-                EN
-              </button>
-              <button
-                onClick={() => setLanguage("spanish")}
-                className={`px-3 py-1 text-xs font-medium transition-colors ${
-                  language === "spanish"
-                    ? "bg-blue-500 text-white"
-                    : "text-gray-700 hover:bg-gray-50"
-                }`}
-              >
-                ES
-              </button>
-            </div>
           </div>
           <p className="text-sm md:text-base text-gray-600">
             {language === "spanish"

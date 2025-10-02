@@ -259,9 +259,10 @@ export async function getPCAVsJCAAnalysis(
 /**
  * Get PCA Result by UserId (Backend API)
  */
-export async function getPCAResultByUserId(userId: string): Promise<any> {
+export async function getPCAResultByUserId(userId: string, language: "english" | "spanish" = "english"): Promise<any> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/pcaapi/get-result`, {
+    const langParam = language === "spanish" ? "sp" : "en";
+    const response = await fetch(`${API_BASE_URL}/api/pcaapi/get-result?lang=${langParam}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -287,10 +288,12 @@ export async function getPCAResultByUserId(userId: string): Promise<any> {
  */
 export async function getPCACompetencesByUserId(
   userId: string,
-  cmpTims: "1" | "0" = "1"
+  cmpTims: "1" | "0" = "1",
+  language: "english" | "spanish" = "english"
 ): Promise<any> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/pcaapi/get-competences`, {
+    const langParam = language === "spanish" ? "sp" : "en";
+    const response = await fetch(`${API_BASE_URL}/api/pcaapi/get-competences?lang=${langParam}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -322,8 +325,9 @@ export async function addPCAEvaluation(
 ): Promise<PCAAssessmentResponse> {
   try {
     const coKey = language === "spanish" ? "NXDAPS" : "NXDAPI";
+    const langParam = language === "spanish" ? "sp" : "en";
 
-    const response = await fetch(`${API_BASE_URL}/api/pcaapi/add-evaluation`, {
+    const response = await fetch(`${API_BASE_URL}/api/pcaapi/add-evaluation?lang=${langParam}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -371,9 +375,10 @@ export async function addPCAEvaluation(
 /**
  * Get All PCA Evaluations (Backend API)
  */
-export async function getAllPCAEvaluations(): Promise<any> {
+export async function getAllPCAEvaluations(language: "english" | "spanish" = "english"): Promise<any> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/pcaapi/evaluations`, {
+    const langParam = language === "spanish" ? "sp" : "en";
+    const response = await fetch(`${API_BASE_URL}/api/pcaapi/evaluations?lang=${langParam}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -394,7 +399,7 @@ export async function getAllPCAEvaluations(): Promise<any> {
 /**
  * Check PCA Status by UserId
  */
-export async function checkPCAStatus(userId: string): Promise<{
+export async function checkPCAStatus(userId: string, language: "english" | "spanish" = "english"): Promise<{
   status: "not_started" | "in_progress" | "completed";
   pcaCod?: string;
   hasResults?: boolean;
@@ -402,7 +407,7 @@ export async function checkPCAStatus(userId: string): Promise<{
 }> {
   try {
     // First, check if user has any PCA evaluations
-    const allEvaluations = await getAllPCAEvaluations();
+    const allEvaluations = await getAllPCAEvaluations(language);
     console.log("All PCA Evaluations:", allEvaluations);
     console.log("User ID:", userId);
     const userEvaluation = allEvaluations.data.find(
@@ -416,7 +421,7 @@ export async function checkPCAStatus(userId: string): Promise<{
 
     // User has a PCA evaluation, check if they have results
     try {
-      const result = await getPCAResultByUserId(userId);
+      const result = await getPCAResultByUserId(userId, language);
       if (result && Object.keys(result).length > 0) {
         return {
           status: "completed",

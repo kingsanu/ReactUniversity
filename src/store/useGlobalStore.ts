@@ -63,6 +63,10 @@ interface GlobalState {
   theme: "light" | "dark";
   toggleTheme: () => void;
 
+  // Language
+  language: "english" | "spanish";
+  setLanguage: (language: "english" | "spanish") => void;
+
   // User Authentication
   user: {
     id: string | null;
@@ -132,6 +136,10 @@ export const useGlobalStore = create<GlobalState>()(
           set((state) => ({
             theme: state.theme === "light" ? "dark" : "light",
           })),
+
+        // Language
+        language: "english",
+        setLanguage: (language: "english" | "spanish") => set({ language }),
 
         // User
         user: {

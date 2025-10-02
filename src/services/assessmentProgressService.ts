@@ -43,7 +43,8 @@ export interface AssessmentOverallProgress {
  * Get comprehensive assessment progress for a user
  */
 export async function getUserAssessmentProgress(
-  userId: string
+  userId: string,
+  language: "english" | "spanish" = "english"
 ): Promise<AssessmentOverallProgress> {
   try {
     // Fetch LIA Assessment Progress
@@ -55,7 +56,7 @@ export async function getUserAssessmentProgress(
     try {
       // Try to get enhanced API data first
       try {
-        enhancedMilData = await getUserExamHistory(userId);
+        enhancedMilData = await getUserExamHistory(userId, language);
 
         if (enhancedMilData && enhancedMilData.examStatus.length > 0) {
           const completedExams = enhancedMilData.examStatus.filter(
@@ -115,7 +116,7 @@ export async function getUserAssessmentProgress(
         );
 
         // Fallback to legacy MIL data
-        const milResults = await getAllUserExamResults();
+        const milResults = await getAllUserExamResults(language);
         const userMilResults = milResults.filter(
           (r) => r.username === userId || r.sessionId.includes(userId)
         );
@@ -151,7 +152,7 @@ export async function getUserAssessmentProgress(
     let evaluationLastActivity: string | undefined;
 
     try {
-      evaluationGroups = await getUserEvaluationGroups(userId);
+      evaluationGroups = await getUserEvaluationGroups(userId, language);
       evaluationProgress = getUserEvaluationProgressSummary(evaluationGroups);
 
       if (evaluationGroups.length > 0) {
@@ -211,7 +212,7 @@ export async function getUserAssessmentProgress(
     let pcaCod = null;
 
     try {
-      const pcaData = await checkPCAStatus(userId);
+      const pcaData = await checkPCAStatus(userId, language);
       pcaStatus = pcaData.status;
       pcaProgress =
         pcaData.status === "completed"
@@ -276,9 +277,9 @@ export async function getUserAssessmentProgress(
 /**
  * Get assessment progress summary for dashboard
  */
-export async function getDashboardAssessmentSummary(userId: string) {
+export async function getDashboardAssessmentSummary(userId: string, language: "english" | "spanish" = "english") {
   try {
-    const progress = await getUserAssessmentProgress(userId);
+    const progress = await getUserAssessmentProgress(userId, language);
 
     return {
       // Overall progress
