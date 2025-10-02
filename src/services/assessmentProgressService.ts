@@ -277,7 +277,10 @@ export async function getUserAssessmentProgress(
 /**
  * Get assessment progress summary for dashboard
  */
-export async function getDashboardAssessmentSummary(userId: string, language: "english" | "spanish" = "english") {
+export async function getDashboardAssessmentSummary(
+  userId: string,
+  language: "english" | "spanish" = "english"
+) {
   try {
     const progress = await getUserAssessmentProgress(userId, language);
 

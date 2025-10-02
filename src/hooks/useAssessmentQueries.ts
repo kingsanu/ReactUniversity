@@ -1,20 +1,32 @@
-'use client';
+"use client";
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getUserAssessmentProgress, getDashboardAssessmentSummary, AssessmentOverallProgress } from '@/services/assessmentProgressService';
-import { getUserExamHistory, getAllUserExamResults } from '@/services/milService';
-import { getUserEvaluationGroups } from '@/services/evaluationService';
-import { useGlobalStore } from '@/store/useGlobalStore';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  getUserAssessmentProgress,
+  getDashboardAssessmentSummary,
+  AssessmentOverallProgress,
+} from "@/services/assessmentProgressService";
+import {
+  getUserExamHistory,
+  getAllUserExamResults,
+} from "@/services/milService";
+import { getUserEvaluationGroups } from "@/services/evaluationService";
+import { useGlobalStore } from "@/store/useGlobalStore";
 
 // Query Keys
 export const assessmentKeys = {
-  all: ['assessments'] as const,
-  progress: (userId: string) => [...assessmentKeys.all, 'progress', userId] as const,
-  dashboardSummary: (userId: string) => [...assessmentKeys.all, 'dashboard-summary', userId] as const,
-  milHistory: (userId: string) => [...assessmentKeys.all, 'mil-history', userId] as const,
-  milResults: () => [...assessmentKeys.all, 'mil-results'] as const,
-  evaluationGroups: (userId: string) => [...assessmentKeys.all, 'evaluation-groups', userId] as const,
-  enhancedLIA: (userId: string) => [...assessmentKeys.all, 'enhanced-lia', userId] as const,
+  all: ["assessments"] as const,
+  progress: (userId: string) =>
+    [...assessmentKeys.all, "progress", userId] as const,
+  dashboardSummary: (userId: string) =>
+    [...assessmentKeys.all, "dashboard-summary", userId] as const,
+  milHistory: (userId: string) =>
+    [...assessmentKeys.all, "mil-history", userId] as const,
+  milResults: () => [...assessmentKeys.all, "mil-results"] as const,
+  evaluationGroups: (userId: string) =>
+    [...assessmentKeys.all, "evaluation-groups", userId] as const,
+  enhancedLIA: (userId: string) =>
+    [...assessmentKeys.all, "enhanced-lia", userId] as const,
 };
 
 // Assessment Progress Hook
@@ -92,38 +104,72 @@ export function useEnhancedLIAData(userId: string) {
 // Invalidation helpers
 export function useInvalidateAssessments() {
   const queryClient = useQueryClient();
-  
+
   return {
-    invalidateAll: () => queryClient.invalidateQueries({ queryKey: assessmentKeys.all }),
+    invalidateAll: () =>
+      queryClient.invalidateQueries({ queryKey: assessmentKeys.all }),
     invalidateProgress: (userId: string) => {
-      queryClient.invalidateQueries({ queryKey: assessmentKeys.progress(userId) });
-      queryClient.invalidateQueries({ queryKey: assessmentKeys.dashboardSummary(userId) });
+      queryClient.invalidateQueries({
+        queryKey: assessmentKeys.progress(userId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: assessmentKeys.dashboardSummary(userId),
+      });
     },
     invalidateMILData: (userId: string) => {
-      queryClient.invalidateQueries({ queryKey: assessmentKeys.milHistory(userId) });
-      queryClient.invalidateQueries({ queryKey: assessmentKeys.enhancedLIA(userId) });
+      queryClient.invalidateQueries({
+        queryKey: assessmentKeys.milHistory(userId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: assessmentKeys.enhancedLIA(userId),
+      });
       queryClient.invalidateQueries({ queryKey: assessmentKeys.milResults() });
       // Also invalidate progress when MIL data changes
-      queryClient.invalidateQueries({ queryKey: assessmentKeys.progress(userId) });
-      queryClient.invalidateQueries({ queryKey: assessmentKeys.dashboardSummary(userId) });
+      queryClient.invalidateQueries({
+        queryKey: assessmentKeys.progress(userId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: assessmentKeys.dashboardSummary(userId),
+      });
     },
     invalidateEvaluations: (userId: string) => {
-      queryClient.invalidateQueries({ queryKey: assessmentKeys.evaluationGroups(userId) });
+      queryClient.invalidateQueries({
+        queryKey: assessmentKeys.evaluationGroups(userId),
+      });
       // Also invalidate progress when evaluation data changes
-      queryClient.invalidateQueries({ queryKey: assessmentKeys.progress(userId) });
-      queryClient.invalidateQueries({ queryKey: assessmentKeys.dashboardSummary(userId) });
+      queryClient.invalidateQueries({
+        queryKey: assessmentKeys.progress(userId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: assessmentKeys.dashboardSummary(userId),
+      });
     },
     // Selective invalidation for specific assessment types
-    invalidateAssessmentType: (userId: string, type: 'mil' | 'evaluation' | 'pca') => {
-      if (type === 'mil') {
-        queryClient.invalidateQueries({ queryKey: assessmentKeys.milHistory(userId) });
-        queryClient.invalidateQueries({ queryKey: assessmentKeys.enhancedLIA(userId) });
-        queryClient.invalidateQueries({ queryKey: assessmentKeys.milResults() });
-      } else if (type === 'evaluation') {
-        queryClient.invalidateQueries({ queryKey: assessmentKeys.evaluationGroups(userId) });
+    invalidateAssessmentType: (
+      userId: string,
+      type: "mil" | "evaluation" | "pca"
+    ) => {
+      if (type === "mil") {
+        queryClient.invalidateQueries({
+          queryKey: assessmentKeys.milHistory(userId),
+        });
+        queryClient.invalidateQueries({
+          queryKey: assessmentKeys.enhancedLIA(userId),
+        });
+        queryClient.invalidateQueries({
+          queryKey: assessmentKeys.milResults(),
+        });
+      } else if (type === "evaluation") {
+        queryClient.invalidateQueries({
+          queryKey: assessmentKeys.evaluationGroups(userId),
+        });
       }
-      queryClient.invalidateQueries({ queryKey: assessmentKeys.progress(userId) });
-      queryClient.invalidateQueries({ queryKey: assessmentKeys.dashboardSummary(userId) });
+      queryClient.invalidateQueries({
+        queryKey: assessmentKeys.progress(userId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: assessmentKeys.dashboardSummary(userId),
+      });
     },
   };
 }
@@ -132,15 +178,15 @@ export function useInvalidateAssessments() {
 export function usePrefetchAssessments() {
   const queryClient = useQueryClient();
   const { language } = useGlobalStore();
-  
+
   return {
-    prefetchProgress: (userId: string) => 
+    prefetchProgress: (userId: string) =>
       queryClient.prefetchQuery({
         queryKey: assessmentKeys.progress(userId),
         queryFn: () => getUserAssessmentProgress(userId, language),
         staleTime: 2 * 60 * 1000,
       }),
-    prefetchMILHistory: (userId: string) => 
+    prefetchMILHistory: (userId: string) =>
       queryClient.prefetchQuery({
         queryKey: assessmentKeys.milHistory(userId),
         queryFn: () => getUserExamHistory(userId, language),

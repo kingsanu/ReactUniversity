@@ -10,27 +10,52 @@ import {
 /**
  * Generate mock MIL exam data for testing
  */
-export function generateMockMILExam(examId: string, type: number = 1, language: "english" | "spanish" = "english"): MILExam {
+export function generateMockMILExam(
+  examId: string,
+  type: number = 1,
+  language: "english" | "spanish" = "english"
+): MILExam {
   const examTypes = {
     1: {
-      name: language === "spanish" ? "Reconocimiento de Patrones" : "Pattern Recognition",
-      description: language === "spanish" ? "Identificar pares de letras coincidentes" : "Identify matching letter pairs",
+      name:
+        language === "spanish"
+          ? "Reconocimiento de Patrones"
+          : "Pattern Recognition",
+      description:
+        language === "spanish"
+          ? "Identificar pares de letras coincidentes"
+          : "Identify matching letter pairs",
     },
     2: {
-      name: language === "spanish" ? "Razonamiento Verbal - Comparaciones" : "Verbal Reasoning",
-      description: language === "spanish" ? "Esta prueba evalúa la capacidad de comparar y ordenar características de diferentes individuos" : "Language comprehension tasks",
+      name:
+        language === "spanish"
+          ? "Razonamiento Verbal - Comparaciones"
+          : "Verbal Reasoning",
+      description:
+        language === "spanish"
+          ? "Esta prueba evalúa la capacidad de comparar y ordenar características de diferentes individuos"
+          : "Language comprehension tasks",
     },
-    3: { 
-      name: language === "spanish" ? "Memoria de Trabajo" : "Working Memory", 
-      description: language === "spanish" ? "Tareas de memoria y procesamiento" : "Memory and processing tasks" 
+    3: {
+      name: language === "spanish" ? "Memoria de Trabajo" : "Working Memory",
+      description:
+        language === "spanish"
+          ? "Tareas de memoria y procesamiento"
+          : "Memory and processing tasks",
     },
-    4: { 
-      name: language === "spanish" ? "Velocidad Numérica" : "Numeric Velocity", 
-      description: language === "spanish" ? "Tareas de aritmética rápida" : "Speed arithmetic tasks" 
+    4: {
+      name: language === "spanish" ? "Velocidad Numérica" : "Numeric Velocity",
+      description:
+        language === "spanish"
+          ? "Tareas de aritmética rápida"
+          : "Speed arithmetic tasks",
     },
-    5: { 
-      name: language === "spanish" ? "Rotación Visual" : "Visual Rotation", 
-      description: language === "spanish" ? "Tareas de razonamiento espacial" : "Spatial reasoning tasks" 
+    5: {
+      name: language === "spanish" ? "Rotación Visual" : "Visual Rotation",
+      description:
+        language === "spanish"
+          ? "Tareas de razonamiento espacial"
+          : "Spatial reasoning tasks",
     },
   };
 
@@ -42,10 +67,11 @@ export function generateMockMILExam(examId: string, type: number = 1, language: 
   for (let i = 1; i <= 60; i++) {
     if (type === 1) {
       // Pattern Recognition - Letter pairs
-      const questionText = language === "spanish" 
-        ? "Identifique cuántos de estos pares de letras son iguales (sin importar si una letra es mayúscula o minúscula)."
-        : "How many letter pairs match?";
-      
+      const questionText =
+        language === "spanish"
+          ? "Identifique cuántos de estos pares de letras son iguales (sin importar si una letra es mayúscula o minúscula)."
+          : "How many letter pairs match?";
+
       questions.push({
         questionNumber: i,
         questionText: questionText,
@@ -58,9 +84,10 @@ export function generateMockMILExam(examId: string, type: number = 1, language: 
             { topLetter: getRandomLetter(), bottomLetter: getRandomLetter() },
           ],
         },
-        explanation: language === "spanish"
-          ? "Cuente el número de pares de letras donde la letra superior y la inferior son iguales, sin importar mayúsculas o minúsculas."
-          : "Count the number of letter pairs where the top and bottom letters are the same.",
+        explanation:
+          language === "spanish"
+            ? "Cuente el número de pares de letras donde la letra superior y la inferior son iguales, sin importar mayúsculas o minúsculas."
+            : "Count the number of letter pairs where the top and bottom letters are the same.",
       });
     } else if (type === 2) {
       // Verbal Reasoning
@@ -85,15 +112,16 @@ export function generateMockMILExam(examId: string, type: number = 1, language: 
       }
     } else if (type === 4) {
       // Numeric Velocity - Find which extreme number is farther from the middle
-      const questionText = language === "spanish" 
-        ? "Encuentre el número más alto y el número más bajo entre los tres valores. Decida cuál de los extremos está más alejado del número intermedio."
-        : "Find the highest and lowest number among the three values. Decide which extreme is farther from the middle number.";
-      
+      const questionText =
+        language === "spanish"
+          ? "Encuentre el número más alto y el número más bajo entre los tres valores. Decida cuál de los extremos está más alejado del número intermedio."
+          : "Find the highest and lowest number among the three values. Decide which extreme is farther from the middle number.";
+
       // Generate three random numbers for the question
       const num1 = Math.floor(Math.random() * 30) + 1;
       const num2 = Math.floor(Math.random() * 30) + 1;
       const num3 = Math.floor(Math.random() * 30) + 1;
-      
+
       questions.push({
         questionNumber: i,
         questionText: questionText,
@@ -102,9 +130,10 @@ export function generateMockMILExam(examId: string, type: number = 1, language: 
           numbers: [num1, num2, num3],
           options: [`${num1}`, `${num2}`, `${num3}`],
         },
-        explanation: language === "spanish"
-          ? `Identifique el número más alto y más bajo entre ${num1}, ${num2}, ${num3}. Determine cuál extremo está más alejado del número intermedio.`
-          : `Identify the highest and lowest numbers among ${num1}, ${num2}, ${num3}. Determine which extreme is farther from the middle number.`,
+        explanation:
+          language === "spanish"
+            ? `Identifique el número más alto y más bajo entre ${num1}, ${num2}, ${num3}. Determine cuál extremo está más alejado del número intermedio.`
+            : `Identify the highest and lowest numbers among ${num1}, ${num2}, ${num3}. Determine which extreme is farther from the middle number.`,
       });
     } else {
       // Generic question for other types
@@ -134,20 +163,34 @@ export function generateMockMILExam(examId: string, type: number = 1, language: 
 /**
  * Generate mock MIL exam metadata
  */
-export function generateMockMILExamMetadata(language: "english" | "spanish" = "english"): MILExamMetadata[] {
+export function generateMockMILExamMetadata(
+  language: "english" | "spanish" = "english"
+): MILExamMetadata[] {
   return [
     {
       id: "pattern-recognition-001",
-      name: language === "spanish" ? "Reconocimiento de Patrones" : "Pattern Recognition",
-      description: language === "spanish" ? "Identificar pares de letras coincidentes y patrones" : "Identify matching letter pairs and patterns",
+      name:
+        language === "spanish"
+          ? "Reconocimiento de Patrones"
+          : "Pattern Recognition",
+      description:
+        language === "spanish"
+          ? "Identificar pares de letras coincidentes y patrones"
+          : "Identify matching letter pairs and patterns",
       type: 1,
       timeLimitMinutes: 3,
       totalQuestions: 60,
     },
     {
       id: "verbal-reasoning-001",
-      name: language === "spanish" ? "Razonamiento Verbal - Comparaciones" : "Verbal Reasoning",
-      description: language === "spanish" ? "Esta prueba evalúa la capacidad de comparar y ordenar características de diferentes individuos" : "Language comprehension and analogies",
+      name:
+        language === "spanish"
+          ? "Razonamiento Verbal - Comparaciones"
+          : "Verbal Reasoning",
+      description:
+        language === "spanish"
+          ? "Esta prueba evalúa la capacidad de comparar y ordenar características de diferentes individuos"
+          : "Language comprehension and analogies",
       type: 2,
       timeLimitMinutes: 4,
       totalQuestions: 50,
@@ -155,7 +198,10 @@ export function generateMockMILExamMetadata(language: "english" | "spanish" = "e
     {
       id: "working-memory-001",
       name: language === "spanish" ? "Memoria de Trabajo" : "Working Memory",
-      description: language === "spanish" ? "Tareas de memoria y procesamiento cognitivo" : "Memory and cognitive processing tasks",
+      description:
+        language === "spanish"
+          ? "Tareas de memoria y procesamiento cognitivo"
+          : "Memory and cognitive processing tasks",
       type: 3,
       timeLimitMinutes: 5,
       totalQuestions: 30,
@@ -163,7 +209,10 @@ export function generateMockMILExamMetadata(language: "english" | "spanish" = "e
     {
       id: "numeric-velocity-001",
       name: language === "spanish" ? "Velocidad Numérica" : "Numeric Velocity",
-      description: language === "spanish" ? "Aritmética rápida y secuencias numéricas" : "Speed arithmetic and number sequences",
+      description:
+        language === "spanish"
+          ? "Aritmética rápida y secuencias numéricas"
+          : "Speed arithmetic and number sequences",
       type: 4,
       timeLimitMinutes: 4,
       totalQuestions: 50,
@@ -239,52 +288,62 @@ export function generateSpanishVerbalReasoningExam(): MILExam {
   const questions: MILQuestion[] = [
     {
       questionNumber: 1,
-      questionText: "Juan es más lento que Jesús. Juan es más rápido que Pedro. ¿Quién es más lento?",
+      questionText:
+        "Juan es más lento que Jesús. Juan es más rápido que Pedro. ¿Quién es más lento?",
       type: 2,
       data: {
         options: ["Juan", "Jesús", "Pedro"],
       },
-      explanation: "Juan es más rápido que Pedro, pero más lento que Jesús. Por lo tanto, Pedro es el más lento.",
+      explanation:
+        "Juan es más rápido que Pedro, pero más lento que Jesús. Por lo tanto, Pedro es el más lento.",
       correctAnswer: 2,
     },
     {
       questionNumber: 2,
-      questionText: "Laura es más baja que Paula. Laura es más alta que Eva. ¿Quién es más alta?",
+      questionText:
+        "Laura es más baja que Paula. Laura es más alta que Eva. ¿Quién es más alta?",
       type: 2,
       data: {
         options: ["Laura", "Paula", "Eva"],
       },
-      explanation: "Paula es más alta que Laura, y Laura es más alta que Eva. Por lo tanto, Paula es la más alta.",
+      explanation:
+        "Paula es más alta que Laura, y Laura es más alta que Eva. Por lo tanto, Paula es la más alta.",
       correctAnswer: 1,
     },
     {
       questionNumber: 3,
-      questionText: "Silvia es más inteligente que Lourdes. Silvia es más torpe que Rocío. ¿Quién es más inteligente?",
+      questionText:
+        "Silvia es más inteligente que Lourdes. Silvia es más torpe que Rocío. ¿Quién es más inteligente?",
       type: 2,
       data: {
         options: ["Silvia", "Lourdes", "Rocío"],
       },
-      explanation: "Rocío es más inteligente que Silvia, y Silvia es más inteligente que Lourdes. Por lo tanto, Rocío es la más inteligente.",
+      explanation:
+        "Rocío es más inteligente que Silvia, y Silvia es más inteligente que Lourdes. Por lo tanto, Rocío es la más inteligente.",
       correctAnswer: 2,
     },
     {
       questionNumber: 4,
-      questionText: "Pablo está más triste que Luis. Pedro está más triste que Pablo. ¿Quién está más feliz?",
+      questionText:
+        "Pablo está más triste que Luis. Pedro está más triste que Pablo. ¿Quién está más feliz?",
       type: 2,
       data: {
         options: ["Pablo", "Luis", "Pedro"],
       },
-      explanation: "Pedro está más triste que Pablo, y Pablo está más triste que Luis. Por lo tanto, Luis está más feliz.",
+      explanation:
+        "Pedro está más triste que Pablo, y Pablo está más triste que Luis. Por lo tanto, Luis está más feliz.",
       correctAnswer: 1,
     },
     {
       questionNumber: 5,
-      questionText: "Aníbal tiene más frío que Carlos. David tiene más frío que Aníbal. ¿Quién tiene más frío?",
+      questionText:
+        "Aníbal tiene más frío que Carlos. David tiene más frío que Aníbal. ¿Quién tiene más frío?",
       type: 2,
       data: {
         options: ["Aníbal", "Carlos", "David"],
       },
-      explanation: "David tiene más frío que Aníbal, y Aníbal tiene más frío que Carlos. Por lo tanto, David tiene más frío.",
+      explanation:
+        "David tiene más frío que Aníbal, y Aníbal tiene más frío que Carlos. Por lo tanto, David tiene más frío.",
       correctAnswer: 2,
     },
   ];
@@ -292,7 +351,8 @@ export function generateSpanishVerbalReasoningExam(): MILExam {
   return {
     id: "verbal-reasoning-001",
     name: "Razonamiento Verbal - Comparaciones",
-    description: "Esta prueba evalúa la capacidad de comparar y ordenar características de diferentes individuos",
+    description:
+      "Esta prueba evalúa la capacidad de comparar y ordenar características de diferentes individuos",
     type: 2,
     timeLimitMinutes: 4,
     totalQuestions: questions.length,
@@ -303,7 +363,9 @@ export function generateSpanishVerbalReasoningExam(): MILExam {
 /**
  * Get pattern recognition instructions in the specified language
  */
-export function getPatternRecognitionInstructions(language: "english" | "spanish" = "english"): string {
+export function getPatternRecognitionInstructions(
+  language: "english" | "spanish" = "english"
+): string {
   if (language === "spanish") {
     return `Esta prueba evalúa la rapidez y precisión con la que las personas realizan mentalmente una tarea de verificación.
 
@@ -344,7 +406,9 @@ If you have any questions, consult with the evaluator before starting.`;
 /**
  * Get numeric velocity instructions in the specified language
  */
-export function getNumericVelocityInstructions(language: "english" | "spanish" = "english"): string {
+export function getNumericVelocityInstructions(
+  language: "english" | "spanish" = "english"
+): string {
   if (language === "spanish") {
     return `Esta prueba evalúa la rapidez y eficacia con la que las personas realizan mentalmente una tarea numérica simple.
 
@@ -397,7 +461,9 @@ If you have any questions, consult with the evaluator before starting.`;
 /**
  * Populate test data for MIL assessment
  */
-export function populateMILTestData(language: "english" | "spanish" = "english"): void {
+export function populateMILTestData(
+  language: "english" | "spanish" = "english"
+): void {
   const exams = generateMockMILExamMetadata(language);
 
   // Create some completed sessions

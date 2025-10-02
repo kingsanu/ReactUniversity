@@ -259,18 +259,24 @@ export async function getPCAVsJCAAnalysis(
 /**
  * Get PCA Result by UserId (Backend API)
  */
-export async function getPCAResultByUserId(userId: string, language: "english" | "spanish" = "english"): Promise<any> {
+export async function getPCAResultByUserId(
+  userId: string,
+  language: "english" | "spanish" = "english"
+): Promise<any> {
   try {
     const langParam = language === "spanish" ? "sp" : "en";
-    const response = await fetch(`${API_BASE_URL}/api/pcaapi/get-result?lang=${langParam}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        UserId: userId,
-      }),
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/api/pcaapi/get-result?lang=${langParam}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          UserId: userId,
+        }),
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`Failed to get PCA result: ${response.status}`);
@@ -293,16 +299,19 @@ export async function getPCACompetencesByUserId(
 ): Promise<any> {
   try {
     const langParam = language === "spanish" ? "sp" : "en";
-    const response = await fetch(`${API_BASE_URL}/api/pcaapi/get-competences?lang=${langParam}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        UserId: userId,
-        CmpTims: cmpTims,
-      }),
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/api/pcaapi/get-competences?lang=${langParam}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          UserId: userId,
+          CmpTims: cmpTims,
+        }),
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`Failed to get PCA competences: ${response.status}`);
@@ -327,17 +336,20 @@ export async function addPCAEvaluation(
     const coKey = language === "spanish" ? "NXDAPS" : "NXDAPI";
     const langParam = language === "spanish" ? "sp" : "en";
 
-    const response = await fetch(`${API_BASE_URL}/api/pcaapi/add-evaluation?lang=${langParam}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        UserId: userId,
-        CoKey: coKey,
-        ...userData,
-      }),
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/api/pcaapi/add-evaluation?lang=${langParam}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          UserId: userId,
+          CoKey: coKey,
+          ...userData,
+        }),
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`Failed to add PCA evaluation: ${response.status}`);
@@ -375,15 +387,20 @@ export async function addPCAEvaluation(
 /**
  * Get All PCA Evaluations (Backend API)
  */
-export async function getAllPCAEvaluations(language: "english" | "spanish" = "english"): Promise<any> {
+export async function getAllPCAEvaluations(
+  language: "english" | "spanish" = "english"
+): Promise<any> {
   try {
     const langParam = language === "spanish" ? "sp" : "en";
-    const response = await fetch(`${API_BASE_URL}/api/pcaapi/evaluations?lang=${langParam}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/api/pcaapi/evaluations?lang=${langParam}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`Failed to get PCA evaluations: ${response.status}`);
@@ -399,7 +416,10 @@ export async function getAllPCAEvaluations(language: "english" | "spanish" = "en
 /**
  * Check PCA Status by UserId
  */
-export async function checkPCAStatus(userId: string, language: "english" | "spanish" = "english"): Promise<{
+export async function checkPCAStatus(
+  userId: string,
+  language: "english" | "spanish" = "english"
+): Promise<{
   status: "not_started" | "in_progress" | "completed";
   pcaCod?: string;
   hasResults?: boolean;

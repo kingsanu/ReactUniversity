@@ -459,13 +459,16 @@ export async function getUserEvaluationGroups(
 ): Promise<EvaluationGroupWithId[]> {
   const langParam = language === "spanish" ? "sp" : "en";
   try {
-    const response = await fetch(`${API_BASE_URL}/evaluation/user/${userId}?lang=${langParam}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/evaluation/user/${userId}?lang=${langParam}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
 
     if (!response.ok) {
       throw new Error("Failed to fetch user evaluation groups");
@@ -852,7 +855,10 @@ export async function checkDuplicateEvaluator(
 /**
  * Validate evaluation invitation token with enhanced validation
  */
-export async function validateEvaluationToken(token: string, language: "english" | "spanish" = "english"): Promise<{
+export async function validateEvaluationToken(
+  token: string,
+  language: "english" | "spanish" = "english"
+): Promise<{
   isValid: boolean;
   evaluatorName?: string;
   evaluatorEmail?: string;
@@ -954,14 +960,17 @@ export async function createEvaluationSession(
 ): Promise<EvaluationSession> {
   try {
     const langParam = language === "spanish" ? "sp" : "en";
-    const response = await fetch(`${API_BASE_URL}/api/evaluation/sessions?lang=${langParam}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      body: JSON.stringify(sessionData),
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/api/evaluation/sessions?lang=${langParam}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify(sessionData),
+      }
+    );
 
     if (!response.ok) {
       throw new Error("Failed to create evaluation session");
@@ -984,11 +993,14 @@ export async function getUserEvaluationGroupsForSessions(
 ): Promise<EvaluationGroupWithId[]> {
   try {
     const langParam = language === "spanish" ? "sp" : "en";
-    const response = await fetch(`${API_BASE_URL}/evaluation/user/${userId}?lang=${langParam}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/evaluation/user/${userId}?lang=${langParam}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
 
     if (!response.ok) {
       throw new Error("Failed to fetch evaluation groups");
