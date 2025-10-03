@@ -112,16 +112,44 @@ export function generateMockMILExam(
       }
     } else if (type === 3) {
       // Working Memory - Alphabet order and distance from middle letter
-      const questionText = language === "spanish" 
-        ? "Mire el conjunto de tres letras. Recuerde el orden de las letras en el alfabeto. Decida cuál de las dos letras que tienen un círculo debajo está más alejada de la letra del medio."
-        : "Look at the set of three letters. Remember the order of the letters in the alphabet. Decide which of the two circled letters is farther from the middle letter.";
-      
+      const questionText =
+        language === "spanish"
+          ? "Mire el conjunto de tres letras. Recuerde el orden de las letras en el alfabeto. Decida cuál de las dos letras que tienen un círculo debajo está más alejada de la letra del medio."
+          : "Look at the set of three letters. Remember the order of the letters in the alphabet. Decide which of the two circled letters is farther from the middle letter.";
+
       // Generate three random letters for the question
-      const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+      const letters = [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "I",
+        "J",
+        "K",
+        "L",
+        "M",
+        "N",
+        "O",
+        "P",
+        "Q",
+        "R",
+        "S",
+        "T",
+        "U",
+        "V",
+        "W",
+        "X",
+        "Y",
+        "Z",
+      ];
       const letter1 = letters[Math.floor(Math.random() * letters.length)];
       const letter2 = letters[Math.floor(Math.random() * letters.length)];
       const letter3 = letters[Math.floor(Math.random() * letters.length)];
-      
+
       questions.push({
         questionNumber: i,
         questionText: questionText,
@@ -130,9 +158,10 @@ export function generateMockMILExam(
           letters: [letter1, letter2, letter3],
           options: [letter1, letter3], // The two extreme letters
         },
-        explanation: language === "spanish"
-          ? `Para las letras ${letter1}, ${letter2}, ${letter3}, determine cuál de ${letter1} o ${letter3} está más alejada de ${letter2} en el orden alfabético.`
-          : `For the letters ${letter1}, ${letter2}, ${letter3}, determine which of ${letter1} or ${letter3} is farther from ${letter2} in alphabetical order.`,
+        explanation:
+          language === "spanish"
+            ? `Para las letras ${letter1}, ${letter2}, ${letter3}, determine cuál de ${letter1} o ${letter3} está más alejada de ${letter2} en el orden alfabético.`
+            : `For the letters ${letter1}, ${letter2}, ${letter3}, determine which of ${letter1} or ${letter3} is farther from ${letter2} in alphabetical order.`,
       });
     } else if (type === 4) {
       // Numeric Velocity - Find which extreme number is farther from the middle
@@ -178,7 +207,7 @@ export function generateMockMILExam(
     name: examInfo.name,
     description: examInfo.description,
     type: type,
-    timeLimitMinutes: type === 5 ? 5 : (type === 3 || type === 4 ? 4 : 3), // Visual rotation has 5 minutes, working memory and numeric velocity have 4, others have 3
+    timeLimitMinutes: type === 5 ? 5 : type === 3 || type === 4 ? 4 : 3, // Visual rotation has 5 minutes, working memory and numeric velocity have 4, others have 3
     totalQuestions: questions.length,
     questions: questions,
   };
@@ -287,7 +316,9 @@ export function createMockMILSession(
 /**
  * Get visual rotation instructions in the specified language
  */
-export function getVisualRotationInstructions(language: "english" | "spanish" = "english"): string {
+export function getVisualRotationInstructions(
+  language: "english" | "spanish" = "english"
+): string {
   if (language === "spanish") {
     return `Esta prueba de orientación es un ejercicio que mide la rapidez y eficacia con la que las personas rotan mentalmente figuras. El problema consiste en decir cuántos pares de figuras, uno encima del otro, tiene exactamente la misma forma.
 
@@ -530,7 +561,9 @@ If you have any questions, consult with the evaluator before starting.`;
 /**
  * Get working memory instructions in the specified language
  */
-export function getWorkingMemoryInstructions(language: "english" | "spanish" = "english"): string {
+export function getWorkingMemoryInstructions(
+  language: "english" | "spanish" = "english"
+): string {
   if (language === "spanish") {
     return `Esta prueba mide la rapidez y eficacia con la que las personas realizan tareas mentales con su memoria.
 Usted necesita recordar el orden de las letras en el alfabeto para realizar esta tarea.
