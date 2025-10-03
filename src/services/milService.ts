@@ -432,6 +432,24 @@ export async function getMILExamInstructions(
         timeLimit: 4,
         examType: 4,
       };
+    } else if (examId === MIL_EXAMS.WORKING_MEMORY) {
+      const { getWorkingMemoryInstructions } = await import(
+        "@/utils/milTestUtils"
+      );
+      return {
+        instructions: getWorkingMemoryInstructions(language),
+        timeLimit: 4,
+        examType: 3,
+      };
+    } else if (examId === MIL_EXAMS.SPATIAL_ORIENTATION) {
+      const { getVisualRotationInstructions } = await import(
+        "@/utils/milTestUtils"
+      );
+      return {
+        instructions: getVisualRotationInstructions(language),
+        timeLimit: 5,
+        examType: 5,
+      };
     }
 
     throw error;

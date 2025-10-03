@@ -3,7 +3,9 @@
 export interface CompetencyDimension {
   id: string;
   name: string;
+  nameSpanish?: string;
   description: string;
+  descriptionSpanish?: string;
   category:
     | "interests"
     | "talents"
@@ -20,20 +22,26 @@ export interface CompetencyDimension {
 export interface RatingScale {
   id: string;
   name: string;
+  nameSpanish?: string;
   description: string;
+  descriptionSpanish?: string;
   type: "likert" | "emotive";
   minValue: number;
   maxValue: number;
   labels: {
     value: number;
     label: string;
+    labelSpanish?: string;
     description?: string;
+    descriptionSpanish?: string;
     emoji?: string;
   }[];
   options: {
     value: number;
     label: string;
+    labelSpanish?: string;
     description?: string;
+    descriptionSpanish?: string;
     emoji?: string;
   }[];
 }
@@ -41,10 +49,12 @@ export interface RatingScale {
 export interface EvaluatorGroup {
   id: string;
   name: string;
+  nameSpanish?: string;
   type: "self" | "parent" | "teacher" | "sibling_friend";
   minRequired: number;
   maxAllowed: number;
   description?: string;
+  descriptionSpanish?: string;
   evaluators: Evaluator[];
 }
 
@@ -178,7 +188,9 @@ export const DEFAULT_COMPETENCY_DIMENSIONS: CompetencyDimension[] = [
   {
     id: "interests-001",
     name: "Academic Interests",
+    nameSpanish: "Intereses Académicos",
     description: "Shows curiosity and engagement in learning activities",
+    descriptionSpanish: "Muestra curiosidad y compromiso en actividades de aprendizaje",
     category: "interests",
     isActive: true,
     order: 1,
@@ -187,7 +199,9 @@ export const DEFAULT_COMPETENCY_DIMENSIONS: CompetencyDimension[] = [
   {
     id: "interests-002",
     name: "Career Interests",
+    nameSpanish: "Intereses Profesionales",
     description: "Demonstrates interest in specific career paths or industries",
+    descriptionSpanish: "Demuestra interés en caminos profesionales específicos o industrias",
     category: "interests",
     isActive: true,
     order: 2,
@@ -196,7 +210,9 @@ export const DEFAULT_COMPETENCY_DIMENSIONS: CompetencyDimension[] = [
   {
     id: "talents-001",
     name: "Analytical Thinking",
+    nameSpanish: "Pensamiento Analítico",
     description: "Ability to break down complex problems and think logically",
+    descriptionSpanish: "Capacidad para desglosar problemas complejos y pensar lógicamente",
     category: "talents",
     isActive: true,
     order: 3,
@@ -205,7 +221,9 @@ export const DEFAULT_COMPETENCY_DIMENSIONS: CompetencyDimension[] = [
   {
     id: "talents-002",
     name: "Creative Expression",
+    nameSpanish: "Expresión Creativa",
     description: "Shows creativity and original thinking in various contexts",
+    descriptionSpanish: "Muestra creatividad y pensamiento original en diversos contextos",
     category: "talents",
     isActive: true,
     order: 4,
@@ -214,7 +232,9 @@ export const DEFAULT_COMPETENCY_DIMENSIONS: CompetencyDimension[] = [
   {
     id: "strengths-001",
     name: "Perseverance",
+    nameSpanish: "Perseverancia",
     description: "Demonstrates persistence when facing challenges",
+    descriptionSpanish: "Demuestra persistencia ante los desafíos",
     category: "strengths",
     isActive: true,
     order: 5,
@@ -223,7 +243,9 @@ export const DEFAULT_COMPETENCY_DIMENSIONS: CompetencyDimension[] = [
   {
     id: "strengths-002",
     name: "Adaptability",
+    nameSpanish: "Adaptabilidad",
     description: "Adjusts well to new situations and changes",
+    descriptionSpanish: "Se adapta bien a situaciones nuevas y cambios",
     category: "strengths",
     isActive: true,
     order: 6,
@@ -232,7 +254,9 @@ export const DEFAULT_COMPETENCY_DIMENSIONS: CompetencyDimension[] = [
   {
     id: "emotional_intelligence-001",
     name: "Self-Awareness",
+    nameSpanish: "Autoconciencia",
     description: "Understands own emotions and their impact on others",
+    descriptionSpanish: "Entiende sus propias emociones y su impacto en los demás",
     category: "emotional_intelligence",
     isActive: true,
     order: 7,
@@ -241,7 +265,9 @@ export const DEFAULT_COMPETENCY_DIMENSIONS: CompetencyDimension[] = [
   {
     id: "emotional_intelligence-002",
     name: "Empathy",
+    nameSpanish: "Empatía",
     description: "Shows understanding and consideration for others feelings",
+    descriptionSpanish: "Muestra comprensión y consideración por los sentimientos de los demás",
     category: "emotional_intelligence",
     isActive: true,
     order: 8,
@@ -250,7 +276,9 @@ export const DEFAULT_COMPETENCY_DIMENSIONS: CompetencyDimension[] = [
   {
     id: "leadership-001",
     name: "Initiative",
+    nameSpanish: "Iniciativa",
     description: "Takes action and shows leadership in group settings",
+    descriptionSpanish: "Toma acción y muestra liderazgo en entornos grupales",
     category: "leadership",
     isActive: true,
     order: 9,
@@ -259,7 +287,9 @@ export const DEFAULT_COMPETENCY_DIMENSIONS: CompetencyDimension[] = [
   {
     id: "leadership-002",
     name: "Collaboration",
+    nameSpanish: "Colaboración",
     description: "Works effectively with others towards common goals",
+    descriptionSpanish: "Trabaja efectivamente con otros hacia objetivos comunes",
     category: "leadership",
     isActive: true,
     order: 10,
@@ -268,7 +298,9 @@ export const DEFAULT_COMPETENCY_DIMENSIONS: CompetencyDimension[] = [
   {
     id: "responsibility-001",
     name: "Accountability",
+    nameSpanish: "Responsabilidad",
     description: "Takes ownership of actions and commitments",
+    descriptionSpanish: "Asume la propiedad de sus acciones y compromisos",
     category: "responsibility",
     isActive: true,
     order: 11,
@@ -277,7 +309,9 @@ export const DEFAULT_COMPETENCY_DIMENSIONS: CompetencyDimension[] = [
   {
     id: "responsibility-002",
     name: "Time Management",
+    nameSpanish: "Gestión del Tiempo",
     description: "Manages time effectively and meets deadlines",
+    descriptionSpanish: "Gestiona el tiempo efectivamente y cumple con los plazos",
     category: "responsibility",
     isActive: true,
     order: 12,
@@ -286,7 +320,9 @@ export const DEFAULT_COMPETENCY_DIMENSIONS: CompetencyDimension[] = [
   {
     id: "communication-001",
     name: "Verbal Communication",
+    nameSpanish: "Comunicación Verbal",
     description: "Expresses ideas clearly and effectively in speech",
+    descriptionSpanish: "Expresa ideas de manera clara y efectiva en el habla",
     category: "communication",
     isActive: true,
     order: 13,
@@ -295,7 +331,9 @@ export const DEFAULT_COMPETENCY_DIMENSIONS: CompetencyDimension[] = [
   {
     id: "communication-002",
     name: "Written Communication",
+    nameSpanish: "Comunicación Escrita",
     description: "Communicates effectively through writing",
+    descriptionSpanish: "Se comunica efectivamente a través de la escritura",
     category: "communication",
     isActive: true,
     order: 14,
@@ -307,7 +345,9 @@ export const DEFAULT_COMPETENCY_DIMENSIONS: CompetencyDimension[] = [
 export const DEFAULT_RATING_SCALE: RatingScale = {
   id: "likert-5-point",
   name: "5-Point Likert Scale",
+  nameSpanish: "Escala Likert de 5 Puntos",
   description: "Standard 5-point rating scale for evaluations",
+  descriptionSpanish: "Escala de calificación estándar de 5 puntos para evaluaciones",
   type: "likert",
   minValue: 1,
   maxValue: 5,
@@ -315,54 +355,74 @@ export const DEFAULT_RATING_SCALE: RatingScale = {
     {
       value: 1,
       label: "Strongly Disagree",
+      labelSpanish: "Totalmente en Desacuerdo",
       description: "This does not describe the person at all",
+      descriptionSpanish: "Esto no describe a la persona en absoluto",
     },
     {
       value: 2,
       label: "Disagree",
+      labelSpanish: "En Desacuerdo",
       description: "This rarely describes the person",
+      descriptionSpanish: "Esto rara vez describe a la persona",
     },
     {
       value: 3,
       label: "Neutral",
+      labelSpanish: "Neutral",
       description: "This sometimes describes the person",
+      descriptionSpanish: "Esto a veces describe a la persona",
     },
     {
       value: 4,
       label: "Agree",
+      labelSpanish: "De Acuerdo",
       description: "This often describes the person",
+      descriptionSpanish: "Esto a menudo describe a la persona",
     },
     {
       value: 5,
       label: "Strongly Agree",
+      labelSpanish: "Totalmente de Acuerdo",
       description: "This always describes the person",
+      descriptionSpanish: "Esto siempre describe a la persona",
     },
   ],
   options: [
     {
       value: 1,
       label: "Strongly Disagree",
+      labelSpanish: "Totalmente en Desacuerdo",
       description: "This does not describe the person at all",
+      descriptionSpanish: "Esto no describe a la persona en absoluto",
     },
     {
       value: 2,
       label: "Disagree",
+      labelSpanish: "En Desacuerdo",
       description: "This rarely describes the person",
+      descriptionSpanish: "Esto rara vez describe a la persona",
     },
     {
       value: 3,
       label: "Neutral",
+      labelSpanish: "Neutral",
       description: "This sometimes describes the person",
+      descriptionSpanish: "Esto a veces describe a la persona",
     },
     {
       value: 4,
       label: "Agree",
+      labelSpanish: "De Acuerdo",
       description: "This often describes the person",
+      descriptionSpanish: "Esto a menudo describe a la persona",
     },
     {
       value: 5,
       label: "Strongly Agree",
+      labelSpanish: "Totalmente de Acuerdo",
       description: "This always describes the person",
+      descriptionSpanish: "Esto siempre describe a la persona",
     },
   ],
 };
@@ -372,37 +432,45 @@ export const DEFAULT_EVALUATOR_GROUPS: EvaluatorGroup[] = [
   {
     id: "self-group",
     name: "Self-Evaluation",
+    nameSpanish: "Autoevaluación",
     type: "self",
     minRequired: 1,
     maxAllowed: 1,
     description: "The person being evaluated completes a self-assessment",
+    descriptionSpanish: "La persona evaluada completa una autoevaluación",
     evaluators: [],
   },
   {
     id: "parent-group",
     name: "Parents/Guardians",
+    nameSpanish: "Padres/Tutores",
     type: "parent",
     minRequired: 1,
     maxAllowed: 2,
     description: "Parents or guardians who know the person well",
+    descriptionSpanish: "Padres o tutores que conocen bien a la persona",
     evaluators: [],
   },
   {
     id: "teacher-group",
     name: "Teachers/Educators",
+    nameSpanish: "Profesores/Educadores",
     type: "teacher",
     minRequired: 2,
     maxAllowed: 4,
     description: "Teachers, instructors, or educational professionals",
+    descriptionSpanish: "Profesores, instructores o profesionales educativos",
     evaluators: [],
   },
   {
     id: "peer-group",
     name: "Siblings/Friends",
+    nameSpanish: "Hermanos/Amigos",
     type: "sibling_friend",
     minRequired: 1,
     maxAllowed: 3,
     description: "Siblings, close friends, or peers who interact regularly",
+    descriptionSpanish: "Hermanos, amigos cercanos o compañeros que interactúan regularmente",
     evaluators: [],
   },
 ];
@@ -1257,32 +1325,44 @@ export function calculateCompetencyAverages(
  * Generate evaluation questions from competency dimensions
  */
 export function generateEvaluationQuestions(
-  competencies: CompetencyDimension[]
+  competencies: CompetencyDimension[],
+  language: "english" | "spanish" = "english"
 ): EvaluationQuestion[] {
   const questions: EvaluationQuestion[] = [];
 
   competencies.forEach((competency, index) => {
+    const competencyName = language === "spanish" 
+      ? (competency.nameSpanish || competency.name).toLowerCase()
+      : competency.name.toLowerCase();
+    
     // Rating question
     questions.push({
       id: `${competency.id}-rating`,
       competencyId: competency.id,
-      questionText: `How would you rate this person's ${competency.name.toLowerCase()}?`,
+      questionText: language === "spanish"
+        ? `¿Cómo calificaría la ${competencyName} de esta persona?`
+        : `How would you rate this person's ${competencyName}?`,
       questionType: "rating",
       isRequired: true,
       order: index * 2 + 1,
-      helpText: competency.description,
+      helpText: language === "spanish" 
+        ? (competency.descriptionSpanish || competency.description)
+        : competency.description,
     });
 
     // Open-ended question
     questions.push({
       id: `${competency.id}-feedback`,
       competencyId: competency.id,
-      questionText: `Please provide specific examples or feedback about this person's ${competency.name.toLowerCase()}.`,
+      questionText: language === "spanish"
+        ? `Por favor, proporcione ejemplos específicos o comentarios sobre la ${competencyName} de esta persona.`
+        : `Please provide specific examples or feedback about this person's ${competencyName}.`,
       questionType: "open_ended",
       isRequired: false,
       order: index * 2 + 2,
-      helpText:
-        "Share specific observations, examples, or suggestions for development.",
+      helpText: language === "spanish"
+        ? "Comparta observaciones específicas, ejemplos o sugerencias para el desarrollo."
+        : "Share specific observations, examples, or suggestions for development.",
     });
   });
 
@@ -1311,7 +1391,7 @@ export function createMockEvaluationSession(): EvaluationSession {
     ratingScale: DEFAULT_RATING_SCALE,
     evaluatorGroups: DEFAULT_EVALUATOR_GROUPS,
     evaluators: [],
-    questions: generateEvaluationQuestions(DEFAULT_COMPETENCY_DIMENSIONS),
+    questions: generateEvaluationQuestions(DEFAULT_COMPETENCY_DIMENSIONS, "english"),
     responses: [],
     configuration: {
       id: "default-config",

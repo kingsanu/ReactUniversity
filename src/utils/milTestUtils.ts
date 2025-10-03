@@ -110,6 +110,30 @@ export function generateMockMILExam(
             "Find the relationship between the first pair and apply it to the second pair.",
         });
       }
+    } else if (type === 3) {
+      // Working Memory - Alphabet order and distance from middle letter
+      const questionText = language === "spanish" 
+        ? "Mire el conjunto de tres letras. Recuerde el orden de las letras en el alfabeto. Decida cuál de las dos letras que tienen un círculo debajo está más alejada de la letra del medio."
+        : "Look at the set of three letters. Remember the order of the letters in the alphabet. Decide which of the two circled letters is farther from the middle letter.";
+      
+      // Generate three random letters for the question
+      const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+      const letter1 = letters[Math.floor(Math.random() * letters.length)];
+      const letter2 = letters[Math.floor(Math.random() * letters.length)];
+      const letter3 = letters[Math.floor(Math.random() * letters.length)];
+      
+      questions.push({
+        questionNumber: i,
+        questionText: questionText,
+        type: 3,
+        data: {
+          letters: [letter1, letter2, letter3],
+          options: [letter1, letter3], // The two extreme letters
+        },
+        explanation: language === "spanish"
+          ? `Para las letras ${letter1}, ${letter2}, ${letter3}, determine cuál de ${letter1} o ${letter3} está más alejada de ${letter2} en el orden alfabético.`
+          : `For the letters ${letter1}, ${letter2}, ${letter3}, determine which of ${letter1} or ${letter3} is farther from ${letter2} in alphabetical order.`,
+      });
     } else if (type === 4) {
       // Numeric Velocity - Find which extreme number is farther from the middle
       const questionText =
@@ -154,7 +178,7 @@ export function generateMockMILExam(
     name: examInfo.name,
     description: examInfo.description,
     type: type,
-    timeLimitMinutes: type === 4 ? 4 : 3, // Numeric velocity has 4 minutes, others have 3
+    timeLimitMinutes: type === 5 ? 5 : (type === 3 || type === 4 ? 4 : 3), // Visual rotation has 5 minutes, working memory and numeric velocity have 4, others have 3
     totalQuestions: questions.length,
     questions: questions,
   };
@@ -203,7 +227,7 @@ export function generateMockMILExamMetadata(
           ? "Tareas de memoria y procesamiento cognitivo"
           : "Memory and cognitive processing tasks",
       type: 3,
-      timeLimitMinutes: 5,
+      timeLimitMinutes: 4,
       totalQuestions: 30,
     },
     {
@@ -258,6 +282,51 @@ export function createMockMILSession(
   }
 
   return session;
+}
+
+/**
+ * Get visual rotation instructions in the specified language
+ */
+export function getVisualRotationInstructions(language: "english" | "spanish" = "english"): string {
+  if (language === "spanish") {
+    return `Esta prueba de orientación es un ejercicio que mide la rapidez y eficacia con la que las personas rotan mentalmente figuras. El problema consiste en decir cuántos pares de figuras, uno encima del otro, tiene exactamente la misma forma.
+
+Nótese que en los ejemplos hemos dibujado líneas para que se aprecien los pares que usted está comparando.
+
+Para esta prueba vamos a emplear dos figuras. Nótese que las figuras son diferentes entre sí, aunque a primera vista pudieran parecer iguales.
+
+¿En qué son diferentes? Fíjese ahora en las siguientes figuras de la parte inferior.
+
+Aunque las figuras superiores parecen iguales a las inferiores, son imágenes reflejadas. Esto significa que no pueden ser rotadas de ninguna manera para coincidir exactamente con las figuras inferiores, ya que son diferentes. Por otro lado, las figuras inferiores que se presentan a continuación coinciden perfectamente con las figuras superiores de cada par.
+
+Fíjese en el ejemplo que se muestra a continuación. Cuántas figuras inferiores son iguales a las que tiene justo encima, después de girarlas alrededor de la página. Compare cada figura con la que está inmediatamente encima de ella.
+
+Compruebe que ha entendido la prueba verificando que las respuestas son correctas. En cada cuestión usted debe decir cuántos pares son iguales. Compare cada figura con la que está inmediatamente encima.
+
+Ejemplos Prácticos:
+Hemos retirado las líneas entre los pares, para hacer el ejemplo exactamente igual a la prueba.
+
+Pregunte antes de seguir si no ha entendido la prueba. El tiempo del que dispone para realizar esta prueba es de 5 minutos.`;
+  } else {
+    return `This orientation test is an exercise that measures the speed and effectiveness with which people mentally rotate figures. The problem consists of saying how many pairs of figures, one on top of the other, have exactly the same shape.
+
+Note that in the examples we have drawn lines to highlight the pairs you are comparing.
+
+For this test we will use two figures. Note that the figures are different from each other, although at first glance they might seem the same.
+
+How are they different? Now look at the following figures in the lower part.
+
+Although the upper figures seem identical to the lower ones, they are mirror images. This means that they cannot be rotated in any way to exactly match the lower figures, since they are different. On the other hand, the lower figures presented below match perfectly with the upper figures of each pair.
+
+Look at the example shown below. How many lower figures are the same as the ones directly above them, after rotating them around the page. Compare each figure with the one immediately above it.
+
+Verify that you have understood the test by checking that the answers are correct. In each question you must say how many pairs are the same. Compare each figure with the one immediately above it.
+
+Practical Examples:
+We have removed the lines between the pairs, to make the example exactly the same as the test.
+
+Ask before continuing if you have not understood the test. The time you have to complete this test is 5 minutes.`;
+  }
 }
 
 /**
@@ -455,6 +524,61 @@ Time limit:
 You have 4 minutes to complete this test.
 
 If you have any questions, consult with the evaluator before starting.`;
+  }
+}
+
+/**
+ * Get working memory instructions in the specified language
+ */
+export function getWorkingMemoryInstructions(language: "english" | "spanish" = "english"): string {
+  if (language === "spanish") {
+    return `Esta prueba mide la rapidez y eficacia con la que las personas realizan tareas mentales con su memoria.
+Usted necesita recordar el orden de las letras en el alfabeto para realizar esta tarea.
+
+Mire el conjunto de tres letras. Recuerde el orden de las letras en el alfabeto.
+
+Entonces decida cuál de las dos letras que tienen un círculo debajo está más alejada de la letra del medio.
+
+Ejemplo:
+Estas tres letras están correctamente ordenadas. La letra A es la primera, después la C y por último la G, en el mismo orden que en el alfabeto.
+
+¿Qué letra, la A o la G, está más alejada de la letra C?
+
+La respuesta es la G
+
+La tarea sigue siendo la misma. Recuerde el orden de las letras en el alfabeto y decida cuál de las dos letras está más alejada de la del centro.
+
+• Ponga un círculo alrededor de la letra correcta.
+• Compruebe de nuevo las respuestas.
+
+Tiempo límite:
+El tiempo del que dispone para realizar esta prueba es de 4 minutos.
+
+Si no ha entendido la prueba, pregunte antes de seguir.`;
+  } else {
+    return `This test measures the speed and efficiency with which people perform mental tasks with their memory.
+You need to remember the order of the letters in the alphabet to perform this task.
+
+Look at the set of three letters. Remember the order of the letters in the alphabet.
+
+Then decide which of the two circled letters is farther from the middle letter.
+
+Example:
+These three letters are correctly ordered. Letter A is first, then C and finally G, in the same order as in the alphabet.
+
+Which letter, A or G, is farther from the letter C?
+
+The answer is G
+
+The task remains the same. Remember the order of the letters in the alphabet and decide which of the two letters is farther from the center one.
+
+• Put a circle around the correct letter.
+• Check your answers again.
+
+Time limit:
+The time you have to complete this test is 4 minutes.
+
+If you have not understood the test, ask before continuing.`;
   }
 }
 
