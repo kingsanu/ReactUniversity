@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { useTranslation } from "react-i18next";
@@ -30,9 +30,17 @@ import {
 
 export function UserProfileDropdown() {
   const router = useRouter();
-  const { user, logout } = useGlobalStore();
+  const { user, logout, setLanguage, language } = useGlobalStore();
   const { i18n, t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
+
+  // Sync language from global store to i18n on mount
+  useEffect(() => {
+    const i18nLanguage = language === "spanish" ? "es" : "en";
+    if (i18n.language !== i18nLanguage) {
+      i18n.changeLanguage(i18nLanguage);
+    }
+  }, [language, i18n]);
 
   const handleLogout = () => {
     logout();
@@ -41,6 +49,9 @@ export function UserProfileDropdown() {
 
   const handleLanguageChange = (languageCode: string) => {
     i18n.changeLanguage(languageCode);
+    // Also save to global store for persistence
+    const globalStoreLanguage = languageCode === "es" ? "spanish" : "english";
+    setLanguage(globalStoreLanguage);
   };
 
   const languages = [

@@ -7,6 +7,7 @@ import {
   EnhancedUserExamHistory,
   ExamStatus,
 } from "@/services/milService";
+import { useGlobalStore } from "@/store/useGlobalStore";
 
 export interface MILProgress {
   completedExams: string[];
@@ -23,6 +24,7 @@ export interface MILProgress {
 }
 
 export function useMILData() {
+  const { language } = useGlobalStore();
   const [exams, setExams] = useState<MILExamMetadata[]>([]);
   const [progress, setProgress] = useState<MILProgress | null>(null);
   const [loading, setLoading] = useState(true);
@@ -52,7 +54,7 @@ export function useMILData() {
       setError(null);
 
       // Load available exams
-      const examData = await getAllMILExams();
+      const examData = await getAllMILExams(language);
       setExams(examData);
 
       // Get current user ID
@@ -64,7 +66,7 @@ export function useMILData() {
 
       if (userId !== "unknown") {
         try {
-          enhancedData = await getUserExamHistory(userId);
+          enhancedData = await getUserExamHistory(userId, language);
 
           // Categorize exam results by status
           const completed = enhancedData.examStatus.filter(

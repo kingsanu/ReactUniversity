@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/select";
 
 export default function EvaluatorsPage() {
-  const { user } = useGlobalStore();
+  const { user, language } = useGlobalStore();
   const { t } = useTranslation();
   const { isLoading, currentSession } = useEvaluationData();
 
@@ -109,7 +109,7 @@ export default function EvaluatorsPage() {
   const loadApiEvaluators = async () => {
     try {
       if (user?.id) {
-        const apiEvaluators = await getUserEvaluationGroups(user.id);
+        const apiEvaluators = await getUserEvaluationGroups(user.id, language);
         setApiEvaluators(apiEvaluators || []);
 
         // Merge API data into evaluator groups

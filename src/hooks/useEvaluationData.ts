@@ -14,6 +14,7 @@ import {
   getUserEvaluationGroupsForSessions,
   EvaluationGroupWithId,
 } from "@/services/evaluationService";
+import { useGlobalStore } from "@/store/useGlobalStore";
 
 export interface EvaluationProgress {
   totalSessions: number;
@@ -25,6 +26,7 @@ export interface EvaluationProgress {
 }
 
 export function useEvaluationData() {
+  const { language } = useGlobalStore();
   const [sessions, setSessions] = useState<EvaluationSession[]>([]);
   const [currentSession, setCurrentSession] =
     useState<EvaluationSession | null>(null);
@@ -67,7 +69,8 @@ export function useEvaluationData() {
         // TODO: Get userId from context or props
         const userId = "current-user-id"; // Replace with actual user ID retrieval
         const evaluationGroups = await getUserEvaluationGroupsForSessions(
-          userId
+          userId,
+          language
         );
 
         // Group evaluators by evaluated user to create sessions
@@ -174,7 +177,7 @@ export function useEvaluationData() {
         setCurrentSession(session);
         return session;
       } else {
-        const session = await getEvaluationSession(sessionId);
+        const session = await getEvaluationSession(sessionId, language);
         setCurrentSession(session);
         return session;
       }
@@ -405,7 +408,7 @@ export function useEvaluationData() {
 
         return mockReport;
       } else {
-        return await getEvaluationReport(sessionId);
+        return await getEvaluationReport(sessionId, language);
       }
     } catch (err) {
       setError(

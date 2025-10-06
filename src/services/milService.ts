@@ -311,13 +311,13 @@ export async function getAllMILExams(
         },
       }
     );
-    console.log(response);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch MIL exams: ${response.status}`);
     }
-
-    return await response.json();
+    const data = await response.json();
+    console.log(data);
+    return data;
   } catch (error) {
     console.error("Get MIL Exams Error:", error);
 

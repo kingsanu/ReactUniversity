@@ -429,6 +429,7 @@ export const useGlobalStore = create<GlobalState>()(
         name: "timcare-global-store",
         partialize: (state) => ({
           theme: state.theme,
+          language: state.language,
           user: state.user,
           resumeBuilder: {
             data: state.resumeBuilder.data,

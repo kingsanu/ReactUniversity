@@ -46,7 +46,7 @@ export default function MILExamRunner({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
-  const { user } = useGlobalStore();
+  const { user, language } = useGlobalStore();
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const cleanupTabMonitoringRef = useRef<(() => void) | null>(null);
 
@@ -72,7 +72,7 @@ export default function MILExamRunner({
       // Check for existing session
       const existingSession = loadMILSession(examId);
       if (existingSession && !existingSession.isCompleted) {
-        const examData = await startMILExam(examId);
+        const examData = await startMILExam(examId, language);
         setExam(examData);
         setSession(existingSession);
         setCurrentQuestionIndex(existingSession.currentQuestion);
@@ -85,7 +85,7 @@ export default function MILExamRunner({
         setTimeRemaining(remaining);
       } else {
         // Start new exam
-        const examData = await startMILExam(examId);
+        const examData = await startMILExam(examId, language);
         const newSession: MILSession = {
           examId,
           startTime: new Date().toISOString(),

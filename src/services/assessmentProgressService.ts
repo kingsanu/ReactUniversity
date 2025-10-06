@@ -293,7 +293,7 @@ export async function getDashboardAssessmentSummary(
       // Individual assessment summaries
       assessments: [
         {
-          name: "LIA Assessment",
+          name: language === "spanish" ? "Evaluación LIA" : "LIA Assessment",
           type: "mil",
           status: progress.milAssessment.status,
           completion: progress.milAssessment.enhancedData
@@ -312,7 +312,7 @@ export async function getDashboardAssessmentSummary(
           },
         },
         {
-          name: "360° Evaluation",
+          name: language === "spanish" ? "Evaluación 360°" : "360° Evaluation",
           type: "evaluation",
           status: progress.evaluationAssessment.status,
           completion:
@@ -331,7 +331,7 @@ export async function getDashboardAssessmentSummary(
           },
         },
         {
-          name: "PCA Assessment",
+          name: language === "spanish" ? "Evaluación PCA" : "PCA Assessment",
           type: "pca",
           status: progress.pcaAssessment.status,
           completion:

@@ -114,13 +114,17 @@ export default function PCAAssessmentPage() {
                     d="M15 19l-7-7 7-7"
                   />
                 </svg>
-                <span className="text-sm">Back to Configuration</span>
+                <span className="text-sm">
+                  {t("dashboard.backToConfiguration")}
+                </span>
               </button>
               <h1 className="text-lg font-semibold text-gray-900">
-                Personal Competence Analysis (PCA)
+                {t("dashboard.pcaTitle")}
               </h1>
             </div>
-            <div className="text-sm text-gray-500">Assessment in Progress</div>
+            <div className="text-sm text-gray-500">
+              {t("dashboard.assessmentInProgress")}
+            </div>
           </div>
         </div>
 
@@ -149,7 +153,7 @@ export default function PCAAssessmentPage() {
                 href="/dashboard"
                 className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600"
               >
-                Dashboard
+                {t("nav.dashboard")}
               </a>
             </li>
             <li>
@@ -169,7 +173,7 @@ export default function PCAAssessmentPage() {
                   href="/dashboard/assessments"
                   className="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2"
                 >
-                  Assessments
+                  {t("dashboard.assessments")}
                 </a>
               </div>
             </li>
@@ -216,11 +220,10 @@ export default function PCAAssessmentPage() {
             </svg>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Personal Competence Analysis (PCA)
+            {t("dashboard.pcaTitle")}
           </h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Complete your professional competency assessment to unlock
-            personalized insights about your strengths and ideal career path.
+            {t("dashboard.pcaDescription")}
           </p>
         </motion.div>
 
@@ -247,7 +250,7 @@ export default function PCAAssessmentPage() {
               </div>
               <div className="flex-1 mx-auto  text-center lg:text-left">
                 <h3 className="text-lg font-semibold text-green-900">
-                  Assessment Completed!
+                  {t("dashboard.assessmentCompleted")}
                 </h3>
                 <p className="text-green-700">
                   Your PCA assessment has been completed successfully.
@@ -272,14 +275,18 @@ export default function PCAAssessmentPage() {
             className="bg-white rounded-lg shadow-sm border p-6 mb-8"
           >
             <h2 className="text-xl font-semibold text-gray-900 mb-6">
-              Assessment Configuration
+              {t("dashboard.assessmentConfiguration")}
             </h2>
             {/* Language Selection */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-3">
-                Select Assessment Language
+                {t("dashboard.selectAssessmentLanguage")}
                 <span className="text-xs text-gray-500 ml-2">
-                  (Current: {selectedLanguage})
+                  ({t("dashboard.current")}:{" "}
+                  {selectedLanguage === "spanish"
+                    ? t("language.spanish")
+                    : t("language.english")}
+                  )
                 </span>
               </label>
               <div className="grid grid-cols-2 gap-4">
@@ -296,9 +303,9 @@ export default function PCAAssessmentPage() {
                 >
                   <div className="text-center">
                     <div className="text-2xl mb-2">🇪🇸</div>
-                    <div className="font-medium">Español</div>
+                    <div className="font-medium">{t("language.spanish")}</div>
                     <div className="text-sm text-gray-500">
-                      Spanish Assessment
+                      {t("dashboard.spanishAssessment")}
                     </div>
                   </div>
                 </button>
@@ -315,9 +322,9 @@ export default function PCAAssessmentPage() {
                 >
                   <div className="text-center">
                     <div className="text-2xl mb-2">🇺🇸</div>
-                    <div className="font-medium">English</div>
+                    <div className="font-medium">{t("language.english")}</div>
                     <div className="text-sm text-gray-500">
-                      English Assessment
+                      {t("dashboard.englishAssessment")}
                     </div>
                   </div>
                 </button>
@@ -351,10 +358,10 @@ export default function PCAAssessmentPage() {
               {isCreating ? (
                 <div className="flex items-center justify-center">
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                  Creating Assessment...
+                  {t("dashboard.creatingAssessment")}
                 </div>
               ) : (
-                "Start PCA Assessment"
+                t("dashboard.startPCA")
               )}
             </button>
           </motion.div>
@@ -369,7 +376,7 @@ export default function PCAAssessmentPage() {
             className="bg-white rounded-lg shadow-sm border p-6"
           >
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              What is PCA?
+              {t("dashboard.whatIsPCA")}
             </h3>
             <ul className="space-y-2 text-gray-600">
               <li className="flex items-start">
@@ -384,7 +391,7 @@ export default function PCAAssessmentPage() {
                     clipRule="evenodd"
                   />
                 </svg>
-                Evaluates your professional competencies
+                {t("dashboard.pcaEvaluates")}
               </li>
               <li className="flex items-start">
                 <svg
@@ -398,7 +405,7 @@ export default function PCAAssessmentPage() {
                     clipRule="evenodd"
                   />
                 </svg>
-                Identifies your strengths and areas for development
+                {t("dashboard.pcaStrengths")}
               </li>
               <li className="flex items-start">
                 <svg
@@ -412,7 +419,7 @@ export default function PCAAssessmentPage() {
                     clipRule="evenodd"
                   />
                 </svg>
-                Provides job-specific competency matching
+                {t("dashboard.pcaJobMatching")}
               </li>
               <li className="flex items-start">
                 <svg
@@ -426,7 +433,7 @@ export default function PCAAssessmentPage() {
                     clipRule="evenodd"
                   />
                 </svg>
-                Available in Spanish and English
+                {t("dashboard.pcaLanguages")}
               </li>
             </ul>
           </motion.div>
@@ -438,7 +445,7 @@ export default function PCAAssessmentPage() {
             className="bg-white rounded-lg shadow-sm border p-6"
           >
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Assessment Details
+              {t("dashboard.assessmentDetails")}
             </h3>
             <ul className="space-y-2 text-gray-600">
               <li className="flex items-start">
@@ -453,7 +460,7 @@ export default function PCAAssessmentPage() {
                     clipRule="evenodd"
                   />
                 </svg>
-                Duration: 15-20 minutes
+                {t("dashboard.pcaDuration")}
               </li>
               <li className="flex items-start">
                 <svg
@@ -467,7 +474,7 @@ export default function PCAAssessmentPage() {
                     clipRule="evenodd"
                   />
                 </svg>
-                Ipsative assessment format
+                {t("dashboard.pcaFormat")}
               </li>
               <li className="flex items-start">
                 <svg
@@ -481,7 +488,7 @@ export default function PCAAssessmentPage() {
                     clipRule="evenodd"
                   />
                 </svg>
-                Immediate results available
+                {t("dashboard.pcaImmediateResults")}
               </li>
               <li className="flex items-start">
                 <svg
@@ -495,7 +502,7 @@ export default function PCAAssessmentPage() {
                     clipRule="evenodd"
                   />
                 </svg>
-                Secure external assessment platform
+                {t("dashboard.pcaSecurePlatform")}
               </li>
             </ul>
           </motion.div>

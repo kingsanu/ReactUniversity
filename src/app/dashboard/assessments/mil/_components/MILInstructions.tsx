@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
+import { useTranslation } from "react-i18next";
+import { useGlobalStore } from "@/store/useGlobalStore";
 import {
   MILExamMetadata,
   getMILExamInstructions,
@@ -20,10 +22,14 @@ export default function MILInstructions({
   onStart,
   onBack,
 }: MILInstructionsProps) {
-  const [currentStep, setCurrentStep] = useState<'instructions' | 'practice' | 'test'>('instructions');
+  const { t } = useTranslation();
+  const { language } = useGlobalStore();
+  const [currentStep, setCurrentStep] = useState<
+    "instructions" | "practice" | "test"
+  >("instructions");
   const [instructions, setInstructions] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-
+  console.log(language);
   useEffect(() => {
     loadInstructions();
   }, [exam.id]);
@@ -31,7 +37,7 @@ export default function MILInstructions({
   const loadInstructions = async () => {
     try {
       setLoading(true);
-      const data = await getMILExamInstructions(exam.id as any);
+      const data = await getMILExamInstructions(exam.id as any, language);
       setInstructions(data);
     } catch (error) {
       console.error("Failed to load instructions:", error);
@@ -98,22 +104,28 @@ export default function MILInstructions({
         <div className="space-y-6">
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
             <h3 className="text-lg font-semibold text-blue-900 mb-2">
-              🎯 Test Instructions
+              🎯 {t("dashboard.testInstructions")}
             </h3>
             <div className="text-blue-800">
-              {typeof instructions === 'string' ? (
+              {typeof instructions === "string" ? (
                 <p>{instructions}</p>
               ) : (
                 <div>
-                  {instructions.title && <h4 className="font-semibold mb-2">{instructions.title}</h4>}
-                  {instructions.description && <p className="mb-3">{instructions.description}</p>}
+                  {instructions.title && (
+                    <h4 className="font-semibold mb-2">{instructions.title}</h4>
+                  )}
+                  {instructions.description && (
+                    <p className="mb-3">{instructions.description}</p>
+                  )}
                   {instructions.instructions && (
                     <div className="space-y-2">
                       {Array.isArray(instructions.instructions) ? (
                         <ul className="list-disc pl-5 space-y-1">
-                          {instructions.instructions.map((instruction: string, index: number) => (
-                            <li key={index}>{instruction}</li>
-                          ))}
+                          {instructions.instructions.map(
+                            (instruction: string, index: number) => (
+                              <li key={index}>{instruction}</li>
+                            )
+                          )}
                         </ul>
                       ) : (
                         <p>{instructions.instructions}</p>
@@ -129,53 +141,75 @@ export default function MILInstructions({
           {instructions.examples && (
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
               <h3 className="text-lg font-semibold text-yellow-900 mb-3">
-                📝 Examples
+                📝 {t("dashboard.examples")}
               </h3>
               <div className="space-y-4">
                 {Array.isArray(instructions.examples) ? (
                   instructions.examples.map((example: any, index: number) => (
-                    <div key={index} className="bg-white border border-yellow-300 rounded-lg p-4">
-                      {typeof example === 'string' ? (
+                    <div
+                      key={index}
+                      className="bg-white border border-yellow-300 rounded-lg p-4"
+                    >
+                      {typeof example === "string" ? (
                         <p className="text-gray-700">{example}</p>
                       ) : (
                         <div className="space-y-2">
                           {example.question && (
-                            <p className="font-medium text-gray-900">{example.question}</p>
+                            <p className="font-medium text-gray-900">
+                              {example.question}
+                            </p>
                           )}
                           {(example.data || example.letterPairs) && (
                             <div className="space-y-3">
-                              {Array.isArray(example.data) && example.data.length > 0 && (
-                                <div className="grid grid-cols-4 gap-2">
-                                  {example.data.map((pair: string[], idx: number) => (
-                                    <div 
-                                      key={idx} 
-                                      className="border rounded p-2 text-center bg-white"
-                                    >
-                                      <div className="font-bold border-b pb-1">{pair[0]}</div>
-                                      <div className="pt-1">{pair[1]}</div>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                              {Array.isArray(example.letterPairs) && example.letterPairs.length > 0 && (
-                                <div className="grid grid-cols-4 gap-2">
-                                  {example.letterPairs.map((pair: { top: string; bottom: string }, idx: number) => (
-                                    <div 
-                                      key={idx} 
-                                      className="border rounded p-2 text-center bg-white"
-                                    >
-                                      <div className="font-bold border-b pb-1">{pair.top}</div>
-                                      <div className="pt-1">{pair.bottom}</div>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
+                              {Array.isArray(example.data) &&
+                                example.data.length > 0 && (
+                                  <div className="grid grid-cols-4 gap-2">
+                                    {example.data.map(
+                                      (pair: string[], idx: number) => (
+                                        <div
+                                          key={idx}
+                                          className="border rounded p-2 text-center bg-white"
+                                        >
+                                          <div className="font-bold border-b pb-1">
+                                            {pair[0]}
+                                          </div>
+                                          <div className="pt-1">{pair[1]}</div>
+                                        </div>
+                                      )
+                                    )}
+                                  </div>
+                                )}
+                              {Array.isArray(example.letterPairs) &&
+                                example.letterPairs.length > 0 && (
+                                  <div className="grid grid-cols-4 gap-2">
+                                    {example.letterPairs.map(
+                                      (
+                                        pair: { top: string; bottom: string },
+                                        idx: number
+                                      ) => (
+                                        <div
+                                          key={idx}
+                                          className="border rounded p-2 text-center bg-white"
+                                        >
+                                          <div className="font-bold border-b pb-1">
+                                            {pair.top}
+                                          </div>
+                                          <div className="pt-1">
+                                            {pair.bottom}
+                                          </div>
+                                        </div>
+                                      )
+                                    )}
+                                  </div>
+                                )}
                             </div>
                           )}
-                          {(example.answer !== undefined || example.correctAnswer !== undefined) && (
+                          {(example.answer !== undefined ||
+                            example.correctAnswer !== undefined) && (
                             <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded">
                               <p className="text-green-700 font-medium">
-                                Correct Answer: {example.answer ?? example.correctAnswer}
+                                {t("dashboard.correctAnswer")}{" "}
+                                {example.answer ?? example.correctAnswer}
                               </p>
                               {example.explanation && (
                                 <p className="text-green-700 text-sm mt-1">
@@ -201,178 +235,214 @@ export default function MILInstructions({
           {instructions.example && (
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
               <h3 className="text-lg font-semibold text-yellow-900 mb-3">
-                📝 Example
+                📝 {t("dashboard.example")}
               </h3>
               <div className="space-y-4">
                 <div className="bg-white border border-yellow-300 rounded-lg p-4">
                   {/* Render letter pairs example */}
                   {instructions.example.letterPairs && (
                     <div className="grid grid-cols-4 gap-2 mb-4">
-                      {instructions.example.letterPairs.map((pair: { top: string; bottom: string }, idx: number) => (
-                        <div 
-                          key={idx} 
-                          className="border rounded p-2 text-center bg-white"
-                        >
-                          <div className="font-bold border-b pb-1">{pair.top}</div>
-                          <div className="pt-1">{pair.bottom}</div>
-                        </div>
-                      ))}
+                      {instructions.example.letterPairs.map(
+                        (
+                          pair: { top: string; bottom: string },
+                          idx: number
+                        ) => (
+                          <div
+                            key={idx}
+                            className="border rounded p-2 text-center bg-white"
+                          >
+                            <div className="font-bold border-b pb-1">
+                              {pair.top}
+                            </div>
+                            <div className="pt-1">{pair.bottom}</div>
+                          </div>
+                        )
+                      )}
                     </div>
                   )}
-                  
+
                   {/* Render numeric example */}
                   {instructions.example.numbers && (
                     <div className="max-w-lg mx-auto mb-6">
                       <div className="relative bg-gradient-to-br from-orange-50 via-yellow-50 to-red-50 border-2 border-orange-200/60 rounded-xl p-4 sm:p-6 shadow-xl backdrop-blur-sm">
                         <div className="flex justify-center items-center space-x-4 sm:space-x-6">
-                          {instructions.example.numbers.map((num: number, index: number) => {
-                            // Determine if this is the lowest, highest, or middle number
-                            const sorted = [...instructions.example.numbers].sort((a, b) => a - b);
-                            const lowest = sorted[0];
-                            const highest = sorted[sorted.length - 1];
-                            const middle = sorted[1];
-                            const isMiddle = num === middle;
-                            const isExtreme = num === lowest || num === highest;
-                            
-                            let bgColor = "bg-gradient-to-br from-gray-100 to-gray-200 border-2 border-gray-300";
-                            
-                            if (isMiddle) {
-                              bgColor = "bg-gradient-to-br from-orange-100 to-yellow-100 border-2 border-orange-300 shadow-lg";
-                            } else if (isExtreme) {
-                              bgColor = "bg-gradient-to-br from-red-100 to-orange-100 border-2 border-red-300 shadow-md";
-                            }
-                            
-                            return (
-                              <div 
-                                key={index} 
-                                className={`text-center ${
-                                  isMiddle ? "transform scale-110" : ""
-                                }`}
-                              >
-                                <div className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-xl flex items-center justify-center ${bgColor}`}>
-                                  <span className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 font-mono">
-                                    {num}
-                                  </span>
+                          {instructions.example.numbers.map(
+                            (num: number, index: number) => {
+                              // Determine if this is the lowest, highest, or middle number
+                              const sorted = [
+                                ...instructions.example.numbers,
+                              ].sort((a, b) => a - b);
+                              const lowest = sorted[0];
+                              const highest = sorted[sorted.length - 1];
+                              const middle = sorted[1];
+                              const isMiddle = num === middle;
+                              const isExtreme =
+                                num === lowest || num === highest;
+
+                              let bgColor =
+                                "bg-gradient-to-br from-gray-100 to-gray-200 border-2 border-gray-300";
+
+                              if (isMiddle) {
+                                bgColor =
+                                  "bg-gradient-to-br from-orange-100 to-yellow-100 border-2 border-orange-300 shadow-lg";
+                              } else if (isExtreme) {
+                                bgColor =
+                                  "bg-gradient-to-br from-red-100 to-orange-100 border-2 border-red-300 shadow-md";
+                              }
+
+                              return (
+                                <div
+                                  key={index}
+                                  className={`text-center ${
+                                    isMiddle ? "transform scale-110" : ""
+                                  }`}
+                                >
+                                  <div
+                                    className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-xl flex items-center justify-center ${bgColor}`}
+                                  >
+                                    <span className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 font-mono">
+                                      {num}
+                                    </span>
+                                  </div>
+                                  {isMiddle && (
+                                    <div className="text-xs sm:text-sm text-orange-600 font-medium mt-2">
+                                      {t("dashboard.middle")}
+                                    </div>
+                                  )}
+                                  {num === lowest && (
+                                    <div className="text-xs sm:text-sm text-red-600 font-medium mt-2">
+                                      {t("dashboard.lowest")}
+                                    </div>
+                                  )}
+                                  {num === highest && (
+                                    <div className="text-xs sm:text-sm text-red-600 font-medium mt-2">
+                                      {t("dashboard.highest")}
+                                    </div>
+                                  )}
                                 </div>
-                                {isMiddle && (
-                                  <div className="text-xs sm:text-sm text-orange-600 font-medium mt-2">
-                                    Middle
-                                  </div>
-                                )}
-                                {num === lowest && (
-                                  <div className="text-xs sm:text-sm text-red-600 font-medium mt-2">
-                                    Lowest
-                                  </div>
-                                )}
-                                {num === highest && (
-                                  <div className="text-xs sm:text-sm text-red-600 font-medium mt-2">
-                                    Highest
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          })}
+                              );
+                            }
+                          )}
                         </div>
                       </div>
                     </div>
                   )}
-                  
+
                   {/* Render Verbal Reasoning example */}
                   {instructions.example.statements && (
                     <div className="space-y-4 mb-6">
                       {/* Statements */}
                       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <h4 className="font-semibold text-blue-900 mb-2">Statements:</h4>
+                        <h4 className="font-semibold text-blue-900 mb-2">
+                          {t("dashboard.statements")}:
+                        </h4>
                         <ul className="space-y-1">
-                          {instructions.example.statements.map((statement: string, index: number) => (
-                            <li key={index} className="text-blue-800">
-                              • {statement}
-                            </li>
-                          ))}
+                          {instructions.example.statements.map(
+                            (statement: string, index: number) => (
+                              <li key={index} className="text-blue-800">
+                                • {statement}
+                              </li>
+                            )
+                          )}
                         </ul>
                       </div>
-                      
+
                       {/* Question */}
                       {instructions.example.question && (
                         <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                          <h4 className="font-semibold text-purple-900 mb-2">Question:</h4>
-                          <p className="text-purple-800">{instructions.example.question}</p>
+                          <h4 className="font-semibold text-purple-900 mb-2">
+                            {t("dashboard.question")}:
+                          </h4>
+                          <p className="text-purple-800">
+                            {instructions.example.question}
+                          </p>
                         </div>
                       )}
-                      
+
                       {/* Options */}
                       {instructions.example.options && (
                         <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                          <h4 className="font-semibold text-gray-900 mb-3">Options:</h4>
+                          <h4 className="font-semibold text-gray-900 mb-3">
+                            {t("dashboard.options")}
+                          </h4>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            {instructions.example.options.map((option: string, index: number) => (
-                              <div 
-                                key={index}
-                                className="flex items-center p-2 bg-white border border-gray-300 rounded text-sm"
-                              >
-                                <span className="font-bold text-blue-600 mr-2">
-                                  {String.fromCharCode(65 + index)}.
-                                </span>
-                                <span className="text-gray-700">{option}</span>
-                              </div>
-                            ))}
+                            {instructions.example.options.map(
+                              (option: string, index: number) => (
+                                <div
+                                  key={index}
+                                  className="flex items-center p-2 bg-white border border-gray-300 rounded text-sm"
+                                >
+                                  <span className="font-bold text-blue-600 mr-2">
+                                    {String.fromCharCode(65 + index)}.
+                                  </span>
+                                  <span className="text-gray-700">
+                                    {option}
+                                  </span>
+                                </div>
+                              )
+                            )}
                           </div>
                         </div>
                       )}
                     </div>
                   )}
-                  
+
                   {/* Render Working Memory example */}
                   {instructions.example.letters && (
                     <div className="max-w-lg mx-auto mb-6">
                       <div className="relative bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 border-2 border-purple-200/60 rounded-xl p-4 sm:p-6 shadow-xl backdrop-blur-sm">
                         {/* Letter Sequence Display */}
                         <div className="flex justify-center items-center space-x-4 sm:space-x-6">
-                          {instructions.example.letters.map((letter: string, index: number) => {
-                            const isMiddle = index === 1; // Middle letter is always at index 1
-                            
-                            return (
-                              <div
-                                key={index}
-                                className={`text-center ${
-                                  isMiddle ? "transform scale-110" : ""
-                                }`}
-                              >
+                          {instructions.example.letters.map(
+                            (letter: string, index: number) => {
+                              const isMiddle = index === 1; // Middle letter is always at index 1
+
+                              return (
                                 <div
-                                  className={`w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center ${
-                                    isMiddle
-                                      ? "bg-gradient-to-br from-purple-100 to-blue-100 border-2 border-purple-300 shadow-lg"
-                                      : "bg-gradient-to-br from-gray-100 to-gray-200 border-2 border-gray-300"
+                                  key={index}
+                                  className={`text-center ${
+                                    isMiddle ? "transform scale-110" : ""
                                   }`}
                                 >
-                                  <span className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 font-mono">
-                                    {letter}
-                                  </span>
-                                </div>
-                                {isMiddle && (
-                                  <div className="text-xs sm:text-sm text-purple-600 font-medium mt-2">
-                                    Middle
+                                  <div
+                                    className={`w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center ${
+                                      isMiddle
+                                        ? "bg-gradient-to-br from-purple-100 to-blue-100 border-2 border-purple-300 shadow-lg"
+                                        : "bg-gradient-to-br from-gray-100 to-gray-200 border-2 border-gray-300"
+                                    }`}
+                                  >
+                                    <span className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 font-mono">
+                                      {letter}
+                                    </span>
                                   </div>
-                                )}
-                              </div>
-                            );
-                          })}
+                                  {isMiddle && (
+                                    <div className="text-xs sm:text-sm text-purple-600 font-medium mt-2">
+                                      {t("dashboard.middle")}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            }
+                          )}
                         </div>
                       </div>
                     </div>
                   )}
-                  
+
                   {/* Render Visual Rotation example */}
-                  {(instructions.example.grid || instructions.title === "Visual Rotation") && (
+                  {(instructions.example.grid ||
+                    instructions.title === "Visual Rotation") && (
                     <div className="space-y-4 mb-6">
                       {/* Question */}
                       <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                        <h4 className="font-semibold text-purple-900 mb-2">Question:</h4>
+                        <h4 className="font-semibold text-purple-900 mb-2">
+                          {t("dashboard.question")}:
+                        </h4>
                         <p className="text-purple-800">
-                          How many of the bottom figures are identical to the ones directly above them, after rotating them in any direction?
+                          {t("dashboard.visualRotationQuestion")}
                         </p>
                       </div>
-                      
+
                       {/* Visual Rotation Grid */}
                       <div className="max-w-lg mx-auto">
                         <div className="relative bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 border-2 border-indigo-200/60 rounded-xl p-4 sm:p-6 shadow-xl backdrop-blur-sm">
@@ -380,19 +450,43 @@ export default function MILInstructions({
                             // Hardcoded example data matching your image
                             const examplePairs = [
                               {
-                                top: { letter: "R", rotationDegree: 0, isMirrored: false },
-                                bottom: { letter: "R", rotationDegree: 180, isMirrored: false }
+                                top: {
+                                  letter: "R",
+                                  rotationDegree: 0,
+                                  isMirrored: false,
+                                },
+                                bottom: {
+                                  letter: "R",
+                                  rotationDegree: 180,
+                                  isMirrored: false,
+                                },
                               },
                               {
-                                top: { letter: "R", rotationDegree: 0, isMirrored: false },
-                                bottom: { letter: "R", rotationDegree: 0, isMirrored: true }
+                                top: {
+                                  letter: "R",
+                                  rotationDegree: 0,
+                                  isMirrored: false,
+                                },
+                                bottom: {
+                                  letter: "R",
+                                  rotationDegree: 0,
+                                  isMirrored: true,
+                                },
                               },
                               {
-                                top: { letter: "R", rotationDegree: 0, isMirrored: false },
-                                bottom: { letter: "R", rotationDegree: 0, isMirrored: false }
-                              }
+                                top: {
+                                  letter: "R",
+                                  rotationDegree: 0,
+                                  isMirrored: false,
+                                },
+                                bottom: {
+                                  letter: "R",
+                                  rotationDegree: 0,
+                                  isMirrored: false,
+                                },
+                              },
                             ];
-                            
+
                             const getTransform = (item: any) => {
                               let transform = "";
                               if (item.rotationDegree !== 0) {
@@ -403,16 +497,21 @@ export default function MILInstructions({
                               }
                               return transform || "none";
                             };
-                            
+
                             return (
                               <>
                                 {/* Top Row */}
                                 <div
                                   className="grid gap-2 sm:gap-4 md:gap-6 mb-4 sm:mb-6"
-                                  style={{ gridTemplateColumns: `repeat(${examplePairs.length}, 1fr)` }}
+                                  style={{
+                                    gridTemplateColumns: `repeat(${examplePairs.length}, 1fr)`,
+                                  }}
                                 >
                                   {examplePairs.map((pair, index) => (
-                                    <div key={`top-${index}`} className="text-center">
+                                    <div
+                                      key={`top-${index}`}
+                                      className="text-center"
+                                    >
                                       <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white border-2 border-indigo-300 rounded-lg flex items-center justify-center shadow-sm">
                                         <span
                                           className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 font-mono inline-block transition-transform duration-200"
@@ -433,15 +532,22 @@ export default function MILInstructions({
                                 {/* Bottom Row */}
                                 <div
                                   className="grid gap-2 sm:gap-4 md:gap-6"
-                                  style={{ gridTemplateColumns: `repeat(${examplePairs.length}, 1fr)` }}
+                                  style={{
+                                    gridTemplateColumns: `repeat(${examplePairs.length}, 1fr)`,
+                                  }}
                                 >
                                   {examplePairs.map((pair, index) => (
-                                    <div key={`bottom-${index}`} className="text-center">
+                                    <div
+                                      key={`bottom-${index}`}
+                                      className="text-center"
+                                    >
                                       <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white border-2 border-indigo-300 rounded-lg flex items-center justify-center shadow-sm">
                                         <span
                                           className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 font-mono inline-block transition-transform duration-200"
                                           style={{
-                                            transform: getTransform(pair.bottom),
+                                            transform: getTransform(
+                                              pair.bottom
+                                            ),
                                           }}
                                         >
                                           {pair.bottom.letter}
@@ -455,16 +561,20 @@ export default function MILInstructions({
                           })()}
                         </div>
                       </div>
-                      
+
                       {/* Answer Options */}
                       <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                        <h4 className="font-semibold text-gray-900 mb-3">How many pairs match?</h4>
+                        <h4 className="font-semibold text-gray-900 mb-3">
+                          {t("dashboard.howManyPairsMatch")}
+                        </h4>
                         <div className="flex justify-center space-x-4">
                           {[0, 1, 2].map((num) => (
-                            <div 
+                            <div
                               key={num}
                               className={`w-12 h-12 rounded-lg flex items-center justify-center border-2 ${
-                                num === 1 ? "bg-green-50 border-green-400" : "bg-white border-gray-300"
+                                num === 1
+                                  ? "bg-green-50 border-green-400"
+                                  : "bg-white border-gray-300"
                               }`}
                             >
                               <span className="text-lg font-bold text-gray-800 font-mono">
@@ -476,10 +586,11 @@ export default function MILInstructions({
                       </div>
                     </div>
                   )}
-                  
+
                   <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded">
                     <p className="text-green-700 font-medium">
-                      Correct Answer: {instructions.example.correctAnswer}
+                      {t("dashboard.correctAnswer")}{" "}
+                      {instructions.example.correctAnswer}
                     </p>
                     <p className="text-green-700 text-sm mt-1">
                       {instructions.example.explanation}
@@ -489,7 +600,6 @@ export default function MILInstructions({
               </div>
             </div>
           )}
-
         </div>
       );
     }
@@ -501,15 +611,19 @@ export default function MILInstructions({
         <div className="bg-gray-50 rounded-lg p-4">
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <span className="font-medium text-gray-900">Time Limit:</span>
+              <span className="font-medium text-gray-900">
+                {t("dashboard.timeLimit")}
+              </span>
               <span className="text-gray-600 ml-2">
-                {exam.timeLimitMinutes} minutes
+                {exam.timeLimitMinutes} {t("dashboard.minutes")}
               </span>
             </div>
             <div>
-              <span className="font-medium text-gray-900">Questions:</span>
+              <span className="font-medium text-gray-900">
+                {t("dashboard.questions")}:
+              </span>
               <span className="text-gray-600 ml-2">
-                {exam.totalQuestions} items
+                {exam.totalQuestions} {t("dashboard.items")}
               </span>
             </div>
           </div>
@@ -518,21 +632,19 @@ export default function MILInstructions({
     );
   };
 
-
-
   // Handle Practice Step
-  if (currentStep === 'practice') {
+  if (currentStep === "practice") {
     return (
       <MILPracticeExamples
         examId={exam.id as any}
-        onComplete={() => setCurrentStep('test')}
-        onBack={() => setCurrentStep('instructions')}
+        onComplete={() => setCurrentStep("test")}
+        onBack={() => setCurrentStep("instructions")}
       />
     );
   }
 
   // Handle Test Step
-  if (currentStep === 'test') {
+  if (currentStep === "test") {
     onStart();
     return null;
   }
@@ -547,14 +659,16 @@ export default function MILInstructions({
               <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
                 {exam.name}
               </h1>
-              <p className="text-sm text-gray-600">Instructions & Examples</p>
+              <p className="text-sm text-gray-600">
+                {t("dashboard.instructionsAndExamples")}
+              </p>
             </div>
             <div className="text-right">
               <div className="text-lg font-semibold text-blue-600">
-                {exam.timeLimitMinutes} minutes
+                {exam.timeLimitMinutes} {t("dashboard.minutes")}
               </div>
               <div className="text-sm text-gray-500">
-                {exam.totalQuestions} questions
+                {exam.totalQuestions} {t("dashboard.questions")}
               </div>
             </div>
           </div>
@@ -571,21 +685,27 @@ export default function MILInstructions({
           >
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
               <h3 className="text-lg font-semibold text-red-900 mb-2">
-                ⏱️ Speed Challenge:
+                ⏱️ {t("dashboard.speedChallenge")}
               </h3>
               <p className="text-red-800 font-medium">
-                You have <strong>{exam.timeLimitMinutes} minutes</strong> for{" "}
-                <strong>{exam.totalQuestions} questions</strong>
+                {t("dashboard.youHave")}{" "}
+                <strong>
+                  {exam.timeLimitMinutes} {t("dashboard.minutes")}
+                </strong>{" "}
+                {t("dashboard.for")}{" "}
+                <strong>
+                  {exam.totalQuestions} {t("dashboard.questions")}
+                </strong>
               </p>
               <p className="text-red-700 text-sm mt-2">
-                That's only{" "}
+                {t("dashboard.thatsOnly")}{" "}
                 <strong>
                   {Math.round(
                     (exam.timeLimitMinutes * 60) / exam.totalQuestions
                   )}{" "}
-                  seconds per question
+                  {t("dashboard.secondsPerQuestion")}
                 </strong>
-                ! Work quickly and trust your first instinct.
+                ! {t("dashboard.workQuickly")}
               </p>
             </div>
 
@@ -593,21 +713,23 @@ export default function MILInstructions({
               {loading ? (
                 <div className="text-center py-8">
                   <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                  <p className="text-gray-600">Loading instructions...</p>
+                  <p className="text-gray-600">
+                    {t("dashboard.loadingInstructions")}
+                  </p>
                 </div>
               ) : (
                 getInstructionContent()
               )}
             </div>
 
-
-
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-8">
-              <h4 className="font-medium text-yellow-900 mb-2">Important:</h4>
+              <h4 className="font-medium text-yellow-900 mb-2">
+                {t("dashboard.important")}
+              </h4>
               <ul className="text-sm text-yellow-800 space-y-1">
-                <li>• You cannot go back to previous questions</li>
-                <li>• Each answer is automatically saved when you continue</li>
-                <li>• Complete practice examples before starting the actual test</li>
+                <li>• {t("dashboard.cannotGoBack")}</li>
+                <li>• {t("dashboard.autoSaved")}</li>
+                <li>• {t("dashboard.completePractice")}</li>
               </ul>
             </div>
 
@@ -616,13 +738,13 @@ export default function MILInstructions({
                 onClick={onBack}
                 className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors"
               >
-                Back to Test List
+                {t("dashboard.backToTestList")}
               </button>
               <button
-                onClick={() => setCurrentStep('practice')}
+                onClick={() => setCurrentStep("practice")}
                 className="px-8 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
               >
-                Continue to Practice
+                {t("dashboard.continueToPractice")}
               </button>
             </div>
           </motion.div>

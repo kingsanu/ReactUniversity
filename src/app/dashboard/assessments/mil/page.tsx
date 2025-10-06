@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { useTranslation } from "react-i18next";
+import { useGlobalStore } from "@/store/useGlobalStore";
 import {
   getAllMILExams,
   MILExamMetadata,
@@ -42,6 +43,7 @@ type AssessmentStep =
 
 export default function MILAssessmentPage() {
   const { t } = useTranslation();
+  const { language } = useGlobalStore();
   const [assessmentType, setAssessmentType] = useState<AssessmentType>("mil");
   const [currentStep, setCurrentStep] = useState<AssessmentStep>("overview");
   const [exams, setExams] = useState<MILExamMetadata[]>([]);
@@ -83,12 +85,12 @@ export default function MILAssessmentPage() {
       const userId = getCurrentUserId();
 
       // Load LIA progress
-      const liaResults = await getAllUserExamResults();
+      const liaResults = await getAllUserExamResults(language);
       const liaProgressSummary = getUserProgressSummary(liaResults);
       setLiaProgress(liaProgressSummary);
 
       // Load 360° Evaluation progress
-      const evaluationGroups = await getUserEvaluationGroups(userId);
+      const evaluationGroups = await getUserEvaluationGroups(userId, language);
       setEvaluationProgress(evaluationGroups);
 
       console.log("🔄 Progress Data Loaded:", {
@@ -107,12 +109,12 @@ export default function MILAssessmentPage() {
     loadExams();
     loadProgress();
     loadProgressData();
-  }, []);
+  }, [language]);
 
   const loadExams = async () => {
     try {
       setLoading(true);
-      const examData = await getAllMILExams();
+      const examData = await getAllMILExams(language);
       setExams(examData);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load exams");
@@ -251,11 +253,10 @@ export default function MILAssessmentPage() {
                 </svg>
               </div>
               <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                Labor Intelligence Assessment (LIA)
+                {t("dashboard.liaTitle")}
               </h1>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                The LIA assesses your ability to learn and adapt to new
-                situations through various cognitive tasks.
+                {t("dashboard.liaAssessmentDescription")}
               </p>
             </div>
 
@@ -264,7 +265,7 @@ export default function MILAssessmentPage() {
               (liaProgress || evaluationProgress.length > 0) && (
                 <div className="mb-8 p-6 bg-gray-50 rounded-lg">
                   <h2 className="text-xl font-semibold text-gray-900 mb-4 text-left">
-                    Assessment Progress Overview
+                    {t("dashboard.assessmentProgressOverview")}
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* LIA Progress */}
@@ -287,33 +288,37 @@ export default function MILAssessmentPage() {
                             </svg>
                           </div>
                           <h3 className="font-semibold text-gray-900">
-                            LIA Progress
+                            {t("dashboard.liaProgress")}
                           </h3>
                         </div>
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between">
                             <span className="text-gray-600">
-                              Total Sub Assessments:
+                              {t("dashboard.totalSubAssessments")}:
                             </span>
                             <span className="font-medium">
                               {liaProgress.totalAttempts}
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-gray-600">Completed:</span>
+                            <span className="text-gray-600">
+                              {t("dashboard.completed")}:
+                            </span>
                             <span className="font-medium">
                               {liaProgress.completedExams}
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-gray-600">Best Score:</span>
+                            <span className="text-gray-600">
+                              {t("dashboard.bestScore")}:
+                            </span>
                             <span className="font-medium">
                               {liaProgress.bestScore.toFixed(1)}%
                             </span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-gray-600">
-                              Average Score:
+                              {t("dashboard.averageScore")}:
                             </span>
                             <span className="font-medium">
                               {liaProgress.averageScore.toFixed(1)}%
@@ -342,7 +347,7 @@ export default function MILAssessmentPage() {
                           </svg>
                         </div>
                         <h3 className="font-semibold text-gray-900">
-                          360° Evaluations
+                          {t("dashboard.360Evaluations")}
                         </h3>
                       </div>
                       <div className="space-y-2 text-sm">
@@ -350,14 +355,16 @@ export default function MILAssessmentPage() {
                           <>
                             <div className="flex justify-between">
                               <span className="text-gray-600">
-                                Total Groups:
+                                {t("dashboard.totalGroups")}:
                               </span>
                               <span className="font-medium">
                                 {evaluationProgress.length}
                               </span>
                             </div>
                             <div className="flex justify-between">
-                              <span className="text-gray-600">Completed:</span>
+                              <span className="text-gray-600">
+                                {t("dashboard.completed")}:
+                              </span>
                               <span className="font-medium">
                                 {
                                   evaluationProgress.filter(
@@ -367,7 +374,9 @@ export default function MILAssessmentPage() {
                               </span>
                             </div>
                             <div className="flex justify-between">
-                              <span className="text-gray-600">Pending:</span>
+                              <span className="text-gray-600">
+                                {t("dashboard.pending")}:
+                              </span>
                               <span className="font-medium">
                                 {
                                   evaluationProgress.filter(
@@ -485,8 +494,8 @@ export default function MILAssessmentPage() {
                 className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg"
               >
                 {completedExams.length === 0
-                  ? "Start Assessment"
-                  : "Continue Assessment"}
+                  ? t("dashboard.startAssessment")
+                  : t("dashboard.continueAssessment")}
               </button>
             ) : (
               <div className="text-center">

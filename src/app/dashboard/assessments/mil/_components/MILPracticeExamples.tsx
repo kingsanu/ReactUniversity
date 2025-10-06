@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
+import { useTranslation } from "react-i18next";
 import {
   MILExamId,
   MILQuestion,
@@ -19,6 +20,7 @@ export default function MILPracticeExamples({
   onComplete,
   onBack,
 }: MILPracticeExamplesProps) {
+  const { t } = useTranslation();
   const [practiceQuestions, setPracticeQuestions] = useState<MILQuestion[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -837,7 +839,9 @@ export default function MILPracticeExamples({
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading practice examples...</p>
+          <p className="text-gray-600">
+            {t("dashboard.loadingPracticeExamples")}
+          </p>
         </div>
       </div>
     );
@@ -847,12 +851,14 @@ export default function MILPracticeExamples({
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600 mb-4">No practice questions available</p>
+          <p className="text-gray-600 mb-4">
+            {t("dashboard.noPracticeQuestions")}
+          </p>
           <button
             onClick={onBack}
             className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
           >
-            Go Back
+            {t("dashboard.goBack")}
           </button>
         </div>
       </div>
@@ -884,10 +890,10 @@ export default function MILPracticeExamples({
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Practice Examples
+              {t("dashboard.practiceExamples")}
             </h1>
             <p className="text-gray-600 mb-4">
-              Answer these examples correctly to proceed to the actual test.
+              {t("dashboard.answerCorrectlyToProceed")}
             </p>
 
             {/* Progress */}
@@ -907,7 +913,10 @@ export default function MILPracticeExamples({
             </div>
 
             <div className="text-sm text-gray-500">
-              Example {currentQuestion + 1} of {practiceQuestions.length}
+              {t("dashboard.exampleOf", {
+                current: currentQuestion + 1,
+                total: practiceQuestions.length,
+              })}
             </div>
           </div>
 
@@ -971,8 +980,8 @@ export default function MILPracticeExamples({
                   }`}
                 >
                   {isCorrect
-                    ? "Perfect! You can now start the test"
-                    : "Review the instructions and try again"}
+                    ? t("dashboard.perfectStartTest")
+                    : t("dashboard.reviewInstructions")}
                 </span>
               </div>
               <p
@@ -988,13 +997,13 @@ export default function MILPracticeExamples({
                     isCorrect ? "text-green-700" : "text-red-700"
                   }`}
                 >
-                  Correct answer:{" "}
+                  {t("dashboard.correctAnswerLabel")}{" "}
                   {(() => {
                     // For letter pairs questions
                     if (currentQ.data.letterPairs) {
                       return `${calculateMatchingPairs(
                         currentQ.data.letterPairs
-                      )} matching pairs`;
+                      )} ${t("dashboard.matchingPairs")}`;
                     }
 
                     // For questions with options
@@ -1014,7 +1023,7 @@ export default function MILPracticeExamples({
                       return currentQ.correctAnswer.toString();
                     }
 
-                    return "Not available";
+                    return t("dashboard.notAvailable");
                   })()}
                 </p>
               )}
@@ -1027,7 +1036,7 @@ export default function MILPracticeExamples({
               onClick={onBack}
               className="px-4 py-2 sm:px-6 sm:py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm sm:text-base"
             >
-              ← Back to Instructions
+              ← {t("dashboard.backToInstructions")}
             </button>
 
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
@@ -1037,7 +1046,7 @@ export default function MILPracticeExamples({
                   disabled={selectedAnswer === null}
                   className="bg-blue-600 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                 >
-                  Submit Answer
+                  {t("dashboard.submitAnswer")}
                 </button>
               ) : (
                 <>
@@ -1046,21 +1055,21 @@ export default function MILPracticeExamples({
                       onClick={handleContinue}
                       className="bg-orange-600 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg hover:bg-orange-700 transition-colors text-sm sm:text-base"
                     >
-                      Try Again
+                      {t("common.tryAgain")}
                     </button>
                   ) : allPracticeCompleted ? (
                     <button
                       onClick={onComplete}
                       className="bg-green-600 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg hover:bg-green-700 transition-colors font-medium text-sm sm:text-base"
                     >
-                      Start Test
+                      {t("dashboard.startTest")}
                     </button>
                   ) : (
                     <button
                       onClick={handleContinue}
                       className="bg-blue-600 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
                     >
-                      Next Example
+                      {t("dashboard.nextExample")}
                     </button>
                   )}
                 </>

@@ -958,14 +958,26 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/pattern-recognition-001",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/pattern-recognition-001?lang={{language}}",
                   "protocol": "https",
                   "host": [
                     "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
-                  "path": ["api", "PCAExam", "exams", "pattern-recognition-001"]
+                  "path": [
+                    "api",
+                    "PCAExam",
+                    "exams",
+                    "pattern-recognition-001"
+                  ],
+                  "query": [
+                    {
+                      "key": "lang",
+                      "value": "{{language}}",
+                      "description": "Language code (en for English, sp for Spanish). Defaults to 'en' if not specified."
+                    }
+                  ]
                 },
-                "description": "Get Pattern Recognition exam with 60 questions"
+                "description": "Get Pattern Recognition exam with 60 questions. Now supports both English and Spanish languages.\n\n**Language Support:**\n- `lang=en` (default): Returns exam in English\n- `lang=sp`: Returns exam in Spanish\n\n**Examples:**\n- Get English: `/api/PCAExam/exams/pattern-recognition-001?lang=en`\n- Get Spanish: `/api/PCAExam/exams/pattern-recognition-001?lang=sp`"
               }
             },
             {
@@ -983,7 +995,7 @@
                   "raw": ""
                 },
                 "url": {
-                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/pattern-recognition-001/start",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/pattern-recognition-001/start?lang={{language}}",
                   "protocol": "https",
                   "host": [
                     "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
@@ -994,9 +1006,16 @@
                     "exams",
                     "pattern-recognition-001",
                     "start"
+                  ],
+                  "query": [
+                    {
+                      "key": "lang",
+                      "value": "{{language}}",
+                      "description": "Language code (en for English, sp for Spanish). Defaults to 'en' if not specified."
+                    }
                   ]
                 },
-                "description": "Start Pattern Recognition exam session"
+                "description": "Start Pattern Recognition exam session with language support.\n\n**Language Support:**\n- `lang=en` (default): Start exam in English\n- `lang=sp`: Start exam in Spanish\n\n**Examples:**\n- Start English: `/api/PCAExam/exams/pattern-recognition-001/start?lang=en`\n- Start Spanish: `/api/PCAExam/exams/pattern-recognition-001/start?lang=sp`"
               }
             },
             {
@@ -1005,7 +1024,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/pattern-recognition-001/instructions",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/pattern-recognition-001/instructions?lang={{language}}",
                   "protocol": "https",
                   "host": [
                     "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
@@ -1016,9 +1035,16 @@
                     "exams",
                     "pattern-recognition-001",
                     "instructions"
+                  ],
+                  "query": [
+                    {
+                      "key": "lang",
+                      "value": "{{language}}",
+                      "description": "Language code (en for English, sp for Spanish). Defaults to 'en' if not specified."
+                    }
                   ]
                 },
-                "description": "Get Pattern Recognition exam instructions and examples"
+                "description": "Get Pattern Recognition exam instructions and examples with language support.\n\n**Language Support:**\n- `lang=en` (default): Get instructions in English\n- `lang=sp`: Get instructions in Spanish\n\n**Examples:**\n- Get English: `/api/PCAExam/exams/pattern-recognition-001/instructions?lang=en`\n- Get Spanish: `/api/PCAExam/exams/pattern-recognition-001/instructions?lang=sp`"
               }
             }
           ]
@@ -1027,19 +1053,49 @@
           "name": "Verbal Reasoning Exam",
           "item": [
             {
-              "name": "Get Verbal Reasoning Exam",
+              "name": "Get Verbal Reasoning Exam (English)",
               "request": {
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/verbal-reasoning-001",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/verbal-reasoning-001?lang=en",
                   "protocol": "https",
                   "host": [
                     "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
-                  "path": ["api", "PCAExam", "exams", "verbal-reasoning-001"]
+                  "path": ["api", "PCAExam", "exams", "verbal-reasoning-001"],
+                  "query": [
+                    {
+                      "key": "lang",
+                      "value": "en",
+                      "description": "Language code (en for English, sp for Spanish)"
+                    }
+                  ]
                 },
-                "description": "Get Verbal Reasoning exam with 50 questions"
+                "description": "Get Verbal Reasoning exam with 50 questions in English (default language)"
+              }
+            },
+            {
+              "name": "Get Verbal Reasoning Exam (Spanish)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/verbal-reasoning-001?lang=sp",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "PCAExam", "exams", "verbal-reasoning-001"],
+                  "query": [
+                    {
+                      "key": "lang",
+                      "value": "sp",
+                      "description": "Language code (en for English, sp for Spanish)"
+                    }
+                  ]
+                },
+                "description": "Get Verbal Reasoning exam with 50 questions in Spanish (Razonamiento Verbal)"
               }
             },
             {
@@ -1106,14 +1162,21 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/working-memory-001",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/working-memory-001?lang={{language}}",
                   "protocol": "https",
                   "host": [
                     "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
-                  "path": ["api", "PCAExam", "exams", "working-memory-001"]
+                  "path": ["api", "PCAExam", "exams", "working-memory-001"],
+                  "query": [
+                    {
+                      "key": "lang",
+                      "value": "{{language}}",
+                      "description": "Language code (en for English, sp for Spanish). Defaults to 'en' if not specified."
+                    }
+                  ]
                 },
-                "description": "Get Working Memory exam with 60 questions"
+                "description": "Get Working Memory exam with 60 questions in specified language. Supports English (en) and Spanish (sp)."
               }
             },
             {
@@ -1175,19 +1238,49 @@
           "name": "Numeric Velocity Exam",
           "item": [
             {
-              "name": "Get Numeric Velocity Exam",
+              "name": "Get Numeric Velocity Exam (English)",
               "request": {
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/numeric-velocity-001",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/numeric-velocity-001?lang=en",
                   "protocol": "https",
                   "host": [
                     "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
-                  "path": ["api", "PCAExam", "exams", "numeric-velocity-001"]
+                  "path": ["api", "PCAExam", "exams", "numeric-velocity-001"],
+                  "query": [
+                    {
+                      "key": "lang",
+                      "value": "en",
+                      "description": "Language code (en for English, sp for Spanish)"
+                    }
+                  ]
                 },
-                "description": "Get Numeric Velocity exam with 60 questions"
+                "description": "Get Numeric Velocity exam with 60 questions in English (default language)"
+              }
+            },
+            {
+              "name": "Get Numeric Velocity Exam (Spanish)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/numeric-velocity-001?lang=sp",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "PCAExam", "exams", "numeric-velocity-001"],
+                  "query": [
+                    {
+                      "key": "lang",
+                      "value": "sp",
+                      "description": "Language code (en for English, sp for Spanish)"
+                    }
+                  ]
+                },
+                "description": "Get Numeric Velocity exam with 60 questions in Spanish (Velocidad Numérica y Precisión)"
               }
             },
             {
@@ -1254,14 +1347,21 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/visual-rotation-001",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/visual-rotation-001?lang={{language}}",
                   "protocol": "https",
                   "host": [
                     "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
-                  "path": ["api", "PCAExam", "exams", "visual-rotation-001"]
+                  "path": ["api", "PCAExam", "exams", "visual-rotation-001"],
+                  "query": [
+                    {
+                      "key": "lang",
+                      "value": "{{language}}",
+                      "description": "Language code (en for English, sp for Spanish). Defaults to 'en' if not specified."
+                    }
+                  ]
                 },
-                "description": "Get Visual Rotation exam with 16 questions featuring rotated 'R' letters"
+                "description": "Get Visual Rotation exam with 60 questions featuring rotated figures. Now supports both English and Spanish languages.\n\n**Language Support:**\n- `lang=en` (default): Returns exam in English\n- `lang=sp`: Returns exam in Spanish\n\n**Examples:**\n- Get English: `/api/PCAExam/exams/visual-rotation-001?lang=en`\n- Get Spanish: `/api/PCAExam/exams/visual-rotation-001?lang=sp`"
               }
             },
             {
@@ -1279,7 +1379,7 @@
                   "raw": ""
                 },
                 "url": {
-                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/visual-rotation-001/start",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/visual-rotation-001/start?lang={{language}}",
                   "protocol": "https",
                   "host": [
                     "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
@@ -1290,9 +1390,16 @@
                     "exams",
                     "visual-rotation-001",
                     "start"
+                  ],
+                  "query": [
+                    {
+                      "key": "lang",
+                      "value": "{{language}}",
+                      "description": "Language code (en for English, sp for Spanish). Defaults to 'en' if not specified."
+                    }
                   ]
                 },
-                "description": "Start Visual Rotation exam session"
+                "description": "Start Visual Rotation exam session with language support.\n\n**Language Support:**\n- `lang=en` (default): Start exam in English\n- `lang=sp`: Start exam in Spanish\n\n**Examples:**\n- Start English: `/api/PCAExam/exams/visual-rotation-001/start?lang=en`\n- Start Spanish: `/api/PCAExam/exams/visual-rotation-001/start?lang=sp`"
               }
             },
             {
@@ -1301,7 +1408,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/visual-rotation-001/instructions",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/visual-rotation-001/instructions?lang={{language}}",
                   "protocol": "https",
                   "host": [
                     "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
@@ -1312,9 +1419,16 @@
                     "exams",
                     "visual-rotation-001",
                     "instructions"
+                  ],
+                  "query": [
+                    {
+                      "key": "lang",
+                      "value": "{{language}}",
+                      "description": "Language code (en for English, sp for Spanish). Defaults to 'en' if not specified."
+                    }
                   ]
                 },
-                "description": "Get Visual Rotation exam instructions and examples"
+                "description": "Get Visual Rotation exam instructions and examples with language support.\n\n**Language Support:**\n- `lang=en` (default): Get instructions in English\n- `lang=sp`: Get instructions in Spanish\n\n**Examples:**\n- Get English: `/api/PCAExam/exams/visual-rotation-001/instructions?lang=en`\n- Get Spanish: `/api/PCAExam/exams/visual-rotation-001/instructions?lang=sp`"
               }
             }
           ]
@@ -1328,14 +1442,21 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/{{examId}}",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/{{examId}}?lang={{language}}",
                   "protocol": "https",
                   "host": [
                     "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
-                  "path": ["api", "PCAExam", "exams", "{{examId}}"]
+                  "path": ["api", "PCAExam", "exams", "{{examId}}"],
+                  "query": [
+                    {
+                      "key": "lang",
+                      "value": "{{language}}",
+                      "description": "Language code (en for English, sp for Spanish). Defaults to 'en' if not specified."
+                    }
+                  ]
                 },
-                "description": "Get specific exam with all questions. Available exam IDs: pattern-recognition-001, verbal-reasoning-001, working-memory-001, numeric-velocity-001, visual-rotation-001"
+                "description": "Get specific exam with all questions. Available exam IDs: pattern-recognition-001, verbal-reasoning-001, working-memory-001, numeric-velocity-001, visual-rotation-001\n\n**Language Support:**\n- `lang=en` (default): Returns exam in English\n- `lang=sp`: Returns exam in Spanish (supported for pattern-recognition-001, verbal-reasoning-001, numeric-velocity-001, working-memory-001, visual-rotation-001)\n\n**Examples:**\n- Get English pattern recognition: `/api/PCAExam/exams/pattern-recognition-001?lang=en`\n- Get Spanish pattern recognition: `/api/PCAExam/exams/pattern-recognition-001?lang=sp`\n- Get English working memory: `/api/PCAExam/exams/working-memory-001?lang=en`\n- Get Spanish working memory: `/api/PCAExam/exams/working-memory-001?lang=sp`\n- Get English verbal reasoning: `/api/PCAExam/exams/verbal-reasoning-001?lang=en`\n- Get Spanish verbal reasoning: `/api/PCAExam/exams/verbal-reasoning-001?lang=sp`\n- Get English visual rotation: `/api/PCAExam/exams/visual-rotation-001?lang=en`\n- Get Spanish visual rotation: `/api/PCAExam/exams/visual-rotation-001?lang=sp`"
               }
             },
             {
@@ -1575,6 +1696,119 @@
               }
             }
           ]
+        }
+      ]
+    },
+    {
+      "name": "Spanish Language Testing",
+      "item": [
+        {
+          "name": "Test Spanish Verbal Reasoning Exam",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/verbal-reasoning-001?lang=sp",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "PCAExam", "exams", "verbal-reasoning-001"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "sp",
+                  "description": "Spanish language code"
+                }
+              ]
+            },
+            "description": "Test the Spanish version of the Verbal Reasoning exam (Razonamiento Verbal) with all 50 questions in Spanish. This demonstrates the new language localization feature.\n\n**Features:**\n- Complete Spanish translation of exam content\n- 50 questions with Spanish statements and options\n- Spanish explanations for each answer\n- Proper Spanish grammar and terminology\n- Same logical structure as English version\n\n**Expected Response:**\n- Exam name: \"Razonamiento Verbal\"\n- Description in Spanish\n- All questions in Spanish with proper formatting\n- Spanish answer options (A, B, C)\n- Spanish explanations for correct answers"
+          }
+        },
+        {
+          "name": "Compare English vs Spanish Verbal Reasoning",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/verbal-reasoning-001?lang=en",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "PCAExam", "exams", "verbal-reasoning-001"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "en",
+                  "description": "English language code"
+                }
+              ]
+            },
+            "description": "Get the English version of the Verbal Reasoning exam for comparison with the Spanish version. Use this to verify that both versions have the same structure and number of questions.\n\n**Comparison Points:**\n- Same number of questions (50)\n- Same time limit (4 minutes)\n- Same question structure and logic\n- Same correct answers (only language differs)\n- Same exam metadata (ID, type, etc.)\n\n**Testing Workflow:**\n1. Call this endpoint (English version)\n2. Call the Spanish version endpoint\n3. Compare response structures\n4. Verify question count matches\n5. Check that only language content differs"
+          }
+        },
+        {
+          "name": "Test Default Language (No Parameter)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/verbal-reasoning-001",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "PCAExam", "exams", "verbal-reasoning-001"]
+            },
+            "description": "Test the default language behavior when no 'lang' parameter is provided. Should default to English as per the implementation.\n\n**Expected Behavior:**\n- Returns English version by default\n- Same response as ?lang=en\n- Maintains backward compatibility\n- No breaking changes for existing API calls"
+          }
+        },
+        {
+          "name": "Test Spanish Numeric Velocity Exam",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/numeric-velocity-001?lang=sp",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "PCAExam", "exams", "numeric-velocity-001"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "sp",
+                  "description": "Spanish language code"
+                }
+              ]
+            },
+            "description": "Test the Spanish version of the Numeric Velocity exam (Velocidad Numérica y Precisión) with 60 questions in Spanish. This demonstrates the new language localization feature for numeric reasoning.\n\n**Features:**\n- Complete Spanish translation of exam content\n- 60 questions with Spanish instructions and explanations\n- Spanish explanations for each answer\n- Proper Spanish grammar and terminology\n- Same logical structure as English version\n\n**Expected Response:**\n- Exam name: \"Velocidad Numérica y Precisión\"\n- Description in Spanish\n- All questions in Spanish with proper formatting\n- Spanish explanations for correct answers\n- Same number patterns and logic as English version"
+          }
+        },
+        {
+          "name": "Test Other Exams (English Only)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/visual-rotation-001?lang=sp",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "PCAExam", "exams", "visual-rotation-001"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "sp",
+                  "description": "Spanish language code (should default to English for non-implemented exams)"
+                }
+              ]
+            },
+            "description": "Test Visual Rotation exam with Spanish language support. All major exams now support Spanish.\n\n**Expected Behavior:**\n- Returns Spanish content for Visual Rotation exam\n- No error thrown\n- Proper Spanish translations for exam name, description, questions, and explanations\n- Maintains existing functionality\n\n**Exams with Spanish Support:**\n- pattern-recognition-001 (✅ Spanish supported)\n- working-memory-001 (✅ Spanish supported)\n- verbal-reasoning-001 (✅ Spanish supported)\n- numeric-velocity-001 (✅ Spanish supported)\n- visual-rotation-001 (✅ Spanish supported)\n\n**All exams now support Spanish!**"
+          }
         }
       ]
     },
@@ -2375,6 +2609,11 @@
       "key": "roleName",
       "value": "Admin",
       "description": "Replace with actual role name for testing"
+    },
+    {
+      "key": "language",
+      "value": "en",
+      "description": "Language code for exam requests (en for English, sp for Spanish)"
     },
     {
       "key": "userId",

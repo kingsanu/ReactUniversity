@@ -2,10 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
+import { useTranslation } from "react-i18next";
+import { useGlobalStore } from "@/store/useGlobalStore";
 import { useMILData } from "@/hooks/useMILData";
 import { loadMILSession, MILSession } from "@/services/milService";
 
 export default function MILResultsPage() {
+  const { t } = useTranslation();
+  const { language } = useGlobalStore();
   const { exams, progress, loading, getOverallScore } = useMILData();
   const [sessions, setSessions] = useState<MILSession[]>([]);
 
@@ -23,7 +27,7 @@ export default function MILResultsPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading results...</p>
+          <p className="text-gray-600">{t("dashboard.loadingResults")}</p>
         </div>
       </div>
     );
@@ -36,35 +40,38 @@ export default function MILResultsPage() {
   // Mock detailed scores - replace with actual calculation
   const subtestResults = [
     {
-      name: "Pattern Recognition",
+      name:
+        language === "spanish"
+          ? "Reconocimiento de Patrones"
+          : "Pattern Recognition",
       score: 85,
       percentile: 78,
       time: "2:45",
       status: "completed",
     },
     {
-      name: "Verbal Reasoning",
+      name: language === "spanish" ? "Razonamiento Verbal" : "Verbal Reasoning",
       score: 78,
       percentile: 65,
       time: "3:12",
       status: "completed",
     },
     {
-      name: "Working Memory",
+      name: language === "spanish" ? "Memoria de Trabajo" : "Working Memory",
       score: 72,
       percentile: 58,
       time: "2:58",
       status: "completed",
     },
     {
-      name: "Numeric Velocity",
+      name: language === "spanish" ? "Velocidad Numérica" : "Numeric Velocity",
       score: 68,
       percentile: 52,
       time: "2:33",
       status: "completed",
     },
     {
-      name: "Visual Rotation",
+      name: language === "spanish" ? "Rotación Visual" : "Visual Rotation",
       score: 75,
       percentile: 61,
       time: "3:05",
@@ -82,11 +89,12 @@ export default function MILResultsPage() {
           className="text-center mb-8"
         >
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            LIA Assessment Results
+            {t("dashboard.liaResultsTitle")}
           </h1>
           <p className="text-gray-600">
-            Your Labor Intelligence Measurement assessment is{" "}
-            {completedCount === totalCount ? "complete" : "in progress"}
+            {completedCount === totalCount
+              ? t("dashboard.liaResultsComplete")
+              : t("dashboard.liaResultsInProgress")}
           </p>
         </motion.div>
 
@@ -127,19 +135,24 @@ export default function MILResultsPage() {
                   <div className="text-3xl font-bold text-purple-600">
                     {overallScore}%
                   </div>
-                  <div className="text-sm text-gray-500">Overall</div>
+                  <div className="text-sm text-gray-500">
+                    {t("dashboard.overall")}
+                  </div>
                 </div>
               </div>
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
               {overallScore >= 80
-                ? "Excellent"
+                ? t("dashboard.excellent")
                 : overallScore >= 60
-                ? "Good"
-                : "Developing"}
+                ? t("dashboard.good")
+                : t("dashboard.developing")}
             </h2>
             <p className="text-gray-600 mb-4">
-              You completed {completedCount} of {totalCount} subtests
+              {t("dashboard.completedSubtests", {
+                completed: completedCount,
+                total: totalCount,
+              })}
             </p>
             <div className="flex justify-center space-x-4 text-sm">
               <div className="text-center">
@@ -149,7 +162,7 @@ export default function MILResultsPage() {
                     0
                   ) / subtestResults.length || 0}
                 </div>
-                <div className="text-gray-500">Avg Score</div>
+                <div className="text-gray-500">{t("dashboard.avgScore")}</div>
               </div>
               <div className="text-center">
                 <div className="font-semibold text-gray-900">
@@ -158,7 +171,9 @@ export default function MILResultsPage() {
                     0
                   ) / subtestResults.length || 0}
                 </div>
-                <div className="text-gray-500">Avg Percentile</div>
+                <div className="text-gray-500">
+                  {t("dashboard.avgPercentile")}
+                </div>
               </div>
               <div className="text-center">
                 <div className="font-semibold text-gray-900">
@@ -167,7 +182,9 @@ export default function MILResultsPage() {
                     0
                   )}
                 </div>
-                <div className="text-gray-500">Total Questions</div>
+                <div className="text-gray-500">
+                  {t("dashboard.totalQuestions")}
+                </div>
               </div>
             </div>
           </div>
@@ -181,7 +198,7 @@ export default function MILResultsPage() {
           className="bg-white rounded-lg shadow-sm border p-6 mb-8"
         >
           <h3 className="text-xl font-semibold text-gray-900 mb-6">
-            Subtest Performance
+            {t("dashboard.subtestPerformance")}
           </h3>
           <div className="space-y-4">
             {subtestResults.map((result, index) => (
@@ -193,7 +210,9 @@ export default function MILResultsPage() {
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="font-medium text-gray-900">{result.name}</h4>
                     <div className="flex items-center space-x-4 text-sm">
-                      <span className="text-gray-600">Time: {result.time}</span>
+                      <span className="text-gray-600">
+                        {t("dashboard.time")}: {result.time}
+                      </span>
                       <span className="font-semibold text-purple-600">
                         {result.score}%
                       </span>
@@ -209,7 +228,8 @@ export default function MILResultsPage() {
                       />
                     </div>
                     <span className="text-sm text-gray-600 min-w-0">
-                      {result.percentile}th percentile
+                      {result.percentile}
+                      {t("dashboard.percentileSuffix")}
                     </span>
                   </div>
                 </div>
@@ -226,7 +246,7 @@ export default function MILResultsPage() {
           className="bg-white rounded-lg shadow-sm border p-6 mb-8"
         >
           <h3 className="text-xl font-semibold text-gray-900 mb-6">
-            Cognitive Profile
+            {t("dashboard.cognitiveProfile")}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="text-center p-4 bg-blue-50 rounded-lg">
@@ -246,10 +266,10 @@ export default function MILResultsPage() {
                 </svg>
               </div>
               <h4 className="font-medium text-gray-900 mb-1">
-                Logical Reasoning
+                {t("dashboard.logicalReasoning")}
               </h4>
               <p className="text-sm text-gray-600">
-                Strong pattern recognition and analytical thinking
+                {t("dashboard.logicalReasoningDesc")}
               </p>
             </div>
             <div className="text-center p-4 bg-green-50 rounded-lg">
@@ -269,10 +289,10 @@ export default function MILResultsPage() {
                 </svg>
               </div>
               <h4 className="font-medium text-gray-900 mb-1">
-                Verbal Processing
+                {t("dashboard.verbalProcessing")}
               </h4>
               <p className="text-sm text-gray-600">
-                Good language comprehension and reasoning
+                {t("dashboard.verbalProcessingDesc")}
               </p>
             </div>
             <div className="text-center p-4 bg-purple-50 rounded-lg">
@@ -292,10 +312,10 @@ export default function MILResultsPage() {
                 </svg>
               </div>
               <h4 className="font-medium text-gray-900 mb-1">
-                Processing Speed
+                {t("dashboard.processingSpeed")}
               </h4>
               <p className="text-sm text-gray-600">
-                Efficient cognitive processing under time pressure
+                {t("dashboard.processingSpeedDesc")}
               </p>
             </div>
           </div>
@@ -312,21 +332,21 @@ export default function MILResultsPage() {
             href="/dashboard"
             className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium"
           >
-            Return to Dashboard
+            {t("dashboard.returnToDashboard")}
           </a>
           {completedCount < totalCount && (
             <a
               href="/dashboard/assessments/mil"
               className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors font-medium"
             >
-              Continue Assessment
+              {t("dashboard.continueAssessment")}
             </a>
           )}
           <button
             onClick={() => window.print()}
             className="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors font-medium"
           >
-            Print Results
+            {t("dashboard.printResults")}
           </button>
         </motion.div>
       </div>

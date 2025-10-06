@@ -21,7 +21,7 @@ export interface PCAData {
 }
 
 export function usePCAData() {
-  const { user } = useGlobalStore();
+  const { user, language } = useGlobalStore();
   const [pcaData, setPcaData] = useState<PCAData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +37,7 @@ export function usePCAData() {
       setError(null);
 
       // Check PCA status using the new backend API
-      const statusData = await checkPCAStatus(user?.id || "unknown");
+      const statusData = await checkPCAStatus(user?.id || "unknown", language);
 
       if (statusData.status === "not_started") {
         setPcaData(null);
@@ -52,8 +52,8 @@ export function usePCAData() {
       if (statusData.hasResults && user?.id) {
         try {
           [results, competences] = await Promise.all([
-            getPCAResultByUserId(user.id).catch(() => null),
-            getPCACompetencesByUserId(user.id).catch(() => null),
+            getPCAResultByUserId(user.id, language).catch(() => null),
+            getPCACompetencesByUserId(user.id, "1", language).catch(() => null),
           ]);
         } catch (err) {
           console.log("Error fetching PCA results/competences:", err);

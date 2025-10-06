@@ -16,7 +16,7 @@ import {
 } from "@/services/evaluationService";
 
 export default function AssessmentsPage() {
-  const { user } = useGlobalStore();
+  const { user, language } = useGlobalStore();
   const { t } = useTranslation();
   const { pcaData, hasPCA, isCompleted } = usePCAData();
   const { isLoading } = useEvaluationData();
@@ -60,7 +60,7 @@ export default function AssessmentsPage() {
       // Use the already fetched evaluation groups or fetch if not available
       let groups = evaluationGroups;
       if (!groups) {
-        groups = await getUserEvaluationGroups(user?.id || "");
+        groups = await getUserEvaluationGroups(user?.id || "", language);
       }
       console.log("User evaluation groups:", groups);
 
@@ -203,12 +203,13 @@ export default function AssessmentsPage() {
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-1">
                     {user.name
-                      ? `Welcome back, ${user.name.split(" ")[0]}!`
-                      : "Welcome!"}
+                      ? t("dashboard.welcomeBack", {
+                          name: user.name.split(" ")[0],
+                        })
+                      : t("dashboard.welcome")}
                   </h3>
                   <p className="text-sm text-gray-600">
-                    Complete all assessments to unlock your full professional
-                    profile
+                    {t("dashboard.completeAssessmentsMessage")}
                   </p>
                 </div>
               </div>
@@ -217,7 +218,9 @@ export default function AssessmentsPage() {
                   {assessmentProgress.completedAssessments}/
                   {assessmentProgress.totalAssessments}
                 </div>
-                <div className="text-xs text-gray-500">Completed</div>
+                <div className="text-xs text-gray-500">
+                  {t("dashboard.completed")}
+                </div>
               </div>
             </div>
 
@@ -225,7 +228,7 @@ export default function AssessmentsPage() {
             <div className="mt-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-gray-700">
-                  Overall Progress
+                  {t("dashboard.overallProgress")}
                 </span>
                 <span className="text-sm text-gray-600">
                   {assessmentProgress.overallCompletion}%
@@ -263,17 +266,27 @@ export default function AssessmentsPage() {
                     />
                   </div>
                   <div className="text-xs text-gray-600 capitalize mb-1">
-                    {assessment.status.replace("_", " ")}
+                    {assessment.status === "completed"
+                      ? t("dashboard.statusCompleted")
+                      : assessment.status === "in_progress"
+                      ? t("dashboard.statusInProgress")
+                      : t("dashboard.statusNotStarted")}
                   </div>
                   {assessment.stats &&
                     Object.keys(assessment.stats).length > 0 && (
                       <div className="text-xs text-gray-500">
                         {assessment.type === "mil" &&
                           assessment.stats.totalAttempts > 0 &&
-                          `${assessment.stats.totalAttempts} sub assessments, ${assessment.stats.bestScore}% best`}
+                          t("dashboard.milStats", {
+                            attempts: assessment.stats.totalAttempts,
+                            score: assessment.stats.bestScore,
+                          })}
                         {assessment.type === "evaluation" &&
                           assessment.stats.totalEvaluators > 0 &&
-                          `${assessment.stats.totalEvaluators} evaluators, ${assessment.stats.completedEvaluations} completed`}
+                          t("dashboard.evaluationStats", {
+                            total: assessment.stats.totalEvaluators,
+                            completed: assessment.stats.completedEvaluations,
+                          })}
                       </div>
                     )}
                 </div>
@@ -292,7 +305,7 @@ export default function AssessmentsPage() {
             <div className="flex items-center justify-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
               <p className="text-gray-600">
-                Loading your assessment progress...
+                {t("dashboard.loadingAssessmentProgress")}
               </p>
             </div>
           </motion.div>
@@ -310,22 +323,21 @@ export default function AssessmentsPage() {
               <div className="flex-1">
                 <div className="flex items-center mb-2">
                   <h2 className="text-xl font-semibold text-gray-900 mr-3">
-                    1. Personal Competence Analysis (PCA)
+                    1. {t("dashboard.pcaTitle")}
                   </h2>
                   {pcaStatus === "completed" && (
                     <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                      Completed
+                      {t("dashboard.statusCompleted")}
                     </span>
                   )}
                   {pcaStatus === "in_progress" && (
                     <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                      In Progress
+                      {t("dashboard.statusInProgress")}
                     </span>
                   )}
                 </div>
                 <p className="text-gray-600 mb-6">
-                  Redirect the user to an external ipsative test to analyze
-                  personal competencies and professional strengths.
+                  {t("dashboard.pcaDescription")}
                 </p>
               </div>
             </div>
@@ -335,38 +347,46 @@ export default function AssessmentsPage() {
               className="inline-flex items-center justify-center w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium"
             >
               {pcaStatus === "completed"
-                ? "View Results"
+                ? t("dashboard.viewResults")
                 : pcaStatus === "in_progress"
-                ? "Continue PCA"
-                : "Start PCA"}
+                ? t("dashboard.continuePCA")
+                : t("dashboard.startPCA")}
             </a>
 
             {pcaStatus === "completed" && pcaData?.results?.data && (
               <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
                 <h4 className="text-sm font-semibold text-green-900 mb-3">
-                  Assessment Summary
+                  {t("dashboard.assessmentSummary")}
                 </h4>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-green-700">Dominance:</span>
+                    <span className="text-green-700">
+                      {t("dashboard.dominance")}:
+                    </span>
                     <span className="font-semibold text-green-900">
                       {pcaData.results.data.pcaD1 || 0}%
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-green-700">Influence:</span>
+                    <span className="text-green-700">
+                      {t("dashboard.influence")}:
+                    </span>
                     <span className="font-semibold text-green-900">
                       {pcaData.results.data.pcaI1 || 0}%
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-green-700">Steadiness:</span>
+                    <span className="text-green-700">
+                      {t("dashboard.steadiness")}:
+                    </span>
                     <span className="font-semibold text-green-900">
                       {pcaData.results.data.pcaS1 || 0}%
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-green-700">Conscientiousness:</span>
+                    <span className="text-green-700">
+                      {t("dashboard.conscientiousness")}:
+                    </span>
                     <span className="font-semibold text-green-900">
                       {pcaData.results.data.pcaC1 || 0}%
                     </span>
@@ -374,15 +394,15 @@ export default function AssessmentsPage() {
                 </div>
                 <div className="mt-3 pt-3 border-t border-green-200">
                   <p className="text-xs text-green-700">
-                    PCA Code:{" "}
+                    {t("dashboard.pcaCode")}:{" "}
                     <code className="bg-green-200 px-1 rounded text-green-900">
                       {pcaData?.pcaCod?.slice(0, 8)}...
                     </code>
                     <span className="ml-2">
-                      Completed:{" "}
+                      {t("dashboard.completed")}:{" "}
                       {pcaData?.lastUpdated
                         ? new Date(pcaData.lastUpdated).toLocaleDateString()
-                        : "Recently"}
+                        : t("dashboard.recently")}
                     </span>
                   </p>
                 </div>
@@ -392,15 +412,15 @@ export default function AssessmentsPage() {
             {pcaStatus === "completed" && !pcaData?.results?.data && (
               <div className="mt-4 p-3 bg-gray-50 rounded-lg">
                 <p className="text-xs text-gray-600">
-                  PCA Code:{" "}
+                  {t("dashboard.pcaCode")}:{" "}
                   <code className="bg-gray-200 px-1 rounded">
                     {pcaData?.pcaCod?.slice(0, 8)}...
                   </code>
                   <span className="ml-2">
-                    Completed:{" "}
+                    {t("dashboard.completed")}:{" "}
                     {pcaData?.lastUpdated
                       ? new Date(pcaData.lastUpdated).toLocaleDateString()
-                      : "Recently"}
+                      : t("dashboard.recently")}
                   </span>
                 </p>
               </div>
@@ -417,11 +437,10 @@ export default function AssessmentsPage() {
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
                 <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                  2. Labor Intelligence Assessment (LIA)
+                  2. {t("dashboard.liaTitle")}
                 </h2>
                 <p className="text-gray-600 mb-6">
-                  Assess your cognitive abilities through pattern recognition,
-                  verbal reasoning, and problem-solving tasks
+                  {t("dashboard.liaDescription")}
                 </p>
               </div>
             </div>
@@ -449,16 +468,16 @@ export default function AssessmentsPage() {
                       </svg>
                     </div>
                     <p className="text-green-700 font-medium mb-2">
-                      Assessment Completed!
+                      {t("dashboard.assessmentCompleted")}
                     </p>
                     <p className="text-sm text-gray-600 mb-4">
-                      You have successfully completed the LIA Assessment.
+                      {t("dashboard.liaCompletedMessage")}
                     </p>
                     <a
                       href="/dashboard/assessments/mil/results"
                       className="inline-flex items-center justify-center w-full bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors font-medium"
                     >
-                      View Results
+                      {t("dashboard.viewResults")}
                     </a>
                   </div>
                 );
@@ -470,8 +489,8 @@ export default function AssessmentsPage() {
                   className="inline-flex items-center justify-center w-full bg-purple-600 text-white py-3 px-6 rounded-lg hover:bg-purple-700 transition-colors font-medium"
                 >
                   {liaAssessment?.status === "in_progress"
-                    ? "Continue LIA Assessment"
-                    : "Start LIA Assessment"}
+                    ? t("dashboard.continueLIA")
+                    : t("dashboard.startLIA")}
                 </a>
               );
             })()}
@@ -487,11 +506,10 @@ export default function AssessmentsPage() {
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
                 <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                  3. 360 Evaluation
+                  3. {t("dashboard.evaluationTitle")}
                 </h2>
                 <p className="text-gray-600 mb-6">
-                  Invite external evaluators (Parents, Teachers, Friends) before
-                  prompting the user to perform a self-assessment.
+                  {t("dashboard.evaluationDescription")}
                 </p>
               </div>
             </div>
@@ -520,16 +538,16 @@ export default function AssessmentsPage() {
                       </svg>
                     </div>
                     <p className="text-green-700 font-medium mb-2">
-                      360 Evaluation Completed!
+                      {t("dashboard.evaluationCompleted")}
                     </p>
                     <p className="text-sm text-gray-600 mb-4">
-                      You have successfully completed the 360 Evaluation.
+                      {t("dashboard.evaluationCompletedMessage")}
                     </p>
                     <a
                       href="/dashboard/assessments/evaluation/results"
                       className="inline-flex items-center justify-center w-full bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors font-medium"
                     >
-                      View Results
+                      {t("dashboard.viewResults")}
                     </a>
                   </div>
                 );
@@ -542,7 +560,9 @@ export default function AssessmentsPage() {
                     disabled={isLoading}
                     className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-3 px-6 rounded-lg font-medium transition-colors"
                   >
-                    {isLoading ? "Loading..." : "Invite Evaluators"}
+                    {isLoading
+                      ? t("dashboard.loading")
+                      : t("dashboard.inviteEvaluators")}
                   </button>
                   <button
                     disabled={
@@ -560,10 +580,10 @@ export default function AssessmentsPage() {
                     onClick={handleStart360Evaluation}
                   >
                     {isStartingEvaluation || loadingGroups
-                      ? "Loading..."
+                      ? t("dashboard.loading")
                       : evaluationAssessment?.status === "in_progress"
-                      ? "Start 360 Evaluation"
-                      : "Start 360 Evaluation"}
+                      ? t("dashboard.start360Evaluation")
+                      : t("dashboard.start360Evaluation")}
                   </button>
                 </div>
               );
@@ -579,34 +599,40 @@ export default function AssessmentsPage() {
           className="mt-8 bg-white rounded-lg shadow-sm border p-6"
         >
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Assessment Guide
+            {t("dashboard.assessmentGuide")}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
             <div>
-              <h4 className="font-medium text-gray-900 mb-2">PCA Assessment</h4>
+              <h4 className="font-medium text-gray-900 mb-2">
+                {t("dashboard.pcaAssessmentTitle")}
+              </h4>
               <ul className="text-gray-600 space-y-1">
-                <li>• Takes 15-20 minutes</li>
-                <li>• Evaluates competencies</li>
-                <li>• Available in Spanish/English</li>
-                <li>• Results on dashboard</li>
+                <li>• {t("dashboard.pcaDuration")}</li>
+                <li>• {t("dashboard.pcaEvaluates")}</li>
+                <li>• {t("dashboard.pcaLanguages")}</li>
+                <li>• {t("dashboard.pcaResults")}</li>
               </ul>
             </div>
             <div>
-              <h4 className="font-medium text-gray-900 mb-2">LIA Assessment</h4>
+              <h4 className="font-medium text-gray-900 mb-2">
+                {t("dashboard.liaAssessmentTitle")}
+              </h4>
               <ul className="text-gray-600 space-y-1">
-                <li>• 5 cognitive subtests</li>
-                <li>• Pattern recognition & reasoning</li>
-                <li>• 15-20 minutes total</li>
-                <li>• Available now</li>
+                <li>• {t("dashboard.liaSubtests")}</li>
+                <li>• {t("dashboard.liaSkills")}</li>
+                <li>• {t("dashboard.liaDuration")}</li>
+                <li>• {t("dashboard.liaAvailable")}</li>
               </ul>
             </div>
             <div>
-              <h4 className="font-medium text-gray-900 mb-2">360 Evaluation</h4>
+              <h4 className="font-medium text-gray-900 mb-2">
+                {t("dashboard.evaluationAssessmentTitle")}
+              </h4>
               <ul className="text-gray-600 space-y-1">
-                <li>• Multi-perspective feedback</li>
-                <li>• External evaluators</li>
-                <li>• Self-assessment included</li>
-                <li>• Coming soon</li>
+                <li>• {t("dashboard.evaluationFeedback")}</li>
+                <li>• {t("dashboard.evaluationEvaluators")}</li>
+                <li>• {t("dashboard.evaluationSelfAssessment")}</li>
+                <li>• {t("dashboard.evaluationComingSoon")}</li>
               </ul>
             </div>
           </div>
