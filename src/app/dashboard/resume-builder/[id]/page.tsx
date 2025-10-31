@@ -44,6 +44,7 @@ import { useGlobalStore } from "@/store/useGlobalStore";
 import { LivePreviewPDF } from "../_components/LivePreviewPDF";
 import { TemplatePreviewCard } from "../_components/TemplatePreviewCard";
 import { cn } from "@/lib/utils";
+import { GenerateButton } from "@/components/ai";
 import {
   DndContext,
   closestCenter,
@@ -876,6 +877,8 @@ export default function ResumeBuilderPage() {
   const [showPersonalInfoModal, setShowPersonalInfoModal] = useState(false);
   const [showSkillsModal, setShowSkillsModal] = useState(false);
   const [showManageFieldsModal, setShowManageFieldsModal] = useState(false);
+  const [showAISummaryModal, setShowAISummaryModal] = useState(false);
+  const [showAIBulletsModal, setShowAIBulletsModal] = useState(false);
   const [editingEducation, setEditingEducation] = useState<string | null>(null);
   const [editingExperience, setEditingExperience] = useState<string | null>(
     null
@@ -1929,9 +1932,36 @@ export default function ResumeBuilderPage() {
                         {/* Professional Summary */}
                         {fieldVisibility.summary && (
                           <div>
-                            <label className="block text-xs font-medium text-foreground mb-1">
-                              Professional Summary
-                            </label>
+                            <div className="flex items-center justify-between gap-2 mb-1">
+                              <label className="block text-xs font-medium text-foreground">
+                                Professional Summary
+                              </label>
+                              <GenerateButton
+                                field="summary"
+                                context={{
+                                  currentRole: personalInfoForm.professionalTitle,
+                                  keySkills: resumeBuilder.data.skills
+                                    .map((s) => s.name)
+                                    .join(", "),
+                                  yearsExperience: resumeBuilder.data.experience
+                                    .length,
+                                }}
+                                variant="icon"
+                                size="sm"
+                                onGenerate={(content) => {
+                                  setPersonalInfoForm({
+                                    ...personalInfoForm,
+                                    summary:
+                                      typeof content === "string"
+                                        ? content
+                                        : content[0],
+                                  });
+                                  handleSavePersonalInfo();
+                                  setSaveSuccess(true);
+                                  setTimeout(() => setSaveSuccess(false), 2000);
+                                }}
+                              />
+                            </div>
                             <textarea
                               value={personalInfoForm.summary}
                               onChange={(e) =>
@@ -2946,9 +2976,35 @@ export default function ResumeBuilderPage() {
                             </label>
                           </div>
                           <div>
-                            <label className="block text-xs font-medium text-foreground mb-1">
-                              Description
-                            </label>
+                            <div className="flex items-center justify-between gap-2 mb-1">
+                              <label className="block text-xs font-medium text-foreground">
+                                Description
+                              </label>
+                              <GenerateButton
+                                field="bullets"
+                                context={{
+                                  jobTitle: experienceForm.jobTitle,
+                                  company: experienceForm.company,
+                                  responsibilities: experienceForm.description.join(
+                                    "\n"
+                                  ),
+                                  technologies: "",
+                                }}
+                                variant="icon"
+                                size="sm"
+                                onGenerate={(content) => {
+                                  const bullets = Array.isArray(content)
+                                    ? content
+                                    : content
+                                        .split("\n")
+                                        .filter((b) => b.trim());
+                                  setExperienceForm({
+                                    ...experienceForm,
+                                    description: bullets,
+                                  });
+                                }}
+                              />
+                            </div>
                             <textarea
                               value={experienceForm.description.join("\n")}
                               onChange={(e) =>

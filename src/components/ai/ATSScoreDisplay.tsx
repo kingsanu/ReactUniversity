@@ -1,0 +1,162 @@
+/**
+ * ATSScoreDisplay Component
+ * 
+ * Displays ATS (Applicant Tracking System) score and optimization metrics.
+ * Shows score percentage, word count, and detected keywords.
+ */
+
+'use client';
+
+import { CheckCircle2, AlertCircle, Zap } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+export interface ATSScoreDisplayProps {
+  score: number;
+  wordCount?: number;
+  keywordsIncluded?: string[];
+  maxWordCount?: number;
+  className?: string;
+}
+
+export function ATSScoreDisplay({
+  score,
+  wordCount,
+  keywordsIncluded,
+  maxWordCount = 150,
+  className,
+}: ATSScoreDisplayProps) {
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return 'text-green-600';
+    if (score >= 60) return 'text-yellow-600';
+    return 'text-orange-600';
+  };
+
+  const getScoreBgColor = (score: number) => {
+    if (score >= 80) return 'bg-green-100 border-green-300';
+    if (score >= 60) return 'bg-yellow-100 border-yellow-300';
+    return 'bg-orange-100 border-orange-300';
+  };
+
+  const getScoreLabel = (score: number) => {
+    if (score >= 80) return 'Excellent';
+    if (score >= 60) return 'Good';
+    return 'Needs Improvement';
+  };
+
+  const getWordCountStatus = (current?: number, max?: number) => {
+    if (!current || !max) return 'neutral';
+    if (current < max * 0.7) return 'short';
+    if (current <= max) return 'good';
+    return 'long';
+  };
+
+  const wordCountStatus = getWordCountStatus(wordCount, maxWordCount);
+
+  return (
+    <div className={cn('space-y-4', className)}>
+      {/* ATS Score */}
+      <div className={cn('p-4 rounded-lg border', getScoreBgColor(score))}>
+        <div className="flex items-start justify-between">
+          <div className="space-y-1">
+            <h3 className="text-sm font-semibold text-gray-900">ATS Compatibility Score</h3>
+            <p className="text-xs text-gray-600">
+              How well this content will be parsed by applicant tracking systems
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            {score >= 80 ? (
+              <CheckCircle2 className={cn('w-5 h-5', getScoreColor(score))} />
+            ) : score >= 60 ? (
+              <AlertCircle className={cn('w-5 h-5', getScoreColor(score))} />
+            ) : (
+              <AlertCircle className={cn('w-5 h-5', getScoreColor(score))} />
+            )}
+            <span className={cn('text-2xl font-bold', getScoreColor(score))}>
+              {score}%
+            </span>
+          </div>
+        </div>
+        <p className="text-xs text-gray-700 mt-2">{getScoreLabel(score)}</p>
+      </div>
+
+      {/* Metrics Grid */}
+      <div className="grid grid-cols-2 gap-3">
+        {/* Word Count */}
+        {wordCount !== undefined && (
+          <div
+            className={cn(
+              'p-3 rounded-lg border transition-colors',
+              wordCountStatus === 'good'
+                ? 'bg-green-50 border-green-200'
+                : wordCountStatus === 'short'
+                  ? 'bg-yellow-50 border-yellow-200'
+                  : 'bg-orange-50 border-orange-200'
+            )}
+          >
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs font-medium text-gray-700">Word Count</span>
+              {wordCountStatus === 'good' && (
+                <CheckCircle2 className="w-4 h-4 text-green-600" />
+              )}
+            </div>
+            <p className="text-sm font-semibold text-gray-900">
+              {wordCount}
+              {maxWordCount && <span className="text-xs font-normal text-gray-600">/{maxWordCount}</span>}
+            </p>
+            <p className="text-xs text-gray-600 mt-1">
+              {wordCountStatus === 'good'
+                ? 'Perfect length'
+                : wordCountStatus === 'short'
+                  ? 'Could be longer'
+                  : 'Consider shortening'}
+            </p>
+          </div>
+        )}
+
+        {/* Keywords Count */}
+        {keywordsIncluded && keywordsIncluded.length > 0 && (
+          <div className="p-3 rounded-lg border border-blue-200 bg-blue-50">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs font-medium text-gray-700">Keywords</span>
+              <Zap className="w-4 h-4 text-blue-600" />
+            </div>
+            <p className="text-sm font-semibold text-gray-900">{keywordsIncluded.length}</p>
+            <p className="text-xs text-gray-600 mt-1">
+              Industry keywords detected
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Keywords List */}
+      {keywordsIncluded && keywordsIncluded.length > 0 && (
+        <div className="space-y-2">
+          <h4 className="text-xs font-semibold text-gray-700">Detected Keywords</h4>
+          <div className="flex flex-wrap gap-2">
+            {keywordsIncluded.slice(0, 8).map((keyword, idx) => (
+              <span
+                key={idx}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 border border-blue-300"
+              >
+                <CheckCircle2 className="w-3 h-3" />
+                {keyword}
+              </span>
+            ))}
+            {keywordsIncluded.length > 8 && (
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-300">
+                +{keywordsIncluded.length - 8} more
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Optimization Tips */}
+      <div className="p-3 rounded-lg border border-blue-200 bg-blue-50/50">
+        <p className="text-xs text-gray-700">
+          <strong>💡 Pro tip:</strong> Use simple formatting and avoid images in your resume. Most ATS systems work best with plain text.
+        </p>
+      </div>
+    </div>
+  );
+}

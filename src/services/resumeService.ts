@@ -41,6 +41,8 @@ export interface Resume {
   skills: ResumeSkills;
   experience: ResumeExperience[];
   education: ResumeEducation[];
+  name: string;
+  template: string;
   createdAt?: string;
   updatedAt?: string;
 }

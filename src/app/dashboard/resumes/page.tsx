@@ -16,7 +16,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { cn } from "@/lib/utils";
-import { getAllResumes, deleteResume } from "@/services/resumeService";
+import { getAllResumes, deleteResume, Resume } from "@/services/resumeService";
 
 /**
  * My Resumes Page
@@ -35,15 +35,6 @@ import { getAllResumes, deleteResume } from "@/services/resumeService";
  * - Real-time resume updates
  * - Empty state handling
  */
-
-interface Resume {
-  _id: string;
-  name: string;
-  template: string;
-  createdAt: string;
-  updatedAt: string;
-  preview?: string;
-}
 
 export default function MyResumesPage() {
   const router = useRouter();
@@ -173,7 +164,7 @@ export default function MyResumesPage() {
         <div className="space-y-1 mb-3">
           <div className="flex items-center text-xs text-gray-600">
             <Calendar className="w-3 h-3 mr-1.5" />
-            Updated {formatDate(resume.updatedAt)}
+            Updated {formatDate(resume.updatedAt || resume.createdAt || new Date().toISOString())}
           </div>
         </div>
 
