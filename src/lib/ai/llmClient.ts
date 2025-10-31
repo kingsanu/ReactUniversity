@@ -1,12 +1,12 @@
 /**
  * LLM Client for AI Content Generation
- * 
+ *
  * Handles all interactions with OpenAI GPT-4o or Claude API
  * Supports content generation, caching, and retry logic
  */
 
 export interface GenerationConfig {
-  model?: 'gpt-4o' | 'gpt-4o-mini' | 'claude-3-5-sonnet';
+  model?: "gpt-4o" | "gpt-4o-mini" | "claude-3-5-sonnet";
   temperature?: number;
   maxTokens?: number;
   retries?: number;
@@ -29,7 +29,7 @@ export interface BatchGenerationResponse {
 }
 
 const DEFAULT_CONFIG: GenerationConfig = {
-  model: 'gpt-4o-mini', // More cost-effective than gpt-4o
+  model: "gpt-4o-mini", // More cost-effective than gpt-4o
   temperature: 0.7,
   maxTokens: 1000,
   retries: 2,
@@ -45,7 +45,7 @@ export async function callOpenAI(
   const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
-    throw new Error('OPENAI_API_KEY is not configured');
+    throw new Error("OPENAI_API_KEY is not configured");
   }
 
   const body = {
@@ -56,10 +56,10 @@ export async function callOpenAI(
   };
 
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify(body),
@@ -82,7 +82,7 @@ export async function callOpenAI(
       model: config.model || DEFAULT_CONFIG.model!,
     };
   } catch (error) {
-    console.error('OpenAI API call failed:', error);
+    console.error("OpenAI API call failed:", error);
     throw error;
   }
 }
@@ -103,9 +103,13 @@ export async function generateProfessionalSummary(
 Career Level: ${careerLevel}
 Industry: ${industry}
 Years of Experience: ${yearsOfExperience}
-Key Skills: ${keySkills.join(', ')}
-${targetRole ? `Target Role: ${targetRole}` : ''}
-${achievements && achievements.length > 0 ? `Achievements: ${achievements.join(', ')}` : ''}
+Key Skills: ${keySkills.join(", ")}
+${targetRole ? `Target Role: ${targetRole}` : ""}
+${
+  achievements && achievements.length > 0
+    ? `Achievements: ${achievements.join(", ")}`
+    : ""
+}
 
 Requirements:
 - 50-100 words
@@ -120,7 +124,7 @@ Generate only the summary text, nothing else.`;
 
   const response = await callOpenAI([
     {
-      role: 'user',
+      role: "user",
       content: prompt,
     },
   ]);
@@ -145,9 +149,9 @@ export async function generateJobBullets(
 Job Title: ${jobTitle}
 Company: ${company}
 Industry: ${industry}
-Responsibilities: ${responsibilities.join(', ')}
-Key Skills: ${keySkills.join(', ')}
-Achievements: ${achievements.join(', ')}
+Responsibilities: ${responsibilities.join(", ")}
+Key Skills: ${keySkills.join(", ")}
+Achievements: ${achievements.join(", ")}
 
 Requirements:
 - ${bulletCount} bullet points (one per line, start with • symbol)
@@ -163,16 +167,16 @@ Generate only the bullet points, one per line starting with •`;
 
   const response = await callOpenAI([
     {
-      role: 'user',
+      role: "user",
       content: prompt,
     },
   ]);
 
   return response.content
-    .split('\n')
-    .filter(line => line.trim().startsWith('•'))
-    .map(line => line.trim().substring(1).trim())
-    .filter(line => line.length > 0);
+    .split("\n")
+    .filter((line) => line.trim().startsWith("•"))
+    .map((line) => line.trim().substring(1).trim())
+    .filter((line) => line.length > 0);
 }
 
 /**
@@ -191,7 +195,7 @@ Career Level: ${careerLevel}
 Years of Experience: ${yearsOfExperience}
 Target Role: ${targetRole}
 Target Industry: ${targetIndustry}
-Key Strengths: ${keyStrengths.join(', ')}
+Key Strengths: ${keyStrengths.join(", ")}
 
 Requirements:
 - 30-50 words
@@ -206,7 +210,7 @@ Generate only the objective statement, nothing else.`;
 
   const response = await callOpenAI([
     {
-      role: 'user',
+      role: "user",
       content: prompt,
     },
   ]);
@@ -228,9 +232,9 @@ export async function generateProjectDescription(
 
 Project Title: ${projectTitle}
 Your Role: ${yourRole}
-Technologies: ${technologies.join(', ')}
-Objectives: ${objectives.join(', ')}
-Outcomes: ${outcomes.join(', ')}
+Technologies: ${technologies.join(", ")}
+Objectives: ${objectives.join(", ")}
+Outcomes: ${outcomes.join(", ")}
 
 Requirements:
 - 80-120 words
@@ -246,7 +250,7 @@ Generate only the description text, nothing else.`;
 
   const response = await callOpenAI([
     {
-      role: 'user',
+      role: "user",
       content: prompt,
     },
   ]);
@@ -280,7 +284,11 @@ ${jobDescription}
 Resume Content:
 ${resumeContent}
 
-${targetKeywords ? `Target Keywords to Look For: ${targetKeywords.join(', ')}` : ''}
+${
+  targetKeywords
+    ? `Target Keywords to Look For: ${targetKeywords.join(", ")}`
+    : ""
+}
 
 Provide analysis in this exact JSON format:
 {
@@ -303,7 +311,7 @@ Return ONLY valid JSON, no markdown or explanations.`;
 
   const response = await callOpenAI([
     {
-      role: 'user',
+      role: "user",
       content: prompt,
     },
   ]);
@@ -330,8 +338,8 @@ Return ONLY valid JSON, no markdown or explanations.`;
       missingKeywords: analysis.missingKeywords || [],
     };
   } catch (error) {
-    console.error('Failed to parse ATS score response:', error);
-    throw new Error('Failed to calculate ATS score');
+    console.error("Failed to parse ATS score response:", error);
+    throw new Error("Failed to calculate ATS score");
   }
 }
 
@@ -339,24 +347,25 @@ Return ONLY valid JSON, no markdown or explanations.`;
  * Generate multiple content variations
  */
 export async function generateAlternatives(
-  contentType: 'summary' | 'objective' | 'bullets' | 'project',
+  contentType: "summary" | "objective" | "bullets" | "project",
   context: Record<string, any>,
   variationCount: number = 3,
   tones: string[] = []
 ): Promise<string[]> {
-  const tonesDescription = tones.length > 0
-    ? `Use these tones for variations: ${tones.join(', ')}`
-    : 'Use varied tones (professional, achievement-focused, impact-driven)';
+  const tonesDescription =
+    tones.length > 0
+      ? `Use these tones for variations: ${tones.join(", ")}`
+      : "Use varied tones (professional, achievement-focused, impact-driven)";
 
-  let prompt = '';
+  let prompt = "";
 
-  if (contentType === 'summary') {
+  if (contentType === "summary") {
     prompt = `Generate ${variationCount} different professional summary variations.
 
 Career Level: ${context.careerLevel}
 Industry: ${context.industry}
 Years of Experience: ${context.yearsOfExperience}
-Key Skills: ${context.keySkills?.join(', ')}
+Key Skills: ${context.keySkills?.join(", ")}
 
 ${tonesDescription}
 
@@ -367,7 +376,7 @@ Requirements:
 - Optimize for ATS
 
 Format: Return numbered list with each variation separated by "---"`;
-  } else if (contentType === 'bullets') {
+  } else if (contentType === "bullets") {
     prompt = `Generate ${variationCount} different sets of 3 job bullet points with different tones/emphasis.
 
 Job Title: ${context.jobTitle}
@@ -386,15 +395,15 @@ Format: Each set separated by "---"`;
 
   const response = await callOpenAI([
     {
-      role: 'user',
+      role: "user",
       content: prompt,
     },
   ]);
 
   return response.content
-    .split('---')
-    .map(item => item.trim())
-    .filter(item => item.length > 0);
+    .split("---")
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0);
 }
 
 /**
@@ -418,14 +427,14 @@ Requirements:
 
   const response = await callOpenAI([
     {
-      role: 'user',
+      role: "user",
       content: prompt,
     },
   ]);
 
   return response.content
-    .split(',')
-    .map(keyword => keyword.trim())
-    .filter(keyword => keyword.length > 0)
+    .split(",")
+    .map((keyword) => keyword.trim())
+    .filter((keyword) => keyword.length > 0)
     .slice(0, limit);
 }

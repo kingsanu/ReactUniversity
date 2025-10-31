@@ -36,7 +36,7 @@ export function successResponse<T>(
     data,
     metadata: {
       generatedAt: metadata?.generatedAt || new Date().toISOString(),
-      model: metadata?.model || 'gpt-4o-mini',
+      model: metadata?.model || "gpt-4o-mini",
       tokensUsed: metadata?.tokensUsed || 0,
     },
   };
@@ -68,7 +68,11 @@ export function validateRequiredFields(
   requiredFields: string[]
 ): { valid: boolean; missingFields: string[] } {
   const missingFields = requiredFields.filter(
-    field => !body || body[field] === undefined || body[field] === null || body[field] === ''
+    (field) =>
+      !body ||
+      body[field] === undefined ||
+      body[field] === null ||
+      body[field] === ""
   );
 
   return {
@@ -88,7 +92,9 @@ export function validateEnum(
   if (!allowedValues.includes(value)) {
     return {
       valid: false,
-      error: `Invalid ${fieldName}. Allowed values: ${allowedValues.join(', ')}`,
+      error: `Invalid ${fieldName}. Allowed values: ${allowedValues.join(
+        ", "
+      )}`,
     };
   }
   return { valid: true };
@@ -98,14 +104,14 @@ export function validateEnum(
  * Sanitize text input
  */
 export function sanitizeInput(text: string, maxLength: number = 10000): string {
-  if (!text || typeof text !== 'string') {
-    return '';
+  if (!text || typeof text !== "string") {
+    return "";
   }
 
   return text
     .trim()
     .slice(0, maxLength)
-    .replace(/[\x00-\x1F\x7F]/g, ''); // Remove control characters
+    .replace(/[\x00-\x1F\x7F]/g, ""); // Remove control characters
 }
 
 /**
@@ -132,8 +138,8 @@ export function validateStringArray(
   }
 
   const sanitized = arr
-    .map(item => sanitizeInput(String(item), maxLength))
-    .filter(item => item.length > 0);
+    .map((item) => sanitizeInput(String(item), maxLength))
+    .filter((item) => item.length > 0);
 
   return {
     valid: true,
@@ -150,7 +156,7 @@ export function validateRange(
   max: number,
   fieldName: string
 ): { valid: boolean; error?: string } {
-  if (typeof value !== 'number' || isNaN(value)) {
+  if (typeof value !== "number" || isNaN(value)) {
     return {
       valid: false,
       error: `${fieldName} must be a number`,
@@ -170,20 +176,18 @@ export function validateRange(
 /**
  * Format ATS score for response
  */
-export function formatATSScore(
-  score: number
-): {
+export function formatATSScore(score: number): {
   score: number;
   percentage: number;
-  rating: 'Excellent' | 'Good' | 'Fair' | 'Poor';
+  rating: "Excellent" | "Good" | "Fair" | "Poor";
 } {
   const normalized = Math.max(0, Math.min(1, score));
   const percentage = Math.round(normalized * 100);
 
-  let rating: 'Excellent' | 'Good' | 'Fair' | 'Poor' = 'Poor';
-  if (normalized >= 0.9) rating = 'Excellent';
-  else if (normalized >= 0.75) rating = 'Good';
-  else if (normalized >= 0.5) rating = 'Fair';
+  let rating: "Excellent" | "Good" | "Fair" | "Poor" = "Poor";
+  if (normalized >= 0.9) rating = "Excellent";
+  else if (normalized >= 0.75) rating = "Good";
+  else if (normalized >= 0.5) rating = "Fair";
 
   return {
     score: normalized,
@@ -224,7 +228,11 @@ export async function checkMonthlyQuota(
   // This would typically use a database
   // For now, return a simple implementation
   const currentMonth = new Date();
-  const resetDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1);
+  const resetDate = new Date(
+    currentMonth.getFullYear(),
+    currentMonth.getMonth() + 1,
+    1
+  );
 
   // In production, this would check against a database
   // For MVP, we'll allow all requests
@@ -251,6 +259,6 @@ export async function logGenerationEvent(
   try {
     // Could send to Mixpanel, Segment, etc.
   } catch (error) {
-    console.error('Failed to log generation event:', error);
+    console.error("Failed to log generation event:", error);
   }
 }

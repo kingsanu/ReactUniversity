@@ -1939,12 +1939,13 @@ export default function ResumeBuilderPage() {
                               <GenerateButton
                                 field="summary"
                                 context={{
-                                  currentRole: personalInfoForm.professionalTitle,
+                                  currentRole:
+                                    personalInfoForm.professionalTitle,
                                   keySkills: resumeBuilder.data.skills
                                     .map((s) => s.name)
                                     .join(", "),
-                                  yearsExperience: resumeBuilder.data.experience
-                                    .length,
+                                  yearsExperience:
+                                    resumeBuilder.data.experience.length,
                                 }}
                                 variant="icon"
                                 size="sm"
@@ -2985,9 +2986,8 @@ export default function ResumeBuilderPage() {
                                 context={{
                                   jobTitle: experienceForm.jobTitle,
                                   company: experienceForm.company,
-                                  responsibilities: experienceForm.description.join(
-                                    "\n"
-                                  ),
+                                  responsibilities:
+                                    experienceForm.description.join("\n"),
                                   technologies: "",
                                 }}
                                 variant="icon"

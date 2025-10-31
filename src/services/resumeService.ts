@@ -1,4 +1,4 @@
-import { apiRequest } from '@/lib/api/apiClient';
+import { apiRequest } from "@/lib/api/apiClient";
 
 export interface ResumePersonal {
   fullName: string;
@@ -60,8 +60,8 @@ export type UpdateResumePayload = Partial<CreateResumePayload>;
 export async function createResume(
   payload: CreateResumePayload
 ): Promise<Resume> {
-  return apiRequest('/api/resume', {
-    method: 'POST',
+  return apiRequest("/api/resume", {
+    method: "POST",
     data: payload,
   });
 }
@@ -71,19 +71,19 @@ export async function updateResume(
   payload: UpdateResumePayload
 ): Promise<Resume> {
   return apiRequest(`/api/resume/${resumeId}`, {
-    method: 'PUT',
+    method: "PUT",
     data: payload,
   });
 }
 
 export async function getAllResumes(): Promise<Resume[]> {
-  return apiRequest('/api/resume', { method: 'GET' });
+  return apiRequest("/api/resume", { method: "GET" });
 }
 
 export async function getResumeById(resumeId: string): Promise<Resume> {
-  return apiRequest(`/api/resume/${resumeId}`, { method: 'GET' });
+  return apiRequest(`/api/resume/${resumeId}`, { method: "GET" });
 }
 
 export async function deleteResume(resumeId: string): Promise<void> {
-  return apiRequest(`/api/resume/${resumeId}`, { method: 'DELETE' });
+  return apiRequest(`/api/resume/${resumeId}`, { method: "DELETE" });
 }
