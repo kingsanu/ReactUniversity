@@ -53,6 +53,8 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
+  DragStartEvent,
+  DragOverlay,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -577,8 +579,9 @@ function SortableSection({
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition,
+    transition: transition || "transform 200ms cubic-bezier(0.25, 1, 0.5, 1)",
     opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 1000 : "auto",
   };
 
   const fieldConfig = SECTION_FIELD_CONFIGS[section.type] || [];
@@ -590,17 +593,27 @@ function SortableSection({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 * (index + 2) }}
-      className="bg-card rounded-lg border border-border overflow-hidden"
+      className={cn(
+        "bg-card rounded-lg border overflow-hidden transition-all duration-200",
+        isDragging
+          ? "border-primary shadow-lg scale-[1.02]"
+          : "border-border hover:border-primary/50"
+      )}
     >
       <div className="w-full flex items-center gap-3 p-4 hover:bg-accent/50 transition-colors">
         {/* Drag Handle */}
         <button
           {...attributes}
           {...listeners}
-          className="cursor-grab active:cursor-grabbing p-1 hover:bg-accent rounded transition-colors"
+          className={cn(
+            "cursor-grab active:cursor-grabbing p-2 rounded transition-all",
+            "hover:bg-primary/10 hover:text-primary",
+            "focus:outline-none focus:ring-2 focus:ring-primary/50",
+            isDragging && "cursor-grabbing bg-primary/20"
+          )}
           title="Drag to reorder"
         >
-          <GripVertical className="w-4 h-4 text-muted-foreground" />
+          <GripVertical className="w-5 h-5" />
         </button>
 
         {/* Section Header */}
@@ -870,6 +883,15 @@ export default function ResumeBuilderPage() {
     addSkill,
     removeSkill,
     setResumeTemplate,
+    addCustomField,
+    updateCustomField,
+    removeCustomField,
+    addDynamicSection,
+    updateDynamicSection,
+    removeDynamicSection,
+    addDynamicSectionEntry,
+    updateDynamicSectionEntry,
+    removeDynamicSectionEntry,
   } = useGlobalStore();
 
   const [activeTab, setActiveTab] = useState<"content" | "template">("content");
@@ -989,33 +1011,51 @@ export default function ResumeBuilderPage() {
   // Accordion state - track which section is currently expanded
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
+  // Drag and drop state
+  const [activeId, setActiveId] = useState<string | null>(null);
+
   // Local sections state (for the collapsible UI)
-  const [sections, setSections] = useState<Section[]>([
-    {
-      id: "education",
-      type: "education",
-      title: "Education",
-      icon: GraduationCap,
-      isExpanded: false,
-      entries: resumeBuilder.data.education || [],
-    },
-    {
-      id: "experience",
-      type: "experience",
-      title: "Professional Experience",
-      icon: Briefcase,
-      isExpanded: false,
-      entries: resumeBuilder.data.experience || [],
-    },
-    {
-      id: "skills",
-      type: "skills",
-      title: "Skills",
-      icon: Target,
-      isExpanded: false,
-      entries: resumeBuilder.data.skills || [],
-    },
-  ]);
+  const [sections, setSections] = useState<Section[]>(() => {
+    const baseSections: Section[] = [
+      {
+        id: "education",
+        type: "education" as SectionType,
+        title: "Education",
+        icon: GraduationCap,
+        isExpanded: false,
+        entries: resumeBuilder.data.education || [],
+      },
+      {
+        id: "experience",
+        type: "experience" as SectionType,
+        title: "Professional Experience",
+        icon: Briefcase,
+        isExpanded: false,
+        entries: resumeBuilder.data.experience || [],
+      },
+      {
+        id: "skills",
+        type: "skills" as SectionType,
+        title: "Skills",
+        icon: Target,
+        isExpanded: false,
+        entries: resumeBuilder.data.skills || [],
+      },
+    ];
+
+    // Add dynamic sections from global store
+    const dynamicSections: Section[] =
+      resumeBuilder.data.dynamicSections?.map((ds) => ({
+        id: ds.id,
+        type: ds.type as SectionType,
+        title: ds.title,
+        icon: Award, // Default icon, will be replaced based on type
+        isExpanded: false,
+        entries: ds.entries || [],
+      })) || [];
+
+    return [...baseSections, ...dynamicSections];
+  });
 
   // Section management functions - Accordion behavior (only one section open at a time)
   const toggleSection = (sectionId: string) => {
@@ -1058,10 +1098,14 @@ export default function ResumeBuilderPage() {
   const handleSaveDynamicEntry = (sectionId: string) => {
     if (!editingDynamicEntry) return;
 
-    const isNewEntry = !sections
-      .find((s) => s.id === sectionId)
-      ?.entries.some((e) => e.id === editingDynamicEntry.entryId);
+    const section = sections.find((s) => s.id === sectionId);
+    if (!section) return;
 
+    const isNewEntry = !section.entries.some(
+      (e) => e.id === editingDynamicEntry.entryId
+    );
+
+    // Update local state
     setSections(
       sections.map((s) => {
         if (s.id === sectionId) {
@@ -1090,6 +1134,26 @@ export default function ResumeBuilderPage() {
       })
     );
 
+    // Sync to global store (only for dynamic sections, not education/experience/skills)
+    if (
+      section.type !== "education" &&
+      section.type !== "experience" &&
+      section.type !== "skills"
+    ) {
+      if (isNewEntry) {
+        addDynamicSectionEntry(sectionId, {
+          id: editingDynamicEntry.entryId,
+          ...dynamicEntryForm,
+        } as any);
+      } else {
+        updateDynamicSectionEntry(
+          sectionId,
+          editingDynamicEntry.entryId,
+          dynamicEntryForm as any
+        );
+      }
+    }
+
     setEditingDynamicEntry(null);
     setDynamicEntryForm({});
     setSaveSuccess(true);
@@ -1097,6 +1161,9 @@ export default function ResumeBuilderPage() {
   };
 
   const handleDeleteDynamicEntry = (sectionId: string, entryId: string) => {
+    const section = sections.find((s) => s.id === sectionId);
+
+    // Update local state
     setSections(
       sections.map((s) =>
         s.id === sectionId
@@ -1104,11 +1171,22 @@ export default function ResumeBuilderPage() {
           : s
       )
     );
+
+    // Sync to global store (only for dynamic sections)
+    if (
+      section &&
+      section.type !== "education" &&
+      section.type !== "experience" &&
+      section.type !== "skills"
+    ) {
+      removeDynamicSectionEntry(sectionId, entryId);
+    }
   };
 
   const addSection = (sectionType: SectionType, title: string, icon: any) => {
+    const sectionId = `section-${Date.now()}`;
     const newSection: Section = {
-      id: `section-${Date.now()}`,
+      id: sectionId,
       type: sectionType,
       title,
       icon,
@@ -1116,6 +1194,15 @@ export default function ResumeBuilderPage() {
       entries: [],
     };
     setSections([...sections, newSection]);
+
+    // Sync to global store with the same ID
+    addDynamicSection({
+      id: sectionId,
+      type: sectionType,
+      title,
+      entries: [],
+    } as any);
+
     setShowAddContentModal(false);
   };
 
@@ -1126,6 +1213,10 @@ export default function ResumeBuilderPage() {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -1138,6 +1229,8 @@ export default function ResumeBuilderPage() {
         return arrayMove(items, oldIndex, newIndex);
       });
     }
+
+    setActiveId(null);
   };
 
   // PDF Download Handler
@@ -3059,43 +3152,43 @@ export default function ResumeBuilderPage() {
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
+              onDragStart={handleDragStart}
               onDragEnd={handleDragEnd}
             >
               <SortableContext
-                items={sections
-                  .filter(
-                    (section) =>
-                      section.type !== "skills" &&
-                      section.type !== "education" &&
-                      section.type !== "experience"
-                  )
-                  .map((s) => s.id)}
+                items={sections.map((s) => s.id)}
                 strategy={verticalListSortingStrategy}
               >
-                {sections
-                  .filter(
-                    (section) =>
-                      section.type !== "skills" &&
-                      section.type !== "education" &&
-                      section.type !== "experience"
-                  )
-                  .map((section, index) => (
-                    <SortableSection
-                      key={section.id}
-                      section={section}
-                      index={index}
-                      toggleSection={toggleSection}
-                      editingDynamicEntry={editingDynamicEntry}
-                      dynamicEntryForm={dynamicEntryForm}
-                      setDynamicEntryForm={setDynamicEntryForm}
-                      handleAddDynamicEntry={handleAddDynamicEntry}
-                      handleEditDynamicEntry={handleEditDynamicEntry}
-                      handleSaveDynamicEntry={handleSaveDynamicEntry}
-                      handleDeleteDynamicEntry={handleDeleteDynamicEntry}
-                      setEditingDynamicEntry={setEditingDynamicEntry}
-                    />
-                  ))}
+                {sections.map((section, index) => (
+                  <SortableSection
+                    key={section.id}
+                    section={section}
+                    index={index}
+                    toggleSection={toggleSection}
+                    editingDynamicEntry={editingDynamicEntry}
+                    dynamicEntryForm={dynamicEntryForm}
+                    setDynamicEntryForm={setDynamicEntryForm}
+                    handleAddDynamicEntry={handleAddDynamicEntry}
+                    handleEditDynamicEntry={handleEditDynamicEntry}
+                    handleSaveDynamicEntry={handleSaveDynamicEntry}
+                    handleDeleteDynamicEntry={handleDeleteDynamicEntry}
+                    setEditingDynamicEntry={setEditingDynamicEntry}
+                  />
+                ))}
               </SortableContext>
+              <DragOverlay>
+                {activeId ? (
+                  <div className="bg-card rounded-lg border-2 border-primary shadow-2xl p-4 opacity-90">
+                    <div className="flex items-center gap-3">
+                      <GripVertical className="w-5 h-5 text-primary" />
+                      <span className="font-semibold text-foreground">
+                        {sections.find((s) => s.id === activeId)?.title ||
+                          "Section"}
+                      </span>
+                    </div>
+                  </div>
+                ) : null}
+              </DragOverlay>
             </DndContext>
           )}
           {/* Add Content Button - Show only in Content tab */}
@@ -3574,7 +3667,9 @@ export default function ResumeBuilderPage() {
               </div>
               <div className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {AVAILABLE_SECTIONS.map((section) => (
+                  {AVAILABLE_SECTIONS.filter(
+                    (section) => !sections.some((s) => s.type === section.type)
+                  ).map((section) => (
                     <button
                       key={section.type}
                       onClick={() =>
@@ -3598,6 +3693,15 @@ export default function ResumeBuilderPage() {
                     </button>
                   ))}
                 </div>
+                {AVAILABLE_SECTIONS.filter(
+                  (section) => !sections.some((s) => s.type === section.type)
+                ).length === 0 && (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground text-sm">
+                      All available sections have been added to your resume.
+                    </p>
+                  </div>
+                )}
               </div>
             </motion.div>
           </motion.div>

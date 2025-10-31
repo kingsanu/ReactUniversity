@@ -10,7 +10,21 @@ interface PersonalInfo {
   location: string;
   linkedin: string;
   website: string;
+  github?: string;
+  twitter?: string;
+  portfolio?: string;
+  professionalTitle?: string;
+  dateOfBirth?: string;
+  nationality?: string;
+  languages?: string;
+  maritalStatus?: string;
+  driversLicense?: string;
+  militaryService?: string;
+  visaStatus?: string;
+  preferredPronouns?: string;
   summary: string;
+  careerObjective?: string;
+  [key: string]: any; // Support for custom fields
 }
 
 interface Experience {
@@ -40,6 +54,24 @@ interface Skill {
   level: "beginner" | "intermediate" | "advanced" | "expert";
 }
 
+interface CustomField {
+  id: string;
+  name: string;
+  value: string;
+  type: "text" | "textarea";
+  enabled: boolean;
+}
+
+interface DynamicSection {
+  id: string;
+  type: string;
+  title: string;
+  entries: Array<{
+    id: string;
+    [key: string]: any;
+  }>;
+}
+
 export interface ResumeData {
   careerField: string;
   // Optional legacy field for compatibility
@@ -48,6 +80,8 @@ export interface ResumeData {
   experience: Experience[];
   education: Education[];
   skills: Skill[];
+  customFields?: CustomField[];
+  dynamicSections?: DynamicSection[];
   template:
     | "modern"
     | "classic"
@@ -97,6 +131,19 @@ interface GlobalState {
   removeEducation: (id: string) => void;
   addSkill: (skill: Omit<Skill, "id">) => void;
   removeSkill: (id: string) => void;
+  addCustomField: (field: Omit<CustomField, "id">) => void;
+  updateCustomField: (id: string, field: Partial<CustomField>) => void;
+  removeCustomField: (id: string) => void;
+  addDynamicSection: (section: Omit<DynamicSection, "id">) => void;
+  updateDynamicSection: (id: string, section: Partial<DynamicSection>) => void;
+  removeDynamicSection: (id: string) => void;
+  addDynamicSectionEntry: (sectionId: string, entry: any) => void;
+  updateDynamicSectionEntry: (
+    sectionId: string,
+    entryId: string,
+    entry: any
+  ) => void;
+  removeDynamicSectionEntry: (sectionId: string, entryId: string) => void;
   setResumeTemplate: (template: ResumeData["template"]) => void;
   setResumeLoading: (loading: boolean) => void;
   resetResumeBuilder: () => void;
@@ -122,6 +169,8 @@ const initialResumeData: ResumeData = {
   experience: [],
   education: [],
   skills: [],
+  customFields: [],
+  dynamicSections: [],
   template: "modern",
 };
 
@@ -356,6 +405,163 @@ export const useGlobalStore = create<GlobalState>()(
               },
             };
           }),
+
+        addCustomField: (field) =>
+          set((state) => ({
+            resumeBuilder: {
+              ...state.resumeBuilder,
+              data: {
+                ...state.resumeBuilder.data,
+                customFields: [
+                  ...(state.resumeBuilder.data.customFields || []),
+                  { ...field, id: crypto.randomUUID() },
+                ],
+              },
+              isDirty: true,
+            },
+          })),
+
+        updateCustomField: (id, field) =>
+          set((state) => ({
+            resumeBuilder: {
+              ...state.resumeBuilder,
+              data: {
+                ...state.resumeBuilder.data,
+                customFields: (state.resumeBuilder.data.customFields || []).map(
+                  (f) => (f.id === id ? { ...f, ...field } : f)
+                ),
+              },
+              isDirty: true,
+            },
+          })),
+
+        removeCustomField: (id) =>
+          set((state) => ({
+            resumeBuilder: {
+              ...state.resumeBuilder,
+              data: {
+                ...state.resumeBuilder.data,
+                customFields: (
+                  state.resumeBuilder.data.customFields || []
+                ).filter((f) => f.id !== id),
+              },
+              isDirty: true,
+            },
+          })),
+
+        addDynamicSection: (section) =>
+          set((state) => ({
+            resumeBuilder: {
+              ...state.resumeBuilder,
+              data: {
+                ...state.resumeBuilder.data,
+                dynamicSections: [
+                  ...(state.resumeBuilder.data.dynamicSections || []),
+                  {
+                    ...section,
+                    id: (section as any).id || crypto.randomUUID(),
+                  },
+                ],
+              },
+              isDirty: true,
+            },
+          })),
+
+        updateDynamicSection: (id, section) =>
+          set((state) => ({
+            resumeBuilder: {
+              ...state.resumeBuilder,
+              data: {
+                ...state.resumeBuilder.data,
+                dynamicSections: (
+                  state.resumeBuilder.data.dynamicSections || []
+                ).map((s) => (s.id === id ? { ...s, ...section } : s)),
+              },
+              isDirty: true,
+            },
+          })),
+
+        removeDynamicSection: (id) =>
+          set((state) => ({
+            resumeBuilder: {
+              ...state.resumeBuilder,
+              data: {
+                ...state.resumeBuilder.data,
+                dynamicSections: (
+                  state.resumeBuilder.data.dynamicSections || []
+                ).filter((s) => s.id !== id),
+              },
+              isDirty: true,
+            },
+          })),
+
+        addDynamicSectionEntry: (sectionId, entry) =>
+          set((state) => ({
+            resumeBuilder: {
+              ...state.resumeBuilder,
+              data: {
+                ...state.resumeBuilder.data,
+                dynamicSections: (
+                  state.resumeBuilder.data.dynamicSections || []
+                ).map((s) =>
+                  s.id === sectionId
+                    ? {
+                        ...s,
+                        entries: [
+                          ...s.entries,
+                          { ...entry, id: entry.id || crypto.randomUUID() },
+                        ],
+                      }
+                    : s
+                ),
+              },
+              isDirty: true,
+            },
+          })),
+
+        updateDynamicSectionEntry: (sectionId, entryId, entry) =>
+          set((state) => ({
+            resumeBuilder: {
+              ...state.resumeBuilder,
+              data: {
+                ...state.resumeBuilder.data,
+                dynamicSections: (
+                  state.resumeBuilder.data.dynamicSections || []
+                ).map((s) =>
+                  s.id === sectionId
+                    ? {
+                        ...s,
+                        entries: s.entries.map((e) =>
+                          e.id === entryId ? { ...e, ...entry } : e
+                        ),
+                      }
+                    : s
+                ),
+              },
+              isDirty: true,
+            },
+          })),
+
+        removeDynamicSectionEntry: (sectionId, entryId) =>
+          set((state) => ({
+            resumeBuilder: {
+              ...state.resumeBuilder,
+              data: {
+                ...state.resumeBuilder.data,
+                dynamicSections: (
+                  state.resumeBuilder.data.dynamicSections || []
+                ).map((s) =>
+                  s.id === sectionId
+                    ? {
+                        ...s,
+                        entries: s.entries.filter((e) => e.id !== entryId),
+                      }
+                    : s
+                ),
+              },
+              isDirty: true,
+            },
+          })),
 
         setResumeTemplate: (template) =>
           set((state) => ({
