@@ -77,7 +77,8 @@ export async function updateResume(
 }
 
 export async function getAllResumes(): Promise<Resume[]> {
-  return apiRequest("/api/resume", { method: "GET" });
+  const response = await apiRequest("/api/resume", { method: "GET" });
+  return response.data?.data || [];
 }
 
 export async function getResumeById(resumeId: string): Promise<Resume> {

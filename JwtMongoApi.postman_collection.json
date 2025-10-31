@@ -309,12 +309,38 @@
       "item": [
         {
           "name": "Create Resume",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.ID) {",
+                  "        pm.collectionVariables.set(\"resumeId\", jsonData.data.ID);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"personal\": {\n    \"fullName\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"+1 123 456 7890\",\n    \"location\": \"St. Louis, MO\",\n    \"linkedIn\": \"https://linkedin.com/in/johndoe\",\n    \"website\": \"https://johndoe.com\"\n  },\n  \"summary\": \"Experienced Salesforce Admin...\",\n  \"skills\": {\n    \"skills\": {\n      \"Programming Languages\": [\"C#\", \"JavaScript\"],\n      \"Frameworks\": [\"React\", \"ASP.NET\"],\n      \"Soft Skills\": [\"Leadership\", \"Teamwork\"]\n    }\n  },\n  \"experience\": [\n    {\n      \"company\": \"Qualcomm\",\n      \"location\": \"USA\",\n      \"title\": \"Salesforce Admin\",\n      \"startDate\": \"Aug 2024\",\n      \"endDate\": \"Present\",\n      \"descriptions\": [\"Configured and maintained...\"]\n    }\n  ],\n  \"education\": [\n    {\n      \"degree\": \"Masters in Information Systems\",\n      \"institution\": \"Saint Louis University\",\n      \"location\": \"St. Louis, MO\",\n      \"startDate\": \"Aug 2023\",\n      \"endDate\": \"May 2025\"\n    }\n  ]\n}"
+              "raw": "{\n  \"name\": \"Software Engineer Resume\",\n  \"template\": \"modern\",\n  \"careerField\": \"technology\",\n  \"personalInfo\": {\n    \"fullName\": \"John Doe\",\n    \"professionalTitle\": \"Senior Software Engineer\",\n    \"email\": \"john.doe@example.com\",\n    \"phone\": \"+1 (555) 123-4567\",\n    \"location\": \"San Francisco, CA\",\n    \"linkedIn\": \"linkedin.com/in/johndoe\",\n    \"website\": \"johndoe.com\",\n    \"github\": \"github.com/johndoe\",\n    \"twitter\": \"@johndoe\",\n    \"dateOfBirth\": \"1990-01-15\",\n    \"nationality\": \"American\",\n    \"languages\": \"English, Spanish\",\n    \"maritalStatus\": \"Single\",\n    \"driversLicense\": \"Yes\",\n    \"militaryService\": \"None\",\n    \"visaStatus\": \"Citizen\",\n    \"preferredPronouns\": \"He/Him\",\n    \"summary\": \"Experienced software engineer with 8+ years in full-stack development\",\n    \"careerObjective\": \"Seeking a challenging role in leading-edge technology\"\n  },\n  \"experience\": [\n    {\n      \"id\": \"exp-1\",\n      \"company\": \"Tech Corp\",\n      \"position\": \"Senior Software Engineer\",\n      \"location\": \"San Francisco, CA\",\n      \"startDate\": \"2020-01\",\n      \"endDate\": \"Present\",\n      \"description\": \"Led development of microservices architecture using .NET Core and React\"\n    }\n  ],\n  \"education\": [\n    {\n      \"id\": \"edu-1\",\n      \"degree\": \"Bachelor of Science in Computer Science\",\n      \"school\": \"Stanford University\",\n      \"location\": \"Stanford, CA\",\n      \"startDate\": \"2008-09\",\n      \"endDate\": \"2012-06\",\n      \"gpa\": \"3.8\"\n    }\n  ],\n  \"skills\": [\n    {\n      \"id\": \"skill-1\",\n      \"name\": \"JavaScript\",\n      \"level\": \"expert\"\n    },\n    {\n      \"id\": \"skill-2\",\n      \"name\": \"React\",\n      \"level\": \"expert\"\n    }\n  ],\n  \"sections\": [\n    {\n      \"id\": \"section-1\",\n      \"type\": \"languages\",\n      \"title\": \"Languages\",\n      \"isExpanded\": false,\n      \"order\": 0,\n      \"entries\": [\n        {\"language\": \"English\", \"proficiency\": \"Native\"}\n      ]\n    }\n  ],\n  \"fieldVisibility\": {\n    \"professionalTitle\": true,\n    \"email\": true,\n    \"phone\": true,\n    \"location\": true,\n    \"linkedIn\": true,\n    \"website\": false,\n    \"github\": true,\n    \"twitter\": false,\n    \"dateOfBirth\": false,\n    \"nationality\": false,\n    \"languages\": false,\n    \"maritalStatus\": false,\n    \"driversLicense\": false,\n    \"militaryService\": false,\n    \"visaStatus\": false,\n    \"preferredPronouns\": false,\n    \"summary\": true,\n    \"careerObjective\": false\n  },\n  \"customFields\": []\n}"
             },
             "url": {
               "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/resume",
@@ -323,48 +349,65 @@
                 "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "resume"]
-            }
-          }
-        },
-        {
-          "name": "Update Resume",
-          "request": {
-            "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"personal\": {\n    \"fullName\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"+1 123 456 7890\",\n    \"location\": \"St. Louis, MO\",\n    \"linkedIn\": \"https://linkedin.com/in/johndoe\",\n    \"website\": \"https://johndoe.com\"\n  },\n  \"summary\": \"Updated summary...\",\n  \"skills\": {\n    \"skills\": {\n      \"Programming Languages\": [\"C#\", \"JavaScript\"],\n      \"Frameworks\": [\"React\", \"ASP.NET\"],\n      \"Soft Skills\": [\"Leadership\", \"Teamwork\"]\n    }\n  },\n  \"experience\": [\n    {\n      \"company\": \"Qualcomm\",\n      \"location\": \"USA\",\n      \"title\": \"Salesforce Admin\",\n      \"startDate\": \"Aug 2024\",\n      \"endDate\": \"Present\",\n      \"descriptions\": [\"Configured and maintained...\"]\n    }\n  ],\n  \"education\": [\n    {\n      \"degree\": \"Masters in Information Systems\",\n      \"institution\": \"Saint Louis University\",\n      \"location\": \"St. Louis, MO\",\n      \"startDate\": \"Aug 2023\",\n      \"endDate\": \"May 2025\"\n    }\n  ]\n}"
             },
-            "url": {
-              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/resume/{{resumeId}}",
-              "protocol": "https",
-              "host": [
-                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
-              ],
-              "path": ["api", "resume", "{{resumeId}}"]
-            }
+            "description": "Creates a new resume for the authenticated user. Requires JWT authentication."
           }
         },
         {
           "name": "Get All Resumes",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
             "url": {
-              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/resume",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/resume?page=1&limit=10&sortBy=updatedAt&order=desc",
               "protocol": "https",
               "host": [
                 "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
-              "path": ["api", "resume"]
-            }
+              "path": ["api", "resume"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (default: 1)"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Results per page (default: 10, max: 100)"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "updatedAt",
+                  "description": "Sort field: name, createdAt, updatedAt (default: updatedAt)"
+                },
+                {
+                  "key": "order",
+                  "value": "desc",
+                  "description": "Sort order: asc or desc (default: desc)"
+                }
+              ]
+            },
+            "description": "Retrieves all resumes for the authenticated user with pagination and sorting. Returns simplified list view."
           }
         },
         {
           "name": "Get Resume By Id",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
             "url": {
               "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/resume/{{resumeId}}",
               "protocol": "https",
@@ -372,14 +415,51 @@
                 "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "resume", "{{resumeId}}"]
-            }
+            },
+            "description": "Retrieves a specific resume by ID. Returns full resume data."
+          }
+        },
+        {
+          "name": "Update Resume",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Resume Name\",\n  \"personalInfo\": {\n    \"fullName\": \"John Smith\",\n    \"email\": \"john.smith@example.com\"\n  }\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/resume/{{resumeId}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "resume", "{{resumeId}}"]
+            },
+            "description": "Updates an existing resume. Supports partial updates - only send fields that changed."
           }
         },
         {
           "name": "Delete Resume",
           "request": {
             "method": "DELETE",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
             "url": {
               "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/resume/{{resumeId}}",
               "protocol": "https",
@@ -387,7 +467,172 @@
                 "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["api", "resume", "{{resumeId}}"]
+            },
+            "description": "Soft-deletes (deactivates) a resume. Data is preserved with IsActive flag."
+          }
+        },
+        {
+          "name": "Update Section Order",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sectionIds\": [\"section-3\", \"section-1\", \"section-2\", \"section-4\"]\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/resume/{{resumeId}}/sections/order",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "resume", "{{resumeId}}", "sections", "order"]
+            },
+            "description": "Updates the order of sections in a resume (for drag-and-drop functionality)."
+          }
+        },
+        {
+          "name": "Add Section",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.id) {",
+                  "        pm.collectionVariables.set(\"sectionId\", jsonData.data.id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
             }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"languages\",\n  \"title\": \"Languages\",\n  \"entries\": []\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/resume/{{resumeId}}/sections",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "resume", "{{resumeId}}", "sections"]
+            },
+            "description": "Adds a new section to a resume. Supports languages, certificates, projects, awards, etc."
+          }
+        },
+        {
+          "name": "Delete Section",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/resume/{{resumeId}}/sections/{{sectionId}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": [
+                "api",
+                "resume",
+                "{{resumeId}}",
+                "sections",
+                "{{sectionId}}"
+              ]
+            },
+            "description": "Deletes a section from a resume."
+          }
+        },
+        {
+          "name": "Update Template",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"template\": \"classic\"\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/resume/{{resumeId}}/template",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "resume", "{{resumeId}}", "template"]
+            },
+            "description": "Updates the template for a resume (e.g., modern, classic, etc.)."
+          }
+        },
+        {
+          "name": "Ask Assistant",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Prompt\": \"Help me write a professional summary for a software engineer resume\"\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/resume/ask",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "resume", "ask"]
+            },
+            "description": "AI assistant for resume help. Accepts JSON {Prompt: \"...\"} or plain text. Forwards to ChatGPT API."
           }
         }
       ]
@@ -1474,14 +1719,21 @@
                   "raw": ""
                 },
                 "url": {
-                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/{{examId}}/start",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/{{examId}}/start?lang={{language}}",
                   "protocol": "https",
                   "host": [
                     "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
-                  "path": ["api", "PCAExam", "exams", "{{examId}}", "start"]
+                  "path": ["api", "PCAExam", "exams", "{{examId}}", "start"],
+                  "query": [
+                    {
+                      "key": "lang",
+                      "value": "{{language}}",
+                      "description": "Language code (en for English, sp for Spanish). Defaults to 'en' if not specified."
+                    }
+                  ]
                 },
-                "description": "Start an exam session. Returns exam data with start timestamp. Available exam IDs: pattern-recognition-001, verbal-reasoning-001, working-memory-001, numeric-velocity-001, visual-rotation-001"
+                "description": "Start an exam session with language support. Returns exam data with start timestamp in the specified language. Available exam IDs: pattern-recognition-001, verbal-reasoning-001, working-memory-001, numeric-velocity-001, visual-rotation-001\n\n**Language Support:**\n- `lang=en` (default): Start exam in English\n- `lang=sp`: Start exam in Spanish\n\n**Examples:**\n- Start English: `/api/PCAExam/exams/pattern-recognition-001/start?lang=en`\n- Start Spanish: `/api/PCAExam/exams/pattern-recognition-001/start?lang=sp`"
               }
             },
             {
@@ -1490,7 +1742,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/{{examId}}/instructions",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/PCAExam/exams/{{examId}}/instructions?lang={{language}}",
                   "protocol": "https",
                   "host": [
                     "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
@@ -1501,9 +1753,16 @@
                     "exams",
                     "{{examId}}",
                     "instructions"
+                  ],
+                  "query": [
+                    {
+                      "key": "lang",
+                      "value": "{{language}}",
+                      "description": "Language code (en for English, sp for Spanish). Defaults to 'en' if not specified."
+                    }
                   ]
                 },
-                "description": "Get detailed instructions and examples for the exam. Available exam IDs: pattern-recognition-001, verbal-reasoning-001, working-memory-001, numeric-velocity-001, visual-rotation-001"
+                "description": "Get detailed instructions and examples for the exam with language support. Available exam IDs: pattern-recognition-001, verbal-reasoning-001, working-memory-001, numeric-velocity-001, visual-rotation-001\n\n**Language Support:**\n- `lang=en` (default): Get instructions in English\n- `lang=sp`: Get instructions in Spanish\n\n**Examples:**\n- Get English: `/api/PCAExam/exams/pattern-recognition-001/instructions?lang=en`\n- Get Spanish: `/api/PCAExam/exams/pattern-recognition-001/instructions?lang=sp`"
               }
             }
           ]
@@ -2704,6 +2963,11 @@
       "key": "parentQuestionId",
       "value": "your-parent-question-id-here",
       "description": "Parent question ID for sub-questions"
+    },
+    {
+      "key": "sectionId",
+      "value": "your-section-id-here",
+      "description": "Replace with actual section ID for testing (e.g., section-1)"
     }
   ]
 }
