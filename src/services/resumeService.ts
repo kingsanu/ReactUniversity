@@ -82,9 +82,71 @@ export async function getAllResumes(): Promise<Resume[]> {
 }
 
 export async function getResumeById(resumeId: string): Promise<Resume> {
-  return apiRequest(`/api/resume/${resumeId}`, { method: "GET" });
+  const response = await apiRequest(`/api/resume/${resumeId}`, { method: "GET" });
+  return response.data || response;
 }
 
 export async function deleteResume(resumeId: string): Promise<void> {
   return apiRequest(`/api/resume/${resumeId}`, { method: "DELETE" });
+}
+
+// AI Generation Functions
+export interface AIGenerationContext {
+  jobTitle?: string;
+  company?: string;
+  responsibilities?: string;
+  technologies?: string;
+  currentRole?: string;
+  keySkills?: string;
+  yearsExperience?: number;
+  industry?: string;
+  targetRole?: string;
+  achievements?: string[];
+}
+
+export interface AIGenerationResponse {
+  success: boolean;
+  data: {
+    generated_content: string | string[];
+    atsScore?: number;
+    wordCount?: number;
+    keywordsIncluded?: string[];
+  };
+  message?: string;
+}
+
+export async function generateProfessionalSummary(
+  context: AIGenerationContext
+): Promise<AIGenerationResponse> {
+  return apiRequest("/api/resume/generate/professional-summary", {
+    method: "POST",
+    data: context,
+  });
+}
+
+export async function generateJobBullets(
+  context: AIGenerationContext
+): Promise<AIGenerationResponse> {
+  return apiRequest("/api/resume/generate/job-bullets", {
+    method: "POST",
+    data: context,
+  });
+}
+
+export async function generateCareerObjective(
+  context: AIGenerationContext
+): Promise<AIGenerationResponse> {
+  return apiRequest("/api/resume/generate/career-objective", {
+    method: "POST",
+    data: context,
+  });
+}
+
+export async function generateProjectDescription(
+  context: AIGenerationContext
+): Promise<AIGenerationResponse> {
+  return apiRequest("/api/resume/generate/project-description", {
+    method: "POST",
+    data: context,
+  });
 }

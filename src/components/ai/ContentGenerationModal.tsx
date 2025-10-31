@@ -21,6 +21,14 @@ import {
 import { cn } from "@/lib/utils";
 import { ATSScoreDisplay } from "./ATSScoreDisplay";
 import { GenerationContextForm } from "./GenerationContextForm";
+import {
+  generateProfessionalSummary,
+  generateJobBullets,
+  generateCareerObjective,
+  generateProjectDescription,
+  AIGenerationContext,
+  AIGenerationResponse
+} from "@/services/resumeService";
 
 export type GenerationStep = "config" | "loading" | "result";
 
@@ -68,12 +76,12 @@ export function ContentGenerationModal({
     skill: "Skill Description",
   };
 
-  const apiEndpoints: Record<string, string> = {
-    summary: "/api/resume/generate/professional-summary",
-    objective: "/api/resume/generate/career-objective",
-    bullets: "/api/resume/generate/job-bullets",
-    project: "/api/resume/generate/project-description",
-    skill: "/api/resume/generate/project-description",
+  const generationFunctions: Record<string, (context: AIGenerationContext) => Promise<AIGenerationResponse>> = {
+    summary: generateProfessionalSummary,
+    objective: generateCareerObjective,
+    bullets: generateJobBullets,
+    project: generateProjectDescription,
+    skill: generateProjectDescription,
   };
 
   const handleGenerate = async () => {
@@ -82,51 +90,30 @@ export function ContentGenerationModal({
     setStep("loading");
 
     try {
-      const endpoint = apiEndpoints[field];
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-        },
-        body: JSON.stringify(generationContext),
-      });
+      const generateFunction = generationFunctions[field];
+      const response = await generateFunction(generationContext);
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (!response.success) {
         throw new Error(
-          errorData.error?.message || `Generation failed (${response.status})`
+          response.message || "Generation failed"
         );
       }
 
-      const data = await response.json();
+      const data = response.data;
 
-      if (!data.success) {
-        throw new Error(data.error?.message || "Generation failed");
-      }
-
-      const content =
-        data.data.generated_content || data.data.bulletPoints || "";
+      const content = data.generated_content;
 
       setGeneratedContent({
         id: "main",
         content,
-        atsScore: data.data.atsScore,
-        wordCount: data.data.wordCount,
-        keywordsIncluded: data.data.keywordsIncluded,
-        tone: data.data.tone || generationContext.tone,
+        atsScore: data.atsScore,
+        wordCount: data.wordCount,
+        keywordsIncluded: data.keywordsIncluded,
+        tone: generationContext.tone,
       });
 
-      if (data.data.alternatives) {
-        setAlternatives(
-          data.data.alternatives.map((alt: any, idx: number) => ({
-            id: `alt-${idx}`,
-            content: alt.content,
-            atsScore: alt.atsScore,
-            tone: alt.tone,
-          }))
-        );
-      }
+      // For now, no alternatives support
+      setAlternatives([]);
 
       setStep("result");
     } catch (err) {
