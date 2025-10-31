@@ -53,7 +53,7 @@ export const dashboardData = {
       subtitle: "dashboard.createWithAI",
       icon: "📄",
       action: "dashboard.startBuilding",
-      link: "/dashboard/resume-builder",
+      link: "/dashboard/resumes",
       variant: "secondary",
       badge: "dashboard.withAI",
     },
@@ -255,7 +255,7 @@ export const sidebarData = {
           name: "dashboard.courseCatalog",
           path: "/dashboard/learning/courses",
         },
-        { name: "dashboard.resumeBuilder", path: "/dashboard/learning/resume" },
+        { name: "dashboard.resumeBuilder", path: "/dashboard/resumes" },
         {
           name: "dashboard.resourceLibrary",
           path: "/dashboard/learning/library",
