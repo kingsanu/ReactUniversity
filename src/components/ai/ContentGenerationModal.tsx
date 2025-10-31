@@ -27,7 +27,7 @@ import {
   generateCareerObjective,
   generateProjectDescription,
   AIGenerationContext,
-  AIGenerationResponse
+  AIGenerationResponse,
 } from "@/services/resumeService";
 
 export type GenerationStep = "config" | "loading" | "result";
@@ -76,7 +76,10 @@ export function ContentGenerationModal({
     skill: "Skill Description",
   };
 
-  const generationFunctions: Record<string, (context: AIGenerationContext) => Promise<AIGenerationResponse>> = {
+  const generationFunctions: Record<
+    string,
+    (context: AIGenerationContext) => Promise<AIGenerationResponse>
+  > = {
     summary: generateProfessionalSummary,
     objective: generateCareerObjective,
     bullets: generateJobBullets,
@@ -94,9 +97,7 @@ export function ContentGenerationModal({
       const response = await generateFunction(generationContext);
 
       if (!response.success) {
-        throw new Error(
-          response.message || "Generation failed"
-        );
+        throw new Error(response.message || "Generation failed");
       }
 
       const data = response.data;
