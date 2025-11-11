@@ -152,3 +152,44 @@ export async function generateProjectDescription(
     data: context,
   });
 }
+
+/**
+ * Generic AI content generation using the /api/resume/ask endpoint
+ * This function constructs a detailed prompt and sends it to the AI
+ */
+export async function generateAIContent(
+  prompt: string
+): Promise<AIGenerationResponse> {
+  try {
+    const response = await apiRequest("/api/resume/ask", {
+      method: "POST",
+      data: {
+        Prompt: prompt,
+      },
+    });
+
+    // The API returns the generated content directly
+    // We need to format it to match our AIGenerationResponse interface
+    return {
+      success: true,
+      data: {
+        generated_content: response,
+      },
+    };
+  } catch (error) {
+    console.error("AI generation error:", error);
+    return {
+      success: false,
+      message:
+        error instanceof Error ? error.message : "Failed to generate content",
+      data: {
+        generated_content: "",
+      },
+    };
+  }
+}
+
+export async function getDefaultResume(): Promise<Resume> {
+  const response = await apiRequest("/api/resume/default", { method: "GET" });
+  return response.data || response;
+}

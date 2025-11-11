@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  type ReactNode,
+} from "react";
 import { useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -35,16 +41,21 @@ import {
   Phone,
   MapPin,
   Linkedin,
+  Github,
+  Twitter,
   ExternalLink,
   EyeOff,
   Settings,
   GripVertical,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { useGlobalStore } from "@/store/useGlobalStore";
+import type { ResumeData } from "@/store/useGlobalStore";
 import { LivePreviewPDF } from "../_components/LivePreviewPDF";
 import { TemplatePreviewCard } from "../_components/TemplatePreviewCard";
 import { cn } from "@/lib/utils";
 import { GenerateButton } from "@/components/ai";
+import { getResumeById } from "@/services/resumeService";
 import {
   DndContext,
   closestCenter,
@@ -82,6 +93,96 @@ type SectionType =
   | "declaration"
   | "custom";
 
+const SECTION_ICON_MAP: Record<SectionType, LucideIcon> = {
+  profile: User,
+  education: GraduationCap,
+  experience: Briefcase,
+  skills: Target,
+  languages: Globe,
+  certificates: Award,
+  interests: Palette,
+  projects: Folder,
+  courses: Book,
+  awards: Trophy,
+  organisations: Building,
+  publications: Newspaper,
+  references: Star,
+  declaration: Pen,
+  custom: Layers,
+};
+
+const getSectionIcon = (type: string): LucideIcon => {
+  if (type in SECTION_ICON_MAP) {
+    return SECTION_ICON_MAP[type as SectionType];
+  }
+
+  return Layers;
+};
+
+const PERSONAL_INFO_FORM_TEMPLATE = {
+  fullName: "",
+  professionalTitle: "",
+  email: "",
+  phone: "",
+  location: "",
+  linkedin: "",
+  website: "",
+  github: "",
+  twitter: "",
+  dateOfBirth: "",
+  nationality: "",
+  languages: "",
+  maritalStatus: "",
+  driversLicense: "",
+  militaryService: "",
+  visaStatus: "",
+  preferredPronouns: "",
+  summary: "",
+  careerObjective: "",
+};
+
+type PersonalInfoFormTemplate = typeof PERSONAL_INFO_FORM_TEMPLATE;
+type PersonalInfoFormState = PersonalInfoFormTemplate & Record<string, string>;
+
+const hasMeaningfulResumeData = (data?: ResumeData | null): boolean => {
+  if (!data) {
+    return false;
+  }
+
+  const hasPersonalInfo = data.personalInfo
+    ? Object.values(data.personalInfo).some((value) => {
+        if (typeof value === "string") {
+          return value.trim().length > 0;
+        }
+
+        if (Array.isArray(value)) {
+          return value.some((entry) =>
+            typeof entry === "string" ? entry.trim().length > 0 : Boolean(entry)
+          );
+        }
+
+        return Boolean(value);
+      })
+    : false;
+
+  const hasExperience =
+    Array.isArray(data.experience) && data.experience.length > 0;
+  const hasEducation =
+    Array.isArray(data.education) && data.education.length > 0;
+  const hasSkills = Array.isArray(data.skills) && data.skills.length > 0;
+  const hasDynamicEntries = Array.isArray(data.dynamicSections)
+    ? data.dynamicSections.some((section) => section.entries.length > 0)
+    : false;
+
+  return (
+    hasPersonalInfo ||
+    hasExperience ||
+    hasEducation ||
+    hasSkills ||
+    hasDynamicEntries
+  );
+};
+
 interface Entry {
   id: string;
   [key: string]: any;
@@ -98,31 +199,6 @@ interface Section {
 
 // Template data for template selection
 const TEMPLATES = [
-  {
-    id: "modern",
-    name: "Modern",
-    description: "Clean professional layout with blue accents",
-  },
-  {
-    id: "creative",
-    name: "Creative",
-    description: "Two-column sidebar layout with purple theme",
-  },
-  {
-    id: "minimal",
-    name: "Minimal",
-    description: "Clean minimal design with left borders",
-  },
-  {
-    id: "executive",
-    name: "Executive",
-    description: "Distinguished executive styling with sophistication",
-  },
-  {
-    id: "tech",
-    name: "Tech",
-    description: "Tech-focused layout with green accents and skill tags",
-  },
   {
     id: "classic",
     name: "Classic",
@@ -531,42 +607,37 @@ const SECTION_FIELD_CONFIGS: Record<
   ],
 };
 
+type SectionFieldConfig = (typeof SECTION_FIELD_CONFIGS)[SectionType][number];
+
 // Sortable Section Component
 interface SortableSectionProps {
   section: Section;
   index: number;
   toggleSection: (id: string) => void;
-  editingDynamicEntry: { sectionId: string; entryId: string } | null;
-  dynamicEntryForm: Record<string, any>;
-  setDynamicEntryForm: (form: Record<string, any>) => void;
-  handleAddDynamicEntry: (sectionId: string) => void;
-  handleEditDynamicEntry: (
-    sectionId: string,
-    entryId: string,
-    entryData: any
-  ) => void;
-  handleSaveDynamicEntry: (sectionId: string) => void;
-  handleDeleteDynamicEntry: (sectionId: string, entryId: string) => void;
-  setEditingDynamicEntry: (
-    entry: {
-      sectionId: string;
-      entryId: string;
-    } | null
-  ) => void;
+  headerMeta?: ReactNode;
+  headerActions?: ReactNode;
+  children: ReactNode;
+  editingSectionTitle?: string | null;
+  sectionTitleForm?: string;
+  onEditTitle?: (sectionId: string, currentTitle: string) => void;
+  onSaveTitle?: (sectionId: string) => void;
+  onCancelEditTitle?: () => void;
+  onTitleChange?: (value: string) => void;
 }
 
 function SortableSection({
   section,
   index,
   toggleSection,
-  editingDynamicEntry,
-  dynamicEntryForm,
-  setDynamicEntryForm,
-  handleAddDynamicEntry,
-  handleEditDynamicEntry,
-  handleSaveDynamicEntry,
-  handleDeleteDynamicEntry,
-  setEditingDynamicEntry,
+  headerMeta,
+  headerActions,
+  children,
+  editingSectionTitle,
+  sectionTitleForm,
+  onEditTitle,
+  onSaveTitle,
+  onCancelEditTitle,
+  onTitleChange,
 }: SortableSectionProps) {
   const {
     attributes,
@@ -584,8 +655,6 @@ function SortableSection({
     zIndex: isDragging ? 1000 : "auto",
   };
 
-  const fieldConfig = SECTION_FIELD_CONFIGS[section.type] || [];
-
   return (
     <motion.div
       ref={setNodeRef}
@@ -600,7 +669,7 @@ function SortableSection({
           : "border-border hover:border-primary/50"
       )}
     >
-      <div className="w-full flex items-center gap-3 p-4 hover:bg-accent/50 transition-colors">
+      <div className="group w-full flex items-center gap-3 p-4 hover:bg-accent/50 transition-colors">
         {/* Drag Handle */}
         <button
           {...attributes}
@@ -617,20 +686,86 @@ function SortableSection({
         </button>
 
         {/* Section Header */}
-        <button
-          onClick={() => toggleSection(section.id)}
-          className="flex-1 flex items-center gap-3"
-        >
-          <section.icon className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-          <span className="font-semibold text-foreground flex-1 text-left">
-            {section.title}
-          </span>
-          {section.isExpanded ? (
-            <ChevronUp className="w-5 h-5 text-muted-foreground" />
-          ) : (
-            <ChevronDown className="w-5 h-5 text-muted-foreground" />
-          )}
-        </button>
+        {editingSectionTitle === section.id ? (
+          <div className="flex-1 flex items-center gap-2">
+            <section.icon className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+            <input
+              type="text"
+              value={sectionTitleForm}
+              onChange={(e) => onTitleChange?.(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  onSaveTitle?.(section.id);
+                } else if (e.key === "Escape") {
+                  onCancelEditTitle?.();
+                }
+              }}
+              className="flex-1 px-2 py-1 text-sm font-semibold bg-background border border-input rounded focus:outline-none focus:ring-2 focus:ring-ring"
+              autoFocus
+              onClick={(e) => e.stopPropagation()}
+            />
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onSaveTitle?.(section.id);
+              }}
+              className="p-1 hover:bg-accent rounded transition-colors"
+              title="Save title"
+            >
+              <Check className="w-4 h-4 text-green-600" />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onCancelEditTitle?.();
+              }}
+              className="p-1 hover:bg-accent rounded transition-colors"
+              title="Cancel"
+            >
+              <X className="w-4 h-4 text-muted-foreground" />
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => toggleSection(section.id)}
+            className="flex-1 flex items-center gap-3"
+          >
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <section.icon className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+              <span className="font-semibold text-foreground text-left truncate">
+                {section.title}
+              </span>
+              {section.type === "custom" && onEditTitle && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEditTitle(section.id, section.title);
+                  }}
+                  className="p-1 opacity-0 group-hover:opacity-100 hover:bg-accent rounded transition-all"
+                  title="Edit section title"
+                >
+                  <Pencil className="w-3 h-3 text-muted-foreground" />
+                </button>
+              )}
+              {headerMeta ? (
+                <span className="text-xs text-muted-foreground truncate">
+                  {headerMeta}
+                </span>
+              ) : null}
+            </div>
+            {section.isExpanded ? (
+              <ChevronUp className="w-5 h-5 text-muted-foreground" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-muted-foreground" />
+            )}
+          </button>
+        )}
+
+        {headerActions ? (
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {headerActions}
+          </div>
+        ) : null}
       </div>
 
       <AnimatePresence>
@@ -641,226 +776,7 @@ function SortableSection({
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
-            <div className="p-4 pt-0 space-y-2">
-              {/* Display existing entries */}
-              {section.entries.map((entry: any) => (
-                <div
-                  key={entry.id}
-                  className="bg-muted/30 rounded-lg p-2 border border-border"
-                >
-                  {editingDynamicEntry?.sectionId === section.id &&
-                  editingDynamicEntry?.entryId === entry.id ? (
-                    // Edit mode - inline form
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="space-y-2"
-                    >
-                      {fieldConfig.map((field) => (
-                        <div key={field.name}>
-                          <label className="block text-xs font-medium text-foreground mb-1">
-                            {field.label}
-                            {field.required && (
-                              <span className="text-destructive ml-1">*</span>
-                            )}
-                          </label>
-                          {field.type === "textarea" ? (
-                            <textarea
-                              value={dynamicEntryForm[field.name] || ""}
-                              onChange={(e) =>
-                                setDynamicEntryForm({
-                                  ...dynamicEntryForm,
-                                  [field.name]: e.target.value,
-                                })
-                              }
-                              placeholder={field.placeholder}
-                              className="w-full px-3 py-1.5 text-sm bg-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring resize-none"
-                              rows={3}
-                            />
-                          ) : field.type === "select" ? (
-                            <select
-                              value={dynamicEntryForm[field.name] || ""}
-                              onChange={(e) =>
-                                setDynamicEntryForm({
-                                  ...dynamicEntryForm,
-                                  [field.name]: e.target.value,
-                                })
-                              }
-                              className="w-full px-3 py-1.5 text-sm bg-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
-                            >
-                              <option value="">Select {field.label}</option>
-                              {field.options?.map((option) => (
-                                <option key={option} value={option}>
-                                  {option}
-                                </option>
-                              ))}
-                            </select>
-                          ) : (
-                            <input
-                              type={field.type}
-                              value={dynamicEntryForm[field.name] || ""}
-                              onChange={(e) =>
-                                setDynamicEntryForm({
-                                  ...dynamicEntryForm,
-                                  [field.name]: e.target.value,
-                                })
-                              }
-                              placeholder={field.placeholder}
-                              className="w-full px-3 py-1.5 text-sm bg-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
-                            />
-                          )}
-                        </div>
-                      ))}
-                      <div className="flex gap-2 justify-end pt-2">
-                        <button
-                          onClick={() => setEditingDynamicEntry(null)}
-                          className="px-3 py-1.5 text-xs border border-input rounded-lg hover:bg-accent transition-colors"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          onClick={() => handleSaveDynamicEntry(section.id)}
-                          className="flex items-center gap-1 px-3 py-1.5 text-xs bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-                        >
-                          <Check className="w-3 h-3" />
-                          Save
-                        </button>
-                      </div>
-                    </motion.div>
-                  ) : (
-                    // Display mode
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        {fieldConfig.slice(0, 2).map((field) => {
-                          const value = entry[field.name];
-                          if (!value) return null;
-                          return (
-                            <p
-                              key={field.name}
-                              className="text-xs text-foreground truncate"
-                            >
-                              <span className="font-medium">
-                                {field.label}:
-                              </span>{" "}
-                              {value}
-                            </p>
-                          );
-                        })}
-                      </div>
-                      <div className="flex gap-1 flex-shrink-0">
-                        <button
-                          onClick={() =>
-                            handleEditDynamicEntry(section.id, entry.id, entry)
-                          }
-                          className="p-1 hover:bg-accent rounded transition-colors"
-                        >
-                          <Pencil className="w-3 h-3 text-muted-foreground" />
-                        </button>
-                        <button
-                          onClick={() =>
-                            handleDeleteDynamicEntry(section.id, entry.id)
-                          }
-                          className="p-1 hover:bg-accent rounded transition-colors"
-                        >
-                          <Trash2 className="w-3 h-3 text-destructive" />
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-
-              {/* Add new entry form or button */}
-              {editingDynamicEntry?.sectionId === section.id &&
-              !section.entries.some(
-                (e: any) => e.id === editingDynamicEntry.entryId
-              ) ? (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="bg-muted/30 rounded-lg p-2 border border-border space-y-2"
-                >
-                  {fieldConfig.map((field) => (
-                    <div key={field.name}>
-                      <label className="block text-xs font-medium text-foreground mb-1">
-                        {field.label}
-                        {field.required && (
-                          <span className="text-destructive ml-1">*</span>
-                        )}
-                      </label>
-                      {field.type === "textarea" ? (
-                        <textarea
-                          value={dynamicEntryForm[field.name] || ""}
-                          onChange={(e) =>
-                            setDynamicEntryForm({
-                              ...dynamicEntryForm,
-                              [field.name]: e.target.value,
-                            })
-                          }
-                          placeholder={field.placeholder}
-                          className="w-full px-3 py-1.5 text-sm bg-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring resize-none"
-                          rows={3}
-                        />
-                      ) : field.type === "select" ? (
-                        <select
-                          value={dynamicEntryForm[field.name] || ""}
-                          onChange={(e) =>
-                            setDynamicEntryForm({
-                              ...dynamicEntryForm,
-                              [field.name]: e.target.value,
-                            })
-                          }
-                          className="w-full px-3 py-1.5 text-sm bg-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
-                        >
-                          <option value="">Select {field.label}</option>
-                          {field.options?.map((option) => (
-                            <option key={option} value={option}>
-                              {option}
-                            </option>
-                          ))}
-                        </select>
-                      ) : (
-                        <input
-                          type={field.type}
-                          value={dynamicEntryForm[field.name] || ""}
-                          onChange={(e) =>
-                            setDynamicEntryForm({
-                              ...dynamicEntryForm,
-                              [field.name]: e.target.value,
-                            })
-                          }
-                          placeholder={field.placeholder}
-                          className="w-full px-3 py-1.5 text-sm bg-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
-                        />
-                      )}
-                    </div>
-                  ))}
-                  <div className="flex gap-2 justify-end pt-2">
-                    <button
-                      onClick={() => setEditingDynamicEntry(null)}
-                      className="px-3 py-1.5 text-xs border border-input rounded-lg hover:bg-accent transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={() => handleSaveDynamicEntry(section.id)}
-                      className="flex items-center gap-1 px-3 py-1.5 text-xs bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-                    >
-                      <Check className="w-3 h-3" />
-                      Add
-                    </button>
-                  </div>
-                </motion.div>
-              ) : (
-                <button
-                  onClick={() => handleAddDynamicEntry(section.id)}
-                  className="w-full flex items-center justify-center gap-1 px-3 py-2 border border-dashed border-border rounded-lg text-xs text-muted-foreground hover:border-primary hover:text-primary transition-colors"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  Add {section.title}
-                </button>
-              )}
-            </div>
+            <div className="p-4 space-y-3">{children}</div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -892,7 +808,175 @@ export default function ResumeBuilderPage() {
     addDynamicSectionEntry,
     updateDynamicSectionEntry,
     removeDynamicSectionEntry,
+    resetResumeBuilder,
+    setCurrentResumeId,
+    loadResume,
   } = useGlobalStore();
+
+  const buildSectionsFromStore = useCallback((): Section[] => {
+    const baseSections: Section[] = [
+      {
+        id: "education",
+        type: "education",
+        title: "Education",
+        icon: SECTION_ICON_MAP.education,
+        isExpanded: false,
+        entries: resumeBuilder.data.education || [],
+      },
+      {
+        id: "experience",
+        type: "experience",
+        title: "Professional Experience",
+        icon: SECTION_ICON_MAP.experience,
+        isExpanded: false,
+        entries: resumeBuilder.data.experience || [],
+      },
+      {
+        id: "skills",
+        type: "skills",
+        title: "Skills",
+        icon: SECTION_ICON_MAP.skills,
+        isExpanded: false,
+        entries: resumeBuilder.data.skills || [],
+      },
+    ];
+
+    const dynamicSections: Section[] | [] =
+      resumeBuilder.data.dynamicSections?.map((section) => {
+        const sectionType = (section.type as SectionType) || "custom";
+
+        return {
+          id: section.id,
+          type: sectionType,
+          title: section.title,
+          icon: getSectionIcon(sectionType),
+          isExpanded: false,
+          entries: section.entries || [],
+        } satisfies Section;
+      }) || [];
+
+    return [...baseSections, ...dynamicSections];
+  }, [
+    resumeBuilder.data.education,
+    resumeBuilder.data.experience,
+    resumeBuilder.data.skills,
+    resumeBuilder.data.dynamicSections,
+  ]);
+
+  useEffect(() => {
+    const idParam = params.id;
+    const normalizedId = Array.isArray(idParam) ? idParam[0] : idParam ?? null;
+    setCurrentResumeId(normalizedId);
+  }, [params.id, setCurrentResumeId]);
+
+  useEffect(() => {
+    const idParam = params.id;
+    const id = Array.isArray(idParam) ? idParam[0] : idParam ?? null;
+
+    if (!id || initializationRef.current) {
+      return;
+    }
+
+    if (id === "new") {
+      const hasExistingData = hasMeaningfulResumeData(resumeDataRef.current);
+
+      let shouldResetToTemplate = !hasExistingData;
+
+      if (shouldResetToTemplate && typeof window !== "undefined") {
+        try {
+          const persistedState = localStorage.getItem("timcare-global-store");
+          if (persistedState) {
+            const parsed = JSON.parse(persistedState);
+            const storedData = parsed?.state?.resumeBuilder?.data as
+              | ResumeData
+              | undefined;
+
+            if (hasMeaningfulResumeData(storedData)) {
+              shouldResetToTemplate = false;
+            }
+          }
+        } catch (error) {
+          console.warn("Unable to inspect persisted resume data", error);
+        }
+      }
+
+      if (shouldResetToTemplate) {
+        resetResumeBuilder();
+        populateWithDummyContent(
+          resumeDataRef.current.careerField || "technology"
+        );
+      }
+
+      initializationRef.current = true;
+      return;
+    }
+
+    let isMounted = true;
+
+    getResumeById(id)
+      .then((apiData) => {
+        if (!isMounted) {
+          return;
+        }
+
+        const storeData: ResumeData = {
+          careerField: "",
+          personalInfo: {
+            fullName: apiData.personal?.fullName || "",
+            email: apiData.personal?.email || "",
+            phone: apiData.personal?.phone || "",
+            location: apiData.personal?.location || "",
+            linkedin: apiData.personal?.linkedIn || "",
+            website: apiData.personal?.website || "",
+            summary: apiData.summary || "",
+          },
+          experience: (apiData.experience || []).map((exp) => ({
+            id: crypto.randomUUID(),
+            jobTitle: exp.title,
+            company: exp.company,
+            location: exp.location,
+            startDate: exp.startDate,
+            endDate: exp.endDate,
+            current: false,
+            description: exp.descriptions || [],
+          })),
+          education: (apiData.education || []).map((edu) => ({
+            id: crypto.randomUUID(),
+            degree: edu.degree,
+            institution: edu.institution,
+            location: edu.location,
+            graduationDate: edu.endDate,
+            gpa: "",
+          })),
+          skills: Object.entries(apiData.skills?.skills || {}).flatMap(
+            ([category, skillNames]) =>
+              (skillNames as string[]).map((name) => ({
+                id: crypto.randomUUID(),
+                name,
+                category: category as "technical" | "soft" | "language",
+                level: "intermediate" as const,
+              }))
+          ),
+          customFields: [],
+          dynamicSections: [],
+          template: "classic",
+        };
+
+        loadResume(storeData);
+      })
+      .catch((error) => {
+        console.error("Failed to load resume from API", error);
+      })
+      .finally(() => {
+        if (isMounted) {
+          initializationRef.current = true;
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [params.id, populateWithDummyContent, resetResumeBuilder, loadResume]);
 
   const [activeTab, setActiveTab] = useState<"content" | "template">("content");
   const [showAddContentModal, setShowAddContentModal] = useState(false);
@@ -901,6 +985,9 @@ export default function ResumeBuilderPage() {
   const [showManageFieldsModal, setShowManageFieldsModal] = useState(false);
   const [showAISummaryModal, setShowAISummaryModal] = useState(false);
   const [showAIBulletsModal, setShowAIBulletsModal] = useState(false);
+  const [showCustomSectionTitleModal, setShowCustomSectionTitleModal] =
+    useState(false);
+  const [customSectionTitle, setCustomSectionTitle] = useState("");
   const [editingEducation, setEditingEducation] = useState<string | null>(null);
   const [editingExperience, setEditingExperience] = useState<string | null>(
     null
@@ -917,29 +1004,86 @@ export default function ResumeBuilderPage() {
   const [dynamicEntryForm, setDynamicEntryForm] = useState<Record<string, any>>(
     {}
   );
+  const [editingSectionTitle, setEditingSectionTitle] = useState<string | null>(
+    null
+  );
+  const [sectionTitleForm, setSectionTitleForm] = useState("");
+
+  // Custom section content state
+  const [customSectionForms, setCustomSectionForms] = useState<
+    Record<string, { description: string; bullets: string }>
+  >({});
+
+  const resumeDataRef = useRef(resumeBuilder.data);
+  const initializationRef = useRef(false);
+
+  useEffect(() => {
+    resumeDataRef.current = resumeBuilder.data;
+  }, [resumeBuilder.data]);
+
+  useEffect(() => {
+    initializationRef.current = false;
+  }, [params.id]);
+
+  // Initialize custom section forms from store data
+  useEffect(() => {
+    const customSections =
+      resumeBuilder.data.dynamicSections?.filter(
+        (section) => section.type === "custom"
+      ) || [];
+
+    const forms: Record<string, { description: string; bullets: string }> = {};
+    customSections.forEach((section) => {
+      forms[section.id] = {
+        description: section.description || "",
+        bullets: section.bullets || "",
+      };
+    });
+
+    setCustomSectionForms(forms);
+  }, [resumeBuilder.data.dynamicSections]);
 
   // Personal Info Form with visibility controls - Expanded to include all fields
-  const [personalInfoForm, setPersonalInfoForm] = useState({
-    fullName: "",
-    professionalTitle: "",
-    email: "",
-    phone: "",
-    location: "",
-    linkedin: "",
-    website: "",
-    github: "",
-    twitter: "",
-    dateOfBirth: "",
-    nationality: "",
-    languages: "",
-    maritalStatus: "",
-    driversLicense: "",
-    militaryService: "",
-    visaStatus: "",
-    preferredPronouns: "",
-    summary: "",
-    careerObjective: "",
-  });
+  const [personalInfoForm, setPersonalInfoForm] =
+    useState<PersonalInfoFormState>({
+      ...PERSONAL_INFO_FORM_TEMPLATE,
+    });
+
+  useEffect(() => {
+    const personalInfo = resumeBuilder.data.personalInfo || {};
+    const storedCustomFields = resumeBuilder.data.customFields || [];
+
+    setPersonalInfoForm((previousForm) => {
+      const nextForm: PersonalInfoFormState = {
+        ...PERSONAL_INFO_FORM_TEMPLATE,
+      };
+
+      (
+        Object.keys(PERSONAL_INFO_FORM_TEMPLATE) as Array<
+          keyof typeof PERSONAL_INFO_FORM_TEMPLATE
+        >
+      ).forEach((key) => {
+        const value = (personalInfo as Record<string, string | undefined>)[key];
+        nextForm[key] = value || "";
+      });
+
+      storedCustomFields.forEach((field) => {
+        nextForm[field.id] = field.value || "";
+      });
+
+      const previousKeys = Object.keys(previousForm);
+      const nextKeys = Object.keys(nextForm);
+
+      if (
+        previousKeys.length === nextKeys.length &&
+        nextKeys.every((key) => previousForm[key] === nextForm[key])
+      ) {
+        return previousForm;
+      }
+
+      return nextForm;
+    });
+  }, [resumeBuilder.data.personalInfo, resumeBuilder.data.customFields]);
 
   // Field visibility controls - Expanded to include all available fields
   const [fieldVisibility, setFieldVisibility] = useState({
@@ -962,6 +1106,78 @@ export default function ResumeBuilderPage() {
     summary: true,
     careerObjective: false,
   });
+  const fieldVisibilityInitialized = useRef(false);
+
+  useEffect(() => {
+    if (fieldVisibilityInitialized.current) {
+      return;
+    }
+
+    const personalInfo = resumeBuilder.data.personalInfo;
+    if (!personalInfo) {
+      return;
+    }
+
+    const hasSavedValues = Object.values(personalInfo).some((value) => {
+      if (Array.isArray(value)) {
+        return value.length > 0;
+      }
+
+      return Boolean(value);
+    });
+
+    if (!hasSavedValues) {
+      return;
+    }
+
+    setFieldVisibility((previousVisibility) => ({
+      ...previousVisibility,
+      professionalTitle:
+        previousVisibility.professionalTitle ||
+        Boolean((personalInfo as Record<string, unknown>).professionalTitle),
+      email: previousVisibility.email || Boolean(personalInfo.email),
+      phone: previousVisibility.phone || Boolean(personalInfo.phone),
+      location: previousVisibility.location || Boolean(personalInfo.location),
+      linkedin: previousVisibility.linkedin || Boolean(personalInfo.linkedin),
+      website: previousVisibility.website || Boolean(personalInfo.website),
+      github:
+        previousVisibility.github ||
+        Boolean((personalInfo as Record<string, unknown>).github),
+      twitter:
+        previousVisibility.twitter ||
+        Boolean((personalInfo as Record<string, unknown>).twitter),
+      dateOfBirth:
+        previousVisibility.dateOfBirth ||
+        Boolean((personalInfo as Record<string, unknown>).dateOfBirth),
+      nationality:
+        previousVisibility.nationality ||
+        Boolean((personalInfo as Record<string, unknown>).nationality),
+      languages:
+        previousVisibility.languages ||
+        Boolean((personalInfo as Record<string, unknown>).languages),
+      maritalStatus:
+        previousVisibility.maritalStatus ||
+        Boolean((personalInfo as Record<string, unknown>).maritalStatus),
+      driversLicense:
+        previousVisibility.driversLicense ||
+        Boolean((personalInfo as Record<string, unknown>).driversLicense),
+      militaryService:
+        previousVisibility.militaryService ||
+        Boolean((personalInfo as Record<string, unknown>).militaryService),
+      visaStatus:
+        previousVisibility.visaStatus ||
+        Boolean((personalInfo as Record<string, unknown>).visaStatus),
+      preferredPronouns:
+        previousVisibility.preferredPronouns ||
+        Boolean((personalInfo as Record<string, unknown>).preferredPronouns),
+      summary: previousVisibility.summary || Boolean(personalInfo.summary),
+      careerObjective:
+        previousVisibility.careerObjective ||
+        Boolean((personalInfo as Record<string, unknown>).careerObjective),
+    }));
+
+    fieldVisibilityInitialized.current = true;
+  }, [resumeBuilder.data.personalInfo]);
 
   // Custom Fields
   const [customFields, setCustomFields] = useState<
@@ -970,12 +1186,46 @@ export default function ResumeBuilderPage() {
       name: string;
       type: "text" | "textarea";
       enabled: boolean;
+      value?: string;
     }>
   >([]);
   const [newCustomFieldName, setNewCustomFieldName] = useState("");
   const [newCustomFieldType, setNewCustomFieldType] = useState<
     "text" | "textarea"
   >("text");
+
+  useEffect(() => {
+    const storedCustomFields = resumeBuilder.data.customFields || [];
+    setCustomFields((previousFields) => {
+      const normalized = storedCustomFields.map((field) => ({
+        id: field.id,
+        name: field.name,
+        type: field.type,
+        enabled: field.enabled,
+        value: field.value ?? "",
+      }));
+
+      if (
+        previousFields.length === normalized.length &&
+        previousFields.every((field, index) => {
+          const compareField = normalized[index];
+          return (
+            field &&
+            compareField &&
+            field.id === compareField.id &&
+            field.name === compareField.name &&
+            field.type === compareField.type &&
+            field.enabled === compareField.enabled &&
+            (field.value ?? "") === (compareField.value ?? "")
+          );
+        })
+      ) {
+        return previousFields;
+      }
+
+      return normalized;
+    });
+  }, [resumeBuilder.data.customFields]);
 
   // Education Form
   const [educationForm, setEducationForm] = useState({
@@ -1015,47 +1265,20 @@ export default function ResumeBuilderPage() {
   const [activeId, setActiveId] = useState<string | null>(null);
 
   // Local sections state (for the collapsible UI)
-  const [sections, setSections] = useState<Section[]>(() => {
-    const baseSections: Section[] = [
-      {
-        id: "education",
-        type: "education" as SectionType,
-        title: "Education",
-        icon: GraduationCap,
-        isExpanded: false,
-        entries: resumeBuilder.data.education || [],
-      },
-      {
-        id: "experience",
-        type: "experience" as SectionType,
-        title: "Professional Experience",
-        icon: Briefcase,
-        isExpanded: false,
-        entries: resumeBuilder.data.experience || [],
-      },
-      {
-        id: "skills",
-        type: "skills" as SectionType,
-        title: "Skills",
-        icon: Target,
-        isExpanded: false,
-        entries: resumeBuilder.data.skills || [],
-      },
-    ];
+  const [sections, setSections] = useState<Section[]>(buildSectionsFromStore);
 
-    // Add dynamic sections from global store
-    const dynamicSections: Section[] =
-      resumeBuilder.data.dynamicSections?.map((ds) => ({
-        id: ds.id,
-        type: ds.type as SectionType,
-        title: ds.title,
-        icon: Award, // Default icon, will be replaced based on type
-        isExpanded: false,
-        entries: ds.entries || [],
-      })) || [];
+  useEffect(() => {
+    setSections((prevSections) => {
+      const expandedState = new Map(
+        prevSections.map((section) => [section.id, section.isExpanded])
+      );
 
-    return [...baseSections, ...dynamicSections];
-  });
+      return buildSectionsFromStore().map((section) => ({
+        ...section,
+        isExpanded: expandedState.get(section.id) ?? section.isExpanded,
+      }));
+    });
+  }, [buildSectionsFromStore]);
 
   // Section management functions - Accordion behavior (only one section open at a time)
   const toggleSection = (sectionId: string) => {
@@ -1084,6 +1307,13 @@ export default function ResumeBuilderPage() {
     const newEntryId = `entry-${Date.now()}`;
     setEditingDynamicEntry({ sectionId, entryId: newEntryId });
     setDynamicEntryForm({});
+    setExpandedSection(sectionId);
+    setSections((prevSections) =>
+      prevSections.map((section) => ({
+        ...section,
+        isExpanded: section.id === sectionId,
+      }))
+    );
   };
 
   const handleEditDynamicEntry = (
@@ -1183,7 +1413,696 @@ export default function ResumeBuilderPage() {
     }
   };
 
+  const handleCreateCustomField = () => {
+    const trimmedName = newCustomFieldName.trim();
+    if (!trimmedName) {
+      return;
+    }
+
+    const newFieldId = `custom_${Date.now()}`;
+    const newField = {
+      id: newFieldId,
+      name: trimmedName,
+      type: newCustomFieldType,
+      enabled: true,
+      value: "",
+    } as const;
+
+    setCustomFields((previousFields) => [...previousFields, newField]);
+    setPersonalInfoForm((previousForm) => ({
+      ...previousForm,
+      [newFieldId]: "",
+    }));
+
+    addCustomField({
+      id: newFieldId,
+      name: trimmedName,
+      type: newCustomFieldType,
+      enabled: true,
+      value: "",
+    } as any);
+
+    setNewCustomFieldName("");
+    setNewCustomFieldType("text");
+  };
+
+  const handleToggleCustomFieldEnabled = (fieldId: string) => {
+    const targetField = customFields.find((field) => field.id === fieldId);
+    if (!targetField) {
+      return;
+    }
+
+    const nextEnabled = !targetField.enabled;
+
+    setCustomFields((previousFields) =>
+      previousFields.map((field) =>
+        field.id === fieldId ? { ...field, enabled: nextEnabled } : field
+      )
+    );
+
+    updateCustomField(fieldId, { enabled: nextEnabled } as any);
+  };
+
+  const handleRemoveCustomFieldConfig = (fieldId: string) => {
+    let updatedForm: PersonalInfoFormState | null = null;
+
+    setPersonalInfoForm((previousForm) => {
+      const nextForm = { ...previousForm } as Record<string, string>;
+      delete nextForm[fieldId];
+      updatedForm = nextForm as PersonalInfoFormState;
+      return nextForm as PersonalInfoFormState;
+    });
+
+    setCustomFields((previousFields) =>
+      previousFields.filter((field) => field.id !== fieldId)
+    );
+
+    removeCustomField(fieldId);
+
+    if (updatedForm) {
+      updatePersonalInfo(updatedForm);
+    }
+  };
+
+  const handleRemoveSection = (sectionId: string) => {
+    const sectionToRemove = sections.find(
+      (section) => section.id === sectionId
+    );
+
+    if (!sectionToRemove || isBaseSectionType(sectionToRemove.type)) {
+      return;
+    }
+
+    setSections((previousSections) =>
+      previousSections.filter((section) => section.id !== sectionId)
+    );
+    removeDynamicSection(sectionId);
+
+    if (editingDynamicEntry?.sectionId === sectionId) {
+      setEditingDynamicEntry(null);
+      setDynamicEntryForm({});
+    }
+
+    if (expandedSection === sectionId) {
+      setExpandedSection(null);
+    }
+
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 2000);
+  };
+
+  const handleEditSectionTitle = (sectionId: string, currentTitle: string) => {
+    setEditingSectionTitle(sectionId);
+    setSectionTitleForm(currentTitle);
+  };
+
+  const handleSaveSectionTitle = (sectionId: string) => {
+    if (!sectionTitleForm.trim()) {
+      return;
+    }
+
+    // Update local state
+    setSections((previousSections) =>
+      previousSections.map((section) =>
+        section.id === sectionId
+          ? { ...section, title: sectionTitleForm.trim() }
+          : section
+      )
+    );
+
+    // Update global store
+    updateDynamicSection(sectionId, { title: sectionTitleForm.trim() });
+
+    setEditingSectionTitle(null);
+    setSectionTitleForm("");
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 2000);
+  };
+
+  const isBaseSectionType = (type: SectionType) =>
+    type === "education" || type === "experience" || type === "skills";
+
+  const getSectionFieldConfig = (section: Section): SectionFieldConfig[] =>
+    SECTION_FIELD_CONFIGS[section.type] || [];
+
+  const renderDynamicFieldControl = (
+    field: SectionFieldConfig,
+    section?: Section
+  ) => {
+    const value = dynamicEntryForm[field.name] ?? "";
+
+    if (field.type === "textarea") {
+      // For custom section content, provide more rows and helpful placeholder
+      const isCustomContent =
+        section?.type === "custom" && field.name === "content";
+      const rows = isCustomContent ? 5 : 3;
+      const placeholder = isCustomContent
+        ? "Enter description or bullet points (one per line)...\n\nExample:\n• First achievement\n• Second achievement\n• Third achievement"
+        : field.placeholder;
+
+      return (
+        <textarea
+          value={value}
+          onChange={(event) =>
+            setDynamicEntryForm({
+              ...dynamicEntryForm,
+              [field.name]: event.target.value,
+            })
+          }
+          placeholder={placeholder}
+          className="w-full px-3 py-2 text-sm bg-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring resize-y"
+          rows={rows}
+        />
+      );
+    }
+
+    if (field.type === "select") {
+      return (
+        <select
+          value={value}
+          onChange={(event) =>
+            setDynamicEntryForm({
+              ...dynamicEntryForm,
+              [field.name]: event.target.value,
+            })
+          }
+          className="w-full px-3 py-1.5 text-sm bg-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
+        >
+          <option value="">Select {field.label}</option>
+          {field.options?.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      );
+    }
+
+    const inputType = field.type === "date" ? "date" : "text";
+
+    return (
+      <input
+        type={inputType}
+        value={value}
+        onChange={(event) =>
+          setDynamicEntryForm({
+            ...dynamicEntryForm,
+            [field.name]: event.target.value,
+          })
+        }
+        placeholder={field.placeholder}
+        className="w-full px-3 py-1.5 text-sm bg-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
+      />
+    );
+  };
+
+  // Helper function to determine AI field type based on section type and field name
+  const getAIFieldType = (
+    sectionType: SectionType,
+    fieldName: string
+  ): import("@/components/ai/GenerateButton").AIFieldType | null => {
+    // Map section types and field names to AI field types
+    if (fieldName === "description") {
+      switch (sectionType) {
+        case "projects":
+          return "project_description";
+        case "courses":
+          return "course_description";
+        case "awards":
+          return "award_description";
+        case "organisations":
+          return "organization_description";
+        case "publications":
+          return "publication_description";
+        case "languages":
+          return "language_description";
+        default:
+          return null;
+      }
+    }
+
+    if (fieldName === "text" && sectionType === "declaration") {
+      return "declaration_text";
+    }
+
+    return null;
+  };
+
+  // Helper function to build context for AI generation
+  const buildAIContext = (sectionType: SectionType, fieldName: string) => {
+    const formData = dynamicEntryForm;
+
+    switch (sectionType) {
+      case "projects":
+        return {
+          project_name: formData.title || "",
+          technologies: formData.technologies || "",
+          role: formData.role || "",
+          description: formData.description || "",
+          impact: formData.impact || "",
+        };
+      case "courses":
+        return {
+          course_name: formData.name || "",
+          provider: formData.institution || "",
+          skills_learned: formData.skills_learned || "",
+          projects: formData.projects || "",
+        };
+      case "awards":
+        return {
+          award_name: formData.title || "",
+          organization: formData.issuer || "",
+          reason: formData.reason || "",
+          impact: formData.impact || "",
+        };
+      case "organisations":
+        return {
+          organization_name: formData.name || "",
+          role: formData.role || "",
+          activities: formData.activities || "",
+          achievements: formData.achievements || "",
+        };
+      case "publications":
+        return {
+          title: formData.title || "",
+          publisher: formData.publisher || "",
+          topic: formData.topic || "",
+          impact: formData.impact || "",
+        };
+      case "languages":
+        return {
+          language: formData.language || "",
+          proficiency: formData.proficiency || "",
+          context: formData.context || "",
+        };
+      case "declaration":
+        return {
+          name: resumeBuilder.data.personalInfo.fullName || "",
+          location: resumeBuilder.data.personalInfo.location || "",
+        };
+      default:
+        return {};
+    }
+  };
+
+  const renderDynamicSectionForm = (
+    section: Section,
+    actionLabel: "Add" | "Save"
+  ) => {
+    const fieldConfig = getSectionFieldConfig(section);
+
+    if (!fieldConfig.length) {
+      return (
+        <p className="text-xs text-muted-foreground">
+          This section does not have configurable fields.
+        </p>
+      );
+    }
+
+    return (
+      <>
+        {section.type === "custom" && (
+          <div className="mb-2 p-2 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <p className="text-xs text-blue-700 dark:text-blue-300">
+              💡 <strong>Tip:</strong> For bullet points, enter each point on a
+              new line. The template will automatically format them.
+            </p>
+          </div>
+        )}
+        {fieldConfig.map((field) => {
+          const aiFieldType = getAIFieldType(section.type, field.name);
+          const showAIButton = field.type === "textarea" && aiFieldType;
+
+          return (
+            <div key={field.name}>
+              <div
+                className={cn(
+                  "mb-1",
+                  showAIButton && "flex items-center justify-between gap-2"
+                )}
+              >
+                <label className="block text-xs font-medium text-foreground">
+                  {field.label}
+                  {field.required ? (
+                    <span className="text-destructive ml-1">*</span>
+                  ) : null}
+                </label>
+                {showAIButton && aiFieldType && (
+                  <GenerateButton
+                    field={aiFieldType}
+                    context={buildAIContext(section.type, field.name)}
+                    variant="icon"
+                    size="sm"
+                    onGenerate={(content) => {
+                      const value =
+                        typeof content === "string"
+                          ? content
+                          : content.join("\n");
+                      setDynamicEntryForm({
+                        ...dynamicEntryForm,
+                        [field.name]: value,
+                      });
+                    }}
+                  />
+                )}
+              </div>
+              {renderDynamicFieldControl(field, section)}
+            </div>
+          );
+        })}
+        <div className="flex gap-2 justify-end pt-2">
+          <button
+            onClick={() => {
+              setEditingDynamicEntry(null);
+              setDynamicEntryForm({});
+            }}
+            className="px-3 py-1.5 text-xs border border-input rounded-lg hover:bg-accent transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => handleSaveDynamicEntry(section.id)}
+            className="flex items-center gap-1 px-3 py-1.5 text-xs bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+          >
+            <Check className="w-3 h-3" />
+            {actionLabel}
+          </button>
+        </div>
+      </>
+    );
+  };
+
+  const renderCustomSectionContent = (section: Section) => {
+    const form = customSectionForms[section.id] || {
+      description: "",
+      bullets: "",
+    };
+
+    const handleSaveCustomSection = () => {
+      // Update global store with custom section data
+      updateDynamicSection(section.id, {
+        description: form.description,
+        bullets: form.bullets,
+      });
+
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 2000);
+    };
+
+    return (
+      <div className="space-y-3">
+        <div>
+          <div className="flex items-center justify-between gap-2 mb-1">
+            <label className="block text-xs font-medium text-foreground">
+              Description
+            </label>
+            <GenerateButton
+              field="custom_description"
+              context={{
+                section_title: section.title,
+                context: form.description || "",
+                key_points: form.bullets || "",
+              }}
+              variant="icon"
+              size="sm"
+              onGenerate={(content) => {
+                const description =
+                  typeof content === "string" ? content : content.join("\n");
+                setCustomSectionForms((prev) => ({
+                  ...prev,
+                  [section.id]: { ...form, description },
+                }));
+                handleSaveCustomSection();
+              }}
+            />
+          </div>
+          <textarea
+            value={form.description}
+            onChange={(e) =>
+              setCustomSectionForms((prev) => ({
+                ...prev,
+                [section.id]: { ...form, description: e.target.value },
+              }))
+            }
+            onBlur={handleSaveCustomSection}
+            placeholder="Enter a brief description or paragraph..."
+            className="w-full px-3 py-2 text-sm bg-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring resize-y"
+            rows={3}
+          />
+        </div>
+        <div>
+          <div className="flex items-center justify-between gap-2 mb-1">
+            <label className="block text-xs font-medium text-foreground">
+              Bullets
+            </label>
+            <GenerateButton
+              field="custom_bullets"
+              context={{
+                section_title: section.title,
+                context: form.description || "",
+                key_points: form.bullets || "",
+              }}
+              variant="icon"
+              size="sm"
+              onGenerate={(content) => {
+                const bullets =
+                  typeof content === "string" ? content : content.join("\n");
+                setCustomSectionForms((prev) => ({
+                  ...prev,
+                  [section.id]: { ...form, bullets },
+                }));
+                handleSaveCustomSection();
+              }}
+            />
+          </div>
+          <textarea
+            value={form.bullets}
+            onChange={(e) =>
+              setCustomSectionForms((prev) => ({
+                ...prev,
+                [section.id]: { ...form, bullets: e.target.value },
+              }))
+            }
+            onBlur={handleSaveCustomSection}
+            placeholder="Enter bullet points (one per line)...&#10;&#10;Example:&#10;• First point&#10;• Second point&#10;• Third point"
+            className="w-full px-3 py-2 text-sm bg-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring resize-y"
+            rows={5}
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            💡 Tip: Enter each bullet point on a new line. The template will
+            automatically format them.
+          </p>
+        </div>
+      </div>
+    );
+  };
+
+  const renderDynamicSectionContent = (section: Section) => {
+    // Custom sections have a different rendering
+    if (section.type === "custom") {
+      return renderCustomSectionContent(section);
+    }
+
+    const fieldConfig = getSectionFieldConfig(section);
+    const isEditingNewEntry =
+      editingDynamicEntry?.sectionId === section.id &&
+      !section.entries.some(
+        (entry) => entry.id === editingDynamicEntry.entryId
+      );
+
+    return (
+      <>
+        {section.entries.map((entry) => {
+          const isEditingCurrentEntry =
+            editingDynamicEntry?.sectionId === section.id &&
+            editingDynamicEntry.entryId === entry.id;
+
+          return (
+            <div
+              key={entry.id}
+              className="bg-muted/30 rounded-lg p-2 border border-border"
+            >
+              {isEditingCurrentEntry ? (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="space-y-2"
+                >
+                  {renderDynamicSectionForm(section, "Save")}
+                </motion.div>
+              ) : (
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0 space-y-1">
+                    {fieldConfig.length ? (
+                      fieldConfig.slice(0, 2).map((field) => {
+                        const value = entry[field.name];
+                        if (!value) return null;
+
+                        // Special handling for custom section content field
+                        if (
+                          section.type === "custom" &&
+                          field.name === "content"
+                        ) {
+                          const displayValue =
+                            value.length > 100
+                              ? value.substring(0, 100) + "..."
+                              : value;
+                          return (
+                            <p
+                              key={field.name}
+                              className="text-xs text-foreground"
+                            >
+                              <span className="font-medium">
+                                {field.label}:
+                              </span>{" "}
+                              {displayValue}
+                            </p>
+                          );
+                        }
+
+                        return (
+                          <p
+                            key={field.name}
+                            className="text-xs text-foreground truncate"
+                          >
+                            <span className="font-medium">{field.label}:</span>{" "}
+                            {value}
+                          </p>
+                        );
+                      })
+                    ) : (
+                      <p className="text-xs text-muted-foreground">
+                        No preview available for this entry.
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex gap-1 flex-shrink-0">
+                    <button
+                      onClick={() =>
+                        handleEditDynamicEntry(section.id, entry.id, entry)
+                      }
+                      className="p-1 hover:bg-accent rounded transition-colors"
+                      title="Edit entry"
+                    >
+                      <Pencil className="w-3 h-3 text-muted-foreground" />
+                    </button>
+                    <button
+                      onClick={() =>
+                        handleDeleteDynamicEntry(section.id, entry.id)
+                      }
+                      className="p-1 hover:bg-destructive/10 rounded transition-colors"
+                      title="Delete entry"
+                    >
+                      <Trash2 className="w-3 h-3 text-destructive" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+
+        {isEditingNewEntry ? (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-muted/30 rounded-lg p-3 border border-border space-y-2"
+          >
+            {renderDynamicSectionForm(section, "Add")}
+          </motion.div>
+        ) : (
+          <button
+            onClick={() => handleAddDynamicEntry(section.id)}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 border-2 border-dashed border-border rounded-lg text-sm text-muted-foreground hover:border-primary hover:text-primary hover:bg-accent/50 transition-all"
+          >
+            <Plus className="w-4 h-4" />
+            Add New Entry
+          </button>
+        )}
+      </>
+    );
+  };
+
+  const renderSectionHeaderMeta = (section: Section) => {
+    // Custom sections don't have entries
+    if (section.type === "custom") {
+      const form = customSectionForms[section.id];
+      if (!form || (!form.description && !form.bullets)) {
+        return "No content yet";
+      }
+      return "Has content";
+    }
+
+    const count = section.entries.length;
+    if (!count) return "No entries yet";
+    return `${count} ${count === 1 ? "entry" : "entries"}`;
+  };
+
+  const renderSectionHeaderActions = (section: Section) => {
+    const isNewEntryActive =
+      editingDynamicEntry?.sectionId === section.id &&
+      !section.entries.some(
+        (entry) => entry.id === editingDynamicEntry.entryId
+      );
+
+    // Custom sections don't have "Add Entry" button
+    if (section.type === "custom") {
+      return (
+        <div className="flex items-center gap-1">
+          <button
+            onClick={(event) => {
+              event.stopPropagation();
+              handleRemoveSection(section.id);
+            }}
+            className="p-1.5 rounded hover:bg-destructive/10 transition-colors"
+            aria-label="Delete section"
+            title="Delete section"
+          >
+            <Trash2 className="w-3.5 h-3.5 text-destructive" />
+          </button>
+        </div>
+      );
+    }
+
+    // Always show delete button, but hide add button when form is active
+    return (
+      <div className="flex items-center gap-1">
+        {!isNewEntryActive && (
+          <button
+            onClick={(event) => {
+              event.stopPropagation();
+              handleAddDynamicEntry(section.id);
+            }}
+            className="flex items-center gap-1 px-2 py-1 text-xs border border-border rounded hover:bg-accent transition-colors"
+          >
+            <Plus className="w-3 h-3" />
+            Add Entry
+          </button>
+        )}
+        <button
+          onClick={(event) => {
+            event.stopPropagation();
+            handleRemoveSection(section.id);
+          }}
+          className="p-1.5 rounded hover:bg-destructive/10 transition-colors"
+          aria-label="Delete entire section"
+          title="Delete entire section"
+        >
+          <Trash2 className="w-3.5 h-3.5 text-destructive" />
+        </button>
+      </div>
+    );
+  };
+
   const addSection = (sectionType: SectionType, title: string, icon: any) => {
+    // For custom sections, prompt for a custom title first
+    if (sectionType === "custom") {
+      setCustomSectionTitle("");
+      setShowCustomSectionTitleModal(true);
+      setShowAddContentModal(false);
+      return;
+    }
+
     const sectionId = `section-${Date.now()}`;
     const newSection: Section = {
       id: sectionId,
@@ -1193,7 +2112,7 @@ export default function ResumeBuilderPage() {
       isExpanded: true,
       entries: [],
     };
-    setSections([...sections, newSection]);
+    setSections((previousSections) => [...previousSections, newSection]);
 
     // Sync to global store with the same ID
     addDynamicSection({
@@ -1204,6 +2123,46 @@ export default function ResumeBuilderPage() {
     } as any);
 
     setShowAddContentModal(false);
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 2000);
+  };
+
+  const handleConfirmCustomSectionTitle = () => {
+    if (!customSectionTitle.trim()) {
+      return;
+    }
+
+    const sectionId = `section-${Date.now()}`;
+    const newSection: Section = {
+      id: sectionId,
+      type: "custom",
+      title: customSectionTitle.trim(),
+      icon: FileText,
+      isExpanded: true,
+      entries: [],
+    };
+    setSections((previousSections) => [...previousSections, newSection]);
+
+    // Sync to global store - custom sections have description and bullets fields
+    addDynamicSection({
+      id: sectionId,
+      type: "custom",
+      title: customSectionTitle.trim(),
+      entries: [],
+      description: "",
+      bullets: "",
+    } as any);
+
+    // Initialize custom section form
+    setCustomSectionForms((prev) => ({
+      ...prev,
+      [sectionId]: { description: "", bullets: "" },
+    }));
+
+    setShowCustomSectionTitleModal(false);
+    setCustomSectionTitle("");
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 2000);
   };
 
   // Drag and Drop functionality
@@ -1293,7 +2252,23 @@ export default function ResumeBuilderPage() {
   };
 
   const handleSavePersonalInfo = () => {
+    const customFieldSnapshot = customFields;
     updatePersonalInfo(personalInfoForm);
+
+    setCustomFields((previousFields) =>
+      previousFields.map((field) => ({
+        ...field,
+        value: personalInfoForm[field.id] ?? "",
+      }))
+    );
+
+    customFieldSnapshot.forEach((field) => {
+      const nextValue = personalInfoForm[field.id] ?? "";
+      if ((field.value ?? "") !== nextValue) {
+        updateCustomField(field.id, { value: nextValue } as any);
+      }
+    });
+
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 2000);
     setShowPersonalInfoModal(false);
@@ -1390,6 +2365,10 @@ export default function ResumeBuilderPage() {
     setEditingSkill(null);
   };
 
+  const dynamicSections = sections.filter(
+    (section) => !isBaseSectionType(section.type)
+  );
+
   return (
     <div className="min-h-screen bg-background">
       {/* Success Notification */}
@@ -1411,7 +2390,7 @@ export default function ResumeBuilderPage() {
       <header className="bg-card border-b border-border sticky top-0 z-50">
         <div className="max-w-[1800px] mx-auto px-6 py-3 flex items-center justify-between">
           <nav className="flex gap-2">
-            {(["content", "template"] as const).map((tab) => (
+            {(["content"] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -1427,9 +2406,9 @@ export default function ResumeBuilderPage() {
             ))}
           </nav>
           <div className="flex items-center gap-3">
-            <select className="px-3 py-2 border border-input rounded-lg text-sm bg-background">
+            {/* <select className="px-3 py-2 border border-input rounded-lg text-sm bg-background">
               <option>Resume 1</option>
-            </select>
+            </select> */}
             <button
               onClick={() =>
                 populateWithDummyContent(
@@ -1541,6 +2520,7 @@ export default function ResumeBuilderPage() {
               className="bg-card rounded-lg border border-border overflow-hidden"
             >
               <button
+                type="button"
                 onClick={() => toggleSection("personalInfo")}
                 className="w-full flex items-center gap-3 p-4 hover:bg-accent/50 transition-colors"
               >
@@ -1548,16 +2528,25 @@ export default function ResumeBuilderPage() {
                 <span className="font-semibold text-foreground flex-1 text-left">
                   Personal Information
                 </span>
-                <button
+                <span
+                  role="button"
+                  tabIndex={0}
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowManageFieldsModal(true);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setShowManageFieldsModal(true);
+                    }
                   }}
                   className="flex items-center gap-1 px-2 py-1 text-xs border border-border rounded hover:bg-accent transition-colors"
                 >
                   <Settings className="w-3 h-3" />
                   Manage Fields
-                </button>
+                </span>
                 <motion.div
                   animate={{
                     rotate: expandedSection === "personalInfo" ? 180 : 0,
@@ -1636,7 +2625,8 @@ export default function ResumeBuilderPage() {
                         <div className="grid grid-cols-2 gap-2">
                           {fieldVisibility.email && (
                             <div>
-                              <label className="block text-xs font-medium text-foreground mb-1">
+                              <label className="text-xs font-medium text-foreground mb-1 flex items-center gap-1">
+                                <Mail className="w-3 h-3" />
                                 Email
                               </label>
                               <input
@@ -1661,7 +2651,8 @@ export default function ResumeBuilderPage() {
 
                           {fieldVisibility.phone && (
                             <div>
-                              <label className="block text-xs font-medium text-foreground mb-1">
+                              <label className="text-xs font-medium text-foreground mb-1 flex items-center gap-1">
+                                <Phone className="w-3 h-3" />
                                 Phone
                               </label>
                               <input
@@ -1689,7 +2680,8 @@ export default function ResumeBuilderPage() {
                         <div className="grid grid-cols-2 gap-2">
                           {fieldVisibility.location && (
                             <div>
-                              <label className="block text-xs font-medium text-foreground mb-1">
+                              <label className="text-xs font-medium text-foreground mb-1 flex items-center gap-1">
+                                <MapPin className="w-3 h-3" />
                                 Location
                               </label>
                               <input
@@ -1714,7 +2706,8 @@ export default function ResumeBuilderPage() {
 
                           {fieldVisibility.linkedin && (
                             <div>
-                              <label className="block text-xs font-medium text-foreground mb-1">
+                              <label className="text-xs font-medium text-foreground mb-1 flex items-center gap-1">
+                                <Linkedin className="w-3 h-3" />
                                 LinkedIn URL
                               </label>
                               <input
@@ -1742,7 +2735,8 @@ export default function ResumeBuilderPage() {
                         <div className="grid grid-cols-2 gap-2">
                           {fieldVisibility.website && (
                             <div>
-                              <label className="block text-xs font-medium text-foreground mb-1">
+                              <label className="text-xs font-medium text-foreground mb-1 flex items-center gap-1">
+                                <ExternalLink className="w-3 h-3" />
                                 Website/Portfolio
                               </label>
                               <input
@@ -1767,7 +2761,8 @@ export default function ResumeBuilderPage() {
 
                           {fieldVisibility.github && (
                             <div>
-                              <label className="block text-xs font-medium text-foreground mb-1">
+                              <label className="text-xs font-medium text-foreground mb-1 flex items-center gap-1">
+                                <Github className="w-3 h-3" />
                                 GitHub
                               </label>
                               <input
@@ -1795,7 +2790,8 @@ export default function ResumeBuilderPage() {
                         <div className="grid grid-cols-2 gap-2">
                           {fieldVisibility.twitter && (
                             <div>
-                              <label className="block text-xs font-medium text-foreground mb-1">
+                              <label className="text-xs font-medium text-foreground mb-1 flex items-center gap-1">
+                                <Twitter className="w-3 h-3" />
                                 Twitter
                               </label>
                               <input
@@ -2861,9 +3857,37 @@ export default function ResumeBuilderPage() {
                                     </label>
                                   </div>
                                   <div>
-                                    <label className="block text-xs font-medium text-foreground mb-1">
-                                      Description
-                                    </label>
+                                    <div className="flex items-center justify-between gap-2 mb-1">
+                                      <label className="block text-xs font-medium text-foreground">
+                                        Description
+                                      </label>
+                                      <GenerateButton
+                                        field="experience_bullets"
+                                        context={{
+                                          job_title: experienceForm.jobTitle,
+                                          company: experienceForm.company,
+                                          responsibilities:
+                                            experienceForm.description.join(
+                                              "\n"
+                                            ),
+                                          achievements: "",
+                                          technologies: "",
+                                        }}
+                                        variant="icon"
+                                        size="sm"
+                                        onGenerate={(content) => {
+                                          const bullets = Array.isArray(content)
+                                            ? content
+                                            : content
+                                                .split("\n")
+                                                .filter((b) => b.trim());
+                                          setExperienceForm({
+                                            ...experienceForm,
+                                            description: bullets,
+                                          });
+                                        }}
+                                      />
+                                    </div>
                                     <textarea
                                       value={experienceForm.description.join(
                                         "\n"
@@ -3075,12 +4099,13 @@ export default function ResumeBuilderPage() {
                                 Description
                               </label>
                               <GenerateButton
-                                field="bullets"
+                                field="experience_bullets"
                                 context={{
-                                  jobTitle: experienceForm.jobTitle,
+                                  job_title: experienceForm.jobTitle,
                                   company: experienceForm.company,
                                   responsibilities:
                                     experienceForm.description.join("\n"),
+                                  achievements: "",
                                   technologies: "",
                                 }}
                                 variant="icon"
@@ -3156,24 +4181,29 @@ export default function ResumeBuilderPage() {
               onDragEnd={handleDragEnd}
             >
               <SortableContext
-                items={sections.map((s) => s.id)}
+                items={dynamicSections.map((section) => section.id)}
                 strategy={verticalListSortingStrategy}
               >
-                {sections.map((section, index) => (
+                {dynamicSections.map((section, index) => (
                   <SortableSection
                     key={section.id}
                     section={section}
                     index={index}
                     toggleSection={toggleSection}
-                    editingDynamicEntry={editingDynamicEntry}
-                    dynamicEntryForm={dynamicEntryForm}
-                    setDynamicEntryForm={setDynamicEntryForm}
-                    handleAddDynamicEntry={handleAddDynamicEntry}
-                    handleEditDynamicEntry={handleEditDynamicEntry}
-                    handleSaveDynamicEntry={handleSaveDynamicEntry}
-                    handleDeleteDynamicEntry={handleDeleteDynamicEntry}
-                    setEditingDynamicEntry={setEditingDynamicEntry}
-                  />
+                    headerMeta={renderSectionHeaderMeta(section)}
+                    headerActions={renderSectionHeaderActions(section)}
+                    editingSectionTitle={editingSectionTitle}
+                    sectionTitleForm={sectionTitleForm}
+                    onEditTitle={handleEditSectionTitle}
+                    onSaveTitle={handleSaveSectionTitle}
+                    onCancelEditTitle={() => {
+                      setEditingSectionTitle(null);
+                      setSectionTitleForm("");
+                    }}
+                    onTitleChange={setSectionTitleForm}
+                  >
+                    {renderDynamicSectionContent(section)}
+                  </SortableSection>
                 ))}
               </SortableContext>
               <DragOverlay>
@@ -3668,7 +4698,10 @@ export default function ResumeBuilderPage() {
               <div className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {AVAILABLE_SECTIONS.filter(
-                    (section) => !sections.some((s) => s.type === section.type)
+                    (section) =>
+                      // Allow custom sections to be added multiple times
+                      section.type === "custom" ||
+                      !sections.some((s) => s.type === section.type)
                   ).map((section) => (
                     <button
                       key={section.type}
@@ -3694,7 +4727,10 @@ export default function ResumeBuilderPage() {
                   ))}
                 </div>
                 {AVAILABLE_SECTIONS.filter(
-                  (section) => !sections.some((s) => s.type === section.type)
+                  (section) =>
+                    // Allow custom sections to be added multiple times
+                    section.type === "custom" ||
+                    !sections.some((s) => s.type === section.type)
                 ).length === 0 && (
                   <div className="text-center py-8">
                     <p className="text-muted-foreground text-sm">
@@ -3702,6 +4738,87 @@ export default function ResumeBuilderPage() {
                     </p>
                   </div>
                 )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Custom Section Title Modal */}
+      <AnimatePresence>
+        {showCustomSectionTitleModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            onClick={() => {
+              setShowCustomSectionTitleModal(false);
+              setCustomSectionTitle("");
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-card rounded-xl shadow-2xl max-w-md w-full border border-border"
+            >
+              <div className="flex items-center justify-between p-6 border-b border-border">
+                <h2 className="text-xl font-bold text-foreground">
+                  Name Your Custom Section
+                </h2>
+                <button
+                  onClick={() => {
+                    setShowCustomSectionTitleModal(false);
+                    setCustomSectionTitle("");
+                  }}
+                  className="p-2 hover:bg-accent rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-muted-foreground" />
+                </button>
+              </div>
+              <div className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Section Title <span className="text-destructive">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={customSectionTitle}
+                    onChange={(e) => setCustomSectionTitle(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && customSectionTitle.trim()) {
+                        handleConfirmCustomSectionTitle();
+                      }
+                    }}
+                    placeholder="e.g., Hobbies, Volunteer Work, Additional Information"
+                    className="w-full px-4 py-2 bg-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
+                    autoFocus
+                  />
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Give your custom section a descriptive name that will appear
+                    on your resume.
+                  </p>
+                </div>
+                <div className="flex gap-3 justify-end pt-2">
+                  <button
+                    onClick={() => {
+                      setShowCustomSectionTitleModal(false);
+                      setCustomSectionTitle("");
+                    }}
+                    className="px-4 py-2 border border-input rounded-lg hover:bg-accent transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleConfirmCustomSectionTitle}
+                    disabled={!customSectionTitle.trim()}
+                    className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Create Section
+                  </button>
+                </div>
               </div>
             </motion.div>
           </motion.div>
@@ -4318,19 +5435,7 @@ export default function ResumeBuilderPage() {
                       </div>
                     </div>
                     <button
-                      onClick={() => {
-                        if (newCustomFieldName.trim()) {
-                          const newField = {
-                            id: `custom_${Date.now()}`,
-                            name: newCustomFieldName.trim(),
-                            type: newCustomFieldType,
-                            enabled: true,
-                          };
-                          setCustomFields([...customFields, newField]);
-                          setNewCustomFieldName("");
-                          setNewCustomFieldType("text");
-                        }
-                      }}
+                      onClick={handleCreateCustomField}
                       className="w-full px-3 py-1.5 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
                     >
                       Add Custom Field
@@ -4358,13 +5463,7 @@ export default function ResumeBuilderPage() {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() =>
-                                setCustomFields(
-                                  customFields.map((f) =>
-                                    f.id === field.id
-                                      ? { ...f, enabled: !f.enabled }
-                                      : f
-                                  )
-                                )
+                                handleToggleCustomFieldEnabled(field.id)
                               }
                               className={cn(
                                 "relative w-11 h-6 rounded-full transition-colors",
@@ -4380,9 +5479,7 @@ export default function ResumeBuilderPage() {
                             </button>
                             <button
                               onClick={() =>
-                                setCustomFields(
-                                  customFields.filter((f) => f.id !== field.id)
-                                )
+                                handleRemoveCustomFieldConfig(field.id)
                               }
                               className="p-1.5 hover:bg-destructive/10 rounded-lg transition-colors"
                             >

@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Font,
 } from "@react-pdf/renderer";
+import { Linkedin, Globe, Github, Twitter, FolderOpen } from "lucide-react";
 
 // Register fonts for better typography
 Font.register({
@@ -302,27 +303,27 @@ export function ExecutiveTemplatePDF({ data }: ExecutiveTemplatePDFProps) {
             <View style={styles.contactInfo}>
               {data.personalInfo.linkedin && (
                 <Text style={styles.contactItem}>
-                  LinkedIn: {data.personalInfo.linkedin}
+                  🔗 {data.personalInfo.linkedin}
                 </Text>
               )}
               {data.personalInfo.website && (
                 <Text style={styles.contactItem}>
-                  Website: {data.personalInfo.website}
+                  🌐 {data.personalInfo.website}
                 </Text>
               )}
               {data.personalInfo.portfolio && (
                 <Text style={styles.contactItem}>
-                  Portfolio: {data.personalInfo.portfolio}
+                  📁 {data.personalInfo.portfolio}
                 </Text>
               )}
               {data.personalInfo.github && (
                 <Text style={styles.contactItem}>
-                  GitHub: {data.personalInfo.github}
+                  💻 {data.personalInfo.github}
                 </Text>
               )}
               {data.personalInfo.twitter && (
                 <Text style={styles.contactItem}>
-                  Twitter: {data.personalInfo.twitter}
+                  🐦 {data.personalInfo.twitter}
                 </Text>
               )}
             </View>
@@ -532,9 +533,42 @@ export function ExecutiveTemplatePDF({ data }: ExecutiveTemplatePDFProps) {
                           )}
                         </View>
                       )}
+                      {section.type === "publications" && (
+                        <>
+                          <Text style={styles.degree}>
+                            {entry.title || entry.name}
+                          </Text>
+                          {entry.authors && (
+                            <Text style={styles.institution}>
+                              Authors: {entry.authors}
+                            </Text>
+                          )}
+                          {entry.publisher && (
+                            <Text style={styles.institution}>
+                              Publisher: {entry.publisher}
+                            </Text>
+                          )}
+                          {entry.description && (
+                            <Text style={styles.skillItem}>
+                              {entry.description}
+                            </Text>
+                          )}
+                          {entry.link && (
+                            <Text style={[styles.skillItem, { fontSize: 9 }]}>
+                              Link: {entry.link}
+                            </Text>
+                          )}
+                          {entry.date && (
+                            <Text style={styles.graduationDate}>
+                              {entry.date}
+                            </Text>
+                          )}
+                        </>
+                      )}
                       {section.type !== "projects" &&
                         section.type !== "certificates" &&
-                        section.type !== "languages" && (
+                        section.type !== "languages" &&
+                        section.type !== "publications" && (
                           <>
                             <Text style={styles.degree}>
                               {entry.title || entry.name}
@@ -590,19 +624,34 @@ export function ExecutiveTemplatePreview({ data }: ExecutiveTemplatePDFProps) {
           data.personalInfo.portfolio) && (
           <div className="flex flex-wrap gap-3 text-gray-600 text-xs mb-2">
             {data.personalInfo.linkedin && (
-              <span>LinkedIn: {data.personalInfo.linkedin}</span>
+              <div className="flex items-center gap-1">
+                <Linkedin size={12} />
+                <span>{data.personalInfo.linkedin}</span>
+              </div>
             )}
             {data.personalInfo.website && (
-              <span>Website: {data.personalInfo.website}</span>
+              <div className="flex items-center gap-1">
+                <Globe size={12} />
+                <span>{data.personalInfo.website}</span>
+              </div>
             )}
             {data.personalInfo.portfolio && (
-              <span>Portfolio: {data.personalInfo.portfolio}</span>
+              <div className="flex items-center gap-1">
+                <FolderOpen size={12} />
+                <span>{data.personalInfo.portfolio}</span>
+              </div>
             )}
             {data.personalInfo.github && (
-              <span>GitHub: {data.personalInfo.github}</span>
+              <div className="flex items-center gap-1">
+                <Github size={12} />
+                <span>{data.personalInfo.github}</span>
+              </div>
             )}
             {data.personalInfo.twitter && (
-              <span>Twitter: {data.personalInfo.twitter}</span>
+              <div className="flex items-center gap-1">
+                <Twitter size={12} />
+                <span>{data.personalInfo.twitter}</span>
+              </div>
             )}
           </div>
         )}
@@ -755,9 +804,32 @@ export function ExecutiveTemplatePreview({ data }: ExecutiveTemplatePDFProps) {
                           )}
                         </div>
                       )}
+                      {section.type === "publications" && (
+                        <>
+                          <p className="text-xs font-bold text-gray-800">
+                            {entry.title || entry.name}
+                          </p>
+                          {entry.authors && (
+                            <p className="text-xs text-gray-600">
+                              Authors: {entry.authors}
+                            </p>
+                          )}
+                          {entry.publisher && (
+                            <p className="text-xs text-gray-600">
+                              Publisher: {entry.publisher}
+                            </p>
+                          )}
+                          {entry.description && (
+                            <p className="text-xs text-gray-700">
+                              {entry.description.substring(0, 60)}...
+                            </p>
+                          )}
+                        </>
+                      )}
                       {section.type !== "projects" &&
                         section.type !== "certificates" &&
-                        section.type !== "languages" && (
+                        section.type !== "languages" &&
+                        section.type !== "publications" && (
                           <p className="text-xs font-bold text-gray-800">
                             {entry.title || entry.name}
                           </p>

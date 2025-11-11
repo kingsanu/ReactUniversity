@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Font,
 } from "@react-pdf/renderer";
+import { Linkedin, Globe, Github, Twitter, FolderOpen } from "lucide-react";
 
 // Register fonts for better typography
 Font.register({
@@ -288,27 +289,27 @@ export function CreativeTemplatePDF({ data }: CreativeTemplatePDFProps) {
             <Text style={styles.sidebarText}>{data.personalInfo.location}</Text>
             {data.personalInfo.linkedin && (
               <Text style={styles.sidebarText}>
-                LinkedIn: {data.personalInfo.linkedin}
+                🔗 {data.personalInfo.linkedin}
               </Text>
             )}
             {data.personalInfo.website && (
               <Text style={styles.sidebarText}>
-                Website: {data.personalInfo.website}
+                🌐 {data.personalInfo.website}
               </Text>
             )}
             {data.personalInfo.portfolio && (
               <Text style={styles.sidebarText}>
-                Portfolio: {data.personalInfo.portfolio}
+                📁 {data.personalInfo.portfolio}
               </Text>
             )}
             {data.personalInfo.github && (
               <Text style={styles.sidebarText}>
-                GitHub: {data.personalInfo.github}
+                💻 {data.personalInfo.github}
               </Text>
             )}
             {data.personalInfo.twitter && (
               <Text style={styles.sidebarText}>
-                Twitter: {data.personalInfo.twitter}
+                🐦 {data.personalInfo.twitter}
               </Text>
             )}
           </View>
@@ -499,9 +500,40 @@ export function CreativeTemplatePDF({ data }: CreativeTemplatePDFProps) {
                         )}
                       </View>
                     )}
+                    {section.type === "publications" && (
+                      <>
+                        <Text style={styles.jobTitle}>
+                          {entry.title || entry.name}
+                        </Text>
+                        {entry.authors && (
+                          <Text style={styles.company}>
+                            Authors: {entry.authors}
+                          </Text>
+                        )}
+                        {entry.publisher && (
+                          <Text style={styles.company}>
+                            Publisher: {entry.publisher}
+                          </Text>
+                        )}
+                        {entry.description && (
+                          <Text style={styles.description}>
+                            {entry.description}
+                          </Text>
+                        )}
+                        {entry.link && (
+                          <Text style={styles.jobDetails}>
+                            Link: {entry.link}
+                          </Text>
+                        )}
+                        {entry.date && (
+                          <Text style={styles.jobDetails}>{entry.date}</Text>
+                        )}
+                      </>
+                    )}
                     {section.type !== "projects" &&
                       section.type !== "certificates" &&
-                      section.type !== "languages" && (
+                      section.type !== "languages" &&
+                      section.type !== "publications" && (
                         <>
                           <Text style={styles.jobTitle}>
                             {entry.title || entry.name}
@@ -553,29 +585,34 @@ export function CreativeTemplatePreview({ data }: CreativeTemplatePDFProps) {
             {data.personalInfo.location}
           </p>
           {data.personalInfo.linkedin && (
-            <p className="text-purple-200 text-xs mb-1">
-              LinkedIn: {data.personalInfo.linkedin}
-            </p>
+            <div className="flex items-center gap-1 text-purple-200 text-xs mb-1">
+              <Linkedin size={10} />
+              <span>{data.personalInfo.linkedin}</span>
+            </div>
           )}
           {data.personalInfo.website && (
-            <p className="text-purple-200 text-xs mb-1">
-              Website: {data.personalInfo.website}
-            </p>
+            <div className="flex items-center gap-1 text-purple-200 text-xs mb-1">
+              <Globe size={10} />
+              <span>{data.personalInfo.website}</span>
+            </div>
           )}
           {data.personalInfo.portfolio && (
-            <p className="text-purple-200 text-xs mb-1">
-              Portfolio: {data.personalInfo.portfolio}
-            </p>
+            <div className="flex items-center gap-1 text-purple-200 text-xs mb-1">
+              <FolderOpen size={10} />
+              <span>{data.personalInfo.portfolio}</span>
+            </div>
           )}
           {data.personalInfo.github && (
-            <p className="text-purple-200 text-xs mb-1">
-              GitHub: {data.personalInfo.github}
-            </p>
+            <div className="flex items-center gap-1 text-purple-200 text-xs mb-1">
+              <Github size={10} />
+              <span>{data.personalInfo.github}</span>
+            </div>
           )}
           {data.personalInfo.twitter && (
-            <p className="text-purple-200 text-xs mb-1">
-              Twitter: {data.personalInfo.twitter}
-            </p>
+            <div className="flex items-center gap-1 text-purple-200 text-xs mb-1">
+              <Twitter size={10} />
+              <span>{data.personalInfo.twitter}</span>
+            </div>
           )}
         </div>
 
@@ -747,9 +784,32 @@ export function CreativeTemplatePreview({ data }: CreativeTemplatePDFProps) {
                       )}
                     </div>
                   )}
+                  {section.type === "publications" && (
+                    <>
+                      <h3 className="font-bold text-gray-900 text-sm">
+                        {entry.title || entry.name}
+                      </h3>
+                      {entry.authors && (
+                        <p className="text-purple-600 text-xs">
+                          Authors: {entry.authors}
+                        </p>
+                      )}
+                      {entry.publisher && (
+                        <p className="text-purple-600 text-xs">
+                          Publisher: {entry.publisher}
+                        </p>
+                      )}
+                      {entry.description && (
+                        <p className="text-gray-700 text-xs">
+                          {entry.description.substring(0, 60)}...
+                        </p>
+                      )}
+                    </>
+                  )}
                   {section.type !== "projects" &&
                     section.type !== "certificates" &&
-                    section.type !== "languages" && (
+                    section.type !== "languages" &&
+                    section.type !== "publications" && (
                       <h3 className="font-bold text-gray-900 text-sm">
                         {entry.title || entry.name}
                       </h3>

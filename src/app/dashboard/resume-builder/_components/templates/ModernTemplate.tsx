@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Font,
 } from "@react-pdf/renderer";
+import { Linkedin, Globe, Github, Twitter, FolderOpen } from "lucide-react";
 
 // Define styles for the Modern template
 const modernStyles = StyleSheet.create({
@@ -215,7 +216,7 @@ export const ModernTemplatePDF: React.FC<ModernTemplatePDFProps> = ({
           >
             {data.personalInfo.linkedin && (
               <Text style={[modernStyles.contactItem, { fontSize: 9 }]}>
-                LinkedIn: {data.personalInfo.linkedin}
+                🔗 {data.personalInfo.linkedin}
               </Text>
             )}
             {data.personalInfo.website && (
@@ -226,7 +227,7 @@ export const ModernTemplatePDF: React.FC<ModernTemplatePDFProps> = ({
                   </Text>
                 )}
                 <Text style={[modernStyles.contactItem, { fontSize: 9 }]}>
-                  Website: {data.personalInfo.website}
+                  🌐 {data.personalInfo.website}
                 </Text>
               </>
             )}
@@ -238,7 +239,7 @@ export const ModernTemplatePDF: React.FC<ModernTemplatePDFProps> = ({
                   </Text>
                 )}
                 <Text style={[modernStyles.contactItem, { fontSize: 9 }]}>
-                  Portfolio: {data.personalInfo.portfolio}
+                  📁 {data.personalInfo.portfolio}
                 </Text>
               </>
             )}
@@ -252,7 +253,7 @@ export const ModernTemplatePDF: React.FC<ModernTemplatePDFProps> = ({
                   </Text>
                 )}
                 <Text style={[modernStyles.contactItem, { fontSize: 9 }]}>
-                  GitHub: {data.personalInfo.github}
+                  💻 {data.personalInfo.github}
                 </Text>
               </>
             )}
@@ -267,7 +268,7 @@ export const ModernTemplatePDF: React.FC<ModernTemplatePDFProps> = ({
                   </Text>
                 )}
                 <Text style={[modernStyles.contactItem, { fontSize: 9 }]}>
-                  Twitter: {data.personalInfo.twitter}
+                  🐦 {data.personalInfo.twitter}
                 </Text>
               </>
             )}
@@ -483,10 +484,45 @@ export const ModernTemplatePDF: React.FC<ModernTemplatePDFProps> = ({
                   </View>
                 )}
 
+                {/* Publications */}
+                {section.type === "publications" && (
+                  <>
+                    <Text style={modernStyles.jobTitle}>
+                      {entry.title || entry.name}
+                    </Text>
+                    {entry.authors && (
+                      <Text style={modernStyles.company}>
+                        Authors: {entry.authors}
+                      </Text>
+                    )}
+                    {entry.publisher && (
+                      <Text style={modernStyles.company}>
+                        Publisher: {entry.publisher}
+                      </Text>
+                    )}
+                    {entry.description && (
+                      <Text style={modernStyles.description}>
+                        {entry.description}
+                      </Text>
+                    )}
+                    {entry.link && (
+                      <Text style={[modernStyles.description, { fontSize: 9 }]}>
+                        Link: {entry.link}
+                      </Text>
+                    )}
+                    {entry.date && (
+                      <Text style={modernStyles.dateLocation}>
+                        {entry.date}
+                      </Text>
+                    )}
+                  </>
+                )}
+
                 {/* Generic rendering for other types */}
                 {section.type !== "projects" &&
                   section.type !== "certificates" &&
-                  section.type !== "languages" && (
+                  section.type !== "languages" &&
+                  section.type !== "publications" && (
                     <>
                       <Text style={modernStyles.jobTitle}>
                         {entry.title || entry.name}
@@ -537,21 +573,36 @@ export function ModernTemplatePreview({ data }: ModernTemplatePDFProps) {
           data.personalInfo.github ||
           data.personalInfo.twitter ||
           data.personalInfo.portfolio) && (
-          <div className="flex flex-wrap justify-center gap-2 text-gray-600 text-xs mt-1">
+          <div className="flex flex-wrap justify-center gap-3 text-gray-600 text-xs mt-1">
             {data.personalInfo.linkedin && (
-              <span>LinkedIn: {data.personalInfo.linkedin}</span>
+              <div className="flex items-center gap-1">
+                <Linkedin size={12} />
+                <span>{data.personalInfo.linkedin}</span>
+              </div>
             )}
             {data.personalInfo.website && (
-              <span>Website: {data.personalInfo.website}</span>
+              <div className="flex items-center gap-1">
+                <Globe size={12} />
+                <span>{data.personalInfo.website}</span>
+              </div>
             )}
             {data.personalInfo.portfolio && (
-              <span>Portfolio: {data.personalInfo.portfolio}</span>
+              <div className="flex items-center gap-1">
+                <FolderOpen size={12} />
+                <span>{data.personalInfo.portfolio}</span>
+              </div>
             )}
             {data.personalInfo.github && (
-              <span>GitHub: {data.personalInfo.github}</span>
+              <div className="flex items-center gap-1">
+                <Github size={12} />
+                <span>{data.personalInfo.github}</span>
+              </div>
             )}
             {data.personalInfo.twitter && (
-              <span>Twitter: {data.personalInfo.twitter}</span>
+              <div className="flex items-center gap-1">
+                <Twitter size={12} />
+                <span>{data.personalInfo.twitter}</span>
+              </div>
             )}
           </div>
         )}
@@ -716,9 +767,32 @@ export function ModernTemplatePreview({ data }: ModernTemplatePDFProps) {
                       )}
                     </div>
                   )}
+                  {section.type === "publications" && (
+                    <>
+                      <h3 className="font-bold text-gray-800 text-xs">
+                        {entry.title || entry.name}
+                      </h3>
+                      {entry.authors && (
+                        <p className="text-blue-600 text-xs">
+                          Authors: {entry.authors}
+                        </p>
+                      )}
+                      {entry.publisher && (
+                        <p className="text-blue-600 text-xs">
+                          Publisher: {entry.publisher}
+                        </p>
+                      )}
+                      {entry.description && (
+                        <p className="text-gray-700 text-xs">
+                          {entry.description.substring(0, 60)}...
+                        </p>
+                      )}
+                    </>
+                  )}
                   {section.type !== "projects" &&
                     section.type !== "certificates" &&
-                    section.type !== "languages" && (
+                    section.type !== "languages" &&
+                    section.type !== "publications" && (
                       <h3 className="font-bold text-gray-800 text-xs">
                         {entry.title || entry.name}
                       </h3>

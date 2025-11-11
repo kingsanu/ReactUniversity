@@ -12,8 +12,30 @@ import { Sparkles, Loader } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ContentGenerationModal } from "./ContentGenerationModal";
 
+export type AIFieldType =
+  | "summary"
+  | "objective"
+  | "bullets"
+  | "project"
+  | "skill"
+  | "experience_description"
+  | "experience_bullets"
+  | "education_description"
+  | "project_description"
+  | "project_bullets"
+  | "course_description"
+  | "award_description"
+  | "organization_description"
+  | "publication_description"
+  | "language_description"
+  | "volunteer_description"
+  | "reference_description"
+  | "declaration_text"
+  | "custom_description"
+  | "custom_bullets";
+
 export interface GenerateButtonProps {
-  field: "summary" | "objective" | "bullets" | "project" | "skill";
+  field: AIFieldType;
   context: Record<string, any>;
   onGenerate: (content: string | string[]) => void;
   onClose?: () => void;
@@ -59,6 +81,21 @@ export function GenerateButton({
     bullets: "Job Bullets",
     project: "Project Description",
     skill: "Skill Description",
+    experience_description: "Experience Description",
+    experience_bullets: "Experience Bullets",
+    education_description: "Education Description",
+    project_description: "Project Description",
+    project_bullets: "Project Bullets",
+    course_description: "Course Description",
+    award_description: "Award Description",
+    organization_description: "Organization Description",
+    publication_description: "Publication Description",
+    language_description: "Language Description",
+    volunteer_description: "Volunteer Description",
+    reference_description: "Reference Description",
+    declaration_text: "Declaration Text",
+    custom_description: "Custom Section Description",
+    custom_bullets: "Custom Section Bullets",
   };
 
   const fieldTooltips: Record<string, string> = {
@@ -67,6 +104,21 @@ export function GenerateButton({
     bullets: "Generate achievement-focused bullet points using AI",
     project: "Generate project description using AI",
     skill: "Generate skill description using AI",
+    experience_description: "Generate experience description using AI",
+    experience_bullets: "Generate experience bullet points using AI",
+    education_description: "Generate education description using AI",
+    project_description: "Generate project description using AI",
+    project_bullets: "Generate project bullet points using AI",
+    course_description: "Generate course description using AI",
+    award_description: "Generate award description using AI",
+    organization_description: "Generate organization description using AI",
+    publication_description: "Generate publication description using AI",
+    language_description: "Generate language description using AI",
+    volunteer_description: "Generate volunteer work description using AI",
+    reference_description: "Generate reference description using AI",
+    declaration_text: "Generate declaration text using AI",
+    custom_description: "Generate custom section description using AI",
+    custom_bullets: "Generate custom section bullet points using AI",
   };
 
   const handleClick = () => {

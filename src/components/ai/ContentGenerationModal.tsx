@@ -21,11 +21,13 @@ import {
 import { cn } from "@/lib/utils";
 import { ATSScoreDisplay } from "./ATSScoreDisplay";
 import { GenerationContextForm } from "./GenerationContextForm";
+import { AIFieldType } from "./GenerateButton";
 import {
   generateProfessionalSummary,
   generateJobBullets,
   generateCareerObjective,
   generateProjectDescription,
+  generateAIContent,
   AIGenerationContext,
   AIGenerationResponse,
 } from "@/services/resumeService";
@@ -43,7 +45,7 @@ export interface GenerationResult {
 
 export interface ContentGenerationModalProps {
   isOpen: boolean;
-  field: "summary" | "objective" | "bullets" | "project" | "skill";
+  field: AIFieldType;
   context: Record<string, any>;
   onClose: () => void;
   onApply: (content: string | string[]) => void;
@@ -74,6 +76,211 @@ export function ContentGenerationModal({
     bullets: "Job Bullet Points",
     project: "Project Description",
     skill: "Skill Description",
+    experience_description: "Experience Description",
+    experience_bullets: "Experience Bullet Points",
+    education_description: "Education Description",
+    project_description: "Project Description",
+    project_bullets: "Project Bullet Points",
+    course_description: "Course Description",
+    award_description: "Award Description",
+    organization_description: "Organization Description",
+    publication_description: "Publication Description",
+    language_description: "Language Description",
+    volunteer_description: "Volunteer Work Description",
+    reference_description: "Reference Description",
+    declaration_text: "Declaration Text",
+    custom_description: "Custom Section Description",
+    custom_bullets: "Custom Section Bullet Points",
+  };
+
+  // Build ATS-optimized prompt based on field type and context
+  const buildPrompt = (
+    fieldType: AIFieldType,
+    ctx: Record<string, any>
+  ): string => {
+    const baseInstructions =
+      "You are an expert resume writer specializing in ATS-optimized content. ";
+
+    switch (fieldType) {
+      case "summary":
+        return `${baseInstructions}Generate a professional summary for a resume.
+Current Role: ${ctx.current_role || "Not specified"}
+Key Skills: ${ctx.key_skills || "Not specified"}
+Years of Experience: ${ctx.years_experience || "0"}
+Industry: ${ctx.industry || "Not specified"}
+Target Role: ${ctx.target_role || "Not specified"}
+
+Requirements:
+- Write a concise 2-3 sentence professional summary
+- Use ATS-friendly language with industry-standard keywords
+- Highlight key skills and experience
+- Make it achievement-focused
+- Use professional tone
+- Return ONLY the summary text, no additional formatting`;
+
+      case "experience_description":
+      case "experience_bullets":
+        const isBullets = fieldType === "experience_bullets";
+        return `${baseInstructions}Generate ${
+          isBullets ? "bullet points" : "a description"
+        } for a work experience entry.
+Job Title: ${ctx.job_title || "Not specified"}
+Company: ${ctx.company || "Not specified"}
+Responsibilities: ${ctx.responsibilities || "Not specified"}
+Achievements: ${ctx.achievements || "Not specified"}
+Technologies/Skills: ${ctx.technologies || "Not specified"}
+
+Requirements:
+${
+  isBullets
+    ? `- Generate 4-6 achievement-focused bullet points
+- Each bullet should start with a strong action verb
+- Include quantifiable metrics where possible
+- Return each bullet point on a new line
+- Do NOT include bullet symbols (•, -, *), just the text`
+    : `- Write a concise 2-3 sentence description
+- Focus on key responsibilities and achievements
+- Use professional language`
+}
+- Use ATS-friendly keywords
+- Make it achievement-focused
+- Return ONLY the ${
+          isBullets ? "bullet points" : "description"
+        }, no additional formatting`;
+
+      case "education_description":
+        return `${baseInstructions}Generate a description for an education entry.
+Degree: ${ctx.degree || "Not specified"}
+Institution: ${ctx.institution || "Not specified"}
+Field of Study: ${ctx.field_of_study || "Not specified"}
+Achievements: ${ctx.achievements || "Not specified"}
+Relevant Coursework: ${ctx.coursework || "Not specified"}
+
+Requirements:
+- Write a concise 1-2 sentence description
+- Highlight relevant achievements, coursework, or honors
+- Use professional language
+- Return ONLY the description, no additional formatting`;
+
+      case "project_description":
+      case "project_bullets":
+        const isProjectBullets = fieldType === "project_bullets";
+        return `${baseInstructions}Generate ${
+          isProjectBullets ? "bullet points" : "a description"
+        } for a project.
+Project Name: ${ctx.project_name || "Not specified"}
+Technologies: ${ctx.technologies || "Not specified"}
+Role: ${ctx.role || "Not specified"}
+Description: ${ctx.description || "Not specified"}
+Impact: ${ctx.impact || "Not specified"}
+
+Requirements:
+${
+  isProjectBullets
+    ? `- Generate 3-5 bullet points describing the project
+- Each bullet should highlight technical skills or achievements
+- Return each bullet point on a new line
+- Do NOT include bullet symbols (•, -, *), just the text`
+    : `- Write a concise 2-3 sentence description
+- Focus on technologies used and impact`
+}
+- Use ATS-friendly technical keywords
+- Return ONLY the ${
+          isProjectBullets ? "bullet points" : "description"
+        }, no additional formatting`;
+
+      case "course_description":
+        return `${baseInstructions}Generate a description for a course/certification.
+Course Name: ${ctx.course_name || "Not specified"}
+Provider: ${ctx.provider || "Not specified"}
+Skills Learned: ${ctx.skills_learned || "Not specified"}
+Projects: ${ctx.projects || "Not specified"}
+
+Requirements:
+- Write a concise 1-2 sentence description
+- Highlight key skills learned or projects completed
+- Use professional language
+- Return ONLY the description, no additional formatting`;
+
+      case "award_description":
+        return `${baseInstructions}Generate a description for an award or achievement.
+Award Name: ${ctx.award_name || "Not specified"}
+Issuing Organization: ${ctx.organization || "Not specified"}
+Reason: ${ctx.reason || "Not specified"}
+Impact: ${ctx.impact || "Not specified"}
+
+Requirements:
+- Write a concise 1-2 sentence description
+- Highlight the significance and impact
+- Use professional language
+- Return ONLY the description, no additional formatting`;
+
+      case "organization_description":
+        return `${baseInstructions}Generate a description for an organization membership.
+Organization Name: ${ctx.organization_name || "Not specified"}
+Role: ${ctx.role || "Not specified"}
+Activities: ${ctx.activities || "Not specified"}
+Achievements: ${ctx.achievements || "Not specified"}
+
+Requirements:
+- Write a concise 1-2 sentence description
+- Highlight role and key activities
+- Use professional language
+- Return ONLY the description, no additional formatting`;
+
+      case "publication_description":
+        return `${baseInstructions}Generate a description for a publication.
+Title: ${ctx.title || "Not specified"}
+Publisher: ${ctx.publisher || "Not specified"}
+Topic: ${ctx.topic || "Not specified"}
+Impact: ${ctx.impact || "Not specified"}
+
+Requirements:
+- Write a concise 1-2 sentence description
+- Highlight the topic and significance
+- Use professional language
+- Return ONLY the description, no additional formatting`;
+
+      case "custom_description":
+      case "custom_bullets":
+        const isCustomBullets = fieldType === "custom_bullets";
+        return `${baseInstructions}Generate ${
+          isCustomBullets ? "bullet points" : "a description"
+        } for a custom resume section.
+Section Title: ${ctx.section_title || "Not specified"}
+Context: ${ctx.context || "Not specified"}
+Key Points: ${ctx.key_points || "Not specified"}
+
+Requirements:
+${
+  isCustomBullets
+    ? `- Generate 3-5 bullet points
+- Return each bullet point on a new line
+- Do NOT include bullet symbols (•, -, *), just the text`
+    : `- Write a concise 2-3 sentence description`
+}
+- Use ATS-friendly language
+- Use professional tone
+- Return ONLY the ${
+          isCustomBullets ? "bullet points" : "description"
+        }, no additional formatting`;
+
+      case "declaration_text":
+        return `${baseInstructions}Generate a professional declaration statement for a resume.
+Name: ${ctx.name || "Not specified"}
+Location: ${ctx.location || "Not specified"}
+
+Requirements:
+- Write a formal declaration statement
+- Include standard declaration language
+- Use professional tone
+- Return ONLY the declaration text, no additional formatting`;
+
+      default:
+        return `${baseInstructions}Generate professional resume content based on the following context: ${JSON.stringify(
+          ctx
+        )}`;
+    }
   };
 
   const generationFunctions: Record<
@@ -93,8 +300,36 @@ export function ContentGenerationModal({
     setStep("loading");
 
     try {
-      const generateFunction = generationFunctions[field];
-      const response = await generateFunction(generationContext);
+      let response: AIGenerationResponse;
+
+      // Use the new AI generation service for new field types
+      const newFieldTypes = [
+        "experience_description",
+        "experience_bullets",
+        "education_description",
+        "project_description",
+        "project_bullets",
+        "course_description",
+        "award_description",
+        "organization_description",
+        "publication_description",
+        "language_description",
+        "volunteer_description",
+        "reference_description",
+        "declaration_text",
+        "custom_description",
+        "custom_bullets",
+      ];
+
+      if (newFieldTypes.includes(field)) {
+        // Build the prompt and use the new AI generation service
+        const prompt = buildPrompt(field, generationContext);
+        response = await generateAIContent(prompt);
+      } else {
+        // Use the existing generation functions for legacy fields
+        const generateFunction = generationFunctions[field];
+        response = await generateFunction(generationContext);
+      }
 
       if (!response.success) {
         throw new Error(response.message || "Generation failed");

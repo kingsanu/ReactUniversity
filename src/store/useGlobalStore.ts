@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import { generateDummyContent } from "@/app/dashboard/resume-builder/_components/dummyContentGenerator";
+import { updateResume, getResumeById } from "@/services/resumeService";
 
 // Resume Builder Types
 interface PersonalInfo {
@@ -70,6 +71,9 @@ interface DynamicSection {
     id: string;
     [key: string]: any;
   }>;
+  // For custom sections only
+  description?: string;
+  bullets?: string;
 }
 
 export interface ResumeData {
@@ -120,6 +124,10 @@ interface GlobalState {
     isLoading: boolean;
     isDirty: boolean;
   };
+  currentResumeId: string | null;
+  setCurrentResumeId: (id: string | null) => void;
+  loadResume: (data: ResumeData) => void;
+  saveResumeToAPI: () => Promise<void>;
   setResumeStep: (step: number) => void;
   setCareerField: (careerField: string) => void;
   updatePersonalInfo: (info: Partial<PersonalInfo>) => void;
@@ -171,7 +179,7 @@ const initialResumeData: ResumeData = {
   skills: [],
   customFields: [],
   dynamicSections: [],
-  template: "modern",
+  template: "classic",
 };
 
 // Create the store
@@ -256,7 +264,59 @@ export const useGlobalStore = create<GlobalState>()(
           isLoading: false,
           isDirty: false,
         },
-
+        currentResumeId: null,
+        setCurrentResumeId: (id) => set({ currentResumeId: id }),
+        loadResume: (data) =>
+          set((state) => ({
+            resumeBuilder: { ...state.resumeBuilder, data, isDirty: false },
+          })),
+        saveResumeToAPI: async () => {
+          const state = get();
+          if (state.currentResumeId && state.currentResumeId !== "new") {
+            try {
+              // Map store data to API format
+              const apiData = {
+                personal: {
+                  fullName: state.resumeBuilder.data.personalInfo.fullName,
+                  email: state.resumeBuilder.data.personalInfo.email,
+                  phone: state.resumeBuilder.data.personalInfo.phone,
+                  location: state.resumeBuilder.data.personalInfo.location,
+                  linkedIn: state.resumeBuilder.data.personalInfo.linkedin,
+                  website: state.resumeBuilder.data.personalInfo.website,
+                },
+                summary: state.resumeBuilder.data.personalInfo.summary,
+                skills: {
+                  skills: state.resumeBuilder.data.skills.reduce(
+                    (acc, skill) => {
+                      if (!acc[skill.category]) acc[skill.category] = [];
+                      acc[skill.category].push(skill.name);
+                      return acc;
+                    },
+                    {} as Record<string, string[]>
+                  ),
+                },
+                experience: state.resumeBuilder.data.experience.map((exp) => ({
+                  company: exp.company,
+                  location: exp.location,
+                  title: exp.jobTitle,
+                  startDate: exp.startDate,
+                  endDate: exp.endDate,
+                  descriptions: exp.description,
+                })),
+                education: state.resumeBuilder.data.education.map((edu) => ({
+                  degree: edu.degree,
+                  institution: edu.institution,
+                  location: edu.location,
+                  startDate: edu.graduationDate, // Assuming graduationDate as endDate
+                  endDate: edu.graduationDate,
+                })),
+              };
+              await updateResume(state.currentResumeId, apiData);
+            } catch (error) {
+              console.error("Failed to save resume to API", error);
+            }
+          }
+        },
         setResumeStep: (step) =>
           set((state) => ({
             resumeBuilder: { ...state.resumeBuilder, currentStep: step },
@@ -271,7 +331,7 @@ export const useGlobalStore = create<GlobalState>()(
             },
           })),
 
-        updatePersonalInfo: (info) =>
+        updatePersonalInfo: (info) => {
           set((state) => ({
             resumeBuilder: {
               ...state.resumeBuilder,
@@ -284,9 +344,11 @@ export const useGlobalStore = create<GlobalState>()(
               },
               isDirty: true,
             },
-          })),
+          }));
+          get().saveResumeToAPI();
+        },
 
-        addExperience: (experience) =>
+        addExperience: (experience) => {
           set((state) => ({
             resumeBuilder: {
               ...state.resumeBuilder,
@@ -299,9 +361,11 @@ export const useGlobalStore = create<GlobalState>()(
               },
               isDirty: true,
             },
-          })),
+          }));
+          get().saveResumeToAPI();
+        },
 
-        updateExperience: (id, experience) =>
+        updateExperience: (id, experience) => {
           set((state) => ({
             resumeBuilder: {
               ...state.resumeBuilder,
@@ -313,9 +377,11 @@ export const useGlobalStore = create<GlobalState>()(
               },
               isDirty: true,
             },
-          })),
+          }));
+          get().saveResumeToAPI();
+        },
 
-        removeExperience: (id) =>
+        removeExperience: (id) => {
           set((state) => ({
             resumeBuilder: {
               ...state.resumeBuilder,
@@ -327,9 +393,11 @@ export const useGlobalStore = create<GlobalState>()(
               },
               isDirty: true,
             },
-          })),
+          }));
+          get().saveResumeToAPI();
+        },
 
-        addEducation: (education) =>
+        addEducation: (education) => {
           set((state) => ({
             resumeBuilder: {
               ...state.resumeBuilder,
@@ -342,9 +410,11 @@ export const useGlobalStore = create<GlobalState>()(
               },
               isDirty: true,
             },
-          })),
+          }));
+          get().saveResumeToAPI();
+        },
 
-        updateEducation: (id, education) =>
+        updateEducation: (id, education) => {
           set((state) => ({
             resumeBuilder: {
               ...state.resumeBuilder,
@@ -356,9 +426,11 @@ export const useGlobalStore = create<GlobalState>()(
               },
               isDirty: true,
             },
-          })),
+          }));
+          get().saveResumeToAPI();
+        },
 
-        removeEducation: (id) =>
+        removeEducation: (id) => {
           set((state) => ({
             resumeBuilder: {
               ...state.resumeBuilder,
@@ -370,9 +442,11 @@ export const useGlobalStore = create<GlobalState>()(
               },
               isDirty: true,
             },
-          })),
+          }));
+          get().saveResumeToAPI();
+        },
 
-        addSkill: (skill) =>
+        addSkill: (skill) => {
           set((state) => ({
             resumeBuilder: {
               ...state.resumeBuilder,
@@ -385,9 +459,11 @@ export const useGlobalStore = create<GlobalState>()(
               },
               isDirty: true,
             },
-          })),
+          }));
+          get().saveResumeToAPI();
+        },
 
-        removeSkill: (id) =>
+        removeSkill: (id) => {
           set((state) => {
             const currentSkills = state.resumeBuilder.data.skills || [];
             const filteredSkills = currentSkills.filter(
@@ -404,24 +480,43 @@ export const useGlobalStore = create<GlobalState>()(
                 isDirty: true,
               },
             };
-          }),
+          });
+          get().saveResumeToAPI();
+        },
 
-        addCustomField: (field) =>
-          set((state) => ({
-            resumeBuilder: {
-              ...state.resumeBuilder,
-              data: {
-                ...state.resumeBuilder.data,
-                customFields: [
-                  ...(state.resumeBuilder.data.customFields || []),
-                  { ...field, id: crypto.randomUUID() },
-                ],
+        addCustomField: (field) => {
+          set((state) => {
+            const fieldWithOptionalId = field as Partial<CustomField> &
+              Omit<CustomField, "id">;
+            const fieldId = fieldWithOptionalId.id || crypto.randomUUID();
+
+            return {
+              resumeBuilder: {
+                ...state.resumeBuilder,
+                data: {
+                  ...state.resumeBuilder.data,
+                  customFields: [
+                    ...(state.resumeBuilder.data.customFields || []),
+                    {
+                      id: fieldId,
+                      name: field.name,
+                      type: field.type,
+                      enabled: field.enabled,
+                      value:
+                        fieldWithOptionalId.value !== undefined
+                          ? fieldWithOptionalId.value
+                          : "",
+                    },
+                  ],
+                },
+                isDirty: true,
               },
-              isDirty: true,
-            },
-          })),
+            };
+          });
+          get().saveResumeToAPI();
+        },
 
-        updateCustomField: (id, field) =>
+        updateCustomField: (id, field) => {
           set((state) => ({
             resumeBuilder: {
               ...state.resumeBuilder,
@@ -433,9 +528,11 @@ export const useGlobalStore = create<GlobalState>()(
               },
               isDirty: true,
             },
-          })),
+          }));
+          get().saveResumeToAPI();
+        },
 
-        removeCustomField: (id) =>
+        removeCustomField: (id) => {
           set((state) => ({
             resumeBuilder: {
               ...state.resumeBuilder,
@@ -447,7 +544,9 @@ export const useGlobalStore = create<GlobalState>()(
               },
               isDirty: true,
             },
-          })),
+          }));
+          get().saveResumeToAPI();
+        },
 
         addDynamicSection: (section) =>
           set((state) => ({

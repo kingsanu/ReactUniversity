@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Font,
 } from "@react-pdf/renderer";
+import { Linkedin, Globe, Github, Twitter, FolderOpen } from "lucide-react";
 
 // Register fonts for better typography
 Font.register({
@@ -301,27 +302,27 @@ export function TechTemplatePDF({ data }: TechTemplatePDFProps) {
             <View style={styles.contactInfo}>
               {data.personalInfo.linkedin && (
                 <Text style={styles.contactItem}>
-                  LinkedIn: {data.personalInfo.linkedin}
+                  🔗 {data.personalInfo.linkedin}
                 </Text>
               )}
               {data.personalInfo.website && (
                 <Text style={styles.contactItem}>
-                  Website: {data.personalInfo.website}
+                  🌐 {data.personalInfo.website}
                 </Text>
               )}
               {data.personalInfo.portfolio && (
                 <Text style={styles.contactItem}>
-                  Portfolio: {data.personalInfo.portfolio}
+                  📁 {data.personalInfo.portfolio}
                 </Text>
               )}
               {data.personalInfo.github && (
                 <Text style={styles.contactItem}>
-                  GitHub: {data.personalInfo.github}
+                  💻 {data.personalInfo.github}
                 </Text>
               )}
               {data.personalInfo.twitter && (
                 <Text style={styles.contactItem}>
-                  Twitter: {data.personalInfo.twitter}
+                  🐦 {data.personalInfo.twitter}
                 </Text>
               )}
             </View>
@@ -521,9 +522,42 @@ export function TechTemplatePDF({ data }: TechTemplatePDFProps) {
                           )}
                         </View>
                       )}
+                      {section.type === "publications" && (
+                        <>
+                          <Text style={styles.jobTitle}>
+                            {entry.title || entry.name}
+                          </Text>
+                          {entry.authors && (
+                            <Text style={styles.company}>
+                              Authors: {entry.authors}
+                            </Text>
+                          )}
+                          {entry.publisher && (
+                            <Text style={styles.company}>
+                              Publisher: {entry.publisher}
+                            </Text>
+                          )}
+                          {entry.description && (
+                            <Text style={styles.description}>
+                              {entry.description}
+                            </Text>
+                          )}
+                          {entry.link && (
+                            <Text style={[styles.description, { fontSize: 8 }]}>
+                              Link: {entry.link}
+                            </Text>
+                          )}
+                          {entry.date && (
+                            <Text style={styles.graduationDate}>
+                              {entry.date}
+                            </Text>
+                          )}
+                        </>
+                      )}
                       {section.type !== "projects" &&
                         section.type !== "certificates" &&
-                        section.type !== "languages" && (
+                        section.type !== "languages" &&
+                        section.type !== "publications" && (
                           <>
                             <Text style={styles.jobTitle}>
                               {entry.title || entry.name}
@@ -591,31 +625,36 @@ export function TechTemplatePreview({ data }: TechTemplatePDFProps) {
           data.personalInfo.github ||
           data.personalInfo.twitter ||
           data.personalInfo.portfolio) && (
-          <div className="flex flex-wrap gap-2 text-xs mb-2">
+          <div className="flex flex-wrap gap-3 text-xs mb-2">
             {data.personalInfo.linkedin && (
-              <span className="bg-slate-700 px-2 py-1 rounded text-xs">
-                LinkedIn
-              </span>
+              <div className="flex items-center gap-1 bg-slate-700 px-2 py-1 rounded text-xs">
+                <Linkedin size={10} />
+                <span>{data.personalInfo.linkedin}</span>
+              </div>
             )}
             {data.personalInfo.website && (
-              <span className="bg-slate-700 px-2 py-1 rounded text-xs">
-                Website
-              </span>
+              <div className="flex items-center gap-1 bg-slate-700 px-2 py-1 rounded text-xs">
+                <Globe size={10} />
+                <span>{data.personalInfo.website}</span>
+              </div>
             )}
             {data.personalInfo.portfolio && (
-              <span className="bg-slate-700 px-2 py-1 rounded text-xs">
-                Portfolio
-              </span>
+              <div className="flex items-center gap-1 bg-slate-700 px-2 py-1 rounded text-xs">
+                <FolderOpen size={10} />
+                <span>{data.personalInfo.portfolio}</span>
+              </div>
             )}
             {data.personalInfo.github && (
-              <span className="bg-slate-700 px-2 py-1 rounded text-xs">
-                GitHub
-              </span>
+              <div className="flex items-center gap-1 bg-slate-700 px-2 py-1 rounded text-xs">
+                <Github size={10} />
+                <span>{data.personalInfo.github}</span>
+              </div>
             )}
             {data.personalInfo.twitter && (
-              <span className="bg-slate-700 px-2 py-1 rounded text-xs">
-                Twitter
-              </span>
+              <div className="flex items-center gap-1 bg-slate-700 px-2 py-1 rounded text-xs">
+                <Twitter size={10} />
+                <span>{data.personalInfo.twitter}</span>
+              </div>
             )}
           </div>
         )}
@@ -783,9 +822,32 @@ export function TechTemplatePreview({ data }: TechTemplatePDFProps) {
                           )}
                         </div>
                       )}
+                      {section.type === "publications" && (
+                        <>
+                          <p className="text-xs font-bold text-slate-900">
+                            {entry.title || entry.name}
+                          </p>
+                          {entry.authors && (
+                            <p className="text-xs text-sky-600">
+                              Authors: {entry.authors}
+                            </p>
+                          )}
+                          {entry.publisher && (
+                            <p className="text-xs text-sky-600">
+                              Publisher: {entry.publisher}
+                            </p>
+                          )}
+                          {entry.description && (
+                            <p className="text-xs text-slate-700">
+                              {entry.description.substring(0, 60)}...
+                            </p>
+                          )}
+                        </>
+                      )}
                       {section.type !== "projects" &&
                         section.type !== "certificates" &&
-                        section.type !== "languages" && (
+                        section.type !== "languages" &&
+                        section.type !== "publications" && (
                           <p className="text-xs font-bold text-slate-900">
                             {entry.title || entry.name}
                           </p>

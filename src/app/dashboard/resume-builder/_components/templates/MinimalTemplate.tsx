@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Font,
 } from "@react-pdf/renderer";
+import { Linkedin, Globe, Github, Twitter, FolderOpen } from "lucide-react";
 
 // Register fonts for better typography
 Font.register({
@@ -271,7 +272,7 @@ export function MinimalTemplatePDF({ data }: MinimalTemplatePDFProps) {
             <View style={styles.contactInfo}>
               {data.personalInfo.linkedin && (
                 <Text style={styles.contactItem}>
-                  LinkedIn: {data.personalInfo.linkedin}
+                  🔗 {data.personalInfo.linkedin}
                 </Text>
               )}
               {data.personalInfo.website && (
@@ -280,7 +281,7 @@ export function MinimalTemplatePDF({ data }: MinimalTemplatePDFProps) {
                     <Text style={styles.contactItem}>•</Text>
                   )}
                   <Text style={styles.contactItem}>
-                    Website: {data.personalInfo.website}
+                    🌐 {data.personalInfo.website}
                   </Text>
                 </>
               )}
@@ -291,7 +292,7 @@ export function MinimalTemplatePDF({ data }: MinimalTemplatePDFProps) {
                     <Text style={styles.contactItem}>•</Text>
                   )}
                   <Text style={styles.contactItem}>
-                    Portfolio: {data.personalInfo.portfolio}
+                    📁 {data.personalInfo.portfolio}
                   </Text>
                 </>
               )}
@@ -303,7 +304,7 @@ export function MinimalTemplatePDF({ data }: MinimalTemplatePDFProps) {
                     <Text style={styles.contactItem}>•</Text>
                   )}
                   <Text style={styles.contactItem}>
-                    GitHub: {data.personalInfo.github}
+                    💻 {data.personalInfo.github}
                   </Text>
                 </>
               )}
@@ -316,7 +317,7 @@ export function MinimalTemplatePDF({ data }: MinimalTemplatePDFProps) {
                     <Text style={styles.contactItem}>•</Text>
                   )}
                   <Text style={styles.contactItem}>
-                    Twitter: {data.personalInfo.twitter}
+                    🐦 {data.personalInfo.twitter}
                   </Text>
                 </>
               )}
@@ -517,9 +518,40 @@ export function MinimalTemplatePDF({ data }: MinimalTemplatePDFProps) {
                       )}
                     </View>
                   )}
+                  {section.type === "publications" && (
+                    <>
+                      <Text style={styles.degree}>
+                        {entry.title || entry.name}
+                      </Text>
+                      {entry.authors && (
+                        <Text style={styles.institution}>
+                          Authors: {entry.authors}
+                        </Text>
+                      )}
+                      {entry.publisher && (
+                        <Text style={styles.institution}>
+                          Publisher: {entry.publisher}
+                        </Text>
+                      )}
+                      {entry.description && (
+                        <Text style={styles.description}>
+                          {entry.description}
+                        </Text>
+                      )}
+                      {entry.link && (
+                        <Text style={[styles.description, { fontSize: 9 }]}>
+                          Link: {entry.link}
+                        </Text>
+                      )}
+                      {entry.date && (
+                        <Text style={styles.graduationDate}>{entry.date}</Text>
+                      )}
+                    </>
+                  )}
                   {section.type !== "projects" &&
                     section.type !== "certificates" &&
-                    section.type !== "languages" && (
+                    section.type !== "languages" &&
+                    section.type !== "publications" && (
                       <>
                         <Text style={styles.degree}>
                           {entry.title || entry.name}
@@ -573,40 +605,36 @@ export function MinimalTemplatePreview({ data }: MinimalTemplatePDFProps) {
           data.personalInfo.github ||
           data.personalInfo.twitter ||
           data.personalInfo.portfolio) && (
-          <div className="flex flex-wrap justify-center items-center gap-2 text-gray-600 text-xs mb-2">
+          <div className="flex flex-wrap justify-center items-center gap-3 text-gray-600 text-xs mb-2">
             {data.personalInfo.linkedin && (
-              <span>LinkedIn: {data.personalInfo.linkedin}</span>
+              <div className="flex items-center gap-1">
+                <Linkedin size={12} />
+                <span>{data.personalInfo.linkedin}</span>
+              </div>
             )}
             {data.personalInfo.website && (
-              <>
-                {data.personalInfo.linkedin && <span>•</span>}
-                <span>Website: {data.personalInfo.website}</span>
-              </>
+              <div className="flex items-center gap-1">
+                <Globe size={12} />
+                <span>{data.personalInfo.website}</span>
+              </div>
             )}
             {data.personalInfo.portfolio && (
-              <>
-                {(data.personalInfo.linkedin || data.personalInfo.website) && (
-                  <span>•</span>
-                )}
-                <span>Portfolio: {data.personalInfo.portfolio}</span>
-              </>
+              <div className="flex items-center gap-1">
+                <FolderOpen size={12} />
+                <span>{data.personalInfo.portfolio}</span>
+              </div>
             )}
             {data.personalInfo.github && (
-              <>
-                {(data.personalInfo.linkedin ||
-                  data.personalInfo.website ||
-                  data.personalInfo.portfolio) && <span>•</span>}
-                <span>GitHub: {data.personalInfo.github}</span>
-              </>
+              <div className="flex items-center gap-1">
+                <Github size={12} />
+                <span>{data.personalInfo.github}</span>
+              </div>
             )}
             {data.personalInfo.twitter && (
-              <>
-                {(data.personalInfo.linkedin ||
-                  data.personalInfo.website ||
-                  data.personalInfo.portfolio ||
-                  data.personalInfo.github) && <span>•</span>}
-                <span>Twitter: {data.personalInfo.twitter}</span>
-              </>
+              <div className="flex items-center gap-1">
+                <Twitter size={12} />
+                <span>{data.personalInfo.twitter}</span>
+              </div>
             )}
           </div>
         )}
@@ -764,9 +792,32 @@ export function MinimalTemplatePreview({ data }: MinimalTemplatePDFProps) {
                       )}
                     </div>
                   )}
+                  {section.type === "publications" && (
+                    <>
+                      <h3 className="font-bold text-gray-900 text-xs mb-1">
+                        {entry.title || entry.name}
+                      </h3>
+                      {entry.authors && (
+                        <p className="text-gray-600 text-xs">
+                          Authors: {entry.authors}
+                        </p>
+                      )}
+                      {entry.publisher && (
+                        <p className="text-gray-600 text-xs">
+                          Publisher: {entry.publisher}
+                        </p>
+                      )}
+                      {entry.description && (
+                        <p className="text-gray-700 text-xs">
+                          {entry.description.substring(0, 60)}...
+                        </p>
+                      )}
+                    </>
+                  )}
                   {section.type !== "projects" &&
                     section.type !== "certificates" &&
-                    section.type !== "languages" && (
+                    section.type !== "languages" &&
+                    section.type !== "publications" && (
                       <h3 className="font-bold text-gray-900 text-xs mb-1">
                         {entry.title || entry.name}
                       </h3>
