@@ -84,7 +84,11 @@ export function CourseCard({
                 </span>
               )}
             </div>
-            <span className={`absolute top-2 right-2 text-xs px-2 py-1 rounded-full font-medium ${getDifficultyColor(course.difficulty)}`}>
+            <span
+              className={`absolute top-2 right-2 text-xs px-2 py-1 rounded-full font-medium ${getDifficultyColor(
+                course.difficulty
+              )}`}
+            >
               {t(`courses.difficulty.${course.difficulty.toLowerCase()}`)}
             </span>
           </div>
@@ -95,9 +99,7 @@ export function CourseCard({
             <h3 className="font-semibold text-lg text-gray-900 line-clamp-2 mb-1">
               {course.title}
             </h3>
-            <p className="text-sm text-gray-600 mb-2">
-              {course.provider}
-            </p>
+            <p className="text-sm text-gray-600 mb-2">{course.provider}</p>
           </div>
 
           <p className="text-sm text-gray-700 line-clamp-3 mb-4 flex-1">
@@ -142,7 +144,9 @@ export function CourseCard({
               size="sm"
               onClick={() => void onStartCourse(course)}
               className="flex-1"
-              variant={enrollmentStatus === "completed" ? "secondary" : "default"}
+              variant={
+                enrollmentStatus === "completed" ? "secondary" : "default"
+              }
             >
               {enrollmentStatus === "completed"
                 ? t("courses.reviewOnCoursera")
@@ -150,16 +154,18 @@ export function CourseCard({
             </Button>
           </div>
 
-          {isEnrolled && enrollmentStatus !== "completed" && onMarkCompleted && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => void onMarkCompleted(course)}
-              className="mt-3 text-blue-600 hover:text-blue-700 justify-start"
-            >
-              {t("courses.markCompleted")}
-            </Button>
-          )}
+          {isEnrolled &&
+            enrollmentStatus !== "completed" &&
+            onMarkCompleted && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => void onMarkCompleted(course)}
+                className="mt-3 text-blue-600 hover:text-blue-700 justify-start"
+              >
+                {t("courses.markCompleted")}
+              </Button>
+            )}
         </CardContent>
       </Card>
     </motion.div>

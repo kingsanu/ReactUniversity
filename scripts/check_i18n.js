@@ -4,7 +4,7 @@ const path = require('path');
 function walk(dir) {
   let results = [];
   const list = fs.readdirSync(dir);
-  list.forEach(function(file) {
+  list.forEach(function (file) {
     file = path.join(dir, file);
     const stat = fs.statSync(file);
     if (stat && stat.isDirectory()) {

@@ -2,7 +2,13 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { CourseFilter, CourseSortOption } from "@/types/course";
 import { useTranslation } from "react-i18next";
 import { Search, Filter, X } from "lucide-react";
@@ -28,7 +34,7 @@ export function CourseFilters({
   onFiltersChange,
   onSortChange,
   onClearFilters,
-  availableFilters
+  availableFilters,
 }: CourseFiltersProps) {
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -40,44 +46,60 @@ export function CourseFilters({
   const handleCategoryChange = (value: string) => {
     const currentCategories = filters.category || [];
     const newCategories = currentCategories.includes(value)
-      ? currentCategories.filter(c => c !== value)
+      ? currentCategories.filter((c) => c !== value)
       : [...currentCategories, value];
-    onFiltersChange({ ...filters, category: newCategories.length > 0 ? newCategories : undefined });
+    onFiltersChange({
+      ...filters,
+      category: newCategories.length > 0 ? newCategories : undefined,
+    });
   };
 
   const handleLanguageChange = (value: string) => {
     const currentLanguages = filters.language || [];
     const newLanguages = currentLanguages.includes(value)
-      ? currentLanguages.filter(l => l !== value)
+      ? currentLanguages.filter((l) => l !== value)
       : [...currentLanguages, value];
-    onFiltersChange({ ...filters, language: newLanguages.length > 0 ? newLanguages : undefined });
+    onFiltersChange({
+      ...filters,
+      language: newLanguages.length > 0 ? newLanguages : undefined,
+    });
   };
 
   const handleDifficultyChange = (value: string) => {
     const currentDifficulties = filters.difficulty || [];
     const newDifficulties = currentDifficulties.includes(value as any)
-      ? currentDifficulties.filter(d => d !== value)
+      ? currentDifficulties.filter((d) => d !== value)
       : [...currentDifficulties, value as any];
-    onFiltersChange({ ...filters, difficulty: newDifficulties.length > 0 ? newDifficulties : undefined });
+    onFiltersChange({
+      ...filters,
+      difficulty: newDifficulties.length > 0 ? newDifficulties : undefined,
+    });
   };
 
   const handleCountryChange = (value: string) => {
     const currentCountries = filters.country || [];
     const newCountries = currentCountries.includes(value)
-      ? currentCountries.filter(c => c !== value)
+      ? currentCountries.filter((c) => c !== value)
       : [...currentCountries, value];
-    onFiltersChange({ ...filters, country: newCountries.length > 0 ? newCountries : undefined });
+    onFiltersChange({
+      ...filters,
+      country: newCountries.length > 0 ? newCountries : undefined,
+    });
   };
 
   const handleRegionChange = (value: string) => {
     const currentRegions = filters.region || [];
     const newRegions = currentRegions.includes(value)
-      ? currentRegions.filter(r => r !== value)
+      ? currentRegions.filter((r) => r !== value)
       : [...currentRegions, value];
-    onFiltersChange({ ...filters, region: newRegions.length > 0 ? newRegions : undefined });
+    onFiltersChange({
+      ...filters,
+      region: newRegions.length > 0 ? newRegions : undefined,
+    });
   };
 
-  const hasActiveFilters = filters.search ||
+  const hasActiveFilters =
+    filters.search ||
     (filters.category && filters.category.length > 0) ||
     (filters.language && filters.language.length > 0) ||
     (filters.difficulty && filters.difficulty.length > 0) ||
@@ -103,11 +125,17 @@ export function CourseFilters({
             <SelectValue placeholder={t("courses.sortBy")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="recommended">{t("courses.sort.recommended")}</SelectItem>
+            <SelectItem value="recommended">
+              {t("courses.sort.recommended")}
+            </SelectItem>
             <SelectItem value="rating">{t("courses.sort.rating")}</SelectItem>
-            <SelectItem value="enrollment">{t("courses.sort.enrollment")}</SelectItem>
+            <SelectItem value="enrollment">
+              {t("courses.sort.enrollment")}
+            </SelectItem>
             <SelectItem value="newest">{t("courses.sort.newest")}</SelectItem>
-            <SelectItem value="duration">{t("courses.sort.duration")}</SelectItem>
+            <SelectItem value="duration">
+              {t("courses.sort.duration")}
+            </SelectItem>
             <SelectItem value="title">{t("courses.sort.title")}</SelectItem>
           </SelectContent>
         </Select>
@@ -131,7 +159,11 @@ export function CourseFilters({
         </Button>
 
         {hasActiveFilters && (
-          <Button variant="ghost" onClick={onClearFilters} className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            onClick={onClearFilters}
+            className="flex items-center gap-2"
+          >
             <X className="w-4 h-4" />
             {t("courses.clearFilters")}
           </Button>
@@ -156,7 +188,9 @@ export function CourseFilters({
                       onChange={() => handleCategoryChange(category)}
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="ml-2 text-sm text-gray-700">{category}</span>
+                    <span className="ml-2 text-sm text-gray-700">
+                      {category}
+                    </span>
                   </label>
                 ))}
               </div>
@@ -176,7 +210,9 @@ export function CourseFilters({
                       onChange={() => handleLanguageChange(language)}
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="ml-2 text-sm text-gray-700">{language}</span>
+                    <span className="ml-2 text-sm text-gray-700">
+                      {language}
+                    </span>
                   </label>
                 ))}
               </div>
@@ -192,7 +228,9 @@ export function CourseFilters({
                   <label key={difficulty} className="flex items-center">
                     <input
                       type="checkbox"
-                      checked={filters.difficulty?.includes(difficulty as any) || false}
+                      checked={
+                        filters.difficulty?.includes(difficulty as any) || false
+                      }
                       onChange={() => handleDifficultyChange(difficulty)}
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
@@ -218,7 +256,9 @@ export function CourseFilters({
                       onChange={() => handleCountryChange(country)}
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="ml-2 text-sm text-gray-700">{country}</span>
+                    <span className="ml-2 text-sm text-gray-700">
+                      {country}
+                    </span>
                   </label>
                 ))}
               </div>

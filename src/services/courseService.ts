@@ -3,7 +3,7 @@ import {
   CourseEnrollment,
   CourseEnrollmentPayload,
   CourseProgressPayload,
-  CourseCompletionPayload
+  CourseCompletionPayload,
 } from "@/types/course";
 
 const enrollmentStore = new Map<string, CourseEnrollment>();
@@ -24,9 +24,9 @@ const buildEnrollmentRecord = (
     courseId: course.id,
     courseTitle: course.title,
     courseThumbnail: course.thumbnailUrl,
-  courseraUrl: course.courseraUrl,
-  enrolledAt: now,
-  status: "in_progress",
+    courseraUrl: course.courseraUrl,
+    enrolledAt: now,
+    status: "in_progress",
     progress: {
       completedModules: 0,
       totalModules: course.syllabus.length,
@@ -41,7 +41,11 @@ export async function enrollInCourse(
 ): Promise<CourseEnrollment> {
   const { course, enrollmentSource } = payload;
   const enrollmentId = `enrollment_${course.id}_${Date.now()}`;
-  const enrollment = buildEnrollmentRecord(course, enrollmentId, enrollmentSource);
+  const enrollment = buildEnrollmentRecord(
+    course,
+    enrollmentId,
+    enrollmentSource
+  );
 
   enrollmentStore.set(enrollmentId, enrollment);
 

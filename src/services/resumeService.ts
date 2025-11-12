@@ -124,7 +124,9 @@ export async function generateProfessionalSummary(
   // frontend controls the prompt content. This avoids calling a fixed
   // specialized endpoint and lets the backend route the prompt to the AI.
   const parts: string[] = [];
-  parts.push("Write a concise professional resume summary (3-4 sentences) optimized for ATS and recruiters.");
+  parts.push(
+    "Write a concise professional resume summary (3-4 sentences) optimized for ATS and recruiters."
+  );
   if (context.jobTitle) parts.push(`Target role: ${context.jobTitle}.`);
   if (context.currentRole) parts.push(`Current role: ${context.currentRole}.`);
   if (context.yearsExperience !== undefined)
@@ -132,10 +134,12 @@ export async function generateProfessionalSummary(
   if (context.keySkills) parts.push(`Key skills: ${context.keySkills}.`);
   if (context.industry) parts.push(`Industry: ${context.industry}.`);
   if (context.achievements && context.achievements.length)
-    parts.push(`Notable achievements: ${context.achievements.join('; ')}.`);
-  parts.push('Highlight impact using metrics where possible and keep tone professional.');
+    parts.push(`Notable achievements: ${context.achievements.join("; ")}.`);
+  parts.push(
+    "Highlight impact using metrics where possible and keep tone professional."
+  );
 
-  const prompt = parts.join(' ');
+  const prompt = parts.join(" ");
 
   return generateAIContent(prompt);
 }
@@ -145,17 +149,21 @@ export async function generateJobBullets(
 ): Promise<AIGenerationResponse> {
   // Build a prompt for generating concise job bullet points
   const parts: string[] = [];
-  parts.push("Generate 4-6 impactful resume bullet points describing achievements and responsibilities for the role below. Use action verbs and include metrics where possible.");
+  parts.push(
+    "Generate 4-6 impactful resume bullet points describing achievements and responsibilities for the role below. Use action verbs and include metrics where possible."
+  );
   if (context.currentRole) parts.push(`Current role: ${context.currentRole}.`);
   if (context.company) parts.push(`Company: ${context.company}.`);
-  if (context.responsibilities) parts.push(`Responsibilities: ${context.responsibilities}.`);
-  if (context.technologies) parts.push(`Technologies: ${context.technologies}.`);
+  if (context.responsibilities)
+    parts.push(`Responsibilities: ${context.responsibilities}.`);
+  if (context.technologies)
+    parts.push(`Technologies: ${context.technologies}.`);
   if (context.yearsExperience !== undefined)
     parts.push(`Years of experience: ${context.yearsExperience}.`);
   if (context.achievements && context.achievements.length)
-    parts.push(`Achievements: ${context.achievements.join('; ')}.`);
-  parts.push('Return bullets as a JSON array of strings.');
-  const prompt = parts.join(' ');
+    parts.push(`Achievements: ${context.achievements.join("; ")}.`);
+  parts.push("Return bullets as a JSON array of strings.");
+  const prompt = parts.join(" ");
   return generateAIContent(prompt);
 }
 
@@ -164,14 +172,14 @@ export async function generateCareerObjective(
 ): Promise<AIGenerationResponse> {
   // Build a prompt for a career objective / professional objective sentence
   const parts: string[] = [];
-  parts.push('Write a 1-2 sentence career objective tailored for a resume.');
+  parts.push("Write a 1-2 sentence career objective tailored for a resume.");
   if (context.targetRole) parts.push(`Target role: ${context.targetRole}.`);
   if (context.industry) parts.push(`Industry: ${context.industry}.`);
   if (context.yearsExperience !== undefined)
     parts.push(`Years of experience: ${context.yearsExperience}.`);
   if (context.keySkills) parts.push(`Key skills: ${context.keySkills}.`);
-  parts.push('Keep tone professional and concise.');
-  const prompt = parts.join(' ');
+  parts.push("Keep tone professional and concise.");
+  const prompt = parts.join(" ");
   return generateAIContent(prompt);
 }
 
@@ -180,13 +188,16 @@ export async function generateProjectDescription(
 ): Promise<AIGenerationResponse> {
   // Build a prompt for project descriptions
   const parts: string[] = [];
-  parts.push('Create a 2-3 sentence project description suitable for a resume. Focus on the problem solved, your contribution, technologies used, and measurable outcome.');
+  parts.push(
+    "Create a 2-3 sentence project description suitable for a resume. Focus on the problem solved, your contribution, technologies used, and measurable outcome."
+  );
   if (context.currentRole) parts.push(`Role: ${context.currentRole}.`);
-  if (context.technologies) parts.push(`Technologies: ${context.technologies}.`);
+  if (context.technologies)
+    parts.push(`Technologies: ${context.technologies}.`);
   if (context.achievements && context.achievements.length)
-    parts.push(`Outcomes: ${context.achievements.join('; ')}.`);
-  parts.push('Keep language concise and achievement-focused.');
-  const prompt = parts.join(' ');
+    parts.push(`Outcomes: ${context.achievements.join("; ")}.`);
+  parts.push("Keep language concise and achievement-focused.");
+  const prompt = parts.join(" ");
   return generateAIContent(prompt);
 }
 
@@ -218,11 +229,18 @@ export async function generateAIContent(
       // { data: "..." }
       // { generated_content: "..." }
       // { data: { generated_content: "..." } }
-      if (typeof response.generated_content === "string" || Array.isArray(response.generated_content)) {
+      if (
+        typeof response.generated_content === "string" ||
+        Array.isArray(response.generated_content)
+      ) {
         generated = response.generated_content;
       } else if (typeof response.data === "string") {
         generated = response.data;
-      } else if (response.data && (typeof response.data.generated_content === "string" || Array.isArray(response.data.generated_content))) {
+      } else if (
+        response.data &&
+        (typeof response.data.generated_content === "string" ||
+          Array.isArray(response.data.generated_content))
+      ) {
         generated = response.data.generated_content;
       } else if (typeof response.message === "string") {
         // As a fallback, use a textual message field if present

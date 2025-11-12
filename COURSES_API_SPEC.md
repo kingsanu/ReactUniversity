@@ -1,16 +1,21 @@
 # Courses API Specification
 
 ## Overview
+
 This document specifies all API endpoints required for the Courses Catalog feature. All endpoints follow RESTful conventions and use JSON for request/response payloads.
 
 ## Authentication
+
 All endpoints require authentication via JWT token in the Authorization header:
+
 ```
 Authorization: Bearer <jwt_token>
 ```
 
 ## Common Response Format
+
 ### Success Response
+
 ```json
 {
   "success": true,
@@ -20,6 +25,7 @@ Authorization: Bearer <jwt_token>
 ```
 
 ### Error Response
+
 ```json
 {
   "success": false,
@@ -34,11 +40,13 @@ Authorization: Bearer <jwt_token>
 ## Endpoints
 
 ### 1. GET /api/courses
+
 Fetch all available courses with optional filtering and pagination.
 
 **Method:** GET
 **Authentication:** Required
 **Query Parameters:**
+
 - `search` (string): Search query for course title, description, or provider
 - `category` (string[]): Filter by categories (comma-separated)
 - `language` (string[]): Filter by languages (comma-separated)
@@ -54,11 +62,13 @@ Fetch all available courses with optional filtering and pagination.
 - `limit` (number): Items per page (default: 20)
 
 **Request Example:**
+
 ```
 GET /api/courses?search=python&category=Technology&difficulty=Beginner&sort=recommended&page=1&limit=12
 ```
 
 **Response Payload:**
+
 ```json
 {
   "success": true,
@@ -104,6 +114,7 @@ GET /api/courses?search=python&category=Technology&difficulty=Beginner&sort=reco
 ```
 
 **Status Codes:**
+
 - 200: Success
 - 401: Unauthorized
 - 500: Internal server error
@@ -111,19 +122,23 @@ GET /api/courses?search=python&category=Technology&difficulty=Beginner&sort=reco
 ---
 
 ### 2. GET /api/courses/:id
+
 Fetch detailed information for a specific course.
 
 **Method:** GET
 **Authentication:** Required
 **Path Parameters:**
+
 - `id` (string): Course ID
 
 **Request Example:**
+
 ```
 GET /api/courses/course_123
 ```
 
 **Response Payload:**
+
 ```json
 {
   "success": true,
@@ -181,6 +196,7 @@ GET /api/courses/course_123
 ```
 
 **Status Codes:**
+
 - 200: Success
 - 401: Unauthorized
 - 404: Course not found
@@ -189,19 +205,23 @@ GET /api/courses/course_123
 ---
 
 ### 3. GET /api/courses/recommended
+
 Fetch courses recommended for the current student based on their assessment results.
 
 **Method:** GET
 **Authentication:** Required
 **Query Parameters:**
+
 - `limit` (number): Number of recommendations to return (default: 10)
 
 **Request Example:**
+
 ```
 GET /api/courses/recommended?limit=6
 ```
 
 **Response Payload:**
+
 ```json
 {
   "success": true,
@@ -226,6 +246,7 @@ GET /api/courses/recommended?limit=6
 ```
 
 **Status Codes:**
+
 - 200: Success
 - 401: Unauthorized
 - 500: Internal server error
@@ -233,11 +254,13 @@ GET /api/courses/recommended?limit=6
 ---
 
 ### 4. POST /api/courses/enroll
+
 Enroll the current student in a course (track enrollment event).
 
 **Method:** POST
 **Authentication:** Required
 **Request Payload:**
+
 ```json
 {
   "courseId": "course_123",
@@ -246,6 +269,7 @@ Enroll the current student in a course (track enrollment event).
 ```
 
 **Response Payload:**
+
 ```json
 {
   "success": true,
@@ -266,6 +290,7 @@ Enroll the current student in a course (track enrollment event).
 ```
 
 **Status Codes:**
+
 - 201: Enrollment successful
 - 400: Invalid request (already enrolled, course not found)
 - 401: Unauthorized
@@ -274,19 +299,23 @@ Enroll the current student in a course (track enrollment event).
 ---
 
 ### 5. GET /api/courses/progress
+
 Fetch the current student's course progress and enrolled courses.
 
 **Method:** GET
 **Authentication:** Required
 **Query Parameters:**
+
 - `status` (string): Filter by status ("enrolled", "in_progress", "completed")
 
 **Request Example:**
+
 ```
 GET /api/courses/progress?status=in_progress
 ```
 
 **Response Payload:**
+
 ```json
 {
   "success": true,
@@ -320,6 +349,7 @@ GET /api/courses/progress?status=in_progress
 ```
 
 **Status Codes:**
+
 - 200: Success
 - 401: Unauthorized
 - 500: Internal server error
@@ -327,14 +357,17 @@ GET /api/courses/progress?status=in_progress
 ---
 
 ### 6. PUT /api/courses/progress/:enrollmentId
+
 Update progress for an enrolled course.
 
 **Method:** PUT
 **Authentication:** Required
 **Path Parameters:**
+
 - `enrollmentId` (string): Enrollment ID
 
 **Request Payload:**
+
 ```json
 {
   "completedModules": 3,
@@ -345,6 +378,7 @@ Update progress for an enrolled course.
 ```
 
 **Response Payload:**
+
 ```json
 {
   "success": true,
@@ -365,6 +399,7 @@ Update progress for an enrolled course.
 ```
 
 **Status Codes:**
+
 - 200: Success
 - 400: Invalid progress data
 - 401: Unauthorized
@@ -374,11 +409,13 @@ Update progress for an enrolled course.
 ---
 
 ### 7. POST /api/admin/courses
+
 Add a new course to the catalog (Admin only).
 
 **Method:** POST
 **Authentication:** Required (Admin role)
 **Request Payload:**
+
 ```json
 {
   "title": "Advanced Machine Learning",
@@ -414,6 +451,7 @@ Add a new course to the catalog (Admin only).
 ```
 
 **Response Payload:**
+
 ```json
 {
   "success": true,
@@ -429,6 +467,7 @@ Add a new course to the catalog (Admin only).
 ```
 
 **Status Codes:**
+
 - 201: Course created
 - 400: Invalid course data
 - 401: Unauthorized (not admin)
@@ -438,16 +477,19 @@ Add a new course to the catalog (Admin only).
 ---
 
 ### 8. PUT /api/admin/courses/:id
+
 Update an existing course (Admin only).
 
 **Method:** PUT
 **Authentication:** Required (Admin role)
 **Path Parameters:**
+
 - `id` (string): Course ID
 
 **Request Payload:** Same as POST /api/admin/courses, all fields optional
 
 **Response Payload:**
+
 ```json
 {
   "success": true,
@@ -461,6 +503,7 @@ Update an existing course (Admin only).
 ```
 
 **Status Codes:**
+
 - 200: Course updated
 - 400: Invalid course data
 - 401: Unauthorized (not admin)
@@ -470,14 +513,17 @@ Update an existing course (Admin only).
 ---
 
 ### 9. DELETE /api/admin/courses/:id
+
 Remove a course from the catalog (Admin only).
 
 **Method:** DELETE
 **Authentication:** Required (Admin role)
 **Path Parameters:**
+
 - `id` (string): Course ID
 
 **Response Payload:**
+
 ```json
 {
   "success": true,
@@ -486,6 +532,7 @@ Remove a course from the catalog (Admin only).
 ```
 
 **Status Codes:**
+
 - 200: Course deleted
 - 401: Unauthorized (not admin)
 - 404: Course not found
@@ -495,6 +542,7 @@ Remove a course from the catalog (Admin only).
 ---
 
 ## Error Codes
+
 - `INVALID_REQUEST`: Malformed request data
 - `COURSE_NOT_FOUND`: Specified course does not exist
 - `ENROLLMENT_NOT_FOUND`: Specified enrollment does not exist
@@ -504,13 +552,15 @@ Remove a course from the catalog (Admin only).
 - `VALIDATION_ERROR`: Request data failed validation
 
 ## Rate Limiting
+
 - Public endpoints: 100 requests per minute per user
 - Admin endpoints: 50 requests per minute per admin user
 
 ## Notes
+
 - All course data is sourced from Coursera API
 - Course enrollments redirect users to Coursera platform
 - Progress tracking is synchronized with Coursera's completion data
 - Admin endpoints require elevated permissions
 - All dates are in ISO 8601 format (UTC)</content>
-<parameter name="filePath">k:\2025\timcare\COURSES_API_SPEC.md
+  <parameter name="filePath">k:\2025\timcare\COURSES_API_SPEC.md

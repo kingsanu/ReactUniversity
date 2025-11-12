@@ -4,8 +4,10 @@ export const mockCourses: Course[] = [
   {
     id: "course_001",
     title: "Python for Data Science",
-    shortDescription: "Learn Python programming fundamentals with a focus on data analysis and visualization",
-    fullDescription: "This comprehensive course covers Python programming from basics to advanced data science applications. You'll learn to work with data structures, create visualizations, and build data analysis pipelines using popular libraries like Pandas, NumPy, and Matplotlib.",
+    shortDescription:
+      "Learn Python programming fundamentals with a focus on data analysis and visualization",
+    fullDescription:
+      "This comprehensive course covers Python programming from basics to advanced data science applications. You'll learn to work with data structures, create visualizations, and build data analysis pipelines using popular libraries like Pandas, NumPy, and Matplotlib.",
     category: "Technology",
     subcategory: "Data Science",
     provider: "Stanford University",
@@ -26,25 +28,73 @@ export const mockCourses: Course[] = [
     courseraUrl: "https://coursera.org/learn/python-data-science",
     externalId: "coursera_python_ds_001",
     syllabus: [
-      { id: "m1", title: "Python Basics", description: "Introduction to Python syntax and data types", week: 1, estimatedHours: 4 },
-      { id: "m2", title: "Data Structures", description: "Lists, dictionaries, and data manipulation", week: 2, estimatedHours: 5 },
-      { id: "m3", title: "NumPy Arrays", description: "Working with numerical data", week: 3, estimatedHours: 6 },
-      { id: "m4", title: "Pandas DataFrames", description: "Data analysis with Pandas", week: 4, estimatedHours: 6 },
-      { id: "m5", title: "Data Visualization", description: "Creating charts with Matplotlib", week: 5, estimatedHours: 5 },
-      { id: "m6", title: "Data Cleaning", description: "Handling missing data and outliers", week: 6, estimatedHours: 4 },
-      { id: "m7", title: "Statistical Analysis", description: "Basic statistics with Python", week: 7, estimatedHours: 5 },
-      { id: "m8", title: "Final Project", description: "Build a complete data analysis project", week: 8, estimatedHours: 8 }
+      {
+        id: "m1",
+        title: "Python Basics",
+        description: "Introduction to Python syntax and data types",
+        week: 1,
+        estimatedHours: 4,
+      },
+      {
+        id: "m2",
+        title: "Data Structures",
+        description: "Lists, dictionaries, and data manipulation",
+        week: 2,
+        estimatedHours: 5,
+      },
+      {
+        id: "m3",
+        title: "NumPy Arrays",
+        description: "Working with numerical data",
+        week: 3,
+        estimatedHours: 6,
+      },
+      {
+        id: "m4",
+        title: "Pandas DataFrames",
+        description: "Data analysis with Pandas",
+        week: 4,
+        estimatedHours: 6,
+      },
+      {
+        id: "m5",
+        title: "Data Visualization",
+        description: "Creating charts with Matplotlib",
+        week: 5,
+        estimatedHours: 5,
+      },
+      {
+        id: "m6",
+        title: "Data Cleaning",
+        description: "Handling missing data and outliers",
+        week: 6,
+        estimatedHours: 4,
+      },
+      {
+        id: "m7",
+        title: "Statistical Analysis",
+        description: "Basic statistics with Python",
+        week: 7,
+        estimatedHours: 5,
+      },
+      {
+        id: "m8",
+        title: "Final Project",
+        description: "Build a complete data analysis project",
+        week: 8,
+        estimatedHours: 8,
+      },
     ],
     learningObjectives: [
       "Write efficient Python code for data analysis",
       "Use NumPy for numerical computations",
       "Manipulate data with Pandas DataFrames",
       "Create compelling data visualizations",
-      "Apply statistical methods to data"
+      "Apply statistical methods to data",
     ],
     prerequisites: [
       "Basic computer skills",
-      "No prior programming experience required"
+      "No prior programming experience required",
     ],
     skills: ["Python", "Pandas", "NumPy", "Matplotlib", "Data Analysis"],
     matchingCompetencies: ["Data Analysis", "Programming", "Problem Solving"],
@@ -52,13 +102,15 @@ export const mockCourses: Course[] = [
     recommendedScore: 85,
     isActive: true,
     createdAt: "2024-01-15T10:00:00Z",
-    updatedAt: "2024-11-01T14:30:00Z"
+    updatedAt: "2024-11-01T14:30:00Z",
   },
   {
     id: "course_002",
     title: "Machine Learning Specialization",
-    shortDescription: "Master machine learning algorithms and applications with hands-on projects",
-    fullDescription: "This specialization covers the fundamentals of machine learning, deep learning, and their practical applications. You'll learn to build and deploy ML models using Python and TensorFlow.",
+    shortDescription:
+      "Master machine learning algorithms and applications with hands-on projects",
+    fullDescription:
+      "This specialization covers the fundamentals of machine learning, deep learning, and their practical applications. You'll learn to build and deploy ML models using Python and TensorFlow.",
     category: "Technology",
     subcategory: "Machine Learning",
     provider: "Stanford University",
@@ -78,32 +130,56 @@ export const mockCourses: Course[] = [
     courseraUrl: "https://coursera.org/specializations/machine-learning",
     externalId: "coursera_ml_spec_002",
     syllabus: [
-      { id: "m1", title: "Supervised Learning", description: "Linear regression and classification", week: 1, estimatedHours: 6 },
-      { id: "m2", title: "Advanced Learning Algorithms", description: "Neural networks and decision trees", week: 2, estimatedHours: 7 },
-      { id: "m3", title: "Unsupervised Learning", description: "Clustering and dimensionality reduction", week: 3, estimatedHours: 6 }
+      {
+        id: "m1",
+        title: "Supervised Learning",
+        description: "Linear regression and classification",
+        week: 1,
+        estimatedHours: 6,
+      },
+      {
+        id: "m2",
+        title: "Advanced Learning Algorithms",
+        description: "Neural networks and decision trees",
+        week: 2,
+        estimatedHours: 7,
+      },
+      {
+        id: "m3",
+        title: "Unsupervised Learning",
+        description: "Clustering and dimensionality reduction",
+        week: 3,
+        estimatedHours: 6,
+      },
     ],
     learningObjectives: [
       "Implement supervised learning algorithms",
       "Build neural networks",
-      "Apply ML to real-world problems"
+      "Apply ML to real-world problems",
     ],
     prerequisites: [
       "Basic programming knowledge",
-      "Linear algebra and calculus basics"
+      "Linear algebra and calculus basics",
     ],
     skills: ["Machine Learning", "Neural Networks", "TensorFlow", "Python"],
-    matchingCompetencies: ["Technical Analytics", "Problem Solving", "Innovation"],
+    matchingCompetencies: [
+      "Technical Analytics",
+      "Problem Solving",
+      "Innovation",
+    ],
     careerPaths: ["ML Engineer", "Data Scientist", "AI Researcher"],
     recommendedScore: 78,
     isActive: true,
     createdAt: "2024-02-01T09:00:00Z",
-    updatedAt: "2024-10-15T11:20:00Z"
+    updatedAt: "2024-10-15T11:20:00Z",
   },
   {
     id: "course_003",
     title: "Digital Marketing Fundamentals",
-    shortDescription: "Learn essential digital marketing strategies and tools for modern businesses",
-    fullDescription: "This course covers the core concepts of digital marketing including SEO, social media marketing, content marketing, and analytics. Perfect for entrepreneurs and marketing professionals.",
+    shortDescription:
+      "Learn essential digital marketing strategies and tools for modern businesses",
+    fullDescription:
+      "This course covers the core concepts of digital marketing including SEO, social media marketing, content marketing, and analytics. Perfect for entrepreneurs and marketing professionals.",
     category: "Business",
     subcategory: "Marketing",
     provider: "Google",
@@ -123,33 +199,61 @@ export const mockCourses: Course[] = [
     courseraUrl: "https://coursera.org/learn/digital-marketing",
     externalId: "coursera_digital_mkt_003",
     syllabus: [
-      { id: "m1", title: "Digital Marketing Overview", description: "Introduction to digital marketing landscape", week: 1, estimatedHours: 3 },
-      { id: "m2", title: "Search Engine Optimization", description: "SEO best practices and strategies", week: 2, estimatedHours: 4 },
-      { id: "m3", title: "Social Media Marketing", description: "Building presence on social platforms", week: 3, estimatedHours: 4 }
+      {
+        id: "m1",
+        title: "Digital Marketing Overview",
+        description: "Introduction to digital marketing landscape",
+        week: 1,
+        estimatedHours: 3,
+      },
+      {
+        id: "m2",
+        title: "Search Engine Optimization",
+        description: "SEO best practices and strategies",
+        week: 2,
+        estimatedHours: 4,
+      },
+      {
+        id: "m3",
+        title: "Social Media Marketing",
+        description: "Building presence on social platforms",
+        week: 3,
+        estimatedHours: 4,
+      },
     ],
     learningObjectives: [
       "Understand digital marketing channels",
       "Implement SEO strategies",
       "Create social media campaigns",
-      "Analyze marketing performance"
+      "Analyze marketing performance",
     ],
     prerequisites: [
       "Basic business knowledge",
-      "No technical experience required"
+      "No technical experience required",
     ],
     skills: ["Digital Marketing", "SEO", "Social Media", "Analytics"],
-    matchingCompetencies: ["Communication", "Strategic Thinking", "Digital Literacy"],
-    careerPaths: ["Marketing Manager", "Digital Marketing Specialist", "Entrepreneur"],
+    matchingCompetencies: [
+      "Communication",
+      "Strategic Thinking",
+      "Digital Literacy",
+    ],
+    careerPaths: [
+      "Marketing Manager",
+      "Digital Marketing Specialist",
+      "Entrepreneur",
+    ],
     recommendedScore: 65,
     isActive: true,
     createdAt: "2024-03-10T08:30:00Z",
-    updatedAt: "2024-09-20T13:45:00Z"
+    updatedAt: "2024-09-20T13:45:00Z",
   },
   {
     id: "course_004",
     title: "UX/UI Design Principles",
-    shortDescription: "Master user experience and interface design with modern design tools",
-    fullDescription: "Learn the fundamentals of UX/UI design, user research, prototyping, and design systems. This course covers the entire design process from research to implementation.",
+    shortDescription:
+      "Master user experience and interface design with modern design tools",
+    fullDescription:
+      "Learn the fundamentals of UX/UI design, user research, prototyping, and design systems. This course covers the entire design process from research to implementation.",
     category: "Design",
     subcategory: "UX/UI Design",
     provider: "California Institute of the Arts",
@@ -169,19 +273,37 @@ export const mockCourses: Course[] = [
     courseraUrl: "https://coursera.org/learn/ux-ui-design",
     externalId: "coursera_ux_ui_004",
     syllabus: [
-      { id: "m1", title: "Design Thinking", description: "Human-centered design approach", week: 1, estimatedHours: 5 },
-      { id: "m2", title: "User Research", description: "Methods for understanding users", week: 2, estimatedHours: 6 },
-      { id: "m3", title: "Wireframing & Prototyping", description: "Creating design artifacts", week: 3, estimatedHours: 7 }
+      {
+        id: "m1",
+        title: "Design Thinking",
+        description: "Human-centered design approach",
+        week: 1,
+        estimatedHours: 5,
+      },
+      {
+        id: "m2",
+        title: "User Research",
+        description: "Methods for understanding users",
+        week: 2,
+        estimatedHours: 6,
+      },
+      {
+        id: "m3",
+        title: "Wireframing & Prototyping",
+        description: "Creating design artifacts",
+        week: 3,
+        estimatedHours: 7,
+      },
     ],
     learningObjectives: [
       "Apply design thinking methodology",
       "Conduct user research and testing",
       "Create wireframes and prototypes",
-      "Design intuitive user interfaces"
+      "Design intuitive user interfaces",
     ],
     prerequisites: [
       "Basic computer skills",
-      "Interest in design and creativity"
+      "Interest in design and creativity",
     ],
     skills: ["UX Design", "UI Design", "Figma", "User Research", "Prototyping"],
     matchingCompetencies: ["Creativity", "User Focus", "Problem Solving"],
@@ -189,13 +311,15 @@ export const mockCourses: Course[] = [
     recommendedScore: 72,
     isActive: true,
     createdAt: "2024-04-05T07:15:00Z",
-    updatedAt: "2024-08-30T10:10:00Z"
+    updatedAt: "2024-08-30T10:10:00Z",
   },
   {
     id: "course_005",
     title: "Project Management Professional",
-    shortDescription: "Learn industry-standard project management methodologies and tools",
-    fullDescription: "This comprehensive course covers PMI's Project Management Body of Knowledge (PMBOK) and prepares you for PMP certification. Learn to manage projects effectively using modern tools and techniques.",
+    shortDescription:
+      "Learn industry-standard project management methodologies and tools",
+    fullDescription:
+      "This comprehensive course covers PMI's Project Management Body of Knowledge (PMBOK) and prepares you for PMP certification. Learn to manage projects effectively using modern tools and techniques.",
     category: "Business",
     subcategory: "Project Management",
     provider: "PMI Institute",
@@ -215,33 +339,58 @@ export const mockCourses: Course[] = [
     courseraUrl: "https://coursera.org/learn/project-management-pmp",
     externalId: "coursera_pmp_005",
     syllabus: [
-      { id: "m1", title: "Project Initiation", description: "Starting projects successfully", week: 1, estimatedHours: 8 },
-      { id: "m2", title: "Project Planning", description: "Creating comprehensive project plans", week: 2, estimatedHours: 9 },
-      { id: "m3", title: "Project Execution", description: "Managing project work and teams", week: 3, estimatedHours: 8 }
+      {
+        id: "m1",
+        title: "Project Initiation",
+        description: "Starting projects successfully",
+        week: 1,
+        estimatedHours: 8,
+      },
+      {
+        id: "m2",
+        title: "Project Planning",
+        description: "Creating comprehensive project plans",
+        week: 2,
+        estimatedHours: 9,
+      },
+      {
+        id: "m3",
+        title: "Project Execution",
+        description: "Managing project work and teams",
+        week: 3,
+        estimatedHours: 8,
+      },
     ],
     learningObjectives: [
       "Apply PMBOK knowledge areas",
       "Manage project scope, time, and cost",
       "Lead project teams effectively",
-      "Use project management software"
+      "Use project management software",
     ],
     prerequisites: [
       "3-5 years project experience",
-      "Basic management knowledge"
+      "Basic management knowledge",
     ],
-    skills: ["Project Management", "Risk Management", "Team Leadership", "Agile"],
+    skills: [
+      "Project Management",
+      "Risk Management",
+      "Team Leadership",
+      "Agile",
+    ],
     matchingCompetencies: ["Leadership", "Organization", "Planning"],
     careerPaths: ["Project Manager", "Program Manager", "Portfolio Manager"],
     recommendedScore: 58,
     isActive: true,
     createdAt: "2024-05-12T06:45:00Z",
-    updatedAt: "2024-07-25T09:30:00Z"
+    updatedAt: "2024-07-25T09:30:00Z",
   },
   {
     id: "course_006",
     title: "Spanish for Beginners",
-    shortDescription: "Learn Spanish language basics for travel, work, and cultural understanding",
-    fullDescription: "This beginner-friendly course teaches Spanish grammar, vocabulary, and conversation skills. Perfect for travelers, professionals, and anyone interested in Spanish-speaking cultures.",
+    shortDescription:
+      "Learn Spanish language basics for travel, work, and cultural understanding",
+    fullDescription:
+      "This beginner-friendly course teaches Spanish grammar, vocabulary, and conversation skills. Perfect for travelers, professionals, and anyone interested in Spanish-speaking cultures.",
     category: "Language",
     subcategory: "Spanish",
     provider: "Instituto Cervantes",
@@ -261,28 +410,50 @@ export const mockCourses: Course[] = [
     courseraUrl: "https://coursera.org/learn/spanish-beginners",
     externalId: "coursera_spanish_006",
     syllabus: [
-      { id: "m1", title: "Basic Greetings", description: "Introduction to Spanish greetings and introductions", week: 1, estimatedHours: 3 },
-      { id: "m2", title: "Present Tense", description: "Learning present tense verbs and conjugation", week: 2, estimatedHours: 4 },
-      { id: "m3", title: "Numbers and Time", description: "Counting, telling time, and dates", week: 3, estimatedHours: 3 }
+      {
+        id: "m1",
+        title: "Basic Greetings",
+        description: "Introduction to Spanish greetings and introductions",
+        week: 1,
+        estimatedHours: 3,
+      },
+      {
+        id: "m2",
+        title: "Present Tense",
+        description: "Learning present tense verbs and conjugation",
+        week: 2,
+        estimatedHours: 4,
+      },
+      {
+        id: "m3",
+        title: "Numbers and Time",
+        description: "Counting, telling time, and dates",
+        week: 3,
+        estimatedHours: 3,
+      },
     ],
     learningObjectives: [
       "Hold basic conversations in Spanish",
       "Understand common Spanish phrases",
       "Read and write simple Spanish text",
-      "Appreciate Spanish-speaking cultures"
+      "Appreciate Spanish-speaking cultures",
     ],
     prerequisites: [
       "No prior Spanish knowledge required",
-      "Basic English literacy"
+      "Basic English literacy",
     ],
     skills: ["Spanish Language", "Conversation", "Grammar", "Vocabulary"],
-    matchingCompetencies: ["Communication", "Cultural Awareness", "Language Learning"],
+    matchingCompetencies: [
+      "Communication",
+      "Cultural Awareness",
+      "Language Learning",
+    ],
     careerPaths: ["Translator", "International Business", "Tourism"],
     recommendedScore: 45,
     isActive: true,
     createdAt: "2024-06-01T05:20:00Z",
-    updatedAt: "2024-06-15T08:15:00Z"
-  }
+    updatedAt: "2024-06-15T08:15:00Z",
+  },
 ];
 
 export const mockRecommendedCourses = mockCourses
@@ -290,18 +461,37 @@ export const mockRecommendedCourses = mockCourses
   .slice(0, 6);
 
 export const mockCategories = [
-  "Technology", "Business", "Design", "Language", "Science", "Arts"
+  "Technology",
+  "Business",
+  "Design",
+  "Language",
+  "Science",
+  "Arts",
 ];
 
 export const mockLanguages = [
-  "English", "Spanish", "French", "German", "Chinese", "Japanese"
+  "English",
+  "Spanish",
+  "French",
+  "German",
+  "Chinese",
+  "Japanese",
 ];
 
 export const mockCountries = [
-  "United States", "United Kingdom", "Canada", "Spain", "Germany", "Australia"
+  "United States",
+  "United Kingdom",
+  "Canada",
+  "Spain",
+  "Germany",
+  "Australia",
 ];
 
-export const mockDifficulties = ["Beginner", "Intermediate", "Advanced"] as const;
+export const mockDifficulties = [
+  "Beginner",
+  "Intermediate",
+  "Advanced",
+] as const;
 
 export const mockRegions = [
   "North America",
@@ -309,5 +499,5 @@ export const mockRegions = [
   "Asia",
   "Latin America",
   "Middle East",
-  "Africa"
+  "Africa",
 ];

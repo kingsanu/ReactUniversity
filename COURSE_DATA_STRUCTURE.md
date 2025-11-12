@@ -3,6 +3,7 @@
 ## Course Entity Fields
 
 ### Core Course Information
+
 - **id**: `string` - Unique identifier for the course
 - **title**: `string` - Course title/name
 - **shortDescription**: `string` - Brief description (max 200 characters)
@@ -16,6 +17,7 @@
 - **region**: `string` - Geographic region (e.g., "North America", "Europe", "Asia")
 
 ### Course Metadata
+
 - **duration**: `number` - Duration in weeks
 - **durationUnit**: `string` - Unit for duration ("weeks", "months")
 - **difficulty**: `string` - Difficulty level ("Beginner", "Intermediate", "Advanced")
@@ -26,6 +28,7 @@
 - **reviewCount**: `number` - Number of reviews/ratings
 
 ### Content & Structure
+
 - **thumbnailUrl**: `string` - URL to course thumbnail image
 - **videoUrl**: `string` - URL to introductory video (optional)
 - **syllabus**: `CourseModule[]` - Array of course modules/weeks
@@ -34,15 +37,18 @@
 - **skills**: `string[]` - Skills that will be gained
 
 ### External Links & Integration
+
 - **courseraUrl**: `string` - Direct link to course on Coursera platform
 - **externalId**: `string` - Coursera's internal course ID
 
 ### Recommendation & Personalization
+
 - **recommendedScore**: `number` - Recommendation score (0-100) based on student's assessments
 - **matchingCompetencies**: `string[]` - Competencies this course helps develop
 - **careerPaths**: `string[]` - Related career paths this course supports
 
 ### Admin & Management (Future Use)
+
 - **isActive**: `boolean` - Whether course is currently available
 - **createdAt**: `Date` - When course was added to catalog
 - **updatedAt**: `Date` - Last update timestamp
@@ -51,6 +57,7 @@
 ## Supporting Types
 
 ### CourseModule
+
 ```typescript
 interface CourseModule {
   id: string;
@@ -62,6 +69,7 @@ interface CourseModule {
 ```
 
 ### CourseFilter
+
 ```typescript
 interface CourseFilter {
   search?: string; // Search query
@@ -77,6 +85,7 @@ interface CourseFilter {
 ```
 
 ### CourseSortOption
+
 ```typescript
 type CourseSortOption =
   | "recommended" // Based on assessment results
@@ -90,6 +99,7 @@ type CourseSortOption =
 ## UI Display Requirements
 
 ### Course Card (Grid/List View)
+
 - Thumbnail image (aspect ratio 16:9)
 - Title (truncated to 2 lines)
 - Provider name
@@ -100,6 +110,7 @@ type CourseSortOption =
 - "View Details" button
 
 ### Course Details Modal/Page
+
 - Full thumbnail
 - Complete title and description
 - Provider and instructor info
@@ -111,6 +122,7 @@ type CourseSortOption =
 - "Start Course" button (external link)
 
 ### Filter Options
+
 - Search input (title, description, provider)
 - Category multi-select
 - Language multi-select
@@ -121,8 +133,9 @@ type CourseSortOption =
 - Rating filter
 
 ### Recommendation Logic
+
 - Based on student's MIL, PCA, and 360 assessment results
 - Match course skills/competencies with student's competency gaps
 - Boost courses related to student's career interests
 - Consider student's current skill level vs course difficulty</content>
-<parameter name="filePath">k:\2025\timcare\COURSE_DATA_STRUCTURE.md
+  <parameter name="filePath">k:\2025\timcare\COURSE_DATA_STRUCTURE.md

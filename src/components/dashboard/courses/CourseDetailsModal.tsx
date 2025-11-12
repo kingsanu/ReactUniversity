@@ -1,9 +1,24 @@
 "use client";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Course, CourseEnrollment } from "@/types/course";
 import { useTranslation } from "react-i18next";
-import { Star, Clock, Users, Award, Globe, BookOpen, Target, CheckCircle, ExternalLink } from "lucide-react";
+import {
+  Star,
+  Clock,
+  Users,
+  Award,
+  Globe,
+  BookOpen,
+  Target,
+  CheckCircle,
+  ExternalLink,
+} from "lucide-react";
 import Image from "next/image";
 
 interface CourseDetailsModalProps {
@@ -21,7 +36,7 @@ export function CourseDetailsModal({
   onClose,
   onStartCourse,
   enrollment,
-  onMarkCompleted
+  onMarkCompleted,
 }: CourseDetailsModalProps) {
   const { t } = useTranslation();
 
@@ -84,7 +99,11 @@ export function CourseDetailsModal({
               <p className="text-gray-700">{course.fullDescription}</p>
 
               <div className="flex flex-wrap gap-2">
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getDifficultyColor(course.difficulty)}`}>
+                <span
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${getDifficultyColor(
+                    course.difficulty
+                  )}`}
+                >
                   {t(`courses.difficulty.${course.difficulty.toLowerCase()}`)}
                 </span>
                 <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
@@ -112,7 +131,9 @@ export function CourseDetailsModal({
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div className="flex items-center gap-2">
                   <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                  <span>{formatRating(course.rating)} ({course.reviewCount})</span>
+                  <span>
+                    {formatRating(course.rating)} ({course.reviewCount})
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Users className="w-4 h-4" />
@@ -158,7 +179,9 @@ export function CourseDetailsModal({
                 {course.prerequisites.map((prerequisite, index) => (
                   <li key={index} className="flex items-start gap-2">
                     <div className="w-2 h-2 bg-gray-400 rounded-full mt-2 flex-shrink-0" />
-                    <span className="text-gray-700 text-sm">{prerequisite}</span>
+                    <span className="text-gray-700 text-sm">
+                      {prerequisite}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -172,13 +195,20 @@ export function CourseDetailsModal({
             </h4>
             <div className="space-y-3">
               {course.syllabus.slice(0, 4).map((module) => (
-                <div key={module.id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                <div
+                  key={module.id}
+                  className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg"
+                >
                   <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0">
                     {module.week}
                   </div>
                   <div className="flex-1">
-                    <h5 className="font-medium text-gray-900">{module.title}</h5>
-                    <p className="text-sm text-gray-600">{module.description}</p>
+                    <h5 className="font-medium text-gray-900">
+                      {module.title}
+                    </h5>
+                    <p className="text-sm text-gray-600">
+                      {module.description}
+                    </p>
                     <p className="text-xs text-gray-500 mt-1">
                       {module.estimatedHours} {t("courses.hours")}
                     </p>
@@ -187,7 +217,9 @@ export function CourseDetailsModal({
               ))}
               {course.syllabus.length > 4 && (
                 <p className="text-sm text-gray-600 text-center">
-                  {t("courses.andMoreModules", { count: course.syllabus.length - 4 })}
+                  {t("courses.andMoreModules", {
+                    count: course.syllabus.length - 4,
+                  })}
                 </p>
               )}
             </div>
@@ -213,7 +245,9 @@ export function CourseDetailsModal({
           {/* Action Buttons */}
           <div className="flex gap-4 pt-4 border-t">
             <Button
-              onClick={() => { void onStartCourse(course); }}
+              onClick={() => {
+                void onStartCourse(course);
+              }}
               className="flex-1 flex items-center gap-2"
             >
               <ExternalLink className="w-4 h-4" />
@@ -221,16 +255,20 @@ export function CourseDetailsModal({
                 ? t("courses.reviewOnCoursera")
                 : t("courses.startCourse")}
             </Button>
-            {enrollment && enrollment.status !== "completed" && onMarkCompleted && (
-              <Button
-                variant="outline"
-                className="flex-1 flex items-center gap-2"
-                onClick={() => { void onMarkCompleted(course); }}
-              >
-                <CheckCircle className="w-4 h-4" />
-                {t("courses.markCompleted")}
-              </Button>
-            )}
+            {enrollment &&
+              enrollment.status !== "completed" &&
+              onMarkCompleted && (
+                <Button
+                  variant="outline"
+                  className="flex-1 flex items-center gap-2"
+                  onClick={() => {
+                    void onMarkCompleted(course);
+                  }}
+                >
+                  <CheckCircle className="w-4 h-4" />
+                  {t("courses.markCompleted")}
+                </Button>
+              )}
             <Button variant="outline" onClick={onClose}>
               {t("common.close")}
             </Button>

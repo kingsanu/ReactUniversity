@@ -7,7 +7,7 @@ import {
   Course,
   CourseFilter,
   CourseSortOption,
-  CourseEnrollment
+  CourseEnrollment,
 } from "@/types/course";
 import {
   mockCourses,
@@ -15,13 +15,13 @@ import {
   mockLanguages,
   mockCountries,
   mockDifficulties,
-  mockRegions
+  mockRegions,
 } from "@/data/mockCourses";
 import { useTranslation } from "react-i18next";
 import {
   enrollInCourse,
   trackCourseProgress,
-  markCourseCompleted
+  markCourseCompleted,
 } from "../../../services/courseService";
 
 export function CoursesCatalog() {
@@ -31,7 +31,9 @@ export function CoursesCatalog() {
   const [sortBy, setSortBy] = useState<CourseSortOption>("recommended");
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [enrollments, setEnrollments] = useState<Record<string, CourseEnrollment>>({});
+  const [enrollments, setEnrollments] = useState<
+    Record<string, CourseEnrollment>
+  >({});
 
   // Filter and sort courses
   const filteredAndSortedCourses = useMemo(() => {
@@ -68,7 +70,8 @@ export function CoursesCatalog() {
 
       // Region filter
       if (filters.region && filters.region.length > 0) {
-        if (!course.region || !filters.region.includes(course.region)) return false;
+        if (!course.region || !filters.region.includes(course.region))
+          return false;
       }
 
       return true;
@@ -84,7 +87,9 @@ export function CoursesCatalog() {
         case "enrollment":
           return b.enrollmentCount - a.enrollmentCount;
         case "newest":
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
         case "duration":
           return a.duration - b.duration;
         case "title":
@@ -116,7 +121,7 @@ export function CoursesCatalog() {
           course,
           enrollmentSource: recommendedCourses.some((c) => c.id === course.id)
             ? "recommended"
-            : "catalog"
+            : "catalog",
         });
 
         setEnrollments((prev) => ({ ...prev, [course.id]: enrollment }));
@@ -127,7 +132,7 @@ export function CoursesCatalog() {
           totalModules: course.syllabus.length,
           percentage: 0,
           status: "in_progress",
-          lastAccessedAt: new Date().toISOString()
+          lastAccessedAt: new Date().toISOString(),
         });
 
         if (progress) {
@@ -150,12 +155,12 @@ export function CoursesCatalog() {
       try {
         const updated = await markCourseCompleted({
           enrollmentId: enrollment.enrollmentId,
-          completedAt: new Date().toISOString()
+          completedAt: new Date().toISOString(),
         });
         if (updated) {
           setEnrollments((prev) => ({
             ...prev,
-            [course.id]: updated
+            [course.id]: updated,
           }));
         }
       } catch (error) {
@@ -232,7 +237,9 @@ export function CoursesCatalog() {
                 course={course}
                 onViewDetails={handleViewDetails}
                 onStartCourse={handleStartCourse}
-                isRecommended={recommendedCourses.some(rc => rc.id === course.id)}
+                isRecommended={recommendedCourses.some(
+                  (rc) => rc.id === course.id
+                )}
                 isEnrolled={Boolean(enrollments[course.id])}
                 enrollmentStatus={enrollments[course.id]?.status}
                 onMarkCompleted={handleMarkCompleted}
@@ -246,7 +253,7 @@ export function CoursesCatalog() {
             <p className="text-gray-600">
               {t("courses.showingResults", {
                 count: filteredAndSortedCourses.length,
-                total: courses.length
+                total: courses.length,
               })}
             </p>
           </div>
