@@ -715,7 +715,9 @@ export async function sendBulkEmailInvitations(userId: string): Promise<{
   }
 }
 
-export async function sendSelectedEmailInvitations(evaluationGroupIds: string[]): Promise<{
+export async function sendSelectedEmailInvitations(
+  evaluationGroupIds: string[]
+): Promise<{
   success: boolean;
   message: string;
   results?: any[];
@@ -744,7 +746,9 @@ export async function sendSelectedEmailInvitations(evaluationGroupIds: string[])
   }
 }
 
-export async function sendSingleEmailInvitation(evaluationGroupId: string): Promise<{
+export async function sendSingleEmailInvitation(
+  evaluationGroupId: string
+): Promise<{
   success: boolean;
   message: string;
   emailSentDate?: string;
@@ -773,7 +777,9 @@ export async function sendSingleEmailInvitation(evaluationGroupId: string): Prom
   }
 }
 
-export async function resendEmailInvitation(evaluationGroupId: string): Promise<{
+export async function resendEmailInvitation(
+  evaluationGroupId: string
+): Promise<{
   success: boolean;
   message: string;
   emailSentDate?: string;

@@ -94,8 +94,12 @@ export default function EvaluatorsPage() {
   const [showDropdown, setShowDropdown] = useState<string | null>(null);
   const [emailSendMode, setEmailSendMode] = useState<"all" | "specific">("all");
   const [smsSendMode, setSmsSendMode] = useState<"all" | "specific">("all");
-  const [selectedEvaluatorsForEmail, setSelectedEvaluatorsForEmail] = useState<string[]>([]);
-  const [selectedEvaluatorsForSMS, setSelectedEvaluatorsForSMS] = useState<string[]>([]);
+  const [selectedEvaluatorsForEmail, setSelectedEvaluatorsForEmail] = useState<
+    string[]
+  >([]);
+  const [selectedEvaluatorsForSMS, setSelectedEvaluatorsForSMS] = useState<
+    string[]
+  >([]);
   const [showEmailSelector, setShowEmailSelector] = useState(false);
   const [showSMSSelector, setShowSMSSelector] = useState(false);
 
@@ -559,7 +563,10 @@ export default function EvaluatorsPage() {
         result = await sendBulkEmailInvitations(user?.id || "");
       } else {
         // Send to selected evaluators
-        const selectedIds = selectedEvaluatorsForEmail.length > 0 ? selectedEvaluatorsForEmail : apiEvaluators.map(group => group.id);
+        const selectedIds =
+          selectedEvaluatorsForEmail.length > 0
+            ? selectedEvaluatorsForEmail
+            : apiEvaluators.map((group) => group.id);
         result = await sendSelectedEmailInvitations(selectedIds);
       }
 
@@ -601,10 +608,10 @@ export default function EvaluatorsPage() {
         );
       } else {
         // Filter selected evaluators that have phone numbers
-        const selectedGroups = evaluatorGroups.filter(group =>
+        const selectedGroups = evaluatorGroups.filter((group) =>
           selectedEvaluatorsForSMS.includes(group.id)
         );
-        const selectedEvaluators = selectedGroups.flatMap(g => g.evaluators);
+        const selectedEvaluators = selectedGroups.flatMap((g) => g.evaluators);
         evaluatorsWithPhone = selectedEvaluators.filter(
           (e) => e.phone && e.phone !== "Not provided"
         );
@@ -787,7 +794,9 @@ export default function EvaluatorsPage() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
-                    disabled={getTotalEvaluators() === 0 || !areAllGroupsComplete()}
+                    disabled={
+                      getTotalEvaluators() === 0 || !areAllGroupsComplete()
+                    }
                     className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl disabled:shadow-none flex items-center space-x-2"
                   >
                     <svg
@@ -804,22 +813,36 @@ export default function EvaluatorsPage() {
                       />
                     </svg>
                     <span>Send Email Invitations</span>
-                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    <svg
+                      className="w-4 h-4 ml-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
                     </svg>
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onClick={() => {
-                    setEmailSendMode("all");
-                    handleSendEmailInvitations();
-                  }}>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setEmailSendMode("all");
+                      handleSendEmailInvitations();
+                    }}
+                  >
                     Send to All
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => {
-                    setEmailSendMode("specific");
-                    setShowEmailSelector(true);
-                  }}>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setEmailSendMode("specific");
+                      setShowEmailSelector(true);
+                    }}
+                  >
                     Send to Specific
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -828,7 +851,9 @@ export default function EvaluatorsPage() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
-                    disabled={getTotalEvaluators() === 0 || !areAllGroupsComplete()}
+                    disabled={
+                      getTotalEvaluators() === 0 || !areAllGroupsComplete()
+                    }
                     className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl disabled:shadow-none flex items-center space-x-2"
                   >
                     <svg
@@ -845,22 +870,36 @@ export default function EvaluatorsPage() {
                       />
                     </svg>
                     <span>Send SMS Invitations</span>
-                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    <svg
+                      className="w-4 h-4 ml-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
                     </svg>
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onClick={() => {
-                    setSmsSendMode("all");
-                    handleSendSMSInvitations();
-                  }}>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setSmsSendMode("all");
+                      handleSendSMSInvitations();
+                    }}
+                  >
                     Send to All
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => {
-                    setSmsSendMode("specific");
-                    setShowSMSSelector(true);
-                  }}>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setSmsSendMode("specific");
+                      setShowSMSSelector(true);
+                    }}
+                  >
                     Send to Specific
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -1419,9 +1458,14 @@ export default function EvaluatorsPage() {
                       checked={selectedEvaluatorsForEmail.includes(group.id)}
                       onChange={(e) => {
                         if (e.target.checked) {
-                          setSelectedEvaluatorsForEmail(prev => [...prev, group.id]);
+                          setSelectedEvaluatorsForEmail((prev) => [
+                            ...prev,
+                            group.id,
+                          ]);
                         } else {
-                          setSelectedEvaluatorsForEmail(prev => prev.filter(id => id !== group.id));
+                          setSelectedEvaluatorsForEmail((prev) =>
+                            prev.filter((id) => id !== group.id)
+                          );
                         }
                       }}
                       className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
@@ -1476,9 +1520,14 @@ export default function EvaluatorsPage() {
                       checked={selectedEvaluatorsForSMS.includes(group.id)}
                       onChange={(e) => {
                         if (e.target.checked) {
-                          setSelectedEvaluatorsForSMS(prev => [...prev, group.id]);
+                          setSelectedEvaluatorsForSMS((prev) => [
+                            ...prev,
+                            group.id,
+                          ]);
                         } else {
-                          setSelectedEvaluatorsForSMS(prev => prev.filter(id => id !== group.id));
+                          setSelectedEvaluatorsForSMS((prev) =>
+                            prev.filter((id) => id !== group.id)
+                          );
                         }
                       }}
                       className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500"
