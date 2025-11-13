@@ -23,6 +23,7 @@ import {
   trackCourseProgress,
   markCourseCompleted,
 } from "../../../services/courseService";
+import { Star, BookOpen, Search } from "lucide-react";
 
 export function CoursesCatalog() {
   const { t } = useTranslation();
@@ -102,11 +103,11 @@ export function CoursesCatalog() {
     return filtered;
   }, [courses, filters, sortBy]);
 
-  // Get recommended courses (top 6 by score)
+  // Get recommended courses (top 3 by score)
   const recommendedCourses = useMemo(() => {
     return [...courses]
       .sort((a, b) => b.recommendedScore - a.recommendedScore)
-      .slice(0, 6);
+      .slice(0, 3);
   }, [courses]);
 
   const handleViewDetails = useCallback((course: Course) => {
@@ -183,13 +184,51 @@ export function CoursesCatalog() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      {/* Search & Filter Section */}
+      <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl shadow-lg">
+              <Search className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-1">
+                {t("courses.searchAndFilter")}
+              </h2>
+              <p className="text-sm text-gray-600">
+                Find courses that match your interests
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <CourseFilters
+          filters={filters}
+          sortBy={sortBy}
+          onFiltersChange={setFilters}
+          onSortChange={setSortBy}
+          onClearFilters={handleClearFilters}
+          availableFilters={availableFilters}
+        />
+      </div>
+
       {/* Recommended Section */}
-      <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">
-          {t("courses.recommendedForYou")}
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl p-8 border border-blue-200 shadow-sm">
+        <div className="flex items-center gap-4 mb-8">
+          <div className="p-3 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl shadow-lg">
+            <Star className="w-6 h-6 text-white fill-white" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-1">
+              {t("courses.recommendedForYou")}
+            </h2>
+            <p className="text-sm text-gray-600">
+              Personalized courses based on your profile and interests
+            </p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {recommendedCourses.map((course) => (
             <CourseCard
               key={course.id}
@@ -206,23 +245,27 @@ export function CoursesCatalog() {
       </div>
 
       {/* All Courses Section */}
-      <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">
-          {t("courses.allCourses")}
-        </h2>
-
-        <CourseFilters
-          filters={filters}
-          sortBy={sortBy}
-          onFiltersChange={setFilters}
-          onSortChange={setSortBy}
-          onClearFilters={handleClearFilters}
-          availableFilters={availableFilters}
-        />
+      <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl shadow-lg">
+              <BookOpen className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-1">
+                {t("courses.allCourses")}
+              </h2>
+              <p className="text-sm text-gray-600">
+                {filteredAndSortedCourses.length} courses available
+              </p>
+            </div>
+          </div>
+        </div>
 
         {filteredAndSortedCourses.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">
+          <div className="text-center py-16 bg-gray-50 rounded-lg mt-6">
+            <Search className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-500 text-lg font-medium">
               {t("courses.noCoursesFound")}
             </p>
             <p className="text-gray-400 text-sm mt-2">
@@ -230,7 +273,7 @@ export function CoursesCatalog() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
             {filteredAndSortedCourses.map((course) => (
               <CourseCard
                 key={course.id}
@@ -249,8 +292,8 @@ export function CoursesCatalog() {
         )}
 
         {filteredAndSortedCourses.length > 0 && (
-          <div className="text-center mt-8">
-            <p className="text-gray-600">
+          <div className="text-center mt-8 p-4 bg-gray-50 rounded-lg">
+            <p className="text-gray-600 font-medium">
               {t("courses.showingResults", {
                 count: filteredAndSortedCourses.length,
                 total: courses.length,

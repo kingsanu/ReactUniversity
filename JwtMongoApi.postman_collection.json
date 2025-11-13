@@ -606,6 +606,186 @@
           }
         },
         {
+          "name": "Generate Professional Summary",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"careerLevel\": \"mid-career\",\n  \"industry\": \"Technology\",\n  \"yearsOfExperience\": 5,\n  \"keySkills\": [\"C#\", \"ASP.NET Core\", \"React\", \"SQL Server\", \"Azure\"],\n  \"targetRole\": \"Senior Software Engineer\",\n  \"achievements\": [\"Led team of 5 developers\", \"Reduced API response time by 40%\"],\n  \"tone\": \"achievement-focused\",\n  \"maxWords\": 100\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/resume/generate/professional-summary",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "resume", "generate", "professional-summary"]
+            },
+            "description": "Generates an ATS-optimized professional summary based on career details, skills, and achievements. Career level: entry-level, mid-career, senior, executive. Tone: professional, achievement-focused, impact-driven, leadership-focused."
+          }
+        },
+        {
+          "name": "Generate Job Bullets",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobTitle\": \"Senior Software Engineer\",\n  \"company\": \"Tech Corp\",\n  \"industry\": \"Technology\",\n  \"duration\": \"2020-2024\",\n  \"responsibilities\": [\"Developed REST APIs\", \"Led code reviews\", \"Mentored junior developers\"],\n  \"keySkills\": [\"C#\", \".NET Core\", \"React\", \"Azure\"],\n  \"achievements\": [\"Improved performance by 50%\", \"Reduced bugs by 30%\"],\n  \"bulletCount\": 5,\n  \"tone\": \"achievement-focused\"\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/resume/generate/job-bullets",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "resume", "generate", "job-bullets"]
+            },
+            "description": "Generates 4-6 achievement-focused, ATS-optimized bullet points for a job entry. Emphasizes action verbs, quantifiable metrics, and concise language. Tone: achievement-focused, impact-driven, leadership-focused, technical."
+          }
+        },
+        {
+          "name": "Generate Career Objective",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"careerLevel\": \"mid-career\",\n  \"yearsOfExperience\": 5,\n  \"targetRole\": \"Senior Software Engineer\",\n  \"targetIndustry\": \"Technology\",\n  \"keyStrengths\": [\"Full-stack development\", \"Team leadership\", \"Problem-solving\", \"Agile methodologies\"],\n  \"maxWords\": 50\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/resume/generate/career-objective",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "resume", "generate", "career-objective"]
+            },
+            "description": "Generates a role-specific career objective statement based on career level, experience, target role/industry, and key strengths. Career level: entry-level, mid-career, senior, executive."
+          }
+        },
+        {
+          "name": "Generate Project Description",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectTitle\": \"E-Commerce Platform\",\n  \"yourRole\": \"Full-Stack Developer\",\n  \"technologies\": [\"React\", \"Node.js\", \"MongoDB\", \"AWS\"],\n  \"objectives\": [\"Build scalable e-commerce solution\", \"Implement payment gateway\"],\n  \"outcomes\": [\"Increased sales by 200%\", \"Reduced load time by 60%\"],\n  \"maxWords\": 150\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/resume/generate/project-description",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "resume", "generate", "project-description"]
+            },
+            "description": "Generates a comprehensive project description highlighting outcomes and technical aspects. Includes technologies used, objectives, and measurable outcomes."
+          }
+        },
+        {
+          "name": "Analyze ATS Score",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resumeContent\": {\n    \"summary\": \"Experienced software engineer with 5+ years in full-stack development\",\n    \"experience\": [\n      {\n        \"title\": \"Senior Software Engineer\",\n        \"bullets\": [\"Developed REST APIs using C#\", \"Led team of 5 developers\", \"Improved performance by 40%\"]\n      }\n    ],\n    \"skills\": [\"C#\", \"ASP.NET Core\", \"React\", \"SQL Server\", \"Azure\"]\n  },\n  \"jobDescription\": \"We are seeking a Senior Software Engineer with experience in C#, ASP.NET Core, React, and Azure. Must have leadership experience and strong problem-solving skills.\",\n  \"targetKeywords\": [\"C#\", \"ASP.NET Core\", \"React\", \"Azure\", \"leadership\"]\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/resume/analyze/ats-score",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "resume", "analyze", "ats-score"]
+            },
+            "description": "Analyzes existing resume content against a job description to provide an ATS compatibility score, breakdown, matched/missing keywords, and suggestions for improvement."
+          }
+        },
+        {
+          "name": "Generate Alternatives",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contentType\": \"summary\",\n  \"context\": {\n    \"careerLevel\": \"mid-career\",\n    \"industry\": \"Technology\",\n    \"yearsOfExperience\": 5,\n    \"keySkills\": [\"C#\", \"ASP.NET Core\", \"React\"],\n    \"targetRole\": \"Senior Software Engineer\"\n  },\n  \"variationCount\": 3,\n  \"tones\": [\"professional\", \"achievement-focused\", \"leadership-focused\"]\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/resume/generate/alternatives",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "resume", "generate", "alternatives"]
+            },
+            "description": "Generates multiple content variations (summary, objective, bullets, project) with different tones/approaches. Content type: summary, objective, bullets, project. Variation count: 2-5."
+          }
+        },
+        {
           "name": "Ask Assistant",
           "request": {
             "method": "POST",
@@ -2100,7 +2280,7 @@
               ],
               "path": ["evaluation", "create-group"]
             },
-            "description": "Creates a new evaluation group for Parent, Teacher, or Sibling/Friend evaluators.\n\nGroup Types:\n- Parent: For parent evaluators\n- Teacher: For teacher evaluators\n- SiblingFriend: For sibling or friend evaluators\n\nReturns:\n- Evaluation group details\n- Invitation token (32-character secure token)\n- Invitation URL\n- Token expiry date (2 days from creation)\n- Status flags (isTokenUsed, isEvaluationCompleted)\n- **Email tracking fields (isEmailSent: false, emailSentDate: null)**"
+            "description": "Creates a new evaluation group for Parent, Teacher, or Sibling/Friend evaluators.\n\n**NEW: Automatic Email Sending**\n- **Invitation email is automatically sent** to the evaluator when the group is created\n- Email tracking is updated (isEmailSent: true, emailSentDate: timestamp)\n- If email sending fails, the group is still created but an error message is returned\n\nGroup Types:\n- Parent: For parent evaluators\n- Teacher: For teacher evaluators\n- SiblingFriend: For sibling or friend evaluators\n\nReturns:\n- Evaluation group details\n- Invitation token (32-character secure token)\n- Invitation URL\n- Token expiry date (2 days from creation)\n- Status flags (isTokenUsed, isEvaluationCompleted)\n- **Email tracking fields (isEmailSent: true if sent successfully, emailSentDate: timestamp)**"
           }
         },
         {
@@ -2214,11 +2394,41 @@
                 "{{evaluationGroupId}}"
               ]
             },
-            "description": "Sends evaluation invitation email to the evaluator and updates email tracking status.\n\n**Features:**\n- **Email Tracking**: Sets isEmailSent to true and records emailSentDate\n- **Duplicate Prevention**: Cannot send email twice to the same evaluation group\n- **Professional Email Template**: HTML-formatted invitation with evaluation details\n- **Comprehensive Information**: Includes student details, evaluator role, and expiration info\n\n**Email Content Includes:**\n- Student name and email\n- Evaluator role (Parent, Teacher, Sibling/Friend, Self)\n- Group type information\n- Token expiration date\n- Direct link to start evaluation\n- Professional formatting with call-to-action button\n\n**Response Includes:**\n- Email sending confirmation\n- Updated email tracking status (isEmailSent: true)\n- Email sent timestamp\n- Invitation URL for reference\n\n**Use Cases:**\n- Send initial invitation emails\n- Track email delivery status\n- Monitor communication with evaluators\n- Ensure proper invitation workflow"
+            "description": "Sends evaluation invitation email to the evaluator and updates email tracking status.\n\n**Features:**\n- **Email Tracking**: Sets isEmailSent to true and records emailSentDate\n- **Professional Email Template**: HTML-formatted invitation with evaluation details\n- **Comprehensive Information**: Includes student details, evaluator role, and expiration info\n\n**Email Content Includes:**\n- Student name and email\n- Evaluator role (Parent, Teacher, Sibling/Friend, Self)\n- Group type information\n- Token expiration date\n- Direct link to start evaluation\n- Professional formatting with call-to-action button\n\n**Response Includes:**\n- Email sending confirmation\n- Updated email tracking status (isEmailSent: true)\n- Email sent timestamp\n- Invitation URL for reference\n\n**Use Cases:**\n- Resend invitation emails if needed\n- Track email delivery status\n- Monitor communication with evaluators"
           },
           "response": []
         },
-
+        {
+          "name": "Send Selected Invitations",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"evaluationGroupIds\": [\n    \"{{evaluationGroupId1}}\",\n    \"{{evaluationGroupId2}}\",\n    \"{{evaluationGroupId3}}\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/evaluation/send-invitations-selected",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["evaluation", "send-invitations-selected"]
+            },
+            "description": "Sends invitation emails to multiple selected evaluation groups at once.\n\n**Features:**\n- **Bulk Email Sending**: Send invitations to multiple evaluators in one request\n- **Selective Sending**: Choose specific evaluation group IDs to send invitations to\n- **Individual Results**: Returns success/failure status for each evaluator\n- **Error Handling**: Continues processing even if some emails fail\n- **Email Tracking**: Updates isEmailSent and emailSentDate for each successful send\n\n**Request Body:**\n- evaluationGroupIds: Array of evaluation group IDs to send invitations to\n\n**Response Includes:**\n- Total selected count\n- Success count (emailsSent)\n- Failure count (emailsFailed)\n- Detailed results array with:\n  - Evaluation group ID\n  - Evaluator name and email\n  - Relation and group type\n  - Email sent status\n  - Error message (if failed)\n  - Sent timestamp\n\n**Use Cases:**\n- Send invitations to multiple selected evaluators at once\n- Bulk invitation management\n- Selective email sending based on user selection\n- Efficient invitation workflow\n\n**Example:**\nSelect multiple evaluators (e.g., fedetafur@gmail.com, kanish@gmail.com, king@gmail.com) and send invitations to all selected at once."
+          },
+          "response": []
+        },
         {
           "name": "Get User Evaluation Groups",
           "request": {

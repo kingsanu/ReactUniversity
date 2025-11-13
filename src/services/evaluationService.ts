@@ -715,6 +715,95 @@ export async function sendBulkEmailInvitations(userId: string): Promise<{
   }
 }
 
+export async function sendSelectedEmailInvitations(evaluationGroupIds: string[]): Promise<{
+  success: boolean;
+  message: string;
+  results?: any[];
+}> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/evaluation/send-selected-invitations`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ evaluationGroupIds }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to send selected email invitations");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error sending selected email invitations:", error);
+    throw error;
+  }
+}
+
+export async function sendSingleEmailInvitation(evaluationGroupId: string): Promise<{
+  success: boolean;
+  message: string;
+  emailSentDate?: string;
+  invitationUrl?: string;
+}> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/evaluation/send-invitation-email/${evaluationGroupId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to send email invitation");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error sending email invitation:", error);
+    throw error;
+  }
+}
+
+export async function resendEmailInvitation(evaluationGroupId: string): Promise<{
+  success: boolean;
+  message: string;
+  emailSentDate?: string;
+  invitationUrl?: string;
+  tokenExtended?: boolean;
+  newExpiryDate?: string;
+}> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/evaluation/resend-email/${evaluationGroupId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to resend email invitation");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error resending email invitation:", error);
+    throw error;
+  }
+}
+
 /**
  * Validate evaluation group update constraints
  */

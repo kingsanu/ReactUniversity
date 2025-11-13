@@ -14,6 +14,7 @@ import {
   deleteEvaluationGroup,
   resendInvitationLink,
   sendBulkEmailInvitations,
+  sendSelectedEmailInvitations,
   checkDuplicateEvaluator,
   validatePhoneNumber,
   EvaluationGroupProgress,
@@ -33,6 +34,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function EvaluatorsPage() {
   const { user, language } = useGlobalStore();
@@ -85,6 +92,12 @@ export default function EvaluatorsPage() {
     null
   );
   const [showDropdown, setShowDropdown] = useState<string | null>(null);
+  const [emailSendMode, setEmailSendMode] = useState<"all" | "specific">("all");
+  const [smsSendMode, setSmsSendMode] = useState<"all" | "specific">("all");
+  const [selectedEvaluatorsForEmail, setSelectedEvaluatorsForEmail] = useState<string[]>([]);
+  const [selectedEvaluatorsForSMS, setSelectedEvaluatorsForSMS] = useState<string[]>([]);
+  const [showEmailSelector, setShowEmailSelector] = useState(false);
+  const [showSMSSelector, setShowSMSSelector] = useState(false);
 
   useEffect(() => {
     if (currentSession?.evaluatorGroups) {
@@ -540,8 +553,15 @@ export default function EvaluatorsPage() {
     try {
       setLoading(true);
 
-      // Use the bulk email invitation API - let the API decide what needs to be sent
-      const result = await sendBulkEmailInvitations(user?.id || "");
+      let result;
+      if (emailSendMode === "all") {
+        // Use the bulk email invitation API - let the API decide what needs to be sent
+        result = await sendBulkEmailInvitations(user?.id || "");
+      } else {
+        // Send to selected evaluators
+        const selectedIds = selectedEvaluatorsForEmail.length > 0 ? selectedEvaluatorsForEmail : apiEvaluators.map(group => group.id);
+        result = await sendSelectedEmailInvitations(selectedIds);
+      }
 
       if (result.success) {
         toast.success(result.message || `Email invitations sent successfully!`);
@@ -572,10 +592,23 @@ export default function EvaluatorsPage() {
 
     try {
       setLoading(true);
-      const allEvaluators = evaluatorGroups.flatMap((g) => g.evaluators);
-      const evaluatorsWithPhone = allEvaluators.filter(
-        (e) => e.phone && e.phone !== "Not provided"
-      );
+      let evaluatorsWithPhone;
+
+      if (smsSendMode === "all") {
+        const allEvaluators = evaluatorGroups.flatMap((g) => g.evaluators);
+        evaluatorsWithPhone = allEvaluators.filter(
+          (e) => e.phone && e.phone !== "Not provided"
+        );
+      } else {
+        // Filter selected evaluators that have phone numbers
+        const selectedGroups = evaluatorGroups.filter(group =>
+          selectedEvaluatorsForSMS.includes(group.id)
+        );
+        const selectedEvaluators = selectedGroups.flatMap(g => g.evaluators);
+        evaluatorsWithPhone = selectedEvaluators.filter(
+          (e) => e.phone && e.phone !== "Not provided"
+        );
+      }
 
       if (evaluatorsWithPhone.length === 0) {
         toast.warning(
@@ -751,46 +784,87 @@ export default function EvaluatorsPage() {
               </p>
             </div>
             <div className="flex flex-col md:flex-row gap-4 space-x-3">
-              <button
-                onClick={handleSendEmailInvitations}
-                disabled={getTotalEvaluators() === 0 || !areAllGroupsComplete()}
-                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl disabled:shadow-none flex items-center space-x-2"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
-                  />
-                </svg>
-                <span>Send Email Invitations</span>
-              </button>
-              <button
-                onClick={handleSendSMSInvitations}
-                disabled={getTotalEvaluators() === 0 || !areAllGroupsComplete()}
-                className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl disabled:shadow-none flex items-center space-x-2"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                  />
-                </svg>
-                <span>Send SMS Invitations</span>
-              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    disabled={getTotalEvaluators() === 0 || !areAllGroupsComplete()}
+                    className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl disabled:shadow-none flex items-center space-x-2"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
+                      />
+                    </svg>
+                    <span>Send Email Invitations</span>
+                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={() => {
+                    setEmailSendMode("all");
+                    handleSendEmailInvitations();
+                  }}>
+                    Send to All
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => {
+                    setEmailSendMode("specific");
+                    setShowEmailSelector(true);
+                  }}>
+                    Send to Specific
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    disabled={getTotalEvaluators() === 0 || !areAllGroupsComplete()}
+                    className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl disabled:shadow-none flex items-center space-x-2"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                      />
+                    </svg>
+                    <span>Send SMS Invitations</span>
+                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={() => {
+                    setSmsSendMode("all");
+                    handleSendSMSInvitations();
+                  }}>
+                    Send to All
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => {
+                    setSmsSendMode("specific");
+                    setShowSMSSelector(true);
+                  }}>
+                    Send to Specific
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </motion.div>
@@ -1322,6 +1396,120 @@ export default function EvaluatorsPage() {
                   "Add Evaluator"
                 )}
               </button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Email Selector Dialog */}
+        <Dialog open={showEmailSelector} onOpenChange={setShowEmailSelector}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Select Evaluators for Email</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600">
+                Choose which evaluators to send email invitations to:
+              </p>
+              <div className="max-h-60 overflow-y-auto space-y-2">
+                {apiEvaluators.map((group) => (
+                  <div key={group.id} className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id={`email-${group.id}`}
+                      checked={selectedEvaluatorsForEmail.includes(group.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedEvaluatorsForEmail(prev => [...prev, group.id]);
+                        } else {
+                          setSelectedEvaluatorsForEmail(prev => prev.filter(id => id !== group.id));
+                        }
+                      }}
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <label
+                      htmlFor={`email-${group.id}`}
+                      className="text-sm font-medium leading-none"
+                    >
+                      {group.evaluatorName} ({group.relation})
+                    </label>
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-end space-x-2">
+                <button
+                  onClick={() => setShowEmailSelector(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    setShowEmailSelector(false);
+                    handleSendEmailInvitations();
+                  }}
+                  disabled={selectedEvaluatorsForEmail.length === 0}
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:bg-gray-400"
+                >
+                  Send Emails ({selectedEvaluatorsForEmail.length})
+                </button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* SMS Selector Dialog */}
+        <Dialog open={showSMSSelector} onOpenChange={setShowSMSSelector}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Select Evaluators for SMS</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600">
+                Choose which evaluators to send SMS invitations to:
+              </p>
+              <div className="max-h-60 overflow-y-auto space-y-2">
+                {apiEvaluators.map((group) => (
+                  <div key={group.id} className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id={`sms-${group.id}`}
+                      checked={selectedEvaluatorsForSMS.includes(group.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedEvaluatorsForSMS(prev => [...prev, group.id]);
+                        } else {
+                          setSelectedEvaluatorsForSMS(prev => prev.filter(id => id !== group.id));
+                        }
+                      }}
+                      className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500"
+                    />
+                    <label
+                      htmlFor={`sms-${group.id}`}
+                      className="text-sm font-medium leading-none"
+                    >
+                      {group.evaluatorName} ({group.relation})
+                    </label>
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-end space-x-2">
+                <button
+                  onClick={() => setShowSMSSelector(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    setShowSMSSelector(false);
+                    handleSendSMSInvitations();
+                  }}
+                  disabled={selectedEvaluatorsForSMS.length === 0}
+                  className="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 disabled:bg-gray-400"
+                >
+                  Send SMS ({selectedEvaluatorsForSMS.length})
+                </button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>

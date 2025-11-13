@@ -23,8 +23,9 @@ export const mockCourses: Course[] = [
     enrollmentCount: 15420,
     rating: 4.7,
     reviewCount: 1250,
-    thumbnailUrl: "/api/placeholder/400/225",
-    videoUrl: "/api/placeholder/video",
+    thumbnailUrl:
+      "https://images.unsplash.com/photo-1526379095098-d400fd0bf935?w=800&h=450&fit=crop",
+    videoUrl: "https://www.youtube.com/watch?v=placeholder",
     courseraUrl: "https://coursera.org/learn/python-data-science",
     externalId: "coursera_python_ds_001",
     syllabus: [
@@ -126,7 +127,9 @@ export const mockCourses: Course[] = [
     enrollmentCount: 28340,
     rating: 4.9,
     reviewCount: 2100,
-    thumbnailUrl: "/api/placeholder/400/225",
+    thumbnailUrl:
+      "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&h=450&fit=crop",
+    videoUrl: "https://www.youtube.com/watch?v=placeholder",
     courseraUrl: "https://coursera.org/specializations/machine-learning",
     externalId: "coursera_ml_spec_002",
     syllabus: [
@@ -195,7 +198,9 @@ export const mockCourses: Course[] = [
     enrollmentCount: 9876,
     rating: 4.5,
     reviewCount: 890,
-    thumbnailUrl: "/api/placeholder/400/225",
+    thumbnailUrl:
+      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=450&fit=crop",
+    videoUrl: "https://www.youtube.com/watch?v=placeholder",
     courseraUrl: "https://coursera.org/learn/digital-marketing",
     externalId: "coursera_digital_mkt_003",
     syllabus: [
@@ -269,7 +274,9 @@ export const mockCourses: Course[] = [
     enrollmentCount: 7234,
     rating: 4.6,
     reviewCount: 567,
-    thumbnailUrl: "/api/placeholder/400/225",
+    thumbnailUrl:
+      "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&h=450&fit=crop",
+    videoUrl: "https://www.youtube.com/watch?v=placeholder",
     courseraUrl: "https://coursera.org/learn/ux-ui-design",
     externalId: "coursera_ux_ui_004",
     syllabus: [
@@ -335,7 +342,9 @@ export const mockCourses: Course[] = [
     enrollmentCount: 5432,
     rating: 4.4,
     reviewCount: 423,
-    thumbnailUrl: "/api/placeholder/400/225",
+    thumbnailUrl:
+      "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&h=450&fit=crop",
+    videoUrl: "https://www.youtube.com/watch?v=placeholder",
     courseraUrl: "https://coursera.org/learn/project-management-pmp",
     externalId: "coursera_pmp_005",
     syllabus: [
@@ -406,7 +415,9 @@ export const mockCourses: Course[] = [
     enrollmentCount: 12876,
     rating: 4.8,
     reviewCount: 987,
-    thumbnailUrl: "/api/placeholder/400/225",
+    thumbnailUrl:
+      "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&h=450&fit=crop",
+    videoUrl: "https://www.youtube.com/watch?v=placeholder",
     courseraUrl: "https://coursera.org/learn/spanish-beginners",
     externalId: "coursera_spanish_006",
     syllabus: [

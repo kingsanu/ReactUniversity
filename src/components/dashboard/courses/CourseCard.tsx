@@ -54,19 +54,21 @@ export function CourseCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
+      className="h-full"
     >
-      <Card className="h-full flex flex-col hover:shadow-lg transition-shadow duration-200">
+      <Card className="h-full flex flex-col hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-gray-200 overflow-hidden group">
         <CardHeader className="p-0">
-          <div className="relative">
+          <div className="relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <Image
               src={course.thumbnailUrl}
               alt={course.title}
               width={400}
               height={225}
-              className="w-full h-48 object-cover rounded-t-lg"
+              className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
-            <div className="absolute top-2 left-2 flex flex-col gap-2">
+            <div className="absolute top-3 left-3 flex flex-col gap-2 z-20">
               {isRecommended && (
                 <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full font-medium shadow-sm">
                   {t("courses.recommended")}
@@ -85,7 +87,7 @@ export function CourseCard({
               )}
             </div>
             <span
-              className={`absolute top-2 right-2 text-xs px-2 py-1 rounded-full font-medium ${getDifficultyColor(
+              className={`absolute top-3 right-3 text-xs px-3 py-1.5 rounded-full font-semibold shadow-md z-20 ${getDifficultyColor(
                 course.difficulty
               )}`}
             >
@@ -94,39 +96,51 @@ export function CourseCard({
           </div>
         </CardHeader>
 
-        <CardContent className="flex-1 p-4 flex flex-col">
-          <div className="mb-2">
-            <h3 className="font-semibold text-lg text-gray-900 line-clamp-2 mb-1">
+        <CardContent className="flex-1 p-5 flex flex-col">
+          <div className="mb-3">
+            <h3 className="font-bold text-lg text-gray-900 line-clamp-2 mb-2 leading-tight">
               {course.title}
             </h3>
-            <p className="text-sm text-gray-600 mb-2">{course.provider}</p>
+            <p className="text-sm text-gray-600 font-medium">
+              {course.provider}
+            </p>
           </div>
 
-          <p className="text-sm text-gray-700 line-clamp-3 mb-4 flex-1">
+          <p className="text-sm text-gray-600 line-clamp-2 mb-4 flex-1 leading-relaxed">
             {course.shortDescription}
           </p>
 
-          <div className="space-y-2 mb-4">
-            <div className="flex items-center justify-between text-sm text-gray-600">
-              <div className="flex items-center gap-1">
+          <div className="space-y-3 mb-5 pb-4 border-b border-gray-100">
+            <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center gap-1.5 text-gray-700">
                 <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                <span>{formatRating(course.rating)}</span>
-                <span>({course.reviewCount})</span>
+                <span className="font-semibold">
+                  {formatRating(course.rating)}
+                </span>
+                <span className="text-gray-500">
+                  ({course.reviewCount.toLocaleString()})
+                </span>
               </div>
-              <div className="flex items-center gap-1">
-                <Users className="w-4 h-4" />
-                <span>{course.enrollmentCount.toLocaleString()}</span>
+              <div className="flex items-center gap-1.5 text-gray-600">
+                <Users className="w-4 h-4 text-blue-600" />
+                <span className="font-medium">
+                  {course.enrollmentCount.toLocaleString()}
+                </span>
               </div>
             </div>
 
-            <div className="flex items-center justify-between text-sm text-gray-600">
-              <div className="flex items-center gap-1">
-                <Clock className="w-4 h-4" />
-                <span>{formatDuration(course.duration)}</span>
+            <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center gap-1.5 text-gray-600">
+                <Clock className="w-4 h-4 text-indigo-600" />
+                <span className="font-medium">
+                  {formatDuration(course.duration)}
+                </span>
               </div>
-              <div className="flex items-center gap-1">
-                <Award className="w-4 h-4" />
-                <span>{course.estimatedHours}h/week</span>
+              <div className="flex items-center gap-1.5 text-gray-600">
+                <Award className="w-4 h-4 text-purple-600" />
+                <span className="font-medium">
+                  {course.estimatedHours}h/week
+                </span>
               </div>
             </div>
           </div>

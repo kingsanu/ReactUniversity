@@ -16,6 +16,8 @@
   "common": {
     "search": "Buscar aquí",
     "loading": "Cargando...",
+    "progress": "Progreso",
+    "refresh": "Actualizar",
     "error": "Error",
     "save": "Guardar",
     "cancel": "Cancelar",
@@ -262,6 +264,7 @@
   },
   "courses": {
     "discoverCourses": "Descubre cursos para mejorar tus habilidades y avanzar en tu carrera",
+    "searchAndFilter": "Buscar y Filtrar",
     "recommendedForYou": "Recomendados para Ti",
     "allCourses": "Todos los Cursos",
     "searchCourses": "Buscar cursos...",
@@ -305,7 +308,10 @@
     "andMoreModules": "y {{count}} módulos más",
     "noCoursesFound": "No se encontraron cursos",
     "tryAdjustingFilters": "Intenta ajustar tus filtros o términos de búsqueda",
-    "showingResults": "Mostrando {{count}} de {{total}} cursos"
+    "showingResults": "Mostrando {{count}} de {{total}} cursos",
+    "totalCourses": "Cursos Totales",
+    "avgRating": "Calificación Promedio",
+    "enrollments": "Inscripciones"
   },
   "language": {
     "english": "Inglés",
