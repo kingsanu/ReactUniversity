@@ -831,19 +831,21 @@ CREATE TABLE recommendation_cache (
 - [ ] Performance testing and optimization
 - [ ] Security audit
 - [ ] Documentation
- - [ ] Documentation
+- [ ] Documentation
 
 ## Importing Course Details from Provider URL (Import Flow)
 
 To streamline admin workflow, the backend should support importing course metadata from a provider URL (e.g., Coursera). The import flow is asynchronous to avoid blocking the UI and robust to failures.
 
 ### Goals
+
 - Allow admins to paste a provider course URL and fetch metadata automatically
 - Normalize provider metadata into our Course model
 - Provide a preview that admins can review and edit before final save
 - Run the fetch in a background worker to handle slow external APIs and retries
 
 ### Security & Policy
+
 - Validate and allowlist provider domains (e.g., `coursera.org`, `www.coursera.org`) or configure per-environment.
 - Prefer provider public APIs over HTML scraping. If scraping is necessary, respect robots.txt and provider TOS.
 - Sanitize all fetched HTML to prevent XSS and remove scripts/iframes.
@@ -857,6 +859,7 @@ Enqueue an import job for a provider URL. Returns a job id to poll for status.
 Authentication: Authorized users (admin or course managers)
 
 Request Body:
+
 ```json
 {
   "url": "https://coursera.org/learn/example-course",
@@ -865,6 +868,7 @@ Request Body:
 ```
 
 Response (202 Accepted):
+
 ```json
 {
   "success": true,
@@ -874,6 +878,7 @@ Response (202 Accepted):
 ```
 
 Notes:
+
 - Respond 400 for invalid URL.
 - Respond 403 if domain not allowed.
 
@@ -882,12 +887,13 @@ Notes:
 Poll job status. When `status === "done"` the preview object will be returned.
 
 Response (200):
+
 ```json
 {
   "success": true,
   "data": {
     "jobId": "import_job_abcdef",
-    "status": "done", /* pending | in_progress | failed | done */
+    "status": "done" /* pending | in_progress | failed | done */,
     "startedAt": "2025-11-14T10:00:00Z",
     "completedAt": "2025-11-14T10:00:12Z",
     "result": {
@@ -921,6 +927,7 @@ If `status === "failed"` include `error` with code/message.
 After reviewing the preview, an authorized user can accept and persist the course to the catalog.
 
 Request Body (optional overrides):
+
 ```json
 {
   "overrides": {
@@ -931,6 +938,7 @@ Request Body (optional overrides):
 ```
 
 Response (201):
+
 ```json
 {
   "success": true,
@@ -942,6 +950,7 @@ Response (201):
 ### Worker Job (Background)
 
 Job payload saved in queue / DB:
+
 ```json
 {
   "jobId": "import_job_abcdef",
@@ -953,6 +962,7 @@ Job payload saved in queue / DB:
 ```
 
 Worker responsibilities:
+
 - Fetch the URL server-side (use server TLS and keep secrets out of client).
 - Prefer provider API / oEmbed / JSON-LD (`<script type="application/ld+json">`) for structured metadata.
 - Fallback: parse OpenGraph meta tags (`og:title`, `og:description`, `og:image`), structured lists on page.
@@ -966,6 +976,7 @@ Worker responsibilities:
 ### Preview Schema (coursePreview)
 
 Partial mapping to `courses` table fields:
+
 - `title` (string)
 - `shortDescription` (string)
 - `fullDescription` (HTML string, sanitized)
@@ -983,12 +994,14 @@ Partial mapping to `courses` table fields:
 - `rawMetadata` (JSON) — raw provider response or scraped JSON
 
 ### Error Handling
+
 - `EXTERNAL_API_ERROR`: provider API returned non-200 or malformed response.
 - `SCRAPE_ERROR`: HTML parsing failed or required metadata missing.
 - `DUPLICATE_COURSE`: course with same `externalId` or `sourceUrl` already exists.
 - `UNSUPPORTED_DOMAIN`: domain not allowed for automated import.
 
 ### Example Flow
+
 1. Admin pastes `https://coursera.org/learn/example-course` into import UI.
 2. Frontend POSTs to `POST /api/admin/courses/import` -> returns `jobId`.
 3. Worker picks job, fetches the URL, extracts metadata, writes preview, marks job done.

@@ -55,7 +55,8 @@ export function CourseImportDialog({ onImport }: CourseImportDialogProps) {
         <DialogHeader>
           <DialogTitle>Import Course from URL</DialogTitle>
           <DialogDescription>
-            Paste a Coursera course URL to automatically fetch and import course details.
+            Paste a Coursera course URL to automatically fetch and import course
+            details.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">

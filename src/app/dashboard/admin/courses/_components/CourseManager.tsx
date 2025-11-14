@@ -71,7 +71,7 @@ export function CourseManager() {
     // Mock import - in real implementation, call POST /api/courses/import
     console.log("Importing from URL:", url);
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     // For now, just show success - backend will handle actual import
   };
 
