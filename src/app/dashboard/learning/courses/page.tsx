@@ -36,7 +36,7 @@ export default function CoursesPage() {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
               <div className="flex items-center gap-3">
                 <GraduationCap className="w-8 h-8 text-blue-600" />
@@ -74,7 +74,7 @@ export default function CoursesPage() {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* Courses Catalog */}

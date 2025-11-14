@@ -107,7 +107,7 @@ export function CourseFilters({
     (filters.region && filters.region.length > 0);
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
+    <div className="bg-white rounded-lg  mb-6">
       {/* Search Bar */}
       <div className="flex gap-4 mb-4">
         <div className="flex-1 relative">

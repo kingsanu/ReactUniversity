@@ -724,7 +724,7 @@ export async function sendSelectedEmailInvitations(
 }> {
   try {
     const response = await fetch(
-      `${API_BASE_URL}/evaluation/send-selected-invitations`,
+      `${API_BASE_URL}/evaluation/send-invitations-selected`,
       {
         method: "POST",
         headers: {

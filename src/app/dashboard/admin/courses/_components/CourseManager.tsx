@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { CourseFormDialog } from "./CourseFormDialog";
+import { CourseImportDialog } from "./CourseImportDialog";
 
 export function CourseManager() {
   const [courses, setCourses] = useState<Course[]>(mockCourses);
@@ -66,6 +67,14 @@ export function CourseManager() {
     setIsFormOpen(false);
   };
 
+  const handleImport = async (url: string) => {
+    // Mock import - in real implementation, call POST /api/courses/import
+    console.log("Importing from URL:", url);
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    // For now, just show success - backend will handle actual import
+  };
+
   return (
     <div className="space-y-6">
       {/* Header Actions */}
@@ -85,6 +94,7 @@ export function CourseManager() {
                   className="pl-10"
                 />
               </div>
+              <CourseImportDialog onImport={handleImport} />
               <Button onClick={handleCreate} className="gap-2">
                 <Plus className="w-4 h-4" />
                 Add Course

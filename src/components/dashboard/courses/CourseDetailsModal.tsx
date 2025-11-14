@@ -65,7 +65,7 @@ export function CourseDetailsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh] p-0 flex flex-col">
+      <DialogContent className="max-w-6xl lg:min-w-5xl max-h-[90vh] p-0 flex flex-col">
         {/* Fixed Header */}
         <DialogHeader className="border-b pb-4 px-6 pt-6 flex-shrink-0">
           <DialogTitle className="text-3xl font-bold text-gray-900 leading-tight">

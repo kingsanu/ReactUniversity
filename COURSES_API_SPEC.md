@@ -45,7 +45,8 @@ Authorization: Bearer <jwt_token>
 2. **User-Specific Data:** Track which courses each user has enrolled in
 3. **Personalization:** Calculate recommendation scores based on user profile
 4. **Progress Tracking:** Store and retrieve course progress per user
-5. **Admin Operations:** CRUD operations for course management
+5. **Admin Operations:** Course management (read, update, delete; create via import flow)
+6. **Import Flow:** Asynchronous course import from provider URLs
 
 ## Common Response Format
 
@@ -549,47 +550,17 @@ Fetch all courses for admin management (Admin only). Returns all courses includi
 
 ---
 
-### 8. POST /api/admin/courses
+### 8. PUT /api/admin/courses/:id
 
-Add a new course to the catalog (Admin only).
+Update an existing course (Admin only).
 
-**Method:** POST
+**Method:** PUT
 **Authentication:** Required (Admin role)
-**Request Payload:**
+**Path Parameters:**
 
-```json
-{
-  "title": "Advanced Machine Learning",
-  "shortDescription": "Deep dive into ML algorithms and applications",
-  "fullDescription": "Comprehensive course covering advanced ML techniques...",
-  "category": "Technology",
-  "subcategory": "Machine Learning",
-  "provider": "Stanford University",
-  "instructor": "Dr. Andrew Ng",
-  "language": "English",
-  "country": "United States",
-  "duration": 10,
-  "difficulty": "Advanced",
-  "estimatedHours": 8,
-  "certificate": true,
-  "thumbnailUrl": "https://example.com/thumbnail.jpg",
-  "courseraUrl": "https://coursera.org/learn/machine-learning",
-  "externalId": "coursera_ml_2024",
-  "syllabus": [
-    {
-      "title": "Neural Networks",
-      "description": "Introduction to neural network architectures",
-      "week": 1,
-      "estimatedHours": 6
-    }
-  ],
-  "learningObjectives": ["Build neural networks", "Apply ML algorithms"],
-  "prerequisites": ["Basic calculus", "Python programming"],
-  "skills": ["TensorFlow", "Neural Networks", "Deep Learning"],
-  "matchingCompetencies": ["Machine Learning", "AI Development"],
-  "careerPaths": ["ML Engineer", "Data Scientist"]
-}
-```
+- `id` (string): Course ID
+
+**Request Payload:** Same as POST /api/admin/courses, all fields optional
 
 **Response Payload:**
 
@@ -599,25 +570,21 @@ Add a new course to the catalog (Admin only).
   "data": {
     "id": "course_789",
     "title": "Advanced Machine Learning",
-    "provider": "Stanford University",
-    "createdAt": "2024-11-12T17:00:00Z",
-    "isActive": true
+    "updatedAt": "2024-11-12T17:30:00Z"
   },
-  "message": "Course added successfully"
+  "message": "Course updated successfully"
 }
 ```
 
 **Status Codes:**
 
-- 201: Course created
+- 200: Course updated
 - 400: Invalid course data
 - 401: Unauthorized (not admin)
-- 409: Course with this external ID already exists
+- 404: Course not found
 - 500: Internal server error
 
 ---
-
-### 9. PUT /api/admin/courses/:id
 
 Update an existing course (Admin only).
 
@@ -840,10 +807,10 @@ CREATE TABLE recommendation_cache (
 ### Phase 2: Admin Management (Week 2-3)
 
 - [ ] Implement GET /api/admin/courses endpoint
-- [ ] Implement POST /api/admin/courses endpoint
 - [ ] Implement PUT /api/admin/courses/:id endpoint
 - [ ] Implement PATCH /api/admin/courses/:id/toggle-active endpoint
 - [ ] Implement DELETE /api/admin/courses/:id endpoint
+- [ ] Implement import flow endpoints (POST /api/courses/import, GET /api/courses/import/:jobId/status, POST /api/courses/import/:jobId/accept)
 - [ ] Add admin authentication middleware
 - [ ] Test admin endpoints
 
@@ -864,16 +831,178 @@ CREATE TABLE recommendation_cache (
 - [ ] Performance testing and optimization
 - [ ] Security audit
 - [ ] Documentation
+ - [ ] Documentation
+
+## Importing Course Details from Provider URL (Import Flow)
+
+To streamline admin workflow, the backend should support importing course metadata from a provider URL (e.g., Coursera). The import flow is asynchronous to avoid blocking the UI and robust to failures.
+
+### Goals
+- Allow admins to paste a provider course URL and fetch metadata automatically
+- Normalize provider metadata into our Course model
+- Provide a preview that admins can review and edit before final save
+- Run the fetch in a background worker to handle slow external APIs and retries
+
+### Security & Policy
+- Validate and allowlist provider domains (e.g., `coursera.org`, `www.coursera.org`) or configure per-environment.
+- Prefer provider public APIs over HTML scraping. If scraping is necessary, respect robots.txt and provider TOS.
+- Sanitize all fetched HTML to prevent XSS and remove scripts/iframes.
+
+### Endpoints
+
+#### 1) POST /api/courses/import
+
+Enqueue an import job for a provider URL. Returns a job id to poll for status.
+
+Authentication: Authorized users (admin or course managers)
+
+Request Body:
+```json
+{
+  "url": "https://coursera.org/learn/example-course",
+  "source": "coursera" /* optional: hint for parser */
+}
+```
+
+Response (202 Accepted):
+```json
+{
+  "success": true,
+  "jobId": "import_job_abcdef",
+  "statusUrl": "/api/admin/courses/import/import_job_abcdef/status"
+}
+```
+
+Notes:
+- Respond 400 for invalid URL.
+- Respond 403 if domain not allowed.
+
+#### 2) GET /api/courses/import/:jobId/status
+
+Poll job status. When `status === "done"` the preview object will be returned.
+
+Response (200):
+```json
+{
+  "success": true,
+  "data": {
+    "jobId": "import_job_abcdef",
+    "status": "done", /* pending | in_progress | failed | done */
+    "startedAt": "2025-11-14T10:00:00Z",
+    "completedAt": "2025-11-14T10:00:12Z",
+    "result": {
+      "coursePreview": {
+        "title": "Intro to Data Science (Coursera)",
+        "shortDescription": "Hands-on data science course",
+        "fullDescription": "<p>Long course description extracted from provider...</p>",
+        "provider": "Coursera",
+        "instructor": "Dr. Jane Doe",
+        "thumbnailUrl": "https://images-coursera...",
+        "videoUrl": "https://youtube.com/..",
+        "duration": 6,
+        "durationUnit": "weeks",
+        "estimatedHours": 4,
+        "language": "English",
+        "category": "Data Science",
+        "externalId": "coursera_course_12345",
+        "sourceUrl": "https://coursera.org/learn/example-course",
+        "notes": "Found via JSON-LD"
+      }
+    },
+    "error": null
+  }
+}
+```
+
+If `status === "failed"` include `error` with code/message.
+
+#### 3) POST /api/courses/import/:jobId/accept
+
+After reviewing the preview, an authorized user can accept and persist the course to the catalog.
+
+Request Body (optional overrides):
+```json
+{
+  "overrides": {
+    "title": "Custom Title",
+    "category": "Business"
+  }
+}
+```
+
+Response (201):
+```json
+{
+  "success": true,
+  "data": { "id": "course_9012" },
+  "message": "Course created from import"
+}
+```
+
+### Worker Job (Background)
+
+Job payload saved in queue / DB:
+```json
+{
+  "jobId": "import_job_abcdef",
+  "url": "https://coursera.org/learn/example-course",
+  "source": "coursera",
+  "requestedBy": "admin_user_123",
+  "createdAt": "2025-11-14T10:00:00Z"
+}
+```
+
+Worker responsibilities:
+- Fetch the URL server-side (use server TLS and keep secrets out of client).
+- Prefer provider API / oEmbed / JSON-LD (`<script type="application/ld+json">`) for structured metadata.
+- Fallback: parse OpenGraph meta tags (`og:title`, `og:description`, `og:image`), structured lists on page.
+- Normalize and map fields into `coursePreview` schema (see example above).
+- Sanitize HTML (`fullDescription`) and strip disallowed tags/attributes.
+- Optionally download/host thumbnail; otherwise keep remote URL and validate content-type.
+- Detect duplicates by `externalId` or `sourceUrl` and return conflict info.
+- Persist preview object to a `course_imports` table with `status`, `result`, `error`.
+- Emit audit log entry and rate-limit external fetches.
+
+### Preview Schema (coursePreview)
+
+Partial mapping to `courses` table fields:
+- `title` (string)
+- `shortDescription` (string)
+- `fullDescription` (HTML string, sanitized)
+- `provider` (string)
+- `instructor` (string | string[])
+- `thumbnailUrl` (string)
+- `videoUrl` (string)
+- `duration` (number)
+- `durationUnit` (string)
+- `estimatedHours` (number)
+- `language` (string)
+- `category` (string)
+- `externalId` (string)
+- `sourceUrl` (string)
+- `rawMetadata` (JSON) — raw provider response or scraped JSON
+
+### Error Handling
+- `EXTERNAL_API_ERROR`: provider API returned non-200 or malformed response.
+- `SCRAPE_ERROR`: HTML parsing failed or required metadata missing.
+- `DUPLICATE_COURSE`: course with same `externalId` or `sourceUrl` already exists.
+- `UNSUPPORTED_DOMAIN`: domain not allowed for automated import.
+
+### Example Flow
+1. Admin pastes `https://coursera.org/learn/example-course` into import UI.
+2. Frontend POSTs to `POST /api/admin/courses/import` -> returns `jobId`.
+3. Worker picks job, fetches the URL, extracts metadata, writes preview, marks job done.
+4. Frontend polls `GET /api/admin/courses/import/:jobId/status` and displays preview when ready.
+5. Admin reviews preview and clicks `Accept` -> `POST /api/admin/courses/import/:jobId/accept` to persist course.
 
 ## Notes
 
 - All course data is sourced from Coursera API
 - Course enrollments redirect users to Coursera platform
-- Progress tracking is synchronized with Coursera's completion data
-- Admin endpoints require elevated permissions
+- Course creation is via import flow from provider URLs; backend fetches details automatically
+- Admin and import endpoints require elevated permissions (authorized users only)
 - All dates are in ISO 8601 format (UTC)
 - Recommendation algorithm should be cached to reduce computation
 - Consider using Redis for caching recommendations
 - Implement proper error handling and validation on all endpoints
-- Add request/response logging for debugging</content>
-  <parameter name="filePath">k:\2025\timcare\COURSES_API_SPEC.md
+- Add request/response logging for debugging

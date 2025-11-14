@@ -184,9 +184,9 @@ export function CoursesCatalog() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="">
       {/* Search & Filter Section */}
-      <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
+      <div className="bg-white rounded-2xl py-0  ">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl shadow-lg">
