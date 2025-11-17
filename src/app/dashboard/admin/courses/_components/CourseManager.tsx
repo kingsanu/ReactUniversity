@@ -1,16 +1,21 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { mockCourses } from "@/data/mockCourses";
 import {
   adminCreateCourse,
+  adminDeleteCourseApi,
+  adminUpdateCourseApi,
   adminUpdateCourse,
-  adminDeleteCourse,
+  adminStartImport,
+  adminGetImportStatus,
+  adminAcceptImport,
 } from "@/services/courseService";
 import { useQueryClient } from "@tanstack/react-query";
-import { courseKeys } from "@/hooks/useCourseQueries";
+import { courseKeys, useCourseList } from "@/hooks/useCourseQueries";
+import { useAdminCourseList } from "@/hooks/useAdminCourseQueries";
 import { Course } from "@/types/course";
 import {
   Plus,
@@ -25,6 +30,7 @@ import Image from "next/image";
 import { CourseFormDialog } from "./CourseFormDialog";
 import { CourseImportDialog } from "./CourseImportDialog";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import { motion } from "motion/react";
 
 export function CourseManager() {
@@ -33,9 +39,19 @@ export function CourseManager() {
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const queryClient = useQueryClient();
+  const courseQuery = useCourseList();
+  const adminQuery = useAdminCourseList();
 
-  const queryClient = useQueryClient(); // Added queryClient initialization
   const { t } = useTranslation();
+
+  useEffect(() => {
+    if (adminQuery.data?.courses?.length) {
+      setCourses(adminQuery.data.courses);
+    } else if (courseQuery.data?.courses?.length) {
+      setCourses(courseQuery.data.courses);
+    }
+  }, [courseQuery.data?.courses]);
   const filteredCourses = courses.filter(
     (course) =>
       course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -55,57 +71,97 @@ export function CourseManager() {
     setIsFormOpen(true);
   };
 
-  const handleDelete = (courseId: string) => {
+  const handleDelete = async (courseId: string) => {
     if (
       confirm(
         t("admin.courses.confirmDelete") ||
           "Are you sure you want to delete this course?"
       )
     ) {
-      setCourses(courses.filter((c) => c.id !== courseId));
+      try {
+        // prefer API-backed deletion
+        await adminDeleteCourseApi(courseId);
+        // if using adminDeleteCourseApi, replace above with adminDeleteCourseApi
+        setCourses((prev) => prev.filter((c) => c.id !== courseId));
+        await queryClient.invalidateQueries({ queryKey: courseKeys.list() });
+      } catch (error) {
+        console.error("Failed to delete course", error);
+      }
     }
-    adminDeleteCourse(courseId).then(() =>
-      queryClient.invalidateQueries({ queryKey: courseKeys.list() })
-    ); // Ensure cache invalidation
   };
 
-  const handleToggleActive = (courseId: string) => {
-    setCourses(
-      courses.map((c) =>
-        c.id === courseId ? { ...c, isActive: !c.isActive } : c
+  const handleToggleActive = async (courseId: string) => {
+    const target = courses.find((c) => c.id === courseId);
+    const nextStatus = target ? !target.isActive : true;
+    setCourses((prev) =>
+      prev.map((c) =>
+        c.id === courseId ? { ...c, isActive: nextStatus } : c
       )
     );
-    // Persist the change to the mock service
-    const course = courses.find((c) => c.id === courseId);
-    if (course) {
-      adminUpdateCourse(courseId, { isActive: !course.isActive }).then(() =>
-        queryClient.invalidateQueries({ queryKey: courseKeys.list() })
-      );
+    try {
+      await adminUpdateCourseApi(courseId, { isActive: nextStatus });
+      await queryClient.invalidateQueries({ queryKey: courseKeys.list() });
+    } catch (error) {
+      console.error("Failed to toggle course", error);
     }
   };
 
-  const handleSave = (course: Course) => {
+  const handleSave = async (course: Course) => {
     if (isCreating) {
-      // Create on mock service and update state with returned id
-      adminCreateCourse(course).then((created) => {
-        setCourses([...courses, created]);
-        queryClient.invalidateQueries({ queryKey: courseKeys.list() });
-      });
+      try {
+        const created = await adminCreateCourse(course);
+        setCourses((prev) => [...prev, created]);
+      } catch (error) {
+        console.error("Failed to create course", error);
+        return;
+      }
     } else {
-      setCourses(courses.map((c) => (c.id === course.id ? course : c)));
-      adminUpdateCourse(course.id, course).then(() =>
-        queryClient.invalidateQueries({ queryKey: courseKeys.list() })
-      );
+      try {
+        // Use the API-backed update and fall back to mock update if server fails
+        await adminUpdateCourseApi(course.id, course);
+        setCourses((prev) => prev.map((c) => (c.id === course.id ? course : c)));
+      } catch (error) {
+        console.error("Failed to update course", error);
+        return;
+      }
     }
+    await queryClient.invalidateQueries({ queryKey: courseKeys.list() });
     setIsFormOpen(false);
   };
 
   const handleImport = async (url: string) => {
-    // Mock import - in real implementation, call POST /api/courses/import
-    console.log("Importing from URL:", url);
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    // For now, just show success - backend will handle actual import
+    try {
+      const resp = await adminStartImport(url);
+      const jobId = resp?.jobId;
+
+      // Show success and poll for done status in background so admins can review
+      toast.success(t("courses_import.started", { jobId }));
+
+      // Poll until done or failed (max 12 attempts -> ~36s)
+      let attempts = 0;
+      const maxAttempts = 12;
+      const interval = 3000;
+      const poll = async () => {
+        attempts += 1;
+        const statusResp = await adminGetImportStatus(jobId);
+        const status = statusResp?.data?.status;
+        if (status === "done") {
+          // Optionally auto-accept or open a preview UI
+          console.log("Import job done", jobId, statusResp?.data?.result?.coursePreview);
+          // TODO: open preview modal for admin approval
+          return;
+        }
+        if (status === "failed" || attempts >= maxAttempts) {
+          console.error("Import failed or timed out", jobId);
+          return;
+        }
+        setTimeout(poll, interval);
+      };
+
+      setTimeout(poll, interval);
+    } catch (err) {
+      console.error("Import failed", err);
+    }
   };
 
   return (

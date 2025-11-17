@@ -6,6 +6,7 @@ import {
   CourseCompletionPayload,
 } from "@/types/course";
 import { mockCourses } from "@/data/mockCourses";
+import { apiRequest } from "@/lib/api/apiClient";
 
 const enrollmentStore = new Map<string, CourseEnrollment>();
 
@@ -113,16 +114,66 @@ export async function listCourses() {
   });
 }
 
+export async function adminListCourses(params?: { page?: number; limit?: number; search?: string }) {
+  try {
+    const q = new URLSearchParams();
+    if (params?.page) q.set("page", String(params.page));
+    if (params?.limit) q.set("limit", String(params.limit));
+    if (params?.search) q.set("search", params.search);
+    const url = `/api/admin/courses?${q.toString()}`;
+    const response = await apiRequest(url, { method: "GET" });
+    const data = response?.data ?? response;
+    // If backend returns empty courses and local mocks are explicitly enabled, fall back to mock list
+    const useLocal = process.env.NEXT_PUBLIC_USE_LOCAL_API === "true";
+    if ((!data || !data.courses || data.courses.length === 0) && useLocal) {
+      return listCourses();
+    }
+    return data;
+  } catch (err) {
+    const useLocal = process.env.NEXT_PUBLIC_USE_LOCAL_API === "true";
+    if (useLocal) return listCourses();
+    throw err;
+  }
+}
+
 export async function getCourseById(id: string) {
   const found = mockCourses.find((c) => c.id === id);
   return simulateNetworkDelay(found ?? null);
 }
 
 export async function adminCreateCourse(payload: Course) {
-  const id = `course_${Date.now()}`;
-  const created = { ...payload, id } as Course;
-  mockCourses.push(created);
-  return simulateNetworkDelay(created);
+  try {
+    const response = await apiRequest(`/api/admin/courses`, {
+      method: "POST",
+      data: payload,
+    });
+    return response?.data ?? response;
+  } catch (err) {
+    // Fallback to mock behaviour if backend unavailable
+    const id = `course_${Date.now()}`;
+    const created = { ...payload, id } as Course;
+    mockCourses.push(created);
+    return simulateNetworkDelay(created);
+  }
+}
+
+// --- Import flow wrappers (frontend -> API) ---
+export async function adminStartImport(url: string, source?: string) {
+  return apiRequest(`/api/admin/courses/import`, {
+    method: "POST",
+    data: { url, source },
+  });
+}
+
+export async function adminGetImportStatus(jobId: string) {
+  return apiRequest(`/api/admin/courses/import/${jobId}/status`, { method: "GET" });
+}
+
+export async function adminAcceptImport(jobId: string, overrides?: Record<string, any>) {
+  return apiRequest(`/api/admin/courses/import/${jobId}/accept`, {
+    method: "POST",
+    data: { overrides },
+  });
 }
 
 export async function adminUpdateCourse(id: string, payload: Partial<Course>) {
@@ -137,4 +188,23 @@ export async function adminDeleteCourse(id: string) {
   if (idx === -1) return simulateNetworkDelay(false);
   mockCourses.splice(idx, 1);
   return simulateNetworkDelay(true);
+}
+
+// Replace update/delete with server-backed variants too (with mock fallback)
+export async function adminUpdateCourseApi(id: string, payload: Partial<Course>) {
+  try {
+    const response = await apiRequest(`/api/admin/courses/${id}`, { method: "PUT", data: payload });
+    return response?.data ?? response;
+  } catch (err) {
+    return adminUpdateCourse(id, payload);
+  }
+}
+
+export async function adminDeleteCourseApi(id: string) {
+  try {
+    const response = await apiRequest(`/api/admin/courses/${id}`, { method: "DELETE" });
+    return response?.data ?? response;
+  } catch (err) {
+    return adminDeleteCourse(id);
+  }
 }

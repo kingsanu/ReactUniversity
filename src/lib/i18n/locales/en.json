@@ -357,6 +357,7 @@
     "importing": "Importing...",
     "invalidUrl": "Please enter a valid URL",
     "success": "Import job started. Check status in a moment.",
+    "started": "Import job started ({{jobId}}). Check status in a moment.",
     "failure": "Failed to start import. Please try again."
   },
   "admin": {

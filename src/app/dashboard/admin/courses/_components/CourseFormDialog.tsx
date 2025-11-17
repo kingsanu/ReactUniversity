@@ -324,7 +324,13 @@ export function CourseFormDialog({
           <Button type="button" variant="outline" onClick={onClose}>
             {t("admin.courses.form.cancel")}
           </Button>
-          <Button type="submit" onClick={(e) => e.preventDefault()}>
+          <Button
+            type="submit"
+            // allow the form submit handler (onSubmit) to call onSave
+            onClick={(e) => {
+              // nothing here — onSubmit will handle
+            }}
+          >
             {isCreating
               ? t("admin.courses.form.titleCreate")
               : t("admin.courses.form.save")}
