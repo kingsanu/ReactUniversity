@@ -312,6 +312,10 @@ export const useGlobalStore = create<GlobalState>()(
                 })),
               };
               await updateResume(state.currentResumeId, apiData);
+              // Mark as not dirty once saved
+              set((state) => ({
+                resumeBuilder: { ...state.resumeBuilder, isDirty: false },
+              }));
             } catch (error) {
               console.error("Failed to save resume to API", error);
             }

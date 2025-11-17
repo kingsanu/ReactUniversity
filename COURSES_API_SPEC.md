@@ -26,11 +26,15 @@ Authorization: Bearer <jwt_token>
 
 ### Frontend Status
 
-- ✅ All UI components built and functional
-- ✅ Mock data integration complete
-- ✅ Admin management interface ready
-- ✅ Responsive design implemented
-- ❌ Backend API integration pending
+- ✅ All UI components built and functional (catalog cards, filters, admin manager)
+- ✅ Mock data integration complete (client-side mock dataset drives UIs reliably)
+- ✅ Admin management interface ready (create/edit, search, toggle active, delete)
+- ✅ Responsive design implemented and validated across breakpoints
+- ✅ Accessibility improvements (ARIA labels, keyboard focus, and screen-reader friendly dialogs)
+- ✅ Import UI: added a modal to paste a Coursera URL and kick off the import flow (frontend mock for testing)
+- ✅ Admin Course form: widened, scrollable dialog with fixed footer for better editing and longer descriptions
+- ✅ Evaluation email invitation bug fixed — frontend now calls evaluation-scoped email endpoints correctly and exposes bulk/selected email flows
+- ❌ Backend API integration pending (frontend uses mocks for import and still needs server endpoints to fetch provider metadata and persist imported courses)
 
 ### Current Behavior
 
@@ -39,14 +43,35 @@ Authorization: Bearer <jwt_token>
 - Recommendations show top 3 mock courses (static scoring)
 - No persistence across sessions
 
+- The admin import flow is present as a clickable modal that accepts a provider course URL; it simulates network behavior for end-to-end UI validation.
+- The `Add Course` flow now supports long content and media; the course form uses a wide, scrollable modal to make editing easier.
+- The evaluators page email invite UI now calls the correct evaluation endpoints for bulk and selected invitations; the UI shows success/failure toasts and refreshes evaluator lists after a send.
+
 ### What Needs Backend Implementation
 
 1. **Data Persistence:** Store courses, enrollments, progress in database
 2. **User-Specific Data:** Track which courses each user has enrolled in
 3. **Personalization:** Calculate recommendation scores based on user profile
 4. **Progress Tracking:** Store and retrieve course progress per user
-5. **Admin Operations:** Course management (read, update, delete; create via import flow)
-6. **Import Flow:** Asynchronous course import from provider URLs
+5. **Import Flow:** Endpoint + worker to fetch provider metadata and persist course previews to `course_imports` before admin acceptance or draft creation
+
+### Demo & QA Steps (Frontend-only)
+
+1. Open the Courses page from the dashboard.
+2. Inspect course cards and filters; verify cards show `title`, `provider`, `category`, and `recommendedScore` from mock data.
+3. Click `Add Course` to open the course dialog; verify width/scroll behavior for long descriptions and that action buttons remain visible.
+4. Click `Import Course` in the admin header; paste a valid provider URL (e.g., a Coursera course link) and click `Start Import`.
+
+- The UI should show a loading state and then a confirmation toast (frontend-only - back end not required).
+
+5. Navigate to the Evaluators page for an assessment; use the Send Email dropdown:
+
+- `Send to all` triggers the bulk email flow and shows success/failure toasts.
+- `Send to specific` opens a selection dialog to choose evaluators; sending shows success/failure.
+
+6. Verify accessibility checks: keyboard navigation (Tab/Enter), screen-reader labels on main dialogs, and focus management after modal open/close.
+
+These steps exercise the UI flows implemented and validate readiness for the backend integration.
 
 ## Common Response Format
 

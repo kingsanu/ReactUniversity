@@ -53,7 +53,7 @@ export const dashboardData = {
       subtitle: "dashboard.createWithAI",
       icon: "📄",
       action: "dashboard.startBuilding",
-      link: "/dashboard/resume-builder/new",
+      link: "/dashboard/resumes",
       variant: "secondary",
       badge: "dashboard.withAI",
     },

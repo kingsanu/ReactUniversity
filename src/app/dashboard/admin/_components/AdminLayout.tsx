@@ -14,6 +14,7 @@ const adminNavItems = [
   { name: "Subscription Plans", path: "/dashboard/admin/plans", icon: "💳" },
   { name: "Users", path: "/dashboard/admin/users", icon: "👥" },
   { name: "Courses", path: "/dashboard/admin/courses", icon: "📚" },
+  { name: "Careers", path: "/dashboard/admin/careers", icon: "💼" },
   { name: "360° Questions", path: "/dashboard/admin/questions", icon: "❓" },
   { name: "Analytics", path: "/dashboard/admin/analytics", icon: "📈" },
   { name: "Settings", path: "/dashboard/admin/settings", icon: "⚙️" },

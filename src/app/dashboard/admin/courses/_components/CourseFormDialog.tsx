@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Course } from "@/types/course";
+import { useTranslation } from "react-i18next";
 
 interface CourseFormDialogProps {
   isOpen: boolean;
@@ -34,6 +35,7 @@ export function CourseFormDialog({
   course,
   isCreating,
 }: CourseFormDialogProps) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<Partial<Course>>({
     title: "",
     shortDescription: "",
@@ -101,7 +103,9 @@ export function CourseFormDialog({
       <DialogContent className="w-full min-w-5xl max-w-5xl h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">
-            {isCreating ? "Create New Course" : "Edit Course"}
+            {isCreating
+              ? t("admin.courses.form.titleCreate")
+              : t("admin.courses.form.titleEdit")}
           </DialogTitle>
         </DialogHeader>
 
@@ -115,7 +119,9 @@ export function CourseFormDialog({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
-                  <Label htmlFor="title">Course Title *</Label>
+                  <Label htmlFor="title">
+                    {t("courses.title") || "Course Title"} *
+                  </Label>
                   <Input
                     id="title"
                     value={formData.title}
@@ -126,7 +132,9 @@ export function CourseFormDialog({
                 </div>
 
                 <div>
-                  <Label htmlFor="provider">Provider *</Label>
+                  <Label htmlFor="provider">
+                    {t("courses.provider") || "Provider"} *
+                  </Label>
                   <Input
                     id="provider"
                     value={formData.provider}
@@ -137,7 +145,9 @@ export function CourseFormDialog({
                 </div>
 
                 <div>
-                  <Label htmlFor="instructor">Instructor *</Label>
+                  <Label htmlFor="instructor">
+                    {t("courses.instructor") || "Instructor"} *
+                  </Label>
                   <Input
                     id="instructor"
                     value={formData.instructor}
@@ -148,7 +158,9 @@ export function CourseFormDialog({
                 </div>
 
                 <div>
-                  <Label htmlFor="category">Category *</Label>
+                  <Label htmlFor="category">
+                    {t("courses.category") || "Category"} *
+                  </Label>
                   <Input
                     id="category"
                     value={formData.category}
@@ -310,10 +322,12 @@ export function CourseFormDialog({
         {/* Form Actions - fixed at bottom of dialog */}
         <div className="flex justify-end gap-3 p-4 border-t">
           <Button type="button" variant="outline" onClick={onClose}>
-            Cancel
+            {t("admin.courses.form.cancel")}
           </Button>
           <Button type="submit" onClick={(e) => e.preventDefault()}>
-            {isCreating ? "Create Course" : "Save Changes"}
+            {isCreating
+              ? t("admin.courses.form.titleCreate")
+              : t("admin.courses.form.save")}
           </Button>
         </div>
       </DialogContent>

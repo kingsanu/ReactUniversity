@@ -32,7 +32,8 @@
     "overview": "Resumen",
     "metrics": "Métricas",
     "feedback": "Comentarios",
-    "results": "Resultados"
+    "results": "Resultados",
+    "today": "Hoy"
   },
   "dashboard": {
     "title": "Panel de Control",
@@ -110,6 +111,14 @@
     "today": "Hoy",
     "top3CareerMatch": "Top 3 Coincidencias Profesionales",
     "showMore": "Mostrar más",
+    "careerExplorerTitle": "Explorador de Rutas Profesionales",
+    "careerExploreSearchPlaceholder": "Buscar carreras...",
+    "careerExplorerFilters": {
+      "industry": "Industria",
+      "education": "Nivel educativo",
+      "location": "Ubicación"
+    },
+
     "assessments": "Evaluaciones",
     "professionalAssessments": "Evaluaciones Profesionales",
     "assessmentsDescription": "Complete sus evaluaciones profesionales para desbloquear conocimientos personalizados sobre sus competencias, habilidades cognitivas y camino profesional ideal. Cada evaluación proporciona datos valiosos para su desarrollo profesional.",
@@ -137,6 +146,7 @@
     "statusNotStarted": "No iniciado",
     "completeAssessmentsMessage": "Completa las evaluaciones para desbloquear tus conocimientos de progreso",
     "loadingAssessmentProgress": "Cargando progreso de evaluación...",
+    "loading": "Cargando panel...",
     "assessmentSummary": "Resumen de la Evaluación",
     "dominance": "Dominancia",
     "influence": "Influencia",
@@ -263,6 +273,27 @@
     "startTest": "Comenzar Prueba",
     "nextExample": "Siguiente Ejemplo"
   },
+  "career": {
+    "match": "Coincidencia",
+    "favorite": "Favorito",
+    "favorited": "Guardado",
+    "compare": "Comparar",
+    "salaryRange": "Rango Salarial",
+    "laborDemand": "Demanda Laboral",
+    "whyRecommended": "Por qué se recomienda",
+    "showAll": "Mostrar todas las recomendaciones",
+    "noResults": "No se encontraron carreras"
+  },
+  "compare": {
+    "selectedCount": "{{count}} seleccionadas",
+    "compareButton": "Comparar"
+  },
+  "careerExplorer": {
+    "jobSummary": "Resumen del Trabajo",
+    "keyResponsibilities": "Responsabilidades Clave",
+    "skillsEducation": "Habilidades y Educación",
+    "allIndustries": "Todas las industrias"
+  },
   "courses": {
     "discoverCourses": "Descubre cursos para mejorar tus habilidades y avanzar en tu carrera",
     "searchAndFilter": "Buscar y Filtrar",
@@ -305,6 +336,9 @@
     "learningObjectives": "Objetivos de Aprendizaje",
     "prerequisites": "Prerrequisitos",
     "syllabus": "Programa del Curso",
+    "title": "Título del Curso",
+    "provider": "Proveedor",
+    "instructor": "Instructor",
     "skills": "Habilidades que Ganarás",
     "andMoreModules": "y {{count}} módulos más",
     "noCoursesFound": "No se encontraron cursos",
@@ -313,6 +347,68 @@
     "totalCourses": "Cursos Totales",
     "avgRating": "Calificación Promedio",
     "enrollments": "Inscripciones"
+  },
+  "courses_import": {
+    "button": "Importar curso",
+    "title": "Importar curso desde URL",
+    "description": "Pega la URL del curso del proveedor para obtener e importar los detalles automáticamente.",
+    "labelUrl": "URL del curso",
+    "start": "Iniciar importación",
+    "importing": "Importando...",
+    "invalidUrl": "Por favor ingresa una URL válida",
+    "success": "Trabajo de importación iniciado. Verifica el estado en breve.",
+    "failure": "No se pudo iniciar la importación. Intenta de nuevo."
+  },
+  "admin": {
+    "courses": {
+      "header": {
+        "addCourse": "Agregar curso"
+      },
+      "table": {
+        "course": "Curso",
+        "provider": "Proveedor",
+        "category": "Categoría",
+        "difficulty": "Dificultad",
+        "status": "Estado",
+        "enrollments": "Inscripciones",
+        "actions": "Acciones"
+      },
+      "status": {
+        "active": "Activo",
+        "inactive": "Inactivo"
+      },
+      "form": {
+        "titleCreate": "Crear nuevo curso",
+        "titleEdit": "Editar curso",
+        "save": "Guardar cambios",
+        "cancel": "Cancelar"
+      },
+      "confirmDelete": "¿Estás seguro de que deseas eliminar este curso?"
+    },
+    "careers": {
+      "header": { "title": "Administrador de Carreras" },
+      "confirmDelete": "¿Estás seguro de que deseas eliminar esta carrera?",
+      "createTitle": "Crear Carrera",
+      "editTitle": "Editar Carrera",
+      "form": {
+        "title": "Título (Inglés)",
+        "shortDescription": "Descripción corta (Inglés)"
+      }
+    }
+  },
+  "evaluation": {
+    "toast": {
+      "emailSent": "¡Correo de invitación enviado con éxito!",
+      "emailFailed": "Error al enviar invitación por correo. Intenta de nuevo.",
+      "emailPartial": "Algunas invitaciones pueden no haberse enviado. Verifica los resultados.",
+      "evalRemoved": "¡Evaluador eliminado con éxito!",
+      "evalRemoveFailed": "Error al eliminar al evaluador. Intenta de nuevo.",
+      "resendSuccess": "¡Enlace de invitación reenviado con éxito!",
+      "resendError": "Error al reenviar el enlace de invitación. Intenta de nuevo.",
+      "groupsIncomplete": "Por favor completa todos los grupos de evaluadores antes de enviar las invitaciones. Cada grupo debe tener al menos el número mínimo requerido de evaluadores.",
+      "noPhoneNumbers": "Ningún evaluador tiene número de teléfono disponible para invitaciones SMS.",
+      "smsComingSoon": "La funcionalidad de SMS estará disponible pronto."
+    }
   },
   "language": {
     "english": "Inglés",

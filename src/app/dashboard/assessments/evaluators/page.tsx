@@ -467,13 +467,13 @@ export default function EvaluatorsPage() {
   const handleResendLink = async (evaluatorId: string) => {
     try {
       await resendInvitationLink(evaluatorId);
-      toast.success("Invitation link resent successfully!");
+      toast.success(t("evaluation.toast.resendSuccess"));
 
       // Reload API evaluators to update status
       await loadApiEvaluators();
     } catch (error) {
       console.error("Error resending invitation link:", error);
-      toast.error("Error resending invitation link. Please try again.");
+      toast.error(t("evaluation.toast.resendError"));
     }
   };
 
@@ -504,13 +504,13 @@ export default function EvaluatorsPage() {
   const handleResendEmailLink = async (evaluatorId: string) => {
     try {
       await resendInvitationLink(evaluatorId);
-      toast.success("Email invitation sent successfully!");
+      toast.success(t("evaluation.toast.emailSent"));
 
       // Reload API evaluators to update status
       await loadApiEvaluators();
     } catch (error) {
       console.error("Error sending email invitation:", error);
-      toast.error("Error sending email invitation. Please try again.");
+      toast.error(t("evaluation.toast.emailFailed"));
     }
   };
 
@@ -547,9 +547,7 @@ export default function EvaluatorsPage() {
     }
 
     if (!areAllGroupsComplete()) {
-      toast.error(
-        "Please complete all evaluator groups before sending invitations. Each group must have at least the minimum required evaluators."
-      );
+      toast.error(t("evaluation.toast.groupsIncomplete"));
       setLoading(false);
       return;
     }
@@ -573,15 +571,13 @@ export default function EvaluatorsPage() {
       if (result.success) {
         toast.success(result.message || `Email invitations sent successfully!`);
       } else {
-        toast.warning(
-          "Some invitations may not have been sent. Please check the results."
-        );
+        toast.warning(t("evaluation.toast.emailPartial"));
       }
 
       await loadApiEvaluators();
     } catch (error) {
       console.error("Error sending email invitations:", error);
-      toast.error("Error sending email invitations. Please try again.");
+      toast.error(t("evaluation.toast.emailFailed"));
     } finally {
       setLoading(false);
     }
@@ -591,9 +587,7 @@ export default function EvaluatorsPage() {
     if (getTotalEvaluators() === 0) return;
 
     if (!areAllGroupsComplete()) {
-      toast.error(
-        "Please complete all evaluator groups before sending invitations. Each group must have at least the minimum required evaluators."
-      );
+      toast.error(t("evaluation.toast.groupsIncomplete"));
       return;
     }
 
@@ -618,16 +612,17 @@ export default function EvaluatorsPage() {
       }
 
       if (evaluatorsWithPhone.length === 0) {
-        toast.warning(
-          "No evaluators have phone numbers available for SMS invitations."
-        );
+        toast.warning(t("evaluation.toast.noPhoneNumbers"));
         setLoading(false);
         return;
       }
 
       // TODO: Implement SMS invitation API when available
       toast.info(
-        `SMS invitations would be sent to ${evaluatorsWithPhone.length} evaluators. SMS functionality coming soon!`
+        t("evaluation.toast.smsComingSoon") +
+          ` (${evaluatorsWithPhone.length} ${t(
+            "dashboard.evaluationEvaluators"
+          )})`
       );
     } catch (error) {
       console.error("Error sending SMS invitations:", error);

@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from "react";
 import { CourseCard } from "./CourseCard";
 import { CourseFilters } from "./CourseFilters";
 import { CourseDetailsModal } from "./CourseDetailsModal";
+import { SkeletonCourseCard } from "./SkeletonCourseCard";
 import {
   Course,
   CourseFilter,
@@ -17,6 +18,7 @@ import {
   mockDifficulties,
   mockRegions,
 } from "@/data/mockCourses";
+import { useCourseList } from "@/hooks/useCourseQueries";
 import { useTranslation } from "react-i18next";
 import {
   enrollInCourse,
@@ -24,10 +26,12 @@ import {
   markCourseCompleted,
 } from "../../../services/courseService";
 import { Star, BookOpen, Search } from "lucide-react";
+import { motion } from "motion/react";
 
 export function CoursesCatalog() {
   const { t } = useTranslation();
-  const [courses] = useState<Course[]>(mockCourses);
+  const { data, isLoading } = useCourseList();
+  const courses = data?.courses || [];
   const [filters, setFilters] = useState<CourseFilter>({});
   const [sortBy, setSortBy] = useState<CourseSortOption>("recommended");
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
@@ -210,6 +214,7 @@ export function CoursesCatalog() {
           onSortChange={setSortBy}
           onClearFilters={handleClearFilters}
           availableFilters={availableFilters}
+          searchCandidates={courses}
         />
       </div>
 
@@ -229,17 +234,23 @@ export function CoursesCatalog() {
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {recommendedCourses.map((course) => (
-            <CourseCard
-              key={course.id}
-              course={course}
-              onViewDetails={handleViewDetails}
-              onStartCourse={handleStartCourse}
-              isRecommended={true}
-              isEnrolled={Boolean(enrollments[course.id])}
-              enrollmentStatus={enrollments[course.id]?.status}
-              onMarkCompleted={handleMarkCompleted}
-            />
+          {recommendedCourses.map((course, index) => (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.06 * index }}
+            >
+              <CourseCard
+                key={course.id}
+                course={course}
+                onViewDetails={handleViewDetails}
+                onStartCourse={handleStartCourse}
+                isRecommended={true}
+                isEnrolled={Boolean(enrollments[course.id])}
+                enrollmentStatus={enrollments[course.id]?.status}
+                onMarkCompleted={handleMarkCompleted}
+              />
+            </motion.div>
           ))}
         </div>
       </div>
@@ -274,19 +285,25 @@ export function CoursesCatalog() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-            {filteredAndSortedCourses.map((course) => (
-              <CourseCard
-                key={course.id}
-                course={course}
-                onViewDetails={handleViewDetails}
-                onStartCourse={handleStartCourse}
-                isRecommended={recommendedCourses.some(
-                  (rc) => rc.id === course.id
-                )}
-                isEnrolled={Boolean(enrollments[course.id])}
-                enrollmentStatus={enrollments[course.id]?.status}
-                onMarkCompleted={handleMarkCompleted}
-              />
+            {filteredAndSortedCourses.map((course, index) => (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.06 * index }}
+              >
+                <CourseCard
+                  key={course.id}
+                  course={course}
+                  onViewDetails={handleViewDetails}
+                  onStartCourse={handleStartCourse}
+                  isRecommended={recommendedCourses.some(
+                    (rc) => rc.id === course.id
+                  )}
+                  isEnrolled={Boolean(enrollments[course.id])}
+                  enrollmentStatus={enrollments[course.id]?.status}
+                  onMarkCompleted={handleMarkCompleted}
+                />
+              </motion.div>
             ))}
           </div>
         )}

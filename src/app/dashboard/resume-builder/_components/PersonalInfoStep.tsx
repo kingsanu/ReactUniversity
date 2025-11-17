@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { motion } from "motion/react";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Linkedin } from "lucide-react";
 import { careerFields } from "./resumeData";
 
 export function PersonalInfoStep() {
@@ -51,6 +51,7 @@ export function PersonalInfoStep() {
           <Sparkles size={16} />
           Fill with Sample Data
         </Button>
+        {/* LinkedIn import removed in this flow — handled by other integration */}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -68,14 +68,20 @@ export default function MyResumesPage() {
    * Create new resume
    */
   const handleCreateResume = () => {
-    router.push("/dashboard/resume-builder/new");
+    // Resume Builder step is disabled. Open the 'New Flow' to create resumes.
+    alert(
+      "Resume Builder is disabled in this product flow. Please use the new creation flow from the 'New Flow' menu."
+    );
   };
 
   /**
    * Edit existing resume
    */
   const handleEditResume = (resumeId: string) => {
-    router.push(`/dashboard/resume-builder/${resumeId}`);
+    // Editing via resume builder is deprecated in this product flow
+    alert(
+      "Editing resumes via the builder is disabled. Use the new resume flow to edit."
+    );
   };
 
   /**

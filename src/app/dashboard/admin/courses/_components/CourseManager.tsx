@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { mockCourses } from "@/data/mockCourses";
+import { adminCreateCourse, adminUpdateCourse, adminDeleteCourse } from '@/services/courseService';
+import { useQueryClient } from '@tanstack/react-query';
+import { courseKeys } from '@/hooks/useCourseQueries';
 import { Course } from "@/types/course";
 import {
   Plus,
@@ -17,6 +20,8 @@ import {
 import Image from "next/image";
 import { CourseFormDialog } from "./CourseFormDialog";
 import { CourseImportDialog } from "./CourseImportDialog";
+import { useTranslation } from "react-i18next";
+import { motion } from "motion/react";
 
 export function CourseManager() {
   const [courses, setCourses] = useState<Course[]>(mockCourses);
@@ -25,6 +30,8 @@ export function CourseManager() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
 
+  const queryClient = useQueryClient(); // Added queryClient initialization
+  const { t } = useTranslation();
   const filteredCourses = courses.filter(
     (course) =>
       course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -45,9 +52,15 @@ export function CourseManager() {
   };
 
   const handleDelete = (courseId: string) => {
-    if (confirm("Are you sure you want to delete this course?")) {
+    if (
+      confirm(
+        t("admin.courses.confirmDelete") ||
+          "Are you sure you want to delete this course?"
+      )
+    ) {
       setCourses(courses.filter((c) => c.id !== courseId));
     }
+        adminDeleteCourse(courseId).then(() => queryClient.invalidateQueries({ queryKey: courseKeys.list() })); // Ensure cache invalidation
   };
 
   const handleToggleActive = (courseId: string) => {
@@ -56,13 +69,23 @@ export function CourseManager() {
         c.id === courseId ? { ...c, isActive: !c.isActive } : c
       )
     );
+    // Persist the change to the mock service
+    const course = courses.find((c) => c.id === courseId);
+    if (course) {
+      adminUpdateCourse(courseId, { isActive: !course.isActive }).then(() => queryClient.invalidateQueries({ queryKey: courseKeys.list() }));
+    }
   };
 
   const handleSave = (course: Course) => {
     if (isCreating) {
-      setCourses([...courses, { ...course, id: `course_${Date.now()}` }]);
+      // Create on mock service and update state with returned id
+      adminCreateCourse(course).then((created) => {
+        setCourses([...courses, created]);
+        queryClient.invalidateQueries({ queryKey: courseKeys.list() });
+      });
     } else {
       setCourses(courses.map((c) => (c.id === course.id ? course : c)));
+      adminUpdateCourse(course.id, course).then(() => queryClient.invalidateQueries({ queryKey: courseKeys.list() }));
     }
     setIsFormOpen(false);
   };
@@ -97,7 +120,7 @@ export function CourseManager() {
               <CourseImportDialog onImport={handleImport} />
               <Button onClick={handleCreate} className="gap-2">
                 <Plus className="w-4 h-4" />
-                Add Course
+                {t("admin.courses.header.addCourse")}
               </Button>
             </div>
           </div>
@@ -112,31 +135,31 @@ export function CourseManager() {
               <thead className="bg-gray-50 border-b">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Course
+                    {t("admin.courses.table.course")}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Provider
+                    {t("admin.courses.table.provider")}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Category
+                    {t("admin.courses.table.category")}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Difficulty
+                    {t("admin.courses.table.difficulty")}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
+                    {t("admin.courses.table.status")}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Enrollments
+                    {t("admin.courses.table.enrollments")}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
+                    {t("admin.courses.table.actions")}
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredCourses.map((course) => (
-                  <tr key={course.id} className="hover:bg-gray-50">
+                  <motion.tr key={course.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <Image
@@ -192,7 +215,9 @@ export function CourseManager() {
                             course.isActive ? "text-green-600" : "text-gray-400"
                           }`}
                         >
-                          {course.isActive ? "Active" : "Inactive"}
+                          {course.isActive
+                            ? t("admin.courses.status.active")
+                            : t("admin.courses.status.inactive")}
                         </span>
                       </button>
                     </td>
@@ -218,7 +243,7 @@ export function CourseManager() {
                         </Button>
                       </div>
                     </td>
-                  </tr>
+                  </motion.tr>
                 ))}
               </tbody>
             </table>

@@ -16,6 +16,8 @@ export interface ATSScoreDisplayProps {
   keywordsIncluded?: string[];
   maxWordCount?: number;
   className?: string;
+  missingKeywords?: string[];
+  onAddSuggestion?: (keyword: string) => void;
 }
 
 export function ATSScoreDisplay({
@@ -161,6 +163,32 @@ export function ATSScoreDisplay({
                 +{keywordsIncluded.length - 8} more
               </span>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Missing Keywords */}
+      {missingKeywords && missingKeywords.length > 0 && (
+        <div className="space-y-2">
+          <h4 className="text-xs font-semibold text-gray-700">
+            Missing Keywords
+          </h4>
+          <p className="text-xs text-gray-600">
+            Keywords present in the job description but not in the generated
+            content.
+          </p>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {missingKeywords.slice(0, 12).map((keyword, idx) => (
+              <button
+                key={idx}
+                onClick={() => onAddSuggestion?.(keyword)}
+                className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700 border border-red-200 hover:bg-red-200 transition-colors"
+                type="button"
+              >
+                <AlertCircle className="w-3 h-3" />
+                Add '{keyword}'
+              </button>
+            ))}
           </div>
         </div>
       )}

@@ -6,6 +6,7 @@ import {
   useRef,
   useCallback,
   type ReactNode,
+  type KeyboardEvent,
 } from "react";
 import { useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -655,6 +656,19 @@ function SortableSection({
     zIndex: isDragging ? 1000 : "auto",
   };
 
+  const handleSectionToggle = () => {
+    toggleSection(section.id);
+  };
+
+  const handleHeaderKeyDown = (
+    event: KeyboardEvent<HTMLDivElement>
+  ) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      handleSectionToggle();
+    }
+  };
+
   return (
     <motion.div
       ref={setNodeRef}
@@ -726,9 +740,13 @@ function SortableSection({
             </button>
           </div>
         ) : (
-          <button
-            onClick={() => toggleSection(section.id)}
-            className="flex-1 flex items-center gap-3"
+          <div
+            role="button"
+            tabIndex={0}
+            aria-expanded={section.isExpanded}
+            onClick={handleSectionToggle}
+            onKeyDown={handleHeaderKeyDown}
+            className="flex-1 flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-md"
           >
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <section.icon className="w-5 h-5 text-muted-foreground flex-shrink-0" />
@@ -758,7 +776,7 @@ function SortableSection({
             ) : (
               <ChevronDown className="w-5 h-5 text-muted-foreground" />
             )}
-          </button>
+          </div>
         )}
 
         {headerActions ? (
@@ -1758,9 +1776,29 @@ export default function ResumeBuilderPage() {
                         typeof content === "string"
                           ? content
                           : content.join("\n");
-                      setDynamicEntryForm({
-                        ...dynamicEntryForm,
-                        [field.name]: value,
+                      setDynamicEntryForm((prev) => {
+                        const next = { ...prev, [field.name]: value };
+                        console.debug(
+                          "AI generated applied to dynamic form",
+                          field.name,
+                          value
+                        );
+
+                        // If we are editing a dynamic entry, update it in the global store
+                        // so the generated content is persisted and won't be overwritten
+                        // by other updates. Do not close the edit panel — we only update
+                        // the store value for the current entry.
+                        if (editingDynamicEntry?.sectionId === section.id) {
+                          setTimeout(() =>
+                            updateDynamicSectionEntry(
+                              section.id,
+                              editingDynamicEntry.entryId,
+                              next as any
+                            )
+                          , 15);
+                        }
+
+                        return next;
                       });
                     }}
                   />
@@ -1832,6 +1870,7 @@ export default function ResumeBuilderPage() {
                   ...prev,
                   [section.id]: { ...form, description },
                 }));
+                console.debug("AI generated applied to custom section", section.id, description);
                 handleSaveCustomSection();
               }}
             />
@@ -1871,6 +1910,7 @@ export default function ResumeBuilderPage() {
                   ...prev,
                   [section.id]: { ...form, bullets },
                 }));
+                console.debug("AI generated applied to custom section bullets", section.id, bullets);
                 handleSaveCustomSection();
               }}
             />
@@ -2251,19 +2291,24 @@ export default function ResumeBuilderPage() {
     setShowPersonalInfoModal(true);
   };
 
-  const handleSavePersonalInfo = () => {
+  const persistPersonalInfoForm = (
+    nextForm: PersonalInfoFormState,
+    options: { closeModal?: boolean } = {}
+  ) => {
+    const { closeModal = false } = options;
     const customFieldSnapshot = customFields;
-    updatePersonalInfo(personalInfoForm);
+
+    updatePersonalInfo(nextForm);
 
     setCustomFields((previousFields) =>
       previousFields.map((field) => ({
         ...field,
-        value: personalInfoForm[field.id] ?? "",
+        value: nextForm[field.id] ?? "",
       }))
     );
 
     customFieldSnapshot.forEach((field) => {
-      const nextValue = personalInfoForm[field.id] ?? "";
+      const nextValue = nextForm[field.id] ?? "";
       if ((field.value ?? "") !== nextValue) {
         updateCustomField(field.id, { value: nextValue } as any);
       }
@@ -2271,7 +2316,14 @@ export default function ResumeBuilderPage() {
 
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 2000);
-    setShowPersonalInfoModal(false);
+
+    if (closeModal) {
+      setShowPersonalInfoModal(false);
+    }
+  };
+
+  const handleSavePersonalInfo = () => {
+    persistPersonalInfoForm(personalInfoForm, { closeModal: true });
   };
 
   // Education Handlers
@@ -3039,16 +3091,21 @@ export default function ResumeBuilderPage() {
                                 variant="icon"
                                 size="sm"
                                 onGenerate={(content) => {
-                                  setPersonalInfoForm({
+                                  const summaryText =
+                                    typeof content === "string"
+                                      ? content
+                                      : content[0] ?? "";
+                                  const nextForm = {
                                     ...personalInfoForm,
-                                    summary:
-                                      typeof content === "string"
-                                        ? content
-                                        : content[0],
-                                  });
-                                  handleSavePersonalInfo();
-                                  setSaveSuccess(true);
-                                  setTimeout(() => setSaveSuccess(false), 2000);
+                                    summary: summaryText,
+                                  };
+
+                                  setPersonalInfoForm(nextForm);
+                                  persistPersonalInfoForm(nextForm);
+                                  console.debug(
+                                    "AI generated applied to personal summary",
+                                    summaryText
+                                  );
                                 }}
                               />
                             </div>
@@ -3881,10 +3938,11 @@ export default function ResumeBuilderPage() {
                                             : content
                                                 .split("\n")
                                                 .filter((b) => b.trim());
-                                          setExperienceForm({
-                                            ...experienceForm,
+                                          setExperienceForm((prev) => ({
+                                            ...prev,
                                             description: bullets,
-                                          });
+                                          }));
+                                          console.debug("AI generated applied to experience bullets", bullets);
                                         }}
                                       />
                                     </div>
@@ -4116,10 +4174,11 @@ export default function ResumeBuilderPage() {
                                     : content
                                         .split("\n")
                                         .filter((b) => b.trim());
-                                  setExperienceForm({
-                                    ...experienceForm,
+                                  setExperienceForm((prev) => ({
+                                    ...prev,
                                     description: bullets,
-                                  });
+                                  }));
+                                  console.debug("AI generated applied to experience bullets", bullets);
                                 }}
                               />
                             </div>

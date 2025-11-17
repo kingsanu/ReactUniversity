@@ -12,6 +12,8 @@ import {
 import { CourseFilter, CourseSortOption } from "@/types/course";
 import { useTranslation } from "react-i18next";
 import { Search, Filter, X } from "lucide-react";
+import Fuse from "fuse.js";
+import { Course } from "@/types/course";
 
 interface CourseFiltersProps {
   filters: CourseFilter;
@@ -25,7 +27,9 @@ interface CourseFiltersProps {
     difficulties: string[];
     countries: string[];
     regions: string[];
+    candidates?: Course[];
   };
+  searchCandidates?: Course[];
 }
 
 export function CourseFilters({
@@ -35,12 +39,31 @@ export function CourseFilters({
   onSortChange,
   onClearFilters,
   availableFilters,
+  searchCandidates,
 }: CourseFiltersProps) {
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [suggestions, setSuggestions] = useState<Course[]>([]);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
 
   const handleSearchChange = (value: string) => {
     onFiltersChange({ ...filters, search: value });
+
+    // fuzzy suggestions
+    if (searchCandidates && value.trim().length > 1) {
+      const fuse = new Fuse(searchCandidates, {
+        keys: ["title", "shortDescription", "provider"],
+        threshold: 0.35,
+      });
+
+      const results = fuse
+        .search(value)
+        .slice(0, 5)
+        .map((r) => r.item);
+      setSuggestions(results);
+    } else {
+      setSuggestions([]);
+    }
   };
 
   const handleCategoryChange = (value: string) => {
@@ -118,6 +141,26 @@ export function CourseFilters({
             onChange={(e) => handleSearchChange(e.target.value)}
             className="pl-10"
           />
+          {suggestions.length > 0 && (
+            <div className="absolute left-0 right-0 mt-12 bg-white shadow rounded z-20">
+              {suggestions.map((s, i) => (
+                <button
+                  key={s.id}
+                  className={`w-full text-left px-3 py-2 hover:bg-gray-50 ${
+                    i === selectedIndex ? "bg-gray-100" : ""
+                  }`}
+                  onClick={() => {
+                    onFiltersChange({ ...filters, search: s.title });
+                    setSuggestions([]);
+                    setSelectedIndex(-1);
+                  }}
+                >
+                  <div className="text-sm font-medium">{s.title}</div>
+                  <div className="text-xs text-gray-500">{s.provider}</div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <Select value={sortBy} onValueChange={onSortChange}>

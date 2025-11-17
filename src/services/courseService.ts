@@ -5,6 +5,7 @@ import {
   CourseProgressPayload,
   CourseCompletionPayload,
 } from "@/types/course";
+import { mockCourses } from "@/data/mockCourses";
 
 const enrollmentStore = new Map<string, CourseEnrollment>();
 
@@ -102,4 +103,38 @@ export async function markCourseCompleted(
   enrollmentStore.set(payload.enrollmentId, updated);
 
   return simulateNetworkDelay(updated);
+}
+
+// --- Course listing & admin (mock) ---
+export async function listCourses() {
+  return simulateNetworkDelay({
+    courses: mockCourses,
+    meta: { total: mockCourses.length, page: 1, pageSize: mockCourses.length },
+  });
+}
+
+export async function getCourseById(id: string) {
+  const found = mockCourses.find((c) => c.id === id);
+  return simulateNetworkDelay(found ?? null);
+}
+
+export async function adminCreateCourse(payload: Course) {
+  const id = `course_${Date.now()}`;
+  const created = { ...payload, id } as Course;
+  mockCourses.push(created);
+  return simulateNetworkDelay(created);
+}
+
+export async function adminUpdateCourse(id: string, payload: Partial<Course>) {
+  const idx = mockCourses.findIndex((c) => c.id === id);
+  if (idx === -1) return simulateNetworkDelay(null);
+  mockCourses[idx] = { ...mockCourses[idx], ...payload } as Course;
+  return simulateNetworkDelay(mockCourses[idx]);
+}
+
+export async function adminDeleteCourse(id: string) {
+  const idx = mockCourses.findIndex((c) => c.id === id);
+  if (idx === -1) return simulateNetworkDelay(false);
+  mockCourses.splice(idx, 1);
+  return simulateNetworkDelay(true);
 }

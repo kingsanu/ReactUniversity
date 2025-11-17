@@ -187,6 +187,41 @@ export function LivePreviewPDF({ className = "" }: LivePreviewPDFProps = {}) {
     }
   }, [templateComponent, debouncedData]);
 
+  const dynamicSectionsSignature = useMemo(() => {
+    const sections = debouncedData.dynamicSections || [];
+    if (!sections.length) {
+      return "no-dynamic-sections";
+    }
+
+    return sections
+      .map((section) => {
+        const entryCount = section.entries?.length || 0;
+        const contentSignature = [
+          section.description?.length || 0,
+          section.bullets?.length || 0,
+        ].join(":");
+
+        return `${section.id}:${section.type}:${entryCount}:${contentSignature}`;
+      })
+      .join("|");
+  }, [debouncedData.dynamicSections]);
+
+  const pdfViewerKey = useMemo(
+    () =>
+      [
+        skills.length,
+        experience.length,
+        education.length,
+        dynamicSectionsSignature,
+      ].join("-"),
+    [
+      skills.length,
+      experience.length,
+      education.length,
+      dynamicSectionsSignature,
+    ]
+  );
+
   if (!isClient) {
     return null;
   }
@@ -210,6 +245,10 @@ export function LivePreviewPDF({ className = "" }: LivePreviewPDFProps = {}) {
                 <span>Updating...</span>
               </div>
             )}
+            {/* Announce updates for screen readers */}
+            <div aria-live="polite" className="sr-only">
+              {isDataChanging ? "Preview is updating" : "Preview updated"}
+            </div>
           </div>
           <div className="text-xs text-gray-500">
             Template: {currentTemplate || "Modern"}
@@ -254,7 +293,7 @@ export function LivePreviewPDF({ className = "" }: LivePreviewPDFProps = {}) {
           <PDFErrorBoundary>
             <div className="w-full h-full">
               <pdfComponents.PDFViewer
-                key={`pdf-${debouncedData.skills.length}-${debouncedData.experience.length}-${debouncedData.education.length}`}
+                key={pdfViewerKey}
                 style={{
                   width: "100%",
                   height: "100%",

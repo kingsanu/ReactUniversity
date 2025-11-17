@@ -8,6 +8,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "motion/react";
 import { Sparkles, Loader } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ContentGenerationModal } from "./ContentGenerationModal";
@@ -131,15 +132,18 @@ export function GenerateButton({
   };
 
   const handleGenerate = (content: string | string[]) => {
+    console.debug("GenerateButton: handleGenerate -> parent onGenerate", content);
     onGenerate(content);
     setIsModalOpen(false);
   };
 
   return (
     <>
-      <button
+      <motion.button
+        whileTap={{ scale: 0.98 }}
         onClick={handleClick}
         disabled={disabled || isLoading}
+        aria-expanded={isModalOpen}
         className={cn(
           variantClasses[variant],
           "disabled:opacity-50 disabled:cursor-not-allowed",
@@ -155,11 +159,18 @@ export function GenerateButton({
           </>
         ) : (
           <>
-            <Sparkles className={sizeClasses[size]} />
+            <motion.span
+              initial={{ rotate: 0, scale: 1 }}
+              whileHover={{ rotate: [0, -8, 8, 0], scale: 1.06 }}
+              transition={{ duration: 0.6 }}
+              aria-hidden
+            >
+              <Sparkles className={sizeClasses[size]} />
+            </motion.span>
             {showLabel && <span>Generate</span>}
           </>
         )}
-      </button>
+      </motion.button>
 
       <ContentGenerationModal
         isOpen={isModalOpen}

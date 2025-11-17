@@ -5,7 +5,7 @@ import { TopNav } from "./_components/TopNav";
 import { ActionCards } from "./_components/ActionCards";
 import { CompetencyChart } from "./_components/CompetencyChart";
 import { OpportunitiesTable } from "./_components/OpportunitiesTable";
-import { CareerMatches } from "./_components/CareerMatches";
+import { Top3Careers } from "@/components/career/Top3Careers";
 import { ActivityChart } from "./_components/ActivityChart";
 import { Benchmarks } from "./_components/Benchmarks";
 import { Milestones } from "./_components/Milestones";
@@ -50,9 +50,9 @@ export default function DashboardPage() {
               <CompetencyChart />
             </div>
 
-            {/* Right: Career Matches */}
+            {/* Right: Career Matches (Top 3) */}
             <div>
-              <CareerMatches />
+              <Top3Careers />
             </div>
           </div>
 

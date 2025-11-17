@@ -1,0 +1,337 @@
+openapi: 3.1.0
+info:
+  title: Career Paths Explorer API
+  description: APIs to support the Career Paths Explorer feature; includes recommendations, career details, favorites and admin operations.
+  version: "1.0.0"
+servers:
+  - url: /api
+paths:
+  /careers:
+    get:
+      summary: List careers
+      description: Retrieve a paginated list of careers with optional filters. Use 'sort=recommended' when you want AI ranking applied.
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: search
+          schema:
+            type: string
+        - in: query
+          name: industry
+          schema:
+            type: string
+        - in: query
+          name: interest
+          schema:
+            type: string
+        - in: query
+          name: education
+          schema:
+            type: string
+        - in: query
+          name: location
+          schema:
+            type: string
+        - in: query
+          name: sort
+          schema:
+            type: string
+            enum: [recommended, match, title, demand]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CareerListResponse'
+  /careers/{careerId}:
+    get:
+      summary: Get career details
+      parameters:
+        - in: path
+          name: careerId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Career details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CareerDetail'
+  /careers/recommendations:
+    post:
+      summary: Get personalized career recommendations for a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecommendationRequest'
+      responses:
+        '200':
+          description: Recommendations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationResponse'
+  /users/{userId}/favorites:
+    get:
+      summary: Get user favorites
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Favorites list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  favorites:
+                    type: array
+                    items:
+                      type: string
+    post:
+      summary: Add to favorites
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                careerId:
+                  type: string
+      responses:
+        '201':
+          description: Created
+  /users/{userId}/favorites/{careerId}:
+    delete:
+      summary: Remove favorite
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: careerId
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted
+  /careers/compare:
+    post:
+      summary: Prepare data to compare careers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                careerIds:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Comparison data
+components:
+  schemas:
+    CareerRole:
+      type: object
+      properties:
+        id:
+          type: string
+        familyId:
+          type: string
+        title:
+          type: object
+          properties:
+            en:
+              type: string
+            es:
+              type: string
+        shortDescription:
+          type: object
+          properties:
+            en:
+              type: string
+            es:
+              type: string
+        longDescription:
+          type: object
+          properties:
+            en:
+              type: string
+            es:
+              type: string
+        responsibilities:
+          type: array
+          items:
+            type: object
+            properties:
+              en:
+                type: string
+              es:
+                type: string
+        skills:
+          type: array
+          items:
+            type: object
+            properties:
+              skillId:
+                type: string
+              name:
+                type: object
+                properties:
+                  en:
+                    type: string
+                  es:
+                    type: string
+              levelRequired:
+                type: string
+        educationLevel:
+          type: string
+          enum:
+            - HighSchool
+            - Associate
+            - Bachelors
+            - Masters
+            - PhD
+        salaryRange:
+          type: object
+          properties:
+            min:
+              type: number
+            median:
+              type: number
+            max:
+              type: number
+            currency:
+              type: string
+        demandStats:
+          type: object
+          properties:
+            jobCount:
+              type: number
+            postedLast30Days:
+              type: number
+            growthPercent:
+              type: number
+        industries:
+          type: array
+          items:
+            type: string
+        iconUrl:
+          type: string
+        matchScore:
+          type: number
+    CareerListResponse:
+      type: object
+      properties:
+        careers:
+          type: array
+          items:
+            $ref: '#/components/schemas/CareerRole'
+        meta:
+          type: object
+          properties:
+            total:
+              type: integer
+            page:
+              type: integer
+            pageSize:
+              type: integer
+    CareerDetail:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/CareerRole'
+        - type: object
+          properties:
+            recommendedReasoning:
+              type: object
+              properties:
+                en:
+                  type: string
+                es:
+                  type: string
+            trendingScore:
+              type: number
+    RecommendationRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+        context:
+          type: object
+          properties:
+            assessmentId:
+              type: string
+            assessmentScores:
+              type: object
+            interestProfile:
+              type: object
+            location:
+              type: string
+            educationLevel:
+              type: string
+            weighting:
+              type: object
+    RecommendationResponse:
+      type: object
+      properties:
+        recommendations:
+          type: array
+          items:
+            type: object
+            properties:
+              careerId:
+                type: string
+              matchScore:
+                type: number
+              explanation:
+                type: object
+                properties:
+                  en:
+                    type: string
+                  es:
+                    type: string
+        engineMeta:
+          type: object
+          properties:
+            engine:
+              type: string
+            timestamp:
+              type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []

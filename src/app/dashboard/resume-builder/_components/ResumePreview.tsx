@@ -5,6 +5,9 @@ import { useGlobalStore } from '@/store/useGlobalStore';
 import { Download, Eye, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { LivePreviewPDF } from './LivePreviewPDF';
+import FocusTrap from 'focus-trap-react';
+import { ATSCheck } from './ATSCheck';
+// ATSCheck removed: resume builder step disabled in current flow
 
 
 
@@ -12,10 +15,41 @@ export function ResumePreview() {
   const { resumeBuilder } = useGlobalStore();
   const [isClient, setIsClient] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  // ATS modal (hidden by default) - allow opening the ATS check overlay
+  const [showATS, setShowATS] = useState(false);
+  const [lastSavedTick, setLastSavedTick] = useState<number | null>(null);
+
+  // Watch autosave state, announce 'Saved' when isDirty flips false
+  useEffect(() => {
+    const unsub = useGlobalStore.subscribe((state) => {
+      if (!state.resumeBuilder.isDirty) {
+        setLastSavedTick(Date.now());
+      }
+    });
+    return unsub;
+  }, []);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  // Close preview with Escape
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showPreview) setShowPreview(false);
+    };
+    if (showPreview) window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [showPreview]);
+
+  // Close ATS with Escape
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showATS) setShowATS(false);
+    };
+    if (showATS) window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [showATS]);
 
   const handleDownload = async () => {
     try {
@@ -47,7 +81,7 @@ export function ResumePreview() {
     }
   };
 
-  if (!isClient) {
+    if (!isClient) {
     return null;
   }
 
@@ -82,13 +116,16 @@ export function ResumePreview() {
           style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
           onClick={() => setShowPreview(false)}
         >
-          <motion.div
+            <motion.div
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -20, opacity: 0 }}
             className="w-full h-full bg-white flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
+              {/* Focus Trap: keep keyboard focus inside preview for accessibility */}
+              <FocusTrap>
+              <div role="dialog" aria-label="Resume preview" className="w-full h-full">
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b bg-white shadow-sm print:hidden">
               <h3 className="text-lg font-semibold text-gray-900">Resume Preview</h3>
@@ -101,11 +138,23 @@ export function ResumePreview() {
                   Print/Save as PDF
                 </button>
                 <button
+                  onClick={() => setShowATS(true)}
+                  className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                >
+                  ATS Check
+                </button>
+                <button
                   onClick={() => setShowPreview(false)}
                   className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 p-2 rounded-full transition-colors"
                 >
                   <X size={20} />
                 </button>
+              </div>
+              {lastSavedTick && (
+                <div className="absolute left-6 top-6 text-sm text-green-600">Saved</div>
+              )}
+              <div aria-live="polite" className="sr-only">
+                {lastSavedTick ? 'Resume saved' : ''}
               </div>
             </div>
 
@@ -119,8 +168,15 @@ export function ResumePreview() {
                 </div>
               </div>
             </div>
+              </div>
+              </FocusTrap>
           </motion.div>
         </motion.div>,
+        document.body
+      )}
+
+      {showATS && isClient && createPortal(
+        <ATSCheck onClose={() => setShowATS(false)} />,
         document.body
       )}
     </>

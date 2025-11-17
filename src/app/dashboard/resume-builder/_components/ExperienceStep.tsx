@@ -1,11 +1,11 @@
 "use client";
-import { useState } from 'react';
-import { useGlobalStore } from '@/store/useGlobalStore';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { motion } from 'motion/react';
-import { cn } from '@/lib/utils';
+import { useState } from "react";
+import { useGlobalStore } from "@/store/useGlobalStore";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { motion } from "motion/react";
+import { cn } from "@/lib/utils";
 
 interface ExperienceForm {
   jobTitle: string;
@@ -18,42 +18,55 @@ interface ExperienceForm {
 }
 
 const initialExperienceForm: ExperienceForm = {
-  jobTitle: '',
-  company: '',
-  location: '',
-  startDate: '',
-  endDate: '',
+  jobTitle: "",
+  company: "",
+  location: "",
+  startDate: "",
+  endDate: "",
   current: false,
-  description: ['']
+  description: [""],
 };
 
 export function ExperienceStep() {
-  const { resumeBuilder, addExperience, updateExperience, removeExperience } = useGlobalStore();
+  const { resumeBuilder, addExperience, updateExperience, removeExperience } =
+    useGlobalStore();
   const { experience } = resumeBuilder.data;
 
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [formData, setFormData] = useState<ExperienceForm>(initialExperienceForm);
-  const [showFresherTips, setShowFresherTips] = useState(experience.length === 0);
+  const [formData, setFormData] = useState<ExperienceForm>(
+    initialExperienceForm
+  );
+  const [showFresherTips, setShowFresherTips] = useState(
+    experience.length === 0
+  );
 
-  const handleInputChange = (field: keyof ExperienceForm, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const handleInputChange = (
+    field: keyof ExperienceForm,
+    value: string | boolean
+  ) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleDescriptionChange = (index: number, value: string) => {
     const newDescription = [...formData.description];
     newDescription[index] = value;
-    setFormData(prev => ({ ...prev, description: newDescription }));
+    setFormData((prev) => ({ ...prev, description: newDescription }));
   };
 
   const addDescriptionBullet = () => {
-    setFormData(prev => ({ ...prev, description: [...prev.description, ''] }));
+    setFormData((prev) => ({
+      ...prev,
+      description: [...prev.description, ""],
+    }));
   };
+
+  // AI Improve feature removed from the Experience step per user request.
 
   const removeDescriptionBullet = (index: number) => {
     if (formData.description.length > 1) {
       const newDescription = formData.description.filter((_, i) => i !== index);
-      setFormData(prev => ({ ...prev, description: newDescription }));
+      setFormData((prev) => ({ ...prev, description: newDescription }));
     }
   };
 
@@ -87,9 +100,12 @@ export function ExperienceStep() {
       className="space-y-6"
     >
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Work Experience</h2>
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          Work Experience
+        </h2>
         <p className="text-sm text-gray-600">
-          Add your professional experience, starting with your most recent position.
+          Add your professional experience, starting with your most recent
+          position.
         </p>
       </div>
 
@@ -102,22 +118,52 @@ export function ExperienceStep() {
         >
           <div className="flex items-start space-x-3">
             <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                className="w-4 h-4 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
             </div>
             <div className="flex-1">
-              <h4 className="font-medium text-blue-900 mb-2">New to the workforce? No problem!</h4>
+              <h4 className="font-medium text-blue-900 mb-2">
+                New to the workforce? No problem!
+              </h4>
               <p className="text-sm text-blue-700 mb-3">
-                Work experience is optional. You can include any of these instead:
+                Work experience is optional. You can include any of these
+                instead:
               </p>
               <ul className="text-sm text-blue-700 space-y-1 mb-3">
-                <li>• <strong>Internships</strong> - Paid or unpaid work experience</li>
-                <li>• <strong>Part-time jobs</strong> - Retail, food service, tutoring, etc.</li>
-                <li>• <strong>Freelance work</strong> - Any project-based work</li>
-                <li>• <strong>Volunteer work</strong> - Community service or NGO work</li>
-                <li>• <strong>Personal projects</strong> - Websites, apps, or other creations</li>
-                <li>• <strong>Leadership roles</strong> - Club president, team captain, etc.</li>
+                <li>
+                  • <strong>Internships</strong> - Paid or unpaid work
+                  experience
+                </li>
+                <li>
+                  • <strong>Part-time jobs</strong> - Retail, food service,
+                  tutoring, etc.
+                </li>
+                <li>
+                  • <strong>Freelance work</strong> - Any project-based work
+                </li>
+                <li>
+                  • <strong>Volunteer work</strong> - Community service or NGO
+                  work
+                </li>
+                <li>
+                  • <strong>Personal projects</strong> - Websites, apps, or
+                  other creations
+                </li>
+                <li>
+                  • <strong>Leadership roles</strong> - Club president, team
+                  captain, etc.
+                </li>
               </ul>
               <div className="flex items-center justify-between">
                 <p className="text-xs text-blue-600">
@@ -142,10 +188,14 @@ export function ExperienceStep() {
             <div key={exp.id} className="border border-gray-200 rounded-lg p-4">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900">{exp.jobTitle}</h3>
-                  <p className="text-sm text-gray-600">{exp.company} • {exp.location}</p>
+                  <h3 className="font-semibold text-gray-900">
+                    {exp.jobTitle}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    {exp.company} • {exp.location}
+                  </p>
                   <p className="text-xs text-gray-500">
-                    {exp.startDate} - {exp.current ? 'Present' : exp.endDate}
+                    {exp.startDate} - {exp.current ? "Present" : exp.endDate}
                   </p>
                 </div>
                 <div className="flex space-x-2">
@@ -175,16 +225,16 @@ export function ExperienceStep() {
       {isAdding ? (
         <div className="border border-gray-200 rounded-lg p-4 space-y-4">
           <h3 className="font-semibold text-gray-900">
-            {editingId ? 'Edit Experience' : 'Add New Experience'}
+            {editingId ? "Edit Experience" : "Add New Experience"}
           </h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="jobTitle">Position/Role *</Label>
               <Input
                 id="jobTitle"
                 value={formData.jobTitle}
-                onChange={(e) => handleInputChange('jobTitle', e.target.value)}
+                onChange={(e) => handleInputChange("jobTitle", e.target.value)}
                 placeholder="e.g., Software Intern, Sales Associate, Volunteer Coordinator"
                 required
               />
@@ -195,7 +245,7 @@ export function ExperienceStep() {
               <Input
                 id="company"
                 value={formData.company}
-                onChange={(e) => handleInputChange('company', e.target.value)}
+                onChange={(e) => handleInputChange("company", e.target.value)}
                 placeholder="e.g., Tech Corp, Local NGO, Freelance Client"
                 required
               />
@@ -206,7 +256,7 @@ export function ExperienceStep() {
               <Input
                 id="location"
                 value={formData.location}
-                onChange={(e) => handleInputChange('location', e.target.value)}
+                onChange={(e) => handleInputChange("location", e.target.value)}
                 placeholder="San Francisco, CA"
               />
             </div>
@@ -217,7 +267,7 @@ export function ExperienceStep() {
                 id="startDate"
                 type="month"
                 value={formData.startDate}
-                onChange={(e) => handleInputChange('startDate', e.target.value)}
+                onChange={(e) => handleInputChange("startDate", e.target.value)}
               />
             </div>
 
@@ -228,7 +278,9 @@ export function ExperienceStep() {
                   type="checkbox"
                   id="current"
                   checked={formData.current}
-                  onChange={(e) => handleInputChange('current', e.target.checked)}
+                  onChange={(e) =>
+                    handleInputChange("current", e.target.checked)
+                  }
                   className="rounded border-gray-300"
                 />
                 <label htmlFor="current" className="text-sm text-gray-700">
@@ -244,7 +296,7 @@ export function ExperienceStep() {
                   id="endDate"
                   type="month"
                   value={formData.endDate}
-                  onChange={(e) => handleInputChange('endDate', e.target.value)}
+                  onChange={(e) => handleInputChange("endDate", e.target.value)}
                 />
               </div>
             )}
@@ -256,7 +308,9 @@ export function ExperienceStep() {
               <div key={index} className="flex space-x-2">
                 <textarea
                   value={desc}
-                  onChange={(e) => handleDescriptionChange(index, e.target.value)}
+                  onChange={(e) =>
+                    handleDescriptionChange(index, e.target.value)
+                  }
                   placeholder="• Describe your responsibilities and achievements..."
                   rows={2}
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -271,6 +325,7 @@ export function ExperienceStep() {
                     ✕
                   </Button>
                 )}
+                {/* Improve AI feature disabled in current flow */}
               </div>
             ))}
             <Button
@@ -285,7 +340,7 @@ export function ExperienceStep() {
 
           <div className="flex space-x-2">
             <Button onClick={handleSubmit}>
-              {editingId ? 'Update Experience' : 'Add Experience'}
+              {editingId ? "Update Experience" : "Add Experience"}
             </Button>
             <Button variant="outline" onClick={handleCancel}>
               Cancel

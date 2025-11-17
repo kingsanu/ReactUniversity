@@ -32,7 +32,8 @@
     "overview": "Overview",
     "metrics": "Metrics",
     "feedback": "Feedback",
-    "results": "Results"
+    "results": "Results",
+    "today": "Today"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -110,6 +111,14 @@
     "today": "Today",
     "top3CareerMatch": "Top 3 Career Match",
     "showMore": "Show more",
+    "careerExplorerTitle": "Career Paths Explorer",
+    "careerExploreSearchPlaceholder": "Search careers...",
+    "careerExplorerFilters": {
+      "industry": "Industry",
+      "education": "Education Level",
+      "location": "Location"
+    },
+
     "assessments": "Assessments",
     "professionalAssessments": "Professional Assessments",
     "assessmentsDescription": "Complete your professional assessments to unlock personalized insights about your competencies, cognitive abilities, and ideal career path. Each assessment provides valuable data for your professional development.",
@@ -137,6 +146,7 @@
     "statusNotStarted": "Not Started",
     "completeAssessmentsMessage": "Complete the assessments to unlock your progress insights",
     "loadingAssessmentProgress": "Loading assessment progress...",
+    "loading": "Loading dashboard...",
     "assessmentSummary": "Assessment Summary",
     "dominance": "Dominance",
     "influence": "Influence",
@@ -263,6 +273,27 @@
     "startTest": "Start Test",
     "nextExample": "Next Example"
   },
+  "career": {
+    "match": "Match",
+    "favorite": "Favorite",
+    "favorited": "Favorited",
+    "compare": "Compare",
+    "salaryRange": "Salary Range",
+    "laborDemand": "Labor Demand",
+    "whyRecommended": "Why recommended",
+    "showAll": "Show all recommendations",
+    "noResults": "No careers found"
+  },
+  "compare": {
+    "selectedCount": "{{count}} selected",
+    "compareButton": "Compare"
+  },
+  "careerExplorer": {
+    "jobSummary": "Job Summary",
+    "keyResponsibilities": "Key Responsibilities",
+    "skillsEducation": "Skills & Education",
+    "allIndustries": "All industries"
+  },
   "courses": {
     "discoverCourses": "Discover courses to enhance your skills and advance your career",
     "searchAndFilter": "Search & Filter",
@@ -305,6 +336,9 @@
     "learningObjectives": "Learning Objectives",
     "prerequisites": "Prerequisites",
     "syllabus": "Course Syllabus",
+    "title": "Course Title",
+    "provider": "Provider",
+    "instructor": "Instructor",
     "skills": "Skills You'll Gain",
     "andMoreModules": "and {{count}} more modules",
     "noCoursesFound": "No courses found",
@@ -313,6 +347,68 @@
     "totalCourses": "Total Courses",
     "avgRating": "Average Rating",
     "enrollments": "Enrollments"
+  },
+  "courses_import": {
+    "button": "Import Course",
+    "title": "Import Course from URL",
+    "description": "Paste a provider course URL to automatically fetch and import course details.",
+    "labelUrl": "Course URL",
+    "start": "Start Import",
+    "importing": "Importing...",
+    "invalidUrl": "Please enter a valid URL",
+    "success": "Import job started. Check status in a moment.",
+    "failure": "Failed to start import. Please try again."
+  },
+  "admin": {
+    "courses": {
+      "header": {
+        "addCourse": "Add Course"
+      },
+      "table": {
+        "course": "Course",
+        "provider": "Provider",
+        "category": "Category",
+        "difficulty": "Difficulty",
+        "status": "Status",
+        "enrollments": "Enrollments",
+        "actions": "Actions"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "form": {
+        "titleCreate": "Create New Course",
+        "titleEdit": "Edit Course",
+        "save": "Save Changes",
+        "cancel": "Cancel"
+      },
+      "confirmDelete": "Are you sure you want to delete this course?"
+    },
+    "careers": {
+      "header": { "title": "Career Manager" },
+      "confirmDelete": "Are you sure you want to delete this career?",
+      "createTitle": "Create Career",
+      "editTitle": "Edit Career",
+      "form": {
+        "title": "Title (English)",
+        "shortDescription": "Short description (English)"
+      }
+    }
+  },
+  "evaluation": {
+    "toast": {
+      "emailSent": "Email invitation sent successfully!",
+      "emailFailed": "Error sending email invitation. Please try again.",
+      "emailPartial": "Some invitations may not have been sent. Please check the results.",
+      "evalRemoved": "Evaluator removed successfully!",
+      "evalRemoveFailed": "Error removing evaluator. Please try again.",
+      "resendSuccess": "Invitation link resent successfully!",
+      "resendError": "Error resending invitation link. Please try again.",
+      "groupsIncomplete": "Please complete all evaluator groups before sending invitations. Each group must have at least the minimum required evaluators.",
+      "noPhoneNumbers": "No evaluators have phone numbers available for SMS invitations.",
+      "smsComingSoon": "SMS functionality coming soon!"
+    }
   },
   "language": {
     "english": "English",

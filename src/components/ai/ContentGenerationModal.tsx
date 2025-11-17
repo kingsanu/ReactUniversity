@@ -20,6 +20,9 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ATSScoreDisplay } from "./ATSScoreDisplay";
+import { extractKeywords } from "@/app/dashboard/resume-builder/_components/atsUtils";
+import { toast } from "sonner";
+import { motion } from "motion/react";
 import { GenerationContextForm } from "./GenerationContextForm";
 import { AIFieldType } from "./GenerateButton";
 import {
@@ -69,6 +72,7 @@ export function ContentGenerationModal({
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationContext, setGenerationContext] = useState(context);
   const [copied, setCopied] = useState(false);
+  const [missingKeywords, setMissingKeywords] = useState<string[]>([]);
 
   const fieldLabels: Record<string, string> = {
     summary: "Professional Summary",
@@ -323,7 +327,8 @@ Requirements:
 
       if (newFieldTypes.includes(field)) {
         // Build the prompt and use the new AI generation service
-        const prompt = buildPrompt(field, generationContext);
+        const built = buildPrompt(field, generationContext);
+        const prompt = built;
         response = await generateAIContent(prompt);
       } else {
         // Use the existing generation functions for legacy fields
@@ -348,6 +353,30 @@ Requirements:
         tone: generationContext.tone,
       });
 
+      // Compute missing keywords when we have a job description in context
+      const jobDescription =
+        generationContext.job_description ||
+        generationContext.job_description_text ||
+        generationContext.jobDesc ||
+        "";
+      if (jobDescription && data?.keywordsIncluded) {
+        try {
+          const jobKeywords = extractKeywords(jobDescription);
+          const included = (data.keywordsIncluded || []).map((k: string) =>
+            k.toLowerCase()
+          );
+          const missing = jobKeywords.filter(
+            (k: string) => !included.includes(k)
+          );
+          setMissingKeywords(missing.slice(0, 12));
+        } catch (err) {
+          console.error("Failed to compute missing keywords", err);
+          setMissingKeywords([]);
+        }
+      } else {
+        setMissingKeywords([]);
+      }
+
       // For now, no alternatives support
       setAlternatives([]);
 
@@ -363,15 +392,62 @@ Requirements:
     }
   };
 
+  const handleAddSuggestion = async (keyword: string) => {
+    // Add keyword to context key_points array for next generation or user visibility
+    const prevKeyPoints = Array.isArray(generationContext.key_points)
+      ? [...generationContext.key_points]
+      : [];
+    const updatedKeyPoints = [...new Set([...prevKeyPoints, keyword])];
+    setGenerationContext({
+      ...generationContext,
+      key_points: updatedKeyPoints,
+    });
+    // Remove it from missing list
+    setMissingKeywords((prev) => prev.filter((k) => k !== keyword));
+    try {
+      await navigator.clipboard.writeText(keyword);
+      toast.success("Keyword added to context and copied to clipboard.");
+    } catch (err) {
+      toast.success("Keyword added to context.");
+    }
+  };
+
   const handleApply = () => {
     const contentToApply =
       alternatives.length > 0
         ? alternatives[selectedAlternativeIndex].content
         : generatedContent?.content;
 
-    if (contentToApply) {
-      onApply(contentToApply);
+    // Treat empty string and empty arrays as "no content" but allow "0" or similar
+    const isEmpty = (c: any) => {
+      if (c === undefined || c === null) return true;
+      if (Array.isArray(c))
+        return c.length === 0 || c.every((v) => !v || !String(v).trim());
+      if (typeof c === "string") return c.trim().length === 0;
+      return false;
+    };
+
+    if (isEmpty(contentToApply)) {
+      // Provide user feedback and don't call the parent change handler when content is empty
+      toast.error("No content to apply. Please generate valid content first.");
+      return;
     }
+
+    // Log and apply - this helps with debugging parent not updating
+    console.debug("ContentGenerationModal apply: ", contentToApply);
+    try {
+      onApply(contentToApply!);
+      toast.success("Applied generated content");
+    } catch (err) {
+      console.error("Failed to apply generated content", err);
+      toast.error("Failed to apply generated content");
+      return;
+    }
+
+    // Close modal after a brief delay to avoid potential race conditions where
+    // the parent immediately re-renders and unmounts this component before state
+    // updates flow through. A short delay helps ensure smoother UX.
+    setTimeout(() => onClose(), 50);
   };
 
   const handleRegenerate = () => {
@@ -415,6 +491,13 @@ Requirements:
             <p className="text-xs text-muted-foreground">
               {fieldLabels[field]} - Optimized for ATS
             </p>
+            <div aria-live="polite" className="sr-only">
+              {isGenerating
+                ? "Generating content"
+                : generatedContent
+                ? "AI generation complete"
+                : "Configure generation settings"}
+            </div>
           </div>
           <button
             onClick={onClose}
@@ -497,7 +580,12 @@ Requirements:
 
           {/* Result Step */}
           {step === "result" && generatedContent && (
-            <div className="space-y-4">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.28 }}
+              className="space-y-4"
+            >
               {/* Generated Content */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-foreground">
@@ -532,6 +620,8 @@ Requirements:
                   score={generatedContent.atsScore}
                   wordCount={generatedContent.wordCount}
                   keywordsIncluded={generatedContent.keywordsIncluded}
+                  missingKeywords={missingKeywords}
+                  onAddSuggestion={handleAddSuggestion}
                 />
               )}
 
@@ -594,13 +684,25 @@ Requirements:
                 </button>
                 <button
                   onClick={handleApply}
-                  className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+                  disabled={
+                    (alternatives.length > 0
+                      ? alternatives[selectedAlternativeIndex].content
+                      : generatedContent?.content) === undefined ||
+                    (Array.isArray(
+                      alternatives.length > 0
+                        ? alternatives[selectedAlternativeIndex].content
+                        : generatedContent?.content
+                    ) &&
+                      (alternatives[selectedAlternativeIndex]?.content || [])
+                        .length === 0)
+                  }
+                  className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Check className="w-4 h-4" />
                   Use This
                 </button>
               </div>
-            </div>
+            </motion.div>
           )}
         </div>
       </div>
