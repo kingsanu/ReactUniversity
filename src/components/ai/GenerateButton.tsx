@@ -132,7 +132,10 @@ export function GenerateButton({
   };
 
   const handleGenerate = (content: string | string[]) => {
-    console.debug("GenerateButton: handleGenerate -> parent onGenerate", content);
+    console.debug(
+      "GenerateButton: handleGenerate -> parent onGenerate",
+      content
+    );
     onGenerate(content);
     setIsModalOpen(false);
   };

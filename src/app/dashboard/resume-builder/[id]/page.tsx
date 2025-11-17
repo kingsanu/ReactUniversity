@@ -660,9 +660,7 @@ function SortableSection({
     toggleSection(section.id);
   };
 
-  const handleHeaderKeyDown = (
-    event: KeyboardEvent<HTMLDivElement>
-  ) => {
+  const handleHeaderKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       handleSectionToggle();
@@ -1789,13 +1787,15 @@ export default function ResumeBuilderPage() {
                         // by other updates. Do not close the edit panel — we only update
                         // the store value for the current entry.
                         if (editingDynamicEntry?.sectionId === section.id) {
-                          setTimeout(() =>
-                            updateDynamicSectionEntry(
-                              section.id,
-                              editingDynamicEntry.entryId,
-                              next as any
-                            )
-                          , 15);
+                          setTimeout(
+                            () =>
+                              updateDynamicSectionEntry(
+                                section.id,
+                                editingDynamicEntry.entryId,
+                                next as any
+                              ),
+                            15
+                          );
                         }
 
                         return next;
@@ -1870,7 +1870,11 @@ export default function ResumeBuilderPage() {
                   ...prev,
                   [section.id]: { ...form, description },
                 }));
-                console.debug("AI generated applied to custom section", section.id, description);
+                console.debug(
+                  "AI generated applied to custom section",
+                  section.id,
+                  description
+                );
                 handleSaveCustomSection();
               }}
             />
@@ -1910,7 +1914,11 @@ export default function ResumeBuilderPage() {
                   ...prev,
                   [section.id]: { ...form, bullets },
                 }));
-                console.debug("AI generated applied to custom section bullets", section.id, bullets);
+                console.debug(
+                  "AI generated applied to custom section bullets",
+                  section.id,
+                  bullets
+                );
                 handleSaveCustomSection();
               }}
             />
@@ -3942,7 +3950,10 @@ export default function ResumeBuilderPage() {
                                             ...prev,
                                             description: bullets,
                                           }));
-                                          console.debug("AI generated applied to experience bullets", bullets);
+                                          console.debug(
+                                            "AI generated applied to experience bullets",
+                                            bullets
+                                          );
                                         }}
                                       />
                                     </div>
@@ -4178,7 +4189,10 @@ export default function ResumeBuilderPage() {
                                     ...prev,
                                     description: bullets,
                                   }));
-                                  console.debug("AI generated applied to experience bullets", bullets);
+                                  console.debug(
+                                    "AI generated applied to experience bullets",
+                                    bullets
+                                  );
                                 }}
                               />
                             </div>

@@ -4,9 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { mockCourses } from "@/data/mockCourses";
-import { adminCreateCourse, adminUpdateCourse, adminDeleteCourse } from '@/services/courseService';
-import { useQueryClient } from '@tanstack/react-query';
-import { courseKeys } from '@/hooks/useCourseQueries';
+import {
+  adminCreateCourse,
+  adminUpdateCourse,
+  adminDeleteCourse,
+} from "@/services/courseService";
+import { useQueryClient } from "@tanstack/react-query";
+import { courseKeys } from "@/hooks/useCourseQueries";
 import { Course } from "@/types/course";
 import {
   Plus,
@@ -60,7 +64,9 @@ export function CourseManager() {
     ) {
       setCourses(courses.filter((c) => c.id !== courseId));
     }
-        adminDeleteCourse(courseId).then(() => queryClient.invalidateQueries({ queryKey: courseKeys.list() })); // Ensure cache invalidation
+    adminDeleteCourse(courseId).then(() =>
+      queryClient.invalidateQueries({ queryKey: courseKeys.list() })
+    ); // Ensure cache invalidation
   };
 
   const handleToggleActive = (courseId: string) => {
@@ -72,7 +78,9 @@ export function CourseManager() {
     // Persist the change to the mock service
     const course = courses.find((c) => c.id === courseId);
     if (course) {
-      adminUpdateCourse(courseId, { isActive: !course.isActive }).then(() => queryClient.invalidateQueries({ queryKey: courseKeys.list() }));
+      adminUpdateCourse(courseId, { isActive: !course.isActive }).then(() =>
+        queryClient.invalidateQueries({ queryKey: courseKeys.list() })
+      );
     }
   };
 
@@ -85,7 +93,9 @@ export function CourseManager() {
       });
     } else {
       setCourses(courses.map((c) => (c.id === course.id ? course : c)));
-      adminUpdateCourse(course.id, course).then(() => queryClient.invalidateQueries({ queryKey: courseKeys.list() }));
+      adminUpdateCourse(course.id, course).then(() =>
+        queryClient.invalidateQueries({ queryKey: courseKeys.list() })
+      );
     }
     setIsFormOpen(false);
   };
@@ -159,7 +169,13 @@ export function CourseManager() {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredCourses.map((course) => (
-                  <motion.tr key={course.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }} className="hover:bg-gray-50">
+                  <motion.tr
+                    key={course.id}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="hover:bg-gray-50"
+                  >
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <Image
