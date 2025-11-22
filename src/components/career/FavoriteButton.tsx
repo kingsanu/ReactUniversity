@@ -8,9 +8,11 @@ import { useTranslation } from "react-i18next";
 export default function FavoriteButton({
   isFavorite,
   onToggle,
+  className,
 }: {
   isFavorite: boolean;
-  onToggle: () => void;
+  onToggle?: () => void | Promise<any>;
+  className?: string;
 }) {
   const { t } = useTranslation();
   return (
@@ -20,10 +22,11 @@ export default function FavoriteButton({
         isFavorite
           ? "bg-yellow-400 text-yellow-800"
           : "bg-gray-100 text-gray-800"
-      } text-sm`}
+      } text-sm ${className ?? ""}`}
       onClick={(e) => {
         e.stopPropagation();
-        onToggle();
+        // support both sync and async toggle handlers
+        onToggle?.();
       }}
       whileTap={{ scale: 0.95 }}
       whileHover={{ scale: 1.02 }}

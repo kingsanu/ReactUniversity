@@ -1,12 +1,70 @@
 "use client";
 import { useState, useEffect } from "react";
-import { AdminLayout } from "../_components/AdminLayout";
 import { useRouter } from "next/navigation";
 import { useAdminAccess } from "@/hooks/useAdminAccess";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Search, MoreHorizontal, UserCheck, UserX, Mail } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
+
+// Mock data for users
+const MOCK_USERS = [
+  {
+    id: "1",
+    name: "Alice Johnson",
+    email: "alice@example.com",
+    role: "Student",
+    status: "Active",
+    joinedDate: "2023-01-15",
+  },
+  {
+    id: "2",
+    name: "Bob Smith",
+    email: "bob@example.com",
+    role: "Instructor",
+    status: "Active",
+    joinedDate: "2023-02-20",
+  },
+  {
+    id: "3",
+    name: "Charlie Brown",
+    email: "charlie@example.com",
+    role: "Student",
+    status: "Inactive",
+    joinedDate: "2023-03-10",
+  },
+  {
+    id: "4",
+    name: "Diana Prince",
+    email: "diana@example.com",
+    role: "Admin",
+    status: "Active",
+    joinedDate: "2022-11-05",
+  },
+];
 
 export default function AdminUsersPage() {
   const router = useRouter();
   const { isAdmin, loading } = useAdminAccess();
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [users, setUsers] = useState(MOCK_USERS);
 
   // Handle admin access check
   useEffect(() => {
@@ -32,59 +90,93 @@ export default function AdminUsersPage() {
     );
   }
 
+  const filteredUsers = users.filter(
+    (user) =>
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <AdminLayout>
-      <div className="p-4 md:p-6">
-        {/* Header */}
-        <div className="mb-6 md:mb-8">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-              User Management
-            </h1>
-            <p className="text-gray-600 text-sm md:text-base">
-              Manage users, roles, and permissions
-            </p>
-          </div>
+    <div className="p-4 md:p-6">
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Users</h1>
+          <p className="text-muted-foreground">
+            Manage user accounts and permissions
+          </p>
         </div>
 
-        {/* Coming Soon */}
-        <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 text-center">
-          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg
-              className="w-8 h-8 text-blue-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
-              />
-            </svg>
+        <div className="flex items-center justify-between">
+          <div className="relative w-72">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search users..."
+              className="pl-8"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            User Management
-          </h3>
-          <p className="text-gray-600 mb-4">
-            User management features are coming soon. This will include user
-            roles, permissions, and account management.
-          </p>
-          <div className="bg-gray-50 rounded-lg p-4 text-left">
-            <h4 className="font-medium text-gray-900 mb-2">
-              Planned Features:
-            </h4>
-            <ul className="text-sm text-gray-600 space-y-1">
-              <li>• View all registered users</li>
-              <li>• Manage user roles and permissions</li>
-              <li>• User account activation/deactivation</li>
-              <li>• User subscription status</li>
-              <li>• Bulk user operations</li>
-            </ul>
-          </div>
+          <Button>Add User</Button>
+        </div>
+
+        <div className="border rounded-lg">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Joined</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredUsers.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell className="font-medium">{user.name}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.role}</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={user.status === "Active" ? "default" : "secondary"}
+                    >
+                      {user.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{user.joinedDate}</TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem
+                          onClick={() => navigator.clipboard.writeText(user.email)}
+                        >
+                          <Mail className="mr-2 h-4 w-4" />
+                          Copy Email
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem>View Profile</DropdownMenuItem>
+                        <DropdownMenuItem>Edit Details</DropdownMenuItem>
+                        <DropdownMenuItem className="text-red-600">
+                          <UserX className="mr-2 h-4 w-4" />
+                          Deactivate User
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       </div>
-    </AdminLayout>
+    </div>
   );
 }

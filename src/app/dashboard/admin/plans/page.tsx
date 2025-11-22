@@ -1,6 +1,5 @@
 "use client";
 import { useEffect } from "react";
-import { AdminLayout } from "../_components/AdminLayout";
 import { SubscriptionPlanManager } from "../_components/SubscriptionPlanManager";
 import SubscriptionPlanCreator from "../_components/SubscriptionPlanCreator";
 import PlanDesignComparison from "../_components/PlanDesignComparison";
@@ -37,34 +36,32 @@ export default function AdminPlansPage() {
   }
 
   return (
-    <AdminLayout>
-      <div className="p-4 md:p-6">
-        {/* Header */}
-        <div className="mb-6 md:mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-                Subscription Plans
-              </h1>
-              <p className="text-gray-600 text-sm md:text-base">
-                Create, edit, and manage subscription plans for your users
-              </p>
-            </div>
+    <div className="p-4 md:p-6">
+      {/* Header */}
+      <div className="mb-6 md:mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+              Subscription Plans
+            </h1>
+            <p className="text-gray-600 text-sm md:text-base">
+              Create, edit, and manage subscription plans for your users
+            </p>
           </div>
         </div>
-
-        {/* Stripe URL Tester */}
-        <StripeUrlTester />
-
-        {/* Plan Design Comparison */}
-        <PlanDesignComparison />
-
-        {/* Subscription Plan Creator */}
-        <SubscriptionPlanCreator />
-
-        {/* Subscription Plan Manager */}
-        <SubscriptionPlanManager />
       </div>
-    </AdminLayout>
+
+      {/* Stripe URL Tester */}
+      <StripeUrlTester />
+
+      {/* Plan Design Comparison */}
+      <PlanDesignComparison />
+
+      {/* Subscription Plan Creator */}
+      <SubscriptionPlanCreator />
+
+      {/* Subscription Plan Manager */}
+      <SubscriptionPlanManager />
+    </div>
   );
 }

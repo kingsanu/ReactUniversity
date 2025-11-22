@@ -96,7 +96,10 @@ export async function simulateImportWorker(jobId: string) {
     setImportJob(job);
   } catch (err) {
     job.status = "failed";
-    job.error = { code: "EXTERNAL_API_ERROR", message: (err as Error).message ?? "Unknown" };
+    job.error = {
+      code: "EXTERNAL_API_ERROR",
+      message: (err as Error).message ?? "Unknown",
+    };
     setImportJob(job);
   }
 }

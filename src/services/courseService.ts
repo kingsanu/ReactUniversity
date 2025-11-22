@@ -114,7 +114,11 @@ export async function listCourses() {
   });
 }
 
-export async function adminListCourses(params?: { page?: number; limit?: number; search?: string }) {
+export async function adminListCourses(params?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+}) {
   try {
     const q = new URLSearchParams();
     if (params?.page) q.set("page", String(params.page));
@@ -166,10 +170,15 @@ export async function adminStartImport(url: string, source?: string) {
 }
 
 export async function adminGetImportStatus(jobId: string) {
-  return apiRequest(`/api/admin/courses/import/${jobId}/status`, { method: "GET" });
+  return apiRequest(`/api/admin/courses/import/${jobId}/status`, {
+    method: "GET",
+  });
 }
 
-export async function adminAcceptImport(jobId: string, overrides?: Record<string, any>) {
+export async function adminAcceptImport(
+  jobId: string,
+  overrides?: Record<string, any>
+) {
   return apiRequest(`/api/admin/courses/import/${jobId}/accept`, {
     method: "POST",
     data: { overrides },
@@ -191,9 +200,15 @@ export async function adminDeleteCourse(id: string) {
 }
 
 // Replace update/delete with server-backed variants too (with mock fallback)
-export async function adminUpdateCourseApi(id: string, payload: Partial<Course>) {
+export async function adminUpdateCourseApi(
+  id: string,
+  payload: Partial<Course>
+) {
   try {
-    const response = await apiRequest(`/api/admin/courses/${id}`, { method: "PUT", data: payload });
+    const response = await apiRequest(`/api/admin/courses/${id}`, {
+      method: "PUT",
+      data: payload,
+    });
     return response?.data ?? response;
   } catch (err) {
     return adminUpdateCourse(id, payload);
@@ -202,7 +217,9 @@ export async function adminUpdateCourseApi(id: string, payload: Partial<Course>)
 
 export async function adminDeleteCourseApi(id: string) {
   try {
-    const response = await apiRequest(`/api/admin/courses/${id}`, { method: "DELETE" });
+    const response = await apiRequest(`/api/admin/courses/${id}`, {
+      method: "DELETE",
+    });
     return response?.data ?? response;
   } catch (err) {
     return adminDeleteCourse(id);

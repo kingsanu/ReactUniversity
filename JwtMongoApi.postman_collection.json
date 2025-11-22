@@ -48,6 +48,97 @@
           }
         },
         {
+          "name": "Sign Up Coach",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Jane Coach\",\n  \"email\": \"coach@example.com\",\n  \"password\": \"Password123\"\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/authapi/signup-coach",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["authapi", "signup-coach"]
+            },
+            "description": "Register a new coach user. Automatically assigns COACH role. No roleId required."
+          }
+        },
+        {
+          "name": "Sign Up Coach Bulk",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"coaches\": [\n    {\n      \"fullName\": \"Jane Coach\",\n      \"email\": \"coach1@example.com\",\n      \"password\": \"Password123\"\n    },\n    {\n      \"fullName\": \"John Coach\",\n      \"email\": \"coach2@example.com\",\n      \"password\": \"Password123\"\n    },\n    {\n      \"fullName\": \"Sarah Coach\",\n      \"email\": \"coach3@example.com\",\n      \"password\": \"Password123\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/authapi/signup-coach-bulk",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["authapi", "signup-coach-bulk"]
+            },
+            "description": "Register multiple coach users in bulk (1-100 coaches at once). Returns detailed results for each coach registration attempt."
+          }
+        },
+        {
+          "name": "Get Coach by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/authapi/coach/{{coachId}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["authapi", "coach", "{{coachId}}"]
+            },
+            "description": "Get coach user details by ID. Returns coach information excluding password."
+          }
+        },
+        {
+          "name": "Invite Coach",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"coach@example.com\"\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/authapi/invite-coach",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["authapi", "invite-coach"]
+            },
+            "description": "Send invitation email to a user to register as a coach. Email contains a link to the coach onboarding page."
+          }
+        },
+        {
           "name": "Login",
           "request": {
             "method": "POST",
@@ -3066,6 +3157,470 @@
           }
         }
       ]
+    },
+    {
+      "name": "Courses",
+      "item": [
+        {
+          "name": "Get All Courses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/courses?search=&category=&language=&difficulty=&country=&duration_min=&duration_max=&certificate=&rating_min=&rating_max=&sort=&page=1&limit=20",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "courses"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search term for course title/description",
+                  "disabled": true
+                },
+                {
+                  "key": "category",
+                  "value": "",
+                  "description": "Comma-separated categories",
+                  "disabled": true
+                },
+                {
+                  "key": "language",
+                  "value": "",
+                  "description": "Comma-separated languages",
+                  "disabled": true
+                },
+                {
+                  "key": "difficulty",
+                  "value": "",
+                  "description": "Comma-separated difficulties",
+                  "disabled": true
+                },
+                {
+                  "key": "country",
+                  "value": "",
+                  "description": "Comma-separated countries",
+                  "disabled": true
+                },
+                {
+                  "key": "duration_min",
+                  "value": "",
+                  "description": "Minimum duration",
+                  "disabled": true
+                },
+                {
+                  "key": "duration_max",
+                  "value": "",
+                  "description": "Maximum duration",
+                  "disabled": true
+                },
+                {
+                  "key": "certificate",
+                  "value": "",
+                  "description": "Filter by certificate availability",
+                  "disabled": true
+                },
+                {
+                  "key": "rating_min",
+                  "value": "",
+                  "description": "Minimum rating",
+                  "disabled": true
+                },
+                {
+                  "key": "rating_max",
+                  "value": "",
+                  "description": "Maximum rating",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "",
+                  "description": "Sort field (title, rating, duration, etc.)",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Items per page"
+                }
+              ]
+            },
+            "description": "Get all available courses with optional filtering and pagination"
+          }
+        },
+        {
+          "name": "Get Course by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/courses/{{courseId}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "courses", "{{courseId}}"]
+            },
+            "description": "Get detailed information for a specific course"
+          }
+        },
+        {
+          "name": "Get Recommended Courses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/courses/recommended?limit=3",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "courses", "recommended"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "3",
+                  "description": "Number of recommended courses (1-20)"
+                }
+              ]
+            },
+            "description": "Get courses recommended for the current student"
+          }
+        },
+        {
+          "name": "Enroll in Course",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseId\": \"{{courseId}}\",\n  \"enrollmentSource\": \"catalog\"\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/courses/enroll",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "courses", "enroll"]
+            },
+            "description": "Enroll the current student in a course"
+          }
+        },
+        {
+          "name": "Get Course Progress",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/courses/progress?status=",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "courses", "progress"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "",
+                  "description": "Filter by status (enrolled, in_progress, completed, dropped)",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get the current student's course progress and enrolled courses"
+          }
+        },
+        {
+          "name": "Update Course Progress",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"completedModules\": 5,\n  \"totalModules\": 10,\n  \"lastAccessedAt\": \"2024-01-15T10:00:00Z\",\n  \"status\": \"in_progress\"\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/courses/progress/{{enrollmentId}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "courses", "progress", "{{enrollmentId}}"]
+            },
+            "description": "Update progress for an enrolled course"
+          }
+        },
+        {
+          "name": "Import Course (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login (Admin role required)"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://www.coursera.org/learn/example-course\",\n  \"source\": \"coursera\"\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/courses/import",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "courses", "import"]
+            },
+            "description": "Import course from provider URL (Admin only)"
+          }
+        },
+        {
+          "name": "Get Import Job Status (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login (Admin role required)"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/courses/import/{{jobId}}/status",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "courses", "import", "{{jobId}}", "status"]
+            },
+            "description": "Get import job status (Admin only)"
+          }
+        },
+        {
+          "name": "Accept Course Import (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login (Admin role required)"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"overrides\": {}\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/courses/import/{{jobId}}/accept",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "courses", "import", "{{jobId}}", "accept"]
+            },
+            "description": "Accept and persist course from import preview (Admin only)"
+          }
+        },
+        {
+          "name": "Get Admin Courses (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login (Admin role required)"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/courses/admin?search=&page=1&limit=50",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "courses", "admin"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search term",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "50",
+                  "description": "Items per page (max 100)"
+                }
+              ]
+            },
+            "description": "Get all courses for admin management (Admin only)"
+          }
+        },
+        {
+          "name": "Update Course (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login (Admin role required)"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Course Title\",\n  \"shortDescription\": \"Updated short description\",\n  \"rating\": 4.5,\n  \"certificate\": true,\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/courses/admin/{{courseId}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "courses", "admin", "{{courseId}}"]
+            },
+            "description": "Update an existing course (Admin only)"
+          }
+        },
+        {
+          "name": "Toggle Course Active Status (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login (Admin role required)"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/courses/admin/{{courseId}}/toggle-active",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "courses", "admin", "{{courseId}}", "toggle-active"]
+            },
+            "description": "Toggle course active status (Admin only)"
+          }
+        },
+        {
+          "name": "Delete Course (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login (Admin role required)"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/courses/admin/{{courseId}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "courses", "admin", "{{courseId}}"]
+            },
+            "description": "Delete a course (Admin only)"
+          }
+        },
+        {
+          "name": "Get Coursera Courses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/courses/coursera",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "courses", "coursera"]
+            },
+            "description": "Get courses from Coursera API"
+          }
+        }
+      ]
     }
   ],
   "variable": [
@@ -3178,6 +3733,21 @@
       "key": "sectionId",
       "value": "your-section-id-here",
       "description": "Replace with actual section ID for testing (e.g., section-1)"
+    },
+    {
+      "key": "courseId",
+      "value": "your-course-id-here",
+      "description": "Replace with actual course ID for testing"
+    },
+    {
+      "key": "enrollmentId",
+      "value": "your-enrollment-id-here",
+      "description": "Replace with actual enrollment ID for testing (returned from enroll endpoint)"
+    },
+    {
+      "key": "jobId",
+      "value": "your-job-id-here",
+      "description": "Replace with actual import job ID for testing (returned from import endpoint)"
     }
   ]
 }

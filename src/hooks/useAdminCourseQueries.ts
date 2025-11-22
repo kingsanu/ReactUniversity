@@ -5,11 +5,20 @@ import { adminListCourses } from "@/services/courseService";
 
 export const adminCourseKeys = {
   all: ["adminCourses"] as const,
-  list: (params?: Record<string, any>) => [...adminCourseKeys.all, "list", params ? JSON.stringify(params) : "default"] as const,
+  list: (params?: Record<string, any>) =>
+    [
+      ...adminCourseKeys.all,
+      "list",
+      params ? JSON.stringify(params) : "default",
+    ] as const,
   detail: (id: string) => [...adminCourseKeys.all, "detail", id] as const,
 };
 
-export function useAdminCourseList(params?: { page?: number; limit?: number; search?: string }) {
+export function useAdminCourseList(params?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+}) {
   return useQuery({
     queryKey: adminCourseKeys.list(params),
     queryFn: () => adminListCourses(params),

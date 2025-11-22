@@ -21,7 +21,14 @@ export const careerKeys = {
     [...careerKeys.all, "recommendations", userId] as const,
 };
 
-export function useCareerList(params?: { search?: string; industry?: string }) {
+export function useCareerList(params?: {
+  search?: string;
+  industry?: string;
+  interest?: string;
+  education?: string;
+  location?: string;
+  sort?: "recommended" | "match" | "title" | "demand";
+}) {
   const { language } = useGlobalStore();
   return useQuery({
     queryKey: careerKeys.list(params),

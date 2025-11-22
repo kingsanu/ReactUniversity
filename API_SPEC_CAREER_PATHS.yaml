@@ -164,34 +164,51 @@ components:
   schemas:
     CareerRole:
       type: object
+      required:
+        - id
+        - title
       properties:
         id:
           type: string
+          description: Unique identifier for the career
         familyId:
           type: string
+          description: Career family grouping identifier
+        slug:
+          type: string
+          description: URL-friendly slug for the career
         title:
           type: object
+          required:
+            - en
           properties:
             en:
               type: string
+              description: Career title in English
             es:
               type: string
+              description: Career title in Spanish
         shortDescription:
           type: object
           properties:
             en:
               type: string
+              description: Brief description in English
             es:
               type: string
+              description: Brief description in Spanish
         longDescription:
           type: object
           properties:
             en:
               type: string
+              description: Detailed description in English
             es:
               type: string
+              description: Detailed description in Spanish
         responsibilities:
           type: array
+          description: List of key responsibilities
           items:
             type: object
             properties:
@@ -201,11 +218,16 @@ components:
                 type: string
         skills:
           type: array
+          description: Required skills for the role
           items:
             type: object
+            required:
+              - skillId
+              - name
             properties:
               skillId:
                 type: string
+                description: Unique skill identifier
               name:
                 type: object
                 properties:
@@ -215,6 +237,8 @@ components:
                     type: string
               levelRequired:
                 type: string
+                enum: [beginner, intermediate, advanced]
+                description: Proficiency level required
         educationLevel:
           type: string
           enum:
@@ -223,34 +247,61 @@ components:
             - Bachelors
             - Masters
             - PhD
+          description: Minimum education level required
         salaryRange:
           type: object
+          description: Salary information
           properties:
             min:
               type: number
+              description: Minimum annual salary
             median:
               type: number
+              description: Median annual salary
             max:
               type: number
+              description: Maximum annual salary
             currency:
               type: string
+              default: USD
+              description: Currency code (ISO 4217)
         demandStats:
           type: object
+          description: Job market demand statistics
           properties:
             jobCount:
               type: number
+              description: Total open positions
             postedLast30Days:
               type: number
+              description: New jobs posted in last 30 days
             growthPercent:
               type: number
+              description: Annual growth rate (0.07 = 7%)
         industries:
           type: array
+          description: Industries where this role is common
+          items:
+            type: string
+        locationSupport:
+          type: array
+          description: Supported locations/regions
           items:
             type: string
         iconUrl:
           type: string
+          description: URL to career icon/image
+        remoteEligible:
+          type: boolean
+          description: Whether remote work is available
         matchScore:
           type: number
+          minimum: 0
+          maximum: 100
+          description: User match percentage (0-100)
+        published:
+          type: boolean
+          description: Whether career is visible to users
     CareerListResponse:
       type: object
       properties:

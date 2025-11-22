@@ -11,7 +11,13 @@ if (USE_LOCAL_API) {
 
 export async function GET(req: Request) {
   if (!USE_LOCAL_API) {
-    return NextResponse.json({ success: false, error: { code: "NOT_FOUND", message: "Local admin API disabled" } }, { status: 404 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: { code: "NOT_FOUND", message: "Local admin API disabled" },
+      },
+      { status: 404 }
+    );
   }
   try {
     const url = new URL(req.url);
@@ -22,27 +28,65 @@ export async function GET(req: Request) {
     let results = getAllAdminCourses();
     if (search) {
       const s = search.toLowerCase();
-      results = results.filter((c) => c.title.toLowerCase().includes(s) || c.provider.toLowerCase().includes(s));
+      results = results.filter(
+        (c) =>
+          c.title.toLowerCase().includes(s) ||
+          c.provider.toLowerCase().includes(s)
+      );
     }
 
     const offset = (page - 1) * limit;
     const paged = results.slice(offset, offset + limit);
 
-    return NextResponse.json({ success: true, data: { courses: paged, pagination: { currentPage: page, totalPages: Math.ceil(results.length / limit), totalItems: results.length, itemsPerPage: limit } } }, { status: 200 });
+    return NextResponse.json(
+      {
+        success: true,
+        data: {
+          courses: paged,
+          pagination: {
+            currentPage: page,
+            totalPages: Math.ceil(results.length / limit),
+            totalItems: results.length,
+            itemsPerPage: limit,
+          },
+        },
+      },
+      { status: 200 }
+    );
   } catch (err) {
-    return NextResponse.json({ success: false, error: { code: "INTERNAL_ERROR", message: (err as Error).message } }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: { code: "INTERNAL_ERROR", message: (err as Error).message },
+      },
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(req: Request) {
   if (!USE_LOCAL_API) {
-    return NextResponse.json({ success: false, error: { code: "NOT_FOUND", message: "Local admin API disabled" } }, { status: 404 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: { code: "NOT_FOUND", message: "Local admin API disabled" },
+      },
+      { status: 404 }
+    );
   }
   try {
     const payload = await req.json();
-    const created = require("@/lib/adminCoursesStore").createAdminCourse(payload);
+    const created = require("@/lib/adminCoursesStore").createAdminCourse(
+      payload
+    );
     return NextResponse.json({ success: true, data: created }, { status: 201 });
   } catch (err) {
-    return NextResponse.json({ success: false, error: { code: "INVALID_REQUEST", message: (err as Error).message } }, { status: 400 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: { code: "INVALID_REQUEST", message: (err as Error).message },
+      },
+      { status: 400 }
+    );
   }
 }

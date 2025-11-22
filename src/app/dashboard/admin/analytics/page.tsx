@@ -1,99 +1,147 @@
 "use client";
 import { useState, useEffect } from "react";
-import { AdminLayout } from "../_components/AdminLayout";
-import { AdminStats } from "../_components/AdminStats";
-import { useRouter } from "next/navigation";
-import { useAdminAccess } from "@/hooks/useAdminAccess";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+} from "recharts";
+import { Users, DollarSign, BookOpen, TrendingUp } from "lucide-react";
 
-export default function AdminAnalyticsPage() {
-  const router = useRouter();
-  const { isAdmin, loading } = useAdminAccess();
+const data = [
+  { name: "Jan", users: 400, revenue: 2400 },
+  { name: "Feb", users: 300, revenue: 1398 },
+  { name: "Mar", users: 200, revenue: 9800 },
+  { name: "Apr", users: 278, revenue: 3908 },
+  { name: "May", users: 189, revenue: 4800 },
+  { name: "Jun", users: 239, revenue: 3800 },
+];
 
-  // Handle admin access check
-  useEffect(() => {
-    if (!loading) {
-      if (!isAdmin) {
-        alert("Access denied. This area is for administrators only.");
-        router.push("/dashboard");
-        return;
-      }
-    }
-  }, [isAdmin, loading, router]);
-
-  if (loading) {
-    return (
-      <div className="flex h-screen bg-gray-50">
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-600">Verifying admin access...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
+export default function AnalyticsPage() {
   return (
-    <AdminLayout>
-      <div className="p-4 md:p-6">
-        {/* Header */}
-        <div className="mb-6 md:mb-8">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-              Analytics & Reports
-            </h1>
-            <p className="text-gray-600 text-sm md:text-base">
-              View detailed analytics and generate reports
-            </p>
-          </div>
-        </div>
-
-        {/* Admin Stats */}
-        <AdminStats />
-
-        {/* Additional Analytics */}
-        <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Revenue Analytics
-            </h3>
-            <div className="bg-gray-50 rounded-lg p-4 text-center">
-              <p className="text-gray-600">
-                Revenue charts and trends coming soon
-              </p>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              User Growth
-            </h3>
-            <div className="bg-gray-50 rounded-lg p-4 text-center">
-              <p className="text-gray-600">User growth analytics coming soon</p>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Subscription Metrics
-            </h3>
-            <div className="bg-gray-50 rounded-lg p-4 text-center">
-              <p className="text-gray-600">
-                Subscription analytics coming soon
-              </p>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              System Performance
-            </h3>
-            <div className="bg-gray-50 rounded-lg p-4 text-center">
-              <p className="text-gray-600">Performance metrics coming soon</p>
-            </div>
-          </div>
-        </div>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Analytics</h1>
+        <p className="text-muted-foreground">
+          Overview of your platform's performance
+        </p>
       </div>
-    </AdminLayout>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">1,234</div>
+            <p className="text-xs text-muted-foreground">
+              +20.1% from last month
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">$45,231.89</div>
+            <p className="text-xs text-muted-foreground">
+              +15% from last month
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Courses</CardTitle>
+            <BookOpen className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">12</div>
+            <p className="text-xs text-muted-foreground">+2 new this month</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Growth Rate</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">+12.5%</div>
+            <p className="text-xs text-muted-foreground">
+              +4% from last month
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+        <Card className="col-span-4">
+          <CardHeader>
+            <CardTitle>Revenue Overview</CardTitle>
+          </CardHeader>
+          <CardContent className="pl-2">
+            <ResponsiveContainer width="100%" height={350}>
+              <BarChart data={data}>
+                <XAxis
+                  dataKey="name"
+                  stroke="#888888"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  stroke="#888888"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(value) => `$${value}`}
+                />
+                <Tooltip />
+                <Bar dataKey="revenue" fill="#adfa1d" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+        <Card className="col-span-3">
+          <CardHeader>
+            <CardTitle>User Growth</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={350}>
+              <LineChart data={data}>
+                <XAxis
+                  dataKey="name"
+                  stroke="#888888"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  stroke="#888888"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <Tooltip />
+                <Line
+                  type="monotone"
+                  dataKey="users"
+                  stroke="#8884d8"
+                  strokeWidth={2}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 }

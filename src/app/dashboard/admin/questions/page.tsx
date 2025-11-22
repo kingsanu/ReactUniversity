@@ -1,57 +1,97 @@
 "use client";
-import { useState, useEffect } from "react";
-import { AdminLayout } from "../_components/AdminLayout";
-import { Question360Manager } from "./_components";
-import { useRouter } from "next/navigation";
-import { useAdminAccess } from "@/hooks/useAdminAccess";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Search, Plus, FileQuestion, FolderOpen } from "lucide-react";
 
-export default function Questions360AdminPage() {
-  const router = useRouter();
-  const { isAdmin, loading } = useAdminAccess();
-
-  // Handle admin access check
-  useEffect(() => {
-    if (!loading) {
-      if (!isAdmin) {
-        alert("Access denied. This area is for administrators only.");
-        router.push("/dashboard");
-        return;
-      }
-    }
-  }, [isAdmin, loading, router]);
-
-  if (loading) {
-    return (
-      <div className="flex h-screen bg-gray-50">
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-600">Verifying admin access...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
+export default function QuestionsPage() {
   return (
-    <AdminLayout>
-      <div className="p-4 md:p-6">
-        {/* Header */}
-        <div className="mb-6 md:mb-8">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-              360° Questions Management
-            </h1>
-            <p className="text-gray-600 text-sm md:text-base">
-              Manage evaluation questions for Parent, Teacher, Other, and Self
-              assessments
-            </p>
-          </div>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Questions Bank</h1>
+          <p className="text-muted-foreground">
+            Manage questions and categories for assessments
+          </p>
         </div>
-
-        {/* Question360 Manager */}
-        <Question360Manager />
+        <Button>
+          <Plus className="mr-2 h-4 w-4" /> Add Question
+        </Button>
       </div>
-    </AdminLayout>
+
+      <div className="flex items-center space-x-2">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="Search questions..." className="pl-8" />
+        </div>
+      </div>
+
+      <Tabs defaultValue="all" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="all">All Questions</TabsTrigger>
+          <TabsTrigger value="categories">Categories</TabsTrigger>
+          <TabsTrigger value="archived">Archived</TabsTrigger>
+        </TabsList>
+        <TabsContent value="all" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {/* Mock Question Cards */}
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Card key={i}>
+                <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Question #{i}
+                  </CardTitle>
+                  <FileQuestion className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-sm text-muted-foreground mt-2">
+                    What is the primary purpose of React hooks?
+                  </div>
+                  <div className="flex items-center mt-4 space-x-2">
+                    <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
+                      Frontend
+                    </span>
+                    <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
+                      React
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+        <TabsContent value="categories">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {/* Mock Category Cards */}
+            {["Frontend", "Backend", "DevOps", "Soft Skills"].map(
+              (category) => (
+                <Card key={category}>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      {category}
+                    </CardTitle>
+                    <FolderOpen className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">24</div>
+                    <p className="text-xs text-muted-foreground">
+                      Questions in this category
+                    </p>
+                  </CardContent>
+                </Card>
+              )
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 }

@@ -94,9 +94,7 @@ export function CourseManager() {
     const target = courses.find((c) => c.id === courseId);
     const nextStatus = target ? !target.isActive : true;
     setCourses((prev) =>
-      prev.map((c) =>
-        c.id === courseId ? { ...c, isActive: nextStatus } : c
-      )
+      prev.map((c) => (c.id === courseId ? { ...c, isActive: nextStatus } : c))
     );
     try {
       await adminUpdateCourseApi(courseId, { isActive: nextStatus });
@@ -119,7 +117,9 @@ export function CourseManager() {
       try {
         // Use the API-backed update and fall back to mock update if server fails
         await adminUpdateCourseApi(course.id, course);
-        setCourses((prev) => prev.map((c) => (c.id === course.id ? course : c)));
+        setCourses((prev) =>
+          prev.map((c) => (c.id === course.id ? course : c))
+        );
       } catch (error) {
         console.error("Failed to update course", error);
         return;
@@ -147,7 +147,11 @@ export function CourseManager() {
         const status = statusResp?.data?.status;
         if (status === "done") {
           // Optionally auto-accept or open a preview UI
-          console.log("Import job done", jobId, statusResp?.data?.result?.coursePreview);
+          console.log(
+            "Import job done",
+            jobId,
+            statusResp?.data?.result?.coursePreview
+          );
           // TODO: open preview modal for admin approval
           return;
         }

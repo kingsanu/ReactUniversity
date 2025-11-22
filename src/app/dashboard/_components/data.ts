@@ -274,5 +274,11 @@ export const sidebarData = {
       icon: "subscriptions",
       path: "/dashboard/subscriptions",
     },
+    {
+      id: "coaching",
+      name: "Coaching",
+      icon: "opportunities", // Reusing icon for now
+      path: "/dashboard/coaching/schedule",
+    },
   ],
 };

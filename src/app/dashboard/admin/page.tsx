@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import { AdminLayout } from "./_components/AdminLayout";
 import { SubscriptionPlanManager } from "./_components/SubscriptionPlanManager";
 import { AdminStats } from "./_components/AdminStats";
 import { Questions360Stats } from "./_components/Questions360Stats";
@@ -38,29 +37,27 @@ export default function AdminPage() {
   }
 
   return (
-    <AdminLayout>
-      <div className="p-4 md:p-6">
-        {/* Header */}
-        <div className="mb-6 md:mb-8">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-              Dashboard Overview
-            </h1>
-            <p className="text-gray-600 text-sm md:text-base">
-              Manage subscription plans and system settings
-            </p>
-          </div>
+    <div className="p-4 md:p-6">
+      {/* Header */}
+      <div className="mb-6 md:mb-8">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+            Dashboard Overview
+          </h1>
+          <p className="text-gray-600 text-sm md:text-base">
+            Manage subscription plans and system settings
+          </p>
         </div>
-
-        {/* Admin Stats */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <AdminStats />
-          <Questions360Stats />
-        </div>
-
-        {/* Subscription Plan Manager */}
-        <SubscriptionPlanManager />
       </div>
-    </AdminLayout>
+
+      {/* Admin Stats */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <AdminStats />
+        <Questions360Stats />
+      </div>
+
+      {/* Subscription Plan Manager */}
+      <SubscriptionPlanManager />
+    </div>
   );
 }

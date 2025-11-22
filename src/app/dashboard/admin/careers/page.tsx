@@ -2,7 +2,6 @@
 
 import React from "react";
 import { useAdminAccess } from "@/hooks/useAdminAccess";
-import { AdminLayout } from "@/app/dashboard/admin/_components/AdminLayout";
 import { CareerManager } from "./_components/CareerManager";
 
 export default function AdminCareersPage() {
@@ -12,8 +11,8 @@ export default function AdminCareersPage() {
   if (!isAdmin) return <div>Access denied</div>;
 
   return (
-    <AdminLayout>
+    <div className="p-6">
       <CareerManager />
-    </AdminLayout>
+    </div>
   );
 }

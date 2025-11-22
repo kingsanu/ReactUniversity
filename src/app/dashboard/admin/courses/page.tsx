@@ -1,57 +1,221 @@
 "use client";
 import { useState, useEffect } from "react";
-import { AdminLayout } from "../_components/AdminLayout";
-import { CourseManager } from "./_components/CourseManager";
-import { useRouter } from "next/navigation";
-import { useAdminAccess } from "@/hooks/useAdminAccess";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Plus, Search, Edit, Trash2, BookOpen } from "lucide-react";
+import { toast } from "sonner";
 
-export default function AdminCoursesPage() {
-  const router = useRouter();
-  const { isAdmin, loading } = useAdminAccess();
+// Mock data for courses
+const MOCK_COURSES = [
+  {
+    id: "1",
+    title: "Introduction to React",
+    description: "Learn the basics of React development",
+    instructor: "John Doe",
+    students: 120,
+    status: "Published",
+    lastUpdated: "2023-11-15",
+  },
+  {
+    id: "2",
+    title: "Advanced TypeScript",
+    description: "Master TypeScript features and patterns",
+    instructor: "Jane Smith",
+    students: 85,
+    status: "Draft",
+    lastUpdated: "2023-11-20",
+  },
+  {
+    id: "3",
+    title: "Node.js Backend Development",
+    description: "Build scalable backends with Node.js",
+    instructor: "Mike Johnson",
+    students: 200,
+    status: "Published",
+    lastUpdated: "2023-10-30",
+  },
+];
 
-  // Handle admin access check
-  useEffect(() => {
-    if (!loading) {
-      if (!isAdmin) {
-        alert("Access denied. This area is for administrators only.");
-        router.push("/dashboard");
-        return;
-      }
-    }
-  }, [isAdmin, loading, router]);
+export default function CoursesPage() {
+  const [courses, setCourses] = useState(MOCK_COURSES);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [newCourse, setNewCourse] = useState({
+    title: "",
+    description: "",
+    instructor: "",
+  });
 
-  if (loading) {
-    return (
-      <div className="flex h-screen bg-gray-50">
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-600">Verifying admin access...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const handleAddCourse = () => {
+    const course = {
+      id: Math.random().toString(36).substr(2, 9),
+      ...newCourse,
+      students: 0,
+      status: "Draft",
+      lastUpdated: new Date().toISOString().split("T")[0],
+    };
+    setCourses([...courses, course]);
+    setIsAddDialogOpen(false);
+    setNewCourse({ title: "", description: "", instructor: "" });
+    toast.success("Course created successfully");
+  };
+
+  const handleDeleteCourse = (id: string) => {
+    setCourses(courses.filter((c) => c.id !== id));
+    toast.success("Course deleted successfully");
+  };
+
+  const filteredCourses = courses.filter((course) =>
+    course.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <AdminLayout>
-      <div className="p-4 md:p-6">
-        {/* Header */}
-        <div className="mb-6 md:mb-8">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-              Course Management
-            </h1>
-            <p className="text-gray-600 text-sm md:text-base">
-              Create, edit, and manage courses in the catalog
-            </p>
-          </div>
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Courses</h1>
+          <p className="text-muted-foreground">
+            Manage your courses and curriculum
+          </p>
         </div>
-
-        {/* Course Manager */}
-        <CourseManager />
+        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" /> Add Course
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create New Course</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="title">Title</Label>
+                <Input
+                  id="title"
+                  value={newCourse.title}
+                  onChange={(e) =>
+                    setNewCourse({ ...newCourse, title: e.target.value })
+                  }
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  value={newCourse.description}
+                  onChange={(e) =>
+                    setNewCourse({ ...newCourse, description: e.target.value })
+                  }
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="instructor">Instructor</Label>
+                <Input
+                  id="instructor"
+                  value={newCourse.instructor}
+                  onChange={(e) =>
+                    setNewCourse({ ...newCourse, instructor: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setIsAddDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button onClick={handleAddCourse}>Create Course</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
-    </AdminLayout>
+
+      <div className="flex items-center mb-6">
+        <div className="relative w-72">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search courses..."
+            className="pl-8"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className="border rounded-lg">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Title</TableHead>
+              <TableHead>Instructor</TableHead>
+              <TableHead>Students</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Last Updated</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredCourses.map((course) => (
+              <TableRow key={course.id}>
+                <TableCell className="font-medium">
+                  <div className="flex items-center">
+                    <BookOpen className="mr-2 h-4 w-4 text-muted-foreground" />
+                    {course.title}
+                  </div>
+                </TableCell>
+                <TableCell>{course.instructor}</TableCell>
+                <TableCell>{course.students}</TableCell>
+                <TableCell>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs ${
+                      course.status === "Published"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-yellow-100 text-yellow-800"
+                    }`}
+                  >
+                    {course.status}
+                  </span>
+                </TableCell>
+                <TableCell>{course.lastUpdated}</TableCell>
+                <TableCell className="text-right">
+                  <Button variant="ghost" size="icon">
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-red-600"
+                    onClick={() => handleDeleteCourse(course.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
   );
 }
-
