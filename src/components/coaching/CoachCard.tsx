@@ -5,19 +5,9 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge";
 import { Star, MapPin, Clock } from "lucide-react";
 
-export interface Coach {
-  id: string;
-  name: string;
-  title: string;
-  specialization: string;
-  rating: number;
-  reviews: number;
-  hourlyRate: number;
-  location: string;
-  availability: string;
-  image: string;
-  tags: string[];
-}
+import { Coach } from "@/types/coach";
+
+// Local interface removed in favor of shared type
 
 interface CoachCardProps {
   coach: Coach;
@@ -56,12 +46,13 @@ export function CoachCard({ coach, onBook }: CoachCardProps) {
           </div>
           <div className="flex items-center text-sm text-gray-600">
             <Clock className="h-4 w-4 mr-2 text-gray-400" />
-            {coach.availability}
+            {/* Simple availability display for now */}
+            {coach.availability ? "View Schedule" : "Contact for availability"}
           </div>
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2">
-          {coach.tags.map((tag) => (
+          {coach.tags?.map((tag) => (
             <Badge key={tag} variant="secondary" className="font-normal">
               {tag}
             </Badge>
@@ -70,10 +61,7 @@ export function CoachCard({ coach, onBook }: CoachCardProps) {
       </CardContent>
       <CardFooter className="px-6 py-4 bg-gray-50 border-t flex justify-between items-center">
         <div>
-          <span className="text-lg font-bold text-gray-900">
-            ${coach.hourlyRate}
-          </span>
-          <span className="text-sm text-gray-500">/hr</span>
+          {/* Price removed */}
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" asChild>

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Filter } from "lucide-react";
-import { Coach, CoachCard } from "@/components/coaching/CoachCard";
+import { CoachCard } from "@/components/coaching/CoachCard";
+import { Coach } from "@/types/coach";
 import { BookingModal } from "@/components/coaching/BookingModal";
 import {
   Select,
@@ -14,110 +15,43 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// Mock Data
-const MOCK_COACHES: Coach[] = [
-  {
-    id: "1",
-    name: "Sarah Wilson",
-    title: "Senior Career Coach",
-    specialization: "Tech Leadership",
-    rating: 4.9,
-    reviews: 124,
-    hourlyRate: 150,
-    location: "San Francisco, CA",
-    availability: "Available Today",
-    image: "https://i.pravatar.cc/150?u=sarah",
-    tags: ["Leadership", "Management", "Tech"],
-  },
-  {
-    id: "2",
-    name: "Michael Chen",
-    title: "Technical Interview Coach",
-    specialization: "Software Engineering",
-    rating: 5.0,
-    reviews: 89,
-    hourlyRate: 200,
-    location: "New York, NY",
-    availability: "Next Available: Tomorrow",
-    image: "https://i.pravatar.cc/150?u=michael",
-    tags: ["Algorithms", "System Design", "Coding"],
-  },
-  {
-    id: "3",
-    name: "Emily Rodriguez",
-    title: "Executive Coach",
-    specialization: "Public Speaking",
-    rating: 4.8,
-    reviews: 210,
-    hourlyRate: 180,
-    location: "Remote",
-    availability: "Available Today",
-    image: "https://i.pravatar.cc/150?u=emily",
-    tags: ["Communication", "Presentation", "Executive"],
-  },
-  {
-    id: "4",
-    name: "David Kim",
-    title: "Product Management Coach",
-    specialization: "Product Strategy",
-    rating: 4.7,
-    reviews: 156,
-    hourlyRate: 160,
-    location: "Seattle, WA",
-    availability: "Next Available: Mon",
-    image: "https://i.pravatar.cc/150?u=david",
-    tags: ["Product", "Strategy", "Agile"],
-  },
-  {
-    id: "5",
-    name: "Jessica Lee",
-    title: "Design Mentor",
-    specialization: "UX/UI Design",
-    rating: 4.9,
-    reviews: 98,
-    hourlyRate: 140,
-    location: "Austin, TX",
-    availability: "Available Today",
-    image: "https://i.pravatar.cc/150?u=jessica",
-    tags: ["Design", "UX", "Portfolio"],
-  },
-  {
-    id: "6",
-    name: "Robert Taylor",
-    title: "Career Transition Specialist",
-    specialization: "Career Change",
-    rating: 4.6,
-    reviews: 75,
-    hourlyRate: 120,
-    location: "London, UK",
-    availability: "Next Available: Wed",
-    image: "https://i.pravatar.cc/150?u=robert",
-    tags: ["Transition", "Resume", "Networking"],
-  },
-];
+// Mock Data removed as we are fetching from API
 
 export default function CoachingSchedulePage() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [specializationFilter, setSpecializationFilter] = useState("all");
-  const [selectedCoach, setSelectedCoach] = useState<Coach | null>(null);
+  const [searchQuery, setSearchTerm] = useState("");
+  const [selectedCategory, setSpecializationFilter] = useState("all");
+  const [selectedCoach, setSelectedCoach] = useState<any | null>(null);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [coaches, setCoaches] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const filteredCoaches = MOCK_COACHES.filter((coach) => {
-    const matchesSearch =
-      coach.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      coach.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      coach.tags.some((tag) =>
-        tag.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+  // Fetch coaches
+  useEffect(() => {
+    const fetchCoaches = async () => {
+      try {
+        setIsLoading(true);
+        const { getCoaches } = await import("@/services/coachService");
+        const response = await getCoaches({
+          search: searchQuery,
+          specialization: selectedCategory === "all" ? undefined : selectedCategory
+        });
+        setCoaches(response.data);
+      } catch (error) {
+        console.error("Failed to fetch coaches:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    const matchesSpecialization =
-      specializationFilter === "all" ||
-      coach.specialization === specializationFilter;
+    // Debounce search
+    const timer = setTimeout(() => {
+      fetchCoaches();
+    }, 500);
 
-    return matchesSearch && matchesSpecialization;
-  });
+    return () => clearTimeout(timer);
+  }, [searchQuery, selectedCategory]);
 
-  const handleBookCoach = (coach: Coach) => {
+  const handleBookCoach = (coach: any) => {
     setSelectedCoach(coach);
     setIsBookingModalOpen(true);
   };
@@ -141,13 +75,13 @@ export default function CoachingSchedulePage() {
           <Input
             placeholder="Search by name, title, or skill..."
             className="pl-10"
-            value={searchTerm}
+            value={searchQuery}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         <div className="w-full md:w-64">
           <Select
-            value={specializationFilter}
+            value={selectedCategory}
             onValueChange={setSpecializationFilter}
           >
             <SelectTrigger>
@@ -173,17 +107,22 @@ export default function CoachingSchedulePage() {
       </div>
 
       {/* Coach Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredCoaches.map((coach) => (
-          <CoachCard key={coach.id} coach={coach} onBook={handleBookCoach} />
-        ))}
-      </div>
-
-      {/* Empty State */}
-      {filteredCoaches.length === 0 && (
+      {isLoading ? (
+        <div className="text-center py-12 text-gray-500">Loading coaches...</div>
+      ) : coaches.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {coaches.map((coach) => (
+            <CoachCard key={coach.id} coach={coach} onBook={handleBookCoach} />
+          ))}
+        </div>
+      ) : (
         <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">
-            No coaches found matching your criteria.
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+            <Search className="h-8 w-8 text-gray-400" />
+          </div>
+          <h3 className="text-lg font-medium text-gray-900">No coaches found</h3>
+          <p className="text-gray-500 mt-1">
+            Try adjusting your search or filters to find what you're looking for.
           </p>
           <Button
             variant="link"

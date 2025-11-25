@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
-import { Coach } from "./CoachCard";
+import { Coach } from "@/types/coach";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { Clock, Video, Globe, ChevronLeft } from "lucide-react";
@@ -48,17 +48,50 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
     setStep("details");
   };
 
-  const handleBook = () => {
-    if (!date || !selectedTime || !topic) {
+  const handleBook = async () => {
+    if (!date || !selectedTime || !topic || !coach) {
       toast.error("Please fill in all fields");
       return;
     }
 
-    // Mock booking API call
-    setTimeout(() => {
+    try {
+      const { bookSession } = await import("@/services/coachService");
+      
+      // Construct start and end times
+      // This is a simplification. In a real app, parse time string properly.
+      // Assuming time is like "09:00am"
+      const timeParts = selectedTime.match(/(\d+):(\d+)(am|pm)/i);
+      if (!timeParts) return;
+      
+      let hours = parseInt(timeParts[1]);
+      const minutes = parseInt(timeParts[2]);
+      const meridian = timeParts[3].toLowerCase();
+      
+      if (meridian === 'pm' && hours < 12) hours += 12;
+      if (meridian === 'am' && hours === 12) hours = 0;
+      
+      const startDate = new Date(date);
+      startDate.setHours(hours, minutes, 0, 0);
+      
+      const endDate = new Date(startDate);
+      endDate.setMinutes(startDate.getMinutes() + 30); // 30 min duration
+      
+      await bookSession({
+        coachId: coach.id,
+        slot: {
+          start: startDate.toISOString(),
+          end: endDate.toISOString()
+        },
+        topic,
+        notes: "" // Add notes field to state if needed
+      });
+
       toast.success(`Session booked with ${coach?.name} on ${format(date, "PPP")} at ${selectedTime}`);
       onClose();
-    }, 1000);
+    } catch (error) {
+      console.error("Booking failed:", error);
+      toast.error("Failed to book session. Please try again.");
+    }
   };
 
   if (!coach) return null;

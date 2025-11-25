@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -12,7 +12,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, MoreHorizontal, Mail } from "lucide-react";
+import { Search, MoreHorizontal, Mail, Loader2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,66 +22,57 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-// Mock data based on COACHES_API_SPEC.md
-const MOCK_COACHES = [
-  {
-    id: "coach_123",
-    fullName: "John Coach",
-    email: "john.coach@example.com",
-    status: "active",
-    joinedAt: "2023-01-15T10:00:00Z",
-    specialization: "Career Development",
-    activeStudents: 12,
-  },
-  {
-    id: "coach_124",
-    fullName: "Jane Mentor",
-    email: "jane.mentor@example.com",
-    status: "pending",
-    joinedAt: "2023-11-20T14:30:00Z",
-    specialization: "Technical Interview",
-    activeStudents: 0,
-  },
-  {
-    id: "coach_125",
-    fullName: "Robert Smith",
-    email: "robert.smith@example.com",
-    status: "active",
-    joinedAt: "2023-03-10T09:15:00Z",
-    specialization: "Leadership",
-    activeStudents: 5,
-  },
-  {
-    id: "coach_126",
-    fullName: "Sarah Wilson",
-    email: "sarah.wilson@example.com",
-    status: "inactive",
-    joinedAt: "2022-12-01T11:00:00Z",
-    specialization: "Resume Building",
-    activeStudents: 0,
-  },
-  {
-    id: "coach_127",
-    fullName: "Michael Brown",
-    email: "michael.brown@example.com",
-    status: "active",
-    joinedAt: "2023-05-22T16:45:00Z",
-    specialization: "Negotiation",
-    activeStudents: 8,
-  },
-];
+import { Coach } from "@/types/coach";
+import { toast } from "sonner";
 
 export function CoachesTable() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [coaches, setCoaches] = useState<Coach[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const filteredCoaches = MOCK_COACHES.filter(
-    (coach) =>
-      coach.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      coach.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  useEffect(() => {
+    const fetchCoaches = async () => {
+      setIsLoading(true);
+      try {
+        const { getAllCoachesAdmin } = await import("@/services/coachService");
+        // In a real app, we would pass page, limit, and search term to the API
+        // For now, we fetch all and filter client-side if the API doesn't support search params yet
+        // or if we want to keep it simple.
+        // The service function signature is: getAllCoachesAdmin(page?: number, limit?: number, search?: string)
+        const response = await getAllCoachesAdmin({ page: 1, limit: 100, search: searchTerm });
+        console.log("getAllCoachesAdmin response:", response);
+        
+        const anyResponse = response as any;
 
-  const getStatusColor = (status: string) => {
+        if (Array.isArray(anyResponse)) {
+            setCoaches(anyResponse);
+        } else if (anyResponse?.data && Array.isArray(anyResponse.data)) {
+             // Handle case where data is directly an array
+            setCoaches(anyResponse.data);
+        } else if (anyResponse?.data?.data && Array.isArray(anyResponse.data.data)) {
+            // Handle nested data.data structure (as reported by user)
+            setCoaches(anyResponse.data.data);
+        } else {
+            console.error("Unexpected API response format:", response);
+            setCoaches([]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch coaches:", error);
+        toast.error("Failed to load coaches");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // Debounce search
+    const timer = setTimeout(() => {
+      fetchCoaches();
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  const getStatusColor = (status?: string) => {
     switch (status) {
       case "active":
         return "bg-green-100 text-green-800 hover:bg-green-100";
@@ -125,26 +116,34 @@ export function CoachesTable() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredCoaches.length === 0 ? (
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="h-24 text-center">
+                    <div className="flex justify-center items-center">
+                      <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : coaches.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="h-24 text-center">
                     No coaches found.
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredCoaches.map((coach) => (
+                coaches.map((coach) => (
                   <TableRow key={coach.id}>
-                    <TableCell className="font-medium">{coach.fullName}</TableCell>
-                    <TableCell>{coach.email}</TableCell>
+                    <TableCell className="font-medium">{coach.name || coach.fullName}</TableCell>
+                    <TableCell>{coach.email || "N/A"}</TableCell>
                     <TableCell>
                       <Badge className={getStatusColor(coach.status)} variant="secondary">
-                        {coach.status.charAt(0).toUpperCase() + coach.status.slice(1)}
+                        {(coach.status || "Unknown").charAt(0).toUpperCase() + (coach.status || "unknown").slice(1)}
                       </Badge>
                     </TableCell>
-                    <TableCell>{coach.specialization}</TableCell>
-                    <TableCell>{coach.activeStudents}</TableCell>
+                    <TableCell>{coach.specialization || "N/A"}</TableCell>
+                    <TableCell>{coach.activeStudents || 0}</TableCell>
                     <TableCell>
-                      {new Date(coach.joinedAt).toLocaleDateString()}
+                      {coach.joinedAt ? new Date(coach.joinedAt).toLocaleDateString() : "N/A"}
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
@@ -157,13 +156,34 @@ export function CoachesTable() {
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
                           <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(coach.email)}
+                            onClick={() => {
+                                if (coach.email) {
+                                    navigator.clipboard.writeText(coach.email);
+                                    toast.success("Email copied to clipboard");
+                                }
+                            }}
                           >
                             Copy Email
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem>View Details</DropdownMenuItem>
                           <DropdownMenuItem>Edit Coach</DropdownMenuItem>
+                          {coach.status === "invited" && (
+                            <DropdownMenuItem
+                              onClick={async () => {
+                                if (!coach.email) return;
+                                try {
+                                  const { inviteCoach } = await import("@/services/coachService");
+                                  await inviteCoach(coach.email);
+                                  toast.success(`Invitation resent to ${coach.email}`);
+                                } catch (error) {
+                                  toast.error("Failed to resend invitation");
+                                }
+                              }}
+                            >
+                              Resend Invite
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem className="text-red-600">
                             Deactivate
                           </DropdownMenuItem>

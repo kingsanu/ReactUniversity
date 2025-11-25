@@ -62,48 +62,29 @@ export function BulkInviteForm() {
       header: true,
       skipEmptyLines: true,
       complete: async (results) => {
-        const coaches = results.data.map((row) => ({
-          fullName: row.fullName,
-          email: row.email,
-          password: generatePassword(), // Generate random password as required by API
-        })).filter(c => c.email && c.fullName); // Basic validation
-
-        if (coaches.length === 0) {
+        const validData = results.data.filter(row => row.email && row.fullName);
+        
+        if (validData.length === 0) {
             toast.error("No valid rows found in CSV");
             setIsLoading(false);
             return;
         }
 
         try {
-          const response = await fetch("/authapi/signup-coach-bulk", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ coaches }),
-          });
+          const { signupCoachBulk } = await import("@/services/coachService");
+          // Transform CSV data to match API expectation
+          const coachesToInvite = validData.map(row => ({
+            email: row.email,
+            fullName: row.fullName,
+            password: generatePassword()
+          }));
 
-          if (!response.ok) {
-             const errorData = await response.json();
-             throw new Error(errorData.message || "Failed to process bulk invite");
-          }
+          const response = await signupCoachBulk(coachesToInvite);
           
-          const data = await response.json();
+          // Assuming response contains results
+          const data = response; 
           
-          // Assuming the API returns details about success/failure counts or list
-          // Adjust based on actual API response structure if needed. 
-          // For now, assuming a simple success or a list of results.
-          // If the API returns a list of results, we can calculate success/failed.
-          
-          // Placeholder for result processing based on API response
-          // Let's assume the API returns { successful: [], failed: [] } or similar
-          // Since I don't have the exact response schema for bulk, I'll assume success for now
-          // and show a generic success message, or if the API returns specific counts.
-          
-          // Based on Postman description: "Returns detailed results for each coach registration attempt."
-          // I'll assume it returns an array of results.
-          
-          const successCount = Array.isArray(data) ? data.filter((r: any) => r.success).length : coaches.length; // Fallback
+          const successCount = Array.isArray(data) ? data.filter((r: any) => r.success).length : coachesToInvite.length;
           const failedCount = Array.isArray(data) ? data.filter((r: any) => !r.success).length : 0;
           const errors = Array.isArray(data) ? data.filter((r: any) => !r.success).map((r: any) => r.error || "Unknown error") : [];
 
@@ -113,7 +94,7 @@ export function BulkInviteForm() {
             errors: errors
           });
 
-          toast.success(`Processed ${coaches.length} records.`);
+          toast.success(`Processed ${coachesToInvite.length} records.`);
           
           if (fileInputRef.current) {
             fileInputRef.current.value = "";

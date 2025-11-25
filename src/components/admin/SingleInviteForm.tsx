@@ -18,17 +18,8 @@ export function SingleInviteForm() {
 
     setIsLoading(true);
     try {
-      const response = await fetch("/authapi/invite-coach", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to send invitation");
-      }
+      const { inviteCoach } = await import("@/services/coachService");
+      await inviteCoach(email);
 
       toast.success(`An invitation has been sent to ${email}`);
       setEmail("");

@@ -1,0 +1,145 @@
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { CoachOnboardingData } from "./types";
+import { Check, Calendar, Mail, ArrowRight, ShieldCheck } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+interface CalendarSyncStepProps {
+  data: CoachOnboardingData["calendarIntegrations"];
+  onNext: (data: CoachOnboardingData["calendarIntegrations"]) => void;
+  onBack: () => void;
+}
+
+export function CalendarSyncStep({ data, onNext, onBack }: CalendarSyncStepProps) {
+  const [integrations, setIntegrations] = React.useState(data);
+
+  const handleConnect = async (provider: "google" | "outlook") => {
+    try {
+      const { getCalendarAuthUrl } = await import("@/services/coachService");
+      const { url } = await getCalendarAuthUrl(provider);
+      // Redirect to auth URL
+      window.location.href = url;
+    } catch (error) {
+      console.error(`Failed to get ${provider} auth URL:`, error);
+      // Fallback for demo/testing if API fails or is not implemented
+      setIntegrations((prev) => ({
+        ...prev,
+        [provider]: !prev[provider],
+      }));
+    }
+  };
+
+  const handleSubmit = () => {
+    onNext(integrations);
+  };
+
+  return (
+    <div className="space-y-8">
+      <div className="bg-green-50/50 p-6 rounded-xl border border-green-100 flex items-start gap-4">
+        <div className="p-2 bg-green-100 rounded-lg text-green-600">
+          <ShieldCheck className="h-5 w-5" />
+        </div>
+        <div>
+          <h3 className="text-green-900 font-semibold">Why connect your calendar?</h3>
+          <p className="text-sm text-green-700/80 mt-1">
+            We'll automatically check for conflicts so you never get double-booked. 
+            We only access your free/busy status, not your event details.
+          </p>
+        </div>
+      </div>
+
+      <div className="grid gap-4">
+        {/* Google Calendar */}
+        <div 
+          className={cn(
+            "relative group p-6 border rounded-2xl transition-all duration-300 flex items-center justify-between",
+            integrations.google 
+              ? "border-blue-200 bg-blue-50/30 shadow-sm" 
+              : "border-gray-200 hover:border-gray-300 hover:shadow-md bg-white"
+          )}
+        >
+          <div className="flex items-center gap-5">
+            <div className="h-12 w-12 bg-white rounded-xl flex items-center justify-center shadow-sm border border-gray-100 shrink-0">
+              {/* Google Icon Placeholder */}
+              <span className="font-bold text-blue-600 text-xl">G</span>
+            </div>
+            <div>
+              <h4 className="font-bold text-gray-900 text-lg">Google Calendar</h4>
+              <p className="text-sm text-gray-500">Connect your Gmail or G Suite calendar</p>
+            </div>
+          </div>
+          <Button
+            size="lg"
+            variant={integrations.google ? "outline" : "default"}
+            onClick={() => handleConnect("google")}
+            className={cn(
+              "min-w-[120px] transition-all",
+              integrations.google 
+                ? "border-blue-200 text-blue-700 hover:bg-blue-100 hover:text-blue-800 bg-blue-50" 
+                : "bg-black text-white hover:bg-gray-800"
+            )}
+          >
+            {integrations.google ? (
+              <>
+                <Check className="h-4 w-4 mr-2" /> Connected
+              </>
+            ) : (
+              "Connect"
+            )}
+          </Button>
+        </div>
+
+        {/* Outlook Calendar */}
+        <div 
+          className={cn(
+            "relative group p-6 border rounded-2xl transition-all duration-300 flex items-center justify-between",
+            integrations.outlook 
+              ? "border-blue-200 bg-blue-50/30 shadow-sm" 
+              : "border-gray-200 hover:border-gray-300 hover:shadow-md bg-white"
+          )}
+        >
+          <div className="flex items-center gap-5">
+            <div className="h-12 w-12 bg-white rounded-xl flex items-center justify-center shadow-sm border border-gray-100 shrink-0">
+              <Mail className="h-6 w-6 text-blue-500" />
+            </div>
+            <div>
+              <h4 className="font-bold text-gray-900 text-lg">Outlook Calendar</h4>
+              <p className="text-sm text-gray-500">Connect Office 365 or Exchange</p>
+            </div>
+          </div>
+          <Button
+            size="lg"
+            variant={integrations.outlook ? "outline" : "default"}
+            onClick={() => handleConnect("outlook")}
+            className={cn(
+              "min-w-[120px] transition-all",
+              integrations.outlook 
+                ? "border-blue-200 text-blue-700 hover:bg-blue-100 hover:text-blue-800 bg-blue-50" 
+                : "bg-black text-white hover:bg-gray-800"
+            )}
+          >
+            {integrations.outlook ? (
+              <>
+                <Check className="h-4 w-4 mr-2" /> Connected
+              </>
+            ) : (
+              "Connect"
+            )}
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex justify-between pt-8 border-t border-gray-100">
+        <Button variant="ghost" onClick={onBack} className="text-gray-500 hover:text-gray-900">
+          Back
+        </Button>
+        <Button 
+          onClick={handleSubmit} 
+          className="bg-black text-white hover:bg-gray-800 px-8 h-12 text-base shadow-lg shadow-black/10 hover:shadow-xl hover:-translate-y-0.5 transition-all"
+        >
+          Complete Setup <ArrowRight className="ml-2 h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+}

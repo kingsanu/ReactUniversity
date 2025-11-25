@@ -139,6 +139,32 @@
           }
         },
         {
+          "name": "Invite Coach Bulk",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/authapi/invite-coach-bulk",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["authapi", "invite-coach-bulk"]
+            },
+            "description": "Invite multiple coaches via Excel file upload. Excel file must contain 'fullName' (or 'full_name' or 'name') and 'email' columns. File must be .xlsx or .xls format and less than 10MB. Returns detailed results for each coach invitation."
+          }
+        },
+        {
           "name": "Login",
           "request": {
             "method": "POST",
@@ -234,6 +260,471 @@
             },
             "description": "Convert all existing users' email addresses to lowercase for consistency"
           }
+        },
+        {
+          "name": "Get All Coaches (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/authapi/coaches?page=1&limit=10&search=",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["authapi", "coaches"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (default: 1)"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Items per page (default: 10)"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search by name or email (optional)"
+                }
+              ]
+            },
+            "description": "Get paginated list of all coaches with their details and status for admin panel."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Coach APIs",
+      "item": [
+        {
+          "name": "Onboarding",
+          "item": [
+            {
+              "name": "Get Onboarding Status",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/{{coachId}}/onboarding-status",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "coach", "{{coachId}}", "onboarding-status"]
+                },
+                "description": "Get coach onboarding status. Used to verify invitation and current status when coach lands on onboarding page."
+              }
+            },
+            {
+              "name": "Upload Profile Image",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": []
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/upload",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "upload"]
+                },
+                "description": "Upload coach profile picture. Accepts image files (.jpg, .jpeg, .png, .gif, .webp) up to 5MB."
+              }
+            },
+            {
+              "name": "Submit Onboarding Data",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"personalInfo\": {\n    \"name\": \"Sarah Wilson\",\n    \"title\": \"Senior Career Coach\",\n    \"bio\": \"Experienced leader in tech with 10+ years of experience...\",\n    \"specialization\": \"Tech Leadership\",\n    \"location\": \"San Francisco, CA\",\n    \"languages\": [\"English\", \"Spanish\"],\n    \"tags\": [\"Leadership\", \"Management\", \"Tech\"],\n    \"image\": \"https://storage.example.com/coaches/profile_123.jpg\"\n  },\n  \"availability\": {\n    \"timezone\": \"America/Los_Angeles\",\n    \"weeklySchedule\": [\n      {\n        \"day\": \"Monday\",\n        \"enabled\": true,\n        \"timeSlots\": [\n          { \"start\": \"09:00\", \"end\": \"12:00\" },\n          { \"start\": \"13:00\", \"end\": \"17:00\" }\n        ]\n      },\n      {\n        \"day\": \"Tuesday\",\n        \"enabled\": true,\n        \"timeSlots\": [\n          { \"start\": \"09:00\", \"end\": \"12:00\" },\n          { \"start\": \"13:00\", \"end\": \"17:00\" }\n        ]\n      },\n      {\n        \"day\": \"Wednesday\",\n        \"enabled\": false,\n        \"timeSlots\": []\n      },\n      {\n        \"day\": \"Thursday\",\n        \"enabled\": true,\n        \"timeSlots\": [\n          { \"start\": \"09:00\", \"end\": \"12:00\" }\n        ]\n      },\n      {\n        \"day\": \"Friday\",\n        \"enabled\": true,\n        \"timeSlots\": [\n          { \"start\": \"09:00\", \"end\": \"17:00\" }\n        ]\n      },\n      {\n        \"day\": \"Saturday\",\n        \"enabled\": false,\n        \"timeSlots\": []\n      },\n      {\n        \"day\": \"Sunday\",\n        \"enabled\": false,\n        \"timeSlots\": []\n      }\n    ]\n  },\n  \"calendarIntegrations\": {\n    \"google\": {\n      \"connected\": false\n    },\n    \"outlook\": {\n      \"connected\": false\n    }\n  }\n}"
+                },
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/{{coachId}}/onboarding",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "coach", "{{coachId}}", "onboarding"]
+                },
+                "description": "Submit coach onboarding data including profile, availability, and calendar preferences."
+              }
+            },
+            {
+              "name": "Get Google Calendar Auth URL",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/auth/google/url",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "auth", "google", "url"]
+                },
+                "description": "Get Google Calendar OAuth consent URL for calendar integration."
+              }
+            },
+            {
+              "name": "Get Outlook Calendar Auth URL",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/auth/outlook/url",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "auth", "outlook", "url"]
+                },
+                "description": "Get Outlook Calendar OAuth consent URL for calendar integration."
+              }
+            }
+          ]
+        },
+        {
+          "name": "User Side (Public)",
+          "item": [
+            {
+              "name": "List Coaches",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach?page=1&limit=10&specialization=Tech Leadership&search=Sarah",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "coach"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "description": "Page number (default: 1)"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "description": "Items per page (default: 10)"
+                    },
+                    {
+                      "key": "specialization",
+                      "value": "Tech Leadership",
+                      "description": "Filter by specialization (optional)"
+                    },
+                    {
+                      "key": "search",
+                      "value": "Sarah",
+                      "description": "Search by name or title (optional)"
+                    }
+                  ]
+                },
+                "description": "Get paginated list of available coaches. Only returns coaches with completed onboarding."
+              }
+            },
+            {
+              "name": "Get Coach Details",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/{{coachId}}",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "coach", "{{coachId}}"]
+                },
+                "description": "Get full public profile of a coach including availability, ratings, and reviews."
+              }
+            },
+            {
+              "name": "Book Session",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"coachId\": \"{{coachId}}\",\n  \"slot\": {\n    \"start\": \"2024-12-25T14:00:00Z\",\n    \"end\": \"2024-12-25T14:30:00Z\"\n  },\n  \"topic\": \"Career Guidance\",\n  \"notes\": \"Looking for help with career transition\"\n}"
+                },
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/bookings",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "bookings"]
+                },
+                "description": "Book a coaching session with a coach. Requires authentication."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Coach Dashboard",
+          "item": [
+            {
+              "name": "Get My Sessions",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/me/sessions?status=upcoming",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "coach", "me", "sessions"],
+                  "query": [
+                    {
+                      "key": "status",
+                      "value": "upcoming",
+                      "description": "Filter: 'upcoming', 'past', or 'all' (default: 'all')"
+                    }
+                  ]
+                },
+                "description": "Get list of upcoming and past sessions for the logged-in coach."
+              }
+            },
+            {
+              "name": "Reschedule Session",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"newSlot\": {\n    \"start\": \"2024-12-26T10:00:00Z\",\n    \"end\": \"2024-12-26T10:30:00Z\"\n  }\n}"
+                },
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/bookings/{{bookingId}}/reschedule",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "bookings", "{{bookingId}}", "reschedule"]
+                },
+                "description": "Reschedule an existing booking. Only the coach who owns the booking can reschedule it."
+              }
+            },
+            {
+              "name": "Get My Availability",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/me/availability",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "coach", "me", "availability"]
+                },
+                "description": "Get current availability settings for the logged-in coach."
+              }
+            },
+            {
+              "name": "Update Availability",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"timezone\": \"America/Los_Angeles\",\n  \"weeklySchedule\": [\n    {\n      \"day\": \"Monday\",\n      \"enabled\": true,\n      \"timeSlots\": [\n        { \"start\": \"09:00\", \"end\": \"12:00\" },\n        { \"start\": \"13:00\", \"end\": \"17:00\" }\n      ]\n    },\n    {\n      \"day\": \"Tuesday\",\n      \"enabled\": true,\n      \"timeSlots\": [\n        { \"start\": \"09:00\", \"end\": \"17:00\" }\n      ]\n    }\n  ]\n}"
+                },
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/me/availability",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "coach", "me", "availability"]
+                },
+                "description": "Update availability settings for the logged-in coach."
+              }
+            },
+            {
+              "name": "Update Coach Profile",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Senior Career Coach\",\n  \"bio\": \"Updated bio with more experience...\",\n  \"specialization\": \"Tech Leadership\",\n  \"location\": \"New York, NY\",\n  \"languages\": [\"English\", \"French\"],\n  \"tags\": [\"Leadership\", \"Management\"]\n}"
+                },
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/me",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "coach", "me"]
+                },
+                "description": "Update coach's personal information (bio, title, specialization, etc.). All fields are optional."
+              }
+            },
+            {
+              "name": "Cancel Session",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"Unexpected conflict\"\n}"
+                },
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/bookings/{{bookingId}}/cancel",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "bookings", "{{bookingId}}", "cancel"]
+                },
+                "description": "Cancel a booking. Can be triggered by coach or student."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reviews",
+          "item": [
+            {
+              "name": "Submit Review",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"bookingId\": \"{{bookingId}}\",\n  \"rating\": 5,\n  \"comment\": \"Great session! Very helpful.\"\n}"
+                },
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/{{coachId}}/reviews",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "coach", "{{coachId}}", "reviews"]
+                },
+                "description": "Submit a review for a coach after a completed session. Rating must be between 1-5."
+              }
+            }
+          ]
         }
       ]
     },
@@ -3748,6 +4239,16 @@
       "key": "jobId",
       "value": "your-job-id-here",
       "description": "Replace with actual import job ID for testing (returned from import endpoint)"
+    },
+    {
+      "key": "coachId",
+      "value": "your-coach-id-here",
+      "description": "Replace with actual coach ID for testing (returned from signup-coach or get all coaches)"
+    },
+    {
+      "key": "bookingId",
+      "value": "your-booking-id-here",
+      "description": "Replace with actual booking ID for testing (returned from book session endpoint)"
     }
   ]
 }
