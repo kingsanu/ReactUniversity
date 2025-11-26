@@ -35,7 +35,7 @@ export function CoachCard({ coach, onBook }: CoachCardProps) {
           </div>
           <div className="flex items-center bg-yellow-50 px-2 py-1 rounded text-yellow-700 text-xs font-bold">
             <Star className="h-3 w-3 fill-yellow-500 text-yellow-500 mr-1" />
-            {coach.rating} ({coach.reviews})
+            {coach.rating} ({Array.isArray(coach.reviews) ? coach.reviews.length : coach.reviews})
           </div>
         </div>
 

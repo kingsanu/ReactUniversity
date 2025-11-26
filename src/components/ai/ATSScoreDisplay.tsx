@@ -26,6 +26,8 @@ export function ATSScoreDisplay({
   keywordsIncluded,
   maxWordCount = 150,
   className,
+  missingKeywords,
+  onAddSuggestion,
 }: ATSScoreDisplayProps) {
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-green-600";
