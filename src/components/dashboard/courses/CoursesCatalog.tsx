@@ -236,6 +236,7 @@ export function CoursesCatalog() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {recommendedCourses.map((course, index) => (
             <motion.div
+              key={course.id}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.06 * index }}
@@ -287,6 +288,7 @@ export function CoursesCatalog() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
             {filteredAndSortedCourses.map((course, index) => (
               <motion.div
+                key={course.id}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.06 * index }}

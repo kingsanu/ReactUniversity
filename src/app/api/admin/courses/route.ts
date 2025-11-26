@@ -76,9 +76,8 @@ export async function POST(req: Request) {
   }
   try {
     const payload = await req.json();
-    const created = require("@/lib/adminCoursesStore").createAdminCourse(
-      payload
-    );
+    const { createAdminCourse } = await import("@/lib/adminCoursesStore");
+    const created = createAdminCourse(payload);
     return NextResponse.json({ success: true, data: created }, { status: 201 });
   } catch (err) {
     return NextResponse.json(

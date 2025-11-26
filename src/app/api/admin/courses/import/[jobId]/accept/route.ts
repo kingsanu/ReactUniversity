@@ -4,7 +4,7 @@ import { adminCreateCourse } from "@/services/courseService";
 
 export async function POST(
   req: Request,
-  { params }: { params: { jobId: string } }
+  { params }: { params: Promise<{ jobId: string }> }
 ) {
   const USE_LOCAL_API = process.env.NEXT_PUBLIC_USE_LOCAL_API === "true";
   if (!USE_LOCAL_API) {
@@ -17,7 +17,7 @@ export async function POST(
     );
   }
   try {
-    const jobId = params.jobId;
+    const { jobId } = await params;
     const job = getImportJob(jobId);
     if (!job) {
       return NextResponse.json(

@@ -7,7 +7,7 @@ import {
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const USE_LOCAL_API = process.env.NEXT_PUBLIC_USE_LOCAL_API === "true";
   if (!USE_LOCAL_API) {
@@ -20,7 +20,7 @@ export async function GET(
     );
   }
   try {
-    const id = params.id;
+    const { id } = await params;
     const course = getAdminCourse(id);
     if (!course) {
       return NextResponse.json(
@@ -45,7 +45,7 @@ export async function GET(
 
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const USE_LOCAL_API = process.env.NEXT_PUBLIC_USE_LOCAL_API === "true";
   if (!USE_LOCAL_API) {
@@ -58,7 +58,7 @@ export async function PUT(
     );
   }
   try {
-    const id = params.id;
+    const { id } = await params;
     const payload = await req.json();
     const updated = updateAdminCourse(id, payload);
     if (!updated) {
@@ -84,7 +84,7 @@ export async function PUT(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const USE_LOCAL_API = process.env.NEXT_PUBLIC_USE_LOCAL_API === "true";
   if (!USE_LOCAL_API) {
@@ -97,7 +97,7 @@ export async function DELETE(
     );
   }
   try {
-    const id = params.id;
+    const { id } = await params;
     const ok = deleteAdminCourse(id);
     if (!ok) {
       return NextResponse.json(

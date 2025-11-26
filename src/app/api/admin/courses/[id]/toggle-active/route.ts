@@ -3,7 +3,7 @@ import { toggleActiveCourse } from "@/lib/adminCoursesStore";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const USE_LOCAL_API = process.env.NEXT_PUBLIC_USE_LOCAL_API === "true";
   if (!USE_LOCAL_API) {
@@ -16,7 +16,7 @@ export async function PATCH(
     );
   }
   try {
-    const id = params.id;
+    const { id } = await params;
     const updated = toggleActiveCourse(id);
     if (!updated) {
       return NextResponse.json(
