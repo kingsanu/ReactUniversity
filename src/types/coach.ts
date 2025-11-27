@@ -20,6 +20,7 @@ export interface Coach {
 
 export interface OnboardingStatus {
   id: string;
+  userId: string;
   email: string;
   name?: string;
   status: 'invited' | 'onboarding_started' | 'completed';

@@ -42,7 +42,7 @@ export default function CoachOnboardingPage({ params }: { params: Promise<{ id: 
       try {
         const { getOnboardingStatus } = await import("@/services/coachService");
         const status = await getOnboardingStatus(id);
-        setCoachId(status.id);
+        setCoachId(status.userId);
         
         // Pre-fill data if available
         setData((prev) => ({
