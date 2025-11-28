@@ -52,11 +52,6 @@ export default function CoachOnboardingPage({ params }: { params: Promise<{ id: 
             name: status.name || prev.personalInfo.name,
           },
         }));
-        
-        // If already completed, redirect?
-        if (status.status === 'completed') {
-          router.push(`/dashboard/coaching/dashboard`);
-        }
       } catch (error) {
         console.error("Failed to fetch onboarding status:", error);
         // toast.error("Failed to verify invitation.");
