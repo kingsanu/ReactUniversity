@@ -100,7 +100,7 @@ Returns the OAuth consent URL for the respective calendar services.
 ## User Side APIs
 
 ### 1. List Coaches
-**Endpoint:** `GET /api/v1/coaches`
+**Endpoint:** `GET /api/v1/coach`
 **Description:** Get a paginated list of available coaches.
 **Query Params:**
 - `page`: number (default 1)
@@ -132,7 +132,7 @@ Returns the OAuth consent URL for the respective calendar services.
 ```
 
 ### 2. Get Coach Details
-**Endpoint:** `GET /api/v1/coaches/:id`
+**Endpoint:** `GET /api/v1/coach/:id`
 **Description:** Get full public profile of a coach including availability.
 
 **Response:**
@@ -187,7 +187,7 @@ Returns the OAuth consent URL for the respective calendar services.
 ## Coach Dashboard APIs
 
 ### 1. Get My Sessions
-**Endpoint:** `GET /api/v1/coaches/me/sessions`
+**Endpoint:** `GET /api/v1/coach/me/sessions`
 **Description:** Get list of upcoming and past sessions for the logged-in coach.
 **Query Params:**
 - `status`: "upcoming" | "past" | "all"
@@ -234,7 +234,7 @@ Returns the OAuth consent URL for the respective calendar services.
 ```
 
 ### 3. Get My Availability
-**Endpoint:** `GET /api/v1/coaches/me/availability`
+**Endpoint:** `GET /api/v1/coach/me/availability`
 **Description:** Get current availability settings.
 
 **Response:**
@@ -246,7 +246,7 @@ Returns the OAuth consent URL for the respective calendar services.
 ```
 
 ### 4. Update Availability
-**Endpoint:** `PUT /api/v1/coaches/me/availability`
+**Endpoint:** `PUT /api/v1/coach/me/availability`
 **Description:** Update availability settings.
 
 **Payload:**
@@ -258,7 +258,7 @@ Returns the OAuth consent URL for the respective calendar services.
 ```
 
 ### 5. Update Coach Profile
-**Endpoint:** `PUT /api/v1/coaches/me`
+**Endpoint:** `PUT /api/v1/coach/me`
 **Description:** Update coach's personal information (bio, title, etc.).
 
 **Payload:**
@@ -297,7 +297,7 @@ Returns the OAuth consent URL for the respective calendar services.
 ## Additional User APIs
 
 ### 4. Post Review
-**Endpoint:** `POST /api/v1/coaches/:id/reviews`
+**Endpoint:** `POST /api/v1/coach/:id/reviews`
 **Description:** Submit a review for a coach after a session.
 
 **Payload:**
@@ -399,3 +399,47 @@ Returns the OAuth consent URL for the respective calendar services.
   }
 ]
 ```
+
+---
+
+## Stripe & Payments APIs
+
+### 1. Get Stripe Config
+**Endpoint:** `GET /api/stripe/config`
+**Description:** Get public Stripe configuration.
+
+### 2. Create Payment Intent
+**Endpoint:** `POST /api/stripe/create-payload`
+**Description:** Create a payment intent for a custom payment flow.
+**Payload:**
+```json
+{
+  "userId": "user_123",
+  "amount": 2000,
+  "currency": "usd",
+  "description": "Test payment"
+}
+```
+
+### 3. Create Checkout Session
+**Endpoint:** `POST /api/stripe/create-checkout-session`
+**Description:** Create a Stripe Checkout Session for hosted payment page.
+**Payload:**
+```json
+{
+  "userId": "user_123",
+  "amount": 2000,
+  "currency": "usd",
+  "productName": "Coaching Session",
+  "successUrl": "https://domain.com/success",
+  "cancelUrl": "https://domain.com/cancel"
+}
+```
+
+### 4. Check Payment Status
+**Endpoint:** `GET /api/stripe/status/:sessionId`
+**Description:** Check status of a payment intent or checkout session.
+
+### 5. Get User Payments
+**Endpoint:** `GET /api/stripe/user/:userId`
+**Description:** Get payment history for a user.

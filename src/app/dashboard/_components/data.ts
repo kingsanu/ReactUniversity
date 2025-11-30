@@ -63,7 +63,7 @@ export const dashboardData = {
       subtitle: "dashboard.bookSession",
       icon: "👥",
       action: "dashboard.bookSession",
-      link: "/dashboard/coaching/schedule",
+      link: "/dashboard/book-coach",
       variant: "secondary",
     },
   ],
@@ -175,110 +175,85 @@ export const sidebarData = {
       path: "/dashboard",
     },
     {
-      id: "analytics",
-      name: "nav.analytics",
-      icon: "analytics",
-      path: "/dashboard/analytics",
-      expanded: true,
-      submenu: [
-        { name: "common.overview", path: "/dashboard/analytics/overview" },
-        {
-          name: "dashboard.subscriptionMetrics",
-          path: "/dashboard/analytics/metrics",
-        },
-        {
-          name: "dashboard.feedbackResults",
-          path: "/dashboard/analytics/feedback",
-        },
-      ],
-    },
-    {
-      id: "career-planning",
-      name: "nav.careerPaths",
-      icon: "career",
-      path: "/dashboard/career-planning",
-      expanded: false,
-      submenu: [
-        {
-          name: "dashboard.careerPathsExplorer",
-          path: "/dashboard/career-planning/paths",
-        },
-        {
-          name: "dashboard.universitySuggestions",
-          path: "/dashboard/career-planning/university",
-        },
-        {
-          name: "dashboard.assessmentProgress",
-          path: "/dashboard/career-planning/assessments",
-        },
-        {
-          name: "dashboard.progressMilestones",
-          path: "/dashboard/career-planning/progress",
-        },
-        {
-          name: "dashboard.benchmarks",
-          path: "/dashboard/career-planning/benchmark",
-        },
-      ],
-    },
-    {
-      id: "opportunities",
-      name: "dashboard.opportunities",
-      icon: "opportunities",
-      path: "/dashboard/opportunities",
-      submenu: [
-        {
-          name: "dashboard.jobOpenings",
-          path: "/dashboard/opportunities/jobs",
-        },
-        {
-          name: "dashboard.internshipOpportunities",
-          path: "/dashboard/opportunities/internships",
-        },
-        {
-          name: "dashboard.mentorshipMatches",
-          path: "/dashboard/opportunities/mentorship",
-        },
-        {
-          name: "dashboard.coachingSessions",
-          path: "/dashboard/opportunities/coaching",
-        },
-      ],
-    },
-    {
-      id: "learning",
-      name: "nav.community",
-      icon: "learning",
-      path: "/dashboard/learning",
-      submenu: [
-        {
-          name: "dashboard.courseCatalog",
-          path: "/dashboard/learning/courses",
-        },
-        { name: "dashboard.resumeBuilder", path: "/dashboard/resumes" },
-        {
-          name: "dashboard.resourceLibrary",
-          path: "/dashboard/learning/library",
-        },
-      ],
-    },
-    {
       id: "assessments",
-      name: "dashboard.assessmentProgress",
+      name: "dashboard.assessments",
       icon: "assessments",
       path: "/dashboard/assessments",
     },
     {
-      id: "subscriptions",
-      name: "nav.community",
-      icon: "subscriptions",
-      path: "/dashboard/subscriptions",
+      id: "career-paths",
+      name: "nav.careerPaths",
+      icon: "career",
+      path: "/dashboard/career-paths",
+    },
+    {
+      id: "courses",
+      name: "dashboard.courses",
+      icon: "learning",
+      path: "/dashboard/learning/courses",
+    },
+    {
+      id: "resumes",
+      name: "dashboard.resumeBuilder",
+      icon: "analytics",
+      path: "/dashboard/resumes",
     },
     {
       id: "coaching",
-      name: "Coaching",
-      icon: "opportunities", // Reusing icon for now
-      path: "/dashboard/coaching/schedule",
+      name: "dashboard.coaching",
+      icon: "opportunities",
+      path: "/dashboard/book-coach",
+      submenu: [
+        { name: "dashboard.findCoach", path: "/dashboard/book-coach" },
+        { name: "dashboard.mySessions", path: "/dashboard/my-sessions" },
+      ],
+    },
+    {
+      id: "subscriptions",
+      name: "dashboard.subscriptions",
+      icon: "subscriptions",
+      path: "/dashboard/subscriptions",
     },
   ],
 };
+
+export const coachSidebarData = {
+  logo: {
+    icon: "V",
+    text: "UNIV.365",
+  },
+
+  navigation: [
+    {
+      id: "dashboard",
+      name: "Dashboard",
+      icon: "dashboard",
+      path: "/dashboard",
+    },
+    {
+      id: "sessions",
+      name: "Sessions",
+      icon: "opportunities",
+      path: "/dashboard/coaching/sessions",
+    },
+    {
+      id: "analytics",
+      name: "Analytics",
+      icon: "analytics",
+      path: "/dashboard/coaching/analytics",
+    },
+    {
+      id: "settings",
+      name: "Settings",
+      icon: "assessments",
+      path: "/dashboard/coaching/settings",
+    },
+    {
+      id: "profile",
+      name: "Profile",
+      icon: "career",
+      path: "/dashboard/coaching/profile",
+    },
+  ],
+};
+

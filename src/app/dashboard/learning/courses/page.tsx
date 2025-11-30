@@ -1,86 +1,56 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CoursesCatalog } from "../../../../components/dashboard/courses/CoursesCatalog";
 import { Breadcrumb } from "../../../../components/ui/breadcrumb";
-import { BookOpen, GraduationCap } from "lucide-react";
+import { BookOpen } from "lucide-react";
+import { Sidebar } from "../../_components/Sidebar";
+import { TopNav } from "../../_components/TopNav";
 
 export default function CoursesPage() {
   const { t } = useTranslation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Breadcrumb */}
-        <Breadcrumb
-          items={[
-            { label: "Learning", href: "/dashboard/learning" },
-            { label: "Courses" },
-          ]}
-        />
+    <div className="flex h-screen bg-gray-50">
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      
+      <div className="flex-1 flex flex-col overflow-hidden lg:ml-0">
+        <TopNav onMenuClick={() => setSidebarOpen(true)} />
+        
+        <main className="flex-1 overflow-y-auto bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {/* Breadcrumb */}
+            <Breadcrumb
+              items={[
+                { label: t("nav.learning"), href: "/dashboard/learning" },
+                { label: t("dashboard.courses") },
+              ]}
+            />
 
-        {/* Header Section */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-blue-600 rounded-xl shadow-lg">
-              <BookOpen className="w-8 h-8 text-white" />
+            {/* Header Section */}
+            <div className="mb-10 mt-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative">
+                <div className="space-y-2 max-w-2xl">
+                  <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                    <div className="p-2.5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg shadow-blue-200">
+                      <BookOpen className="w-6 h-6 text-white" />
+                    </div>
+                    {t("dashboard.courseCatalog")}
+                  </h1>
+                  <p className="text-gray-500 text-lg ml-[3.75rem] leading-relaxed">
+                    {t("courses.discoverCourses")}
+                  </p>
+                </div>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                {t("dashboard.courseCatalog")}
-              </h1>
-              <p className="text-gray-600 mt-1 text-lg">
-                {t("courses.discoverCourses")}
-              </p>
+
+            {/* Courses Catalog */}
+            <div className="">
+              <CoursesCatalog />
             </div>
           </div>
-
-          {/* Stats Cards */}
-          {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-              <div className="flex items-center gap-3">
-                <GraduationCap className="w-8 h-8 text-blue-600" />
-                <div>
-                  <p className="text-2xl font-bold text-gray-900">50+</p>
-                  <p className="text-sm text-gray-600">
-                    {t("courses.totalCourses")}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                  <span className="text-green-600 font-bold">★</span>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-gray-900">4.8</p>
-                  <p className="text-sm text-gray-600">
-                    {t("courses.avgRating")}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                  <span className="text-purple-600 font-bold">🏆</span>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-gray-900">10k+</p>
-                  <p className="text-sm text-gray-600">
-                    {t("courses.enrollments")}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div> */}
-        </div>
-
-        {/* Courses Catalog */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <CoursesCatalog />
-        </div>
+        </main>
       </div>
     </div>
   );

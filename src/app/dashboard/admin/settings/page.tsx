@@ -6,6 +6,11 @@ import StripeUrlDiagnostic from "../_components/StripeUrlDiagnostic";
 import { setTestAdminRole } from "@/services/adminService";
 import { useRouter } from "next/navigation";
 import { useAdminAccess } from "@/hooks/useAdminAccess";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 export default function AdminSettingsPage() {
   const router = useRouter();
@@ -115,10 +120,8 @@ export default function AdminSettingsPage() {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             Payment Settings
           </h3>
-          <div className="bg-gray-50 rounded-lg p-4 text-center">
-            <p className="text-gray-600">
-              Stripe and payment configuration coming soon
-            </p>
+          <div className="space-y-4">
+            <PlatformFeeSettings />
           </div>
         </div>
 
@@ -143,6 +146,74 @@ export default function AdminSettingsPage() {
             </p>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function PlatformFeeSettings() {
+  const [fee, setFee] = useState(15);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/settings")
+      .then((res) => res.json())
+      .then((data) => {
+        if (typeof data.platformFee === "number") {
+          setFee(data.platformFee);
+        }
+        setLoading(false);
+      })
+      .catch(() => {
+        toast.error("Failed to load settings");
+        setLoading(false);
+      });
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ platformFee: Number(fee) }),
+      });
+
+      if (!res.ok) throw new Error("Failed to save");
+
+      toast.success("Platform fee updated");
+    } catch (error) {
+      toast.error("Failed to update platform fee");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return <div>Loading settings...</div>;
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="platformFee">Platform Fee Percentage (%)</Label>
+        <div className="flex gap-4">
+          <Input
+            id="platformFee"
+            type="number"
+            min="0"
+            max="100"
+            value={fee}
+            onChange={(e) => setFee(Number(e.target.value))}
+            className="max-w-[200px]"
+          />
+          <Button onClick={handleSave} disabled={saving}>
+            {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Save
+          </Button>
+        </div>
+        <p className="text-sm text-gray-500">
+          This percentage will be deducted from coach earnings.
+        </p>
       </div>
     </div>
   );

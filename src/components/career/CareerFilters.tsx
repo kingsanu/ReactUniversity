@@ -3,6 +3,14 @@
 import React from "react";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { useTranslation } from "react-i18next";
+import { Search } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export function CareerFilters({
   filters,
@@ -20,64 +28,83 @@ export function CareerFilters({
   const { t } = useTranslation();
 
   const handleChange = (key: string, value: string) => {
-    onChange({ ...filters, [key]: value || undefined });
+    onChange({ ...filters, [key]: value === "all" ? undefined : value });
   };
 
   return (
-    <div className="flex flex-col md:flex-row items-center gap-4 p-4 bg-white rounded-lg shadow-sm border mb-6">
-      <div className="flex-1 w-full">
-        <input
-          type="text"
-          placeholder={t("career.search_placeholder", "Search careers...")}
-          className="w-full rounded-md border px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none"
-          value={filters.search || ""}
-          onChange={(e) => handleChange("search", e.target.value)}
-        />
-      </div>
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-8">
+      <div className="flex flex-col md:flex-row gap-5">
+        {/* Search Bar */}
+        <div className="flex-1 relative group">
+          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <Search className="h-5 w-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors" />
+          </div>
+          <input
+            type="text"
+            placeholder={t("career.search_placeholder", "Search for careers, skills, or keywords...")}
+            className="block w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-base"
+            value={filters.search || ""}
+            onChange={(e) => handleChange("search", e.target.value)}
+          />
+        </div>
 
-      <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto">
-        <select
-          className="rounded-md border px-3 py-2 bg-white"
-          value={filters.industry || ""}
-          onChange={(e) => handleChange("industry", e.target.value)}
-        >
-          <option value="">
-            {t("career.all_industries", "All Industries")}
-          </option>
-          <option value="Technology">Technology</option>
-          <option value="Finance">Finance</option>
-          <option value="Retail">Retail</option>
-          <option value="Healthcare">Healthcare</option>
-        </select>
+        {/* Filters */}
+        <div className="flex flex-wrap md:flex-nowrap gap-3 w-full md:w-auto">
+          <div className="min-w-[160px] flex-1 md:flex-none">
+            <Select
+              value={filters.industry || "all"}
+              onValueChange={(value) => handleChange("industry", value)}
+            >
+              <SelectTrigger className="w-full h-[50px] rounded-xl border-gray-200 bg-white text-gray-700 font-medium focus:ring-indigo-500/20 focus:border-indigo-500 hover:bg-gray-50">
+                <SelectValue placeholder={t("career.all_industries", "All Industries")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t("career.all_industries", "All Industries")}</SelectItem>
+                <SelectItem value="Technology">Technology</SelectItem>
+                <SelectItem value="Finance">Finance</SelectItem>
+                <SelectItem value="Retail">Retail</SelectItem>
+                <SelectItem value="Healthcare">Healthcare</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-        <select
-          className="rounded-md border px-3 py-2 bg-white"
-          value={filters.education || ""}
-          onChange={(e) => handleChange("education", e.target.value)}
-        >
-          <option value="">{t("career.all_education", "Any Education")}</option>
-          <option value="HighSchool">High School</option>
-          <option value="Associate">Associate</option>
-          <option value="Bachelors">Bachelors</option>
-          <option value="Masters">Masters</option>
-          <option value="PhD">PhD</option>
-        </select>
+          <div className="min-w-[160px] flex-1 md:flex-none">
+            <Select
+              value={filters.education || "all"}
+              onValueChange={(value) => handleChange("education", value)}
+            >
+              <SelectTrigger className="w-full h-[50px] rounded-xl border-gray-200 bg-white text-gray-700 font-medium focus:ring-indigo-500/20 focus:border-indigo-500 hover:bg-gray-50">
+                <SelectValue placeholder={t("career.all_education", "Education")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t("career.all_education", "Any Education")}</SelectItem>
+                <SelectItem value="HighSchool">High School</SelectItem>
+                <SelectItem value="Associate">Associate</SelectItem>
+                <SelectItem value="Bachelors">Bachelors</SelectItem>
+                <SelectItem value="Masters">Masters</SelectItem>
+                <SelectItem value="PhD">PhD</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-        <select
-          className="rounded-md border px-3 py-2 bg-white"
-          value={filters.sort || ""}
-          onChange={(e) => handleChange("sort", e.target.value)}
-        >
-          <option value="">{t("career.sort_default", "Default Sort")}</option>
-          <option value="recommended">
-            {t("career.sort_recommended", "Recommended")}
-          </option>
-          <option value="match">{t("career.sort_match", "Match Score")}</option>
-          <option value="title">{t("career.sort_title", "Name (A-Z)")}</option>
-          <option value="demand">
-            {t("career.sort_demand", "High Demand")}
-          </option>
-        </select>
+          <div className="min-w-[160px] flex-1 md:flex-none">
+            <Select
+              value={filters.sort || "all"}
+              onValueChange={(value) => handleChange("sort", value)}
+            >
+              <SelectTrigger className="w-full h-[50px] rounded-xl border-gray-200 bg-white text-gray-700 font-medium focus:ring-indigo-500/20 focus:border-indigo-500 hover:bg-gray-50">
+                <SelectValue placeholder={t("career.sort_default", "Sort By")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t("career.sort_default", "Default Sort")}</SelectItem>
+                <SelectItem value="recommended">{t("career.sort_recommended", "Recommended")}</SelectItem>
+                <SelectItem value="match">{t("career.sort_match", "Match Score")}</SelectItem>
+                <SelectItem value="title">{t("career.sort_title", "Name (A-Z)")}</SelectItem>
+                <SelectItem value="demand">{t("career.sort_demand", "High Demand")}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       </div>
     </div>
   );

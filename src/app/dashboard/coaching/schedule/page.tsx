@@ -1,147 +1,327 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
+import React, { useState, useEffect } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Search, Filter } from "lucide-react";
-import { CoachCard } from "@/components/coaching/CoachCard";
-import { Coach } from "@/types/coach";
-import { BookingModal } from "@/components/coaching/BookingModal";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, Clock, Video, User, MoreHorizontal } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
-// Mock Data removed as we are fetching from API
-
-export default function CoachingSchedulePage() {
-  const [searchQuery, setSearchTerm] = useState("");
-  const [selectedCategory, setSpecializationFilter] = useState("all");
-  const [selectedCoach, setSelectedCoach] = useState<any | null>(null);
-  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-  const [coaches, setCoaches] = useState<any[]>([]);
+export default function CoachSessionsPage() {
+  const [activeTab, setActiveTab] = useState("upcoming");
+  const [sessions, setSessions] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRescheduleOpen, setIsRescheduleOpen] = useState(false);
+  const [isCancelOpen, setIsCancelOpen] = useState(false);
+  const [selectedSession, setSelectedSession] = useState<any>(null);
+  const [rescheduleDate, setRescheduleDate] = useState("");
+  const [rescheduleTime, setRescheduleTime] = useState("");
+  const [cancelReason, setCancelReason] = useState("");
 
-  // Fetch coaches
-  useEffect(() => {
-    const fetchCoaches = async () => {
-      try {
-        setIsLoading(true);
-        const { getCoaches } = await import("@/services/coachService");
-        const response = await getCoaches({
-          search: searchQuery,
-          specialization: selectedCategory === "all" ? undefined : selectedCategory
-        });
-        setCoaches(response.data);
-      } catch (error) {
-        console.error("Failed to fetch coaches:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    // Debounce search
-    const timer = setTimeout(() => {
-      fetchCoaches();
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [searchQuery, selectedCategory]);
-
-  const handleBookCoach = (coach: any) => {
-    setSelectedCoach(coach);
-    setIsBookingModalOpen(true);
+  const fetchSessions = async () => {
+    try {
+      const { getCoachSessions } = await import("@/services/coachService");
+      const response = await getCoachSessions("all");
+      const sessionsData = Array.isArray(response?.data) ? response.data : [];
+      setSessions(sessionsData);
+    } catch (error) {
+      console.error("Failed to fetch sessions:", error);
+      toast.error("Failed to load sessions");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-          Find Your Perfect Coach
-        </h1>
-        <p className="text-gray-500 mt-2">
-          Connect with industry experts to accelerate your career growth.
-        </p>
-      </div>
+  useEffect(() => {
+    fetchSessions();
+  }, []);
 
-      {/* Filters */}
-      <div className="flex flex-col md:flex-row gap-4 items-center bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-        <div className="relative flex-1 w-full">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input
-            placeholder="Search by name, title, or skill..."
-            className="pl-10"
-            value={searchQuery}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        <div className="w-full md:w-64">
-          <Select
-            value={selectedCategory}
-            onValueChange={setSpecializationFilter}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Specialization" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Specializations</SelectItem>
-              <SelectItem value="Tech Leadership">Tech Leadership</SelectItem>
-              <SelectItem value="Software Engineering">
-                Software Engineering
-              </SelectItem>
-              <SelectItem value="Public Speaking">Public Speaking</SelectItem>
-              <SelectItem value="Product Strategy">Product Strategy</SelectItem>
-              <SelectItem value="UX/UI Design">UX/UI Design</SelectItem>
-              <SelectItem value="Career Change">Career Change</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <Button variant="outline" className="w-full md:w-auto">
-          <Filter className="h-4 w-4 mr-2" />
-          More Filters
-        </Button>
-      </div>
+  const upcomingSessions = sessions.filter(
+    (s) => s.status === "confirmed" || s.status === "rescheduled"
+  );
+  const pastSessions = sessions.filter(
+    (s) => s.status === "completed" || s.status === "cancelled"
+  );
 
-      {/* Coach Grid */}
-      {isLoading ? (
-        <div className="text-center py-12 text-gray-500">Loading coaches...</div>
-      ) : coaches.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {coaches.map((coach) => (
-            <CoachCard key={coach.id} coach={coach} onBook={handleBookCoach} />
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-            <Search className="h-8 w-8 text-gray-400" />
+  const handleRescheduleClick = (session: any) => {
+    setSelectedSession(session);
+    setRescheduleDate("");
+    setRescheduleTime("");
+    setIsRescheduleOpen(true);
+  };
+
+  const handleCancelClick = (session: any) => {
+    setSelectedSession(session);
+    setCancelReason("");
+    setIsCancelOpen(true);
+  };
+
+  const confirmReschedule = async () => {
+    if (!selectedSession || !rescheduleDate || !rescheduleTime) {
+      toast.error("Please select a new date and time");
+      return;
+    }
+
+    try {
+      const { rescheduleSession } = await import("@/services/coachService");
+      // Construct ISO string or required format
+      const start = new Date(`${rescheduleDate}T${rescheduleTime}`).toISOString();
+      // Assuming 1 hour duration for now, or calculate based on original duration
+      const end = new Date(new Date(start).getTime() + 60 * 60 * 1000).toISOString();
+
+      await rescheduleSession(selectedSession.id, { start, end });
+      
+      toast.success("Session rescheduled successfully");
+      setIsRescheduleOpen(false);
+      fetchSessions(); // Refresh list
+    } catch (error) {
+      console.error("Reschedule error:", error);
+      toast.error("Failed to reschedule session");
+    }
+  };
+
+  const confirmCancel = async () => {
+    if (!selectedSession) return;
+
+    try {
+      const { cancelSession } = await import("@/services/coachService");
+      await cancelSession(selectedSession.id, cancelReason || "Cancelled by coach");
+      
+      toast.success("Session cancelled successfully");
+      setIsCancelOpen(false);
+      fetchSessions(); // Refresh list
+    } catch (error) {
+      console.error("Cancel error:", error);
+      toast.error("Failed to cancel session");
+    }
+  };
+
+  const SessionCard = ({ session }: { session: any }) => (
+    <Card className="hover:shadow-md transition-shadow">
+      <CardContent className="p-6">
+        <div className="flex items-start justify-between">
+          <div className="flex items-start gap-4 flex-1">
+            <Avatar className="h-12 w-12">
+              <AvatarImage src={session.studentImage} />
+              <AvatarFallback>
+                {session.studentName?.charAt(0) || "S"}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <h3 className="font-semibold text-gray-900">
+                {session.studentName || "Student"}
+              </h3>
+              <p className="text-sm text-gray-600 mt-1">{session.topic}</p>
+              <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
+                <div className="flex items-center gap-1">
+                  <Calendar className="h-4 w-4" />
+                  <span>{session.date || new Date(session.startTime).toLocaleDateString()}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Clock className="h-4 w-4" />
+                  <span>{session.time || new Date(session.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <h3 className="text-lg font-medium text-gray-900">No coaches found</h3>
-          <p className="text-gray-500 mt-1">
-            Try adjusting your search or filters to find what you're looking for.
-          </p>
-          <Button
-            variant="link"
-            onClick={() => {
-              setSearchTerm("");
-              setSpecializationFilter("all");
-            }}
-          >
-            Clear all filters
-          </Button>
+          <div className="flex items-center gap-2">
+            <Badge
+              variant={
+                session.status === "confirmed"
+                  ? "default"
+                  : session.status === "completed"
+                  ? "secondary"
+                  : "destructive"
+              }
+            >
+              {session.status}
+            </Badge>
+            {session.status === "confirmed" && (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleRescheduleClick(session)}
+                >
+                  Reschedule
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => handleCancelClick(session)}
+                >
+                  Cancel
+                </Button>
+              </>
+            )}
+            {session.meetingLink && session.status === "confirmed" && (
+              <Button size="sm" asChild>
+                <a href={session.meetingLink} target="_blank" rel="noopener noreferrer">
+                  <Video className="h-4 w-4 mr-2" />
+                  Join
+                </a>
+              </Button>
+            )}
+          </div>
         </div>
-      )}
+      </CardContent>
+    </Card>
+  );
 
-      {/* Booking Modal */}
-      <BookingModal
-        coach={selectedCoach}
-        isOpen={isBookingModalOpen}
-        onClose={() => setIsBookingModalOpen(false)}
-      />
+  return (
+    <div className="min-h-screen bg-gray-50/30">
+      <div className="max-w-6xl mx-auto px-6 py-10 space-y-8">
+        {/* Header */}
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">My Sessions</h1>
+          <p className="text-gray-500 mt-1">Manage your coaching sessions</p>
+        </div>
+
+        {/* Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsTrigger value="upcoming">
+              Upcoming ({upcomingSessions.length})
+            </TabsTrigger>
+            <TabsTrigger value="past">
+              Past ({pastSessions.length})
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="upcoming" className="space-y-4 mt-6">
+            {isLoading ? (
+              <div className="text-center py-12 text-gray-500">
+                Loading sessions...
+              </div>
+            ) : upcomingSessions.length > 0 ? (
+              upcomingSessions.map((session) => (
+                <SessionCard key={session.id} session={session} />
+              ))
+            ) : (
+              <Card>
+                <CardContent className="p-12 text-center">
+                  <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900">
+                    No upcoming sessions
+                  </h3>
+                  <p className="text-gray-500 mt-1">
+                    Your upcoming coaching sessions will appear here
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="past" className="space-y-4 mt-6">
+            {isLoading ? (
+              <div className="text-center py-12 text-gray-500">
+                Loading sessions...
+              </div>
+            ) : pastSessions.length > 0 ? (
+              pastSessions.map((session) => (
+                <SessionCard key={session.id} session={session} />
+              ))
+            ) : (
+              <Card>
+                <CardContent className="p-12 text-center">
+                  <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900">
+                    No past sessions
+                  </h3>
+                  <p className="text-gray-500 mt-1">
+                    Your completed sessions will appear here
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+        </Tabs>
+
+        {/* Reschedule Dialog */}
+        <Dialog open={isRescheduleOpen} onOpenChange={setIsRescheduleOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Reschedule Session</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label>New Date</Label>
+                <Input 
+                  type="date" 
+                  value={rescheduleDate}
+                  onChange={(e) => setRescheduleDate(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>New Time</Label>
+                <Input 
+                  type="time" 
+                  value={rescheduleTime}
+                  onChange={(e) => setRescheduleTime(e.target.value)}
+                />
+              </div>
+              <div className="flex gap-3 pt-4">
+                <Button
+                  onClick={confirmReschedule}
+                  className="flex-1"
+                >
+                  Confirm
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsRescheduleOpen(false)}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Cancel Dialog */}
+        <Dialog open={isCancelOpen} onOpenChange={setIsCancelOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Cancel Session</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <p className="text-sm text-gray-500">
+                Are you sure you want to cancel this session? This action cannot be undone.
+              </p>
+              <div className="space-y-2">
+                <Label>Reason (Optional)</Label>
+                <Input 
+                  placeholder="e.g. Unexpected conflict"
+                  value={cancelReason}
+                  onChange={(e) => setCancelReason(e.target.value)}
+                />
+              </div>
+              <div className="flex gap-3 pt-4">
+                <Button
+                  variant="destructive"
+                  onClick={confirmCancel}
+                  className="flex-1"
+                >
+                  Confirm Cancellation
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsCancelOpen(false)}
+                  className="flex-1"
+                >
+                  Keep Session
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
 }

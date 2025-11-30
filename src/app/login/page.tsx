@@ -60,10 +60,15 @@ export default function LoginPage() {
 
       if (!response.token) throw new Error("No token received from server");
       localStorage.setItem("token", response.token);
+      
+      // Extract role name from response
+      const roleName = response.user?.role?.name || null;
+      
       setUser({
         id: response.user?.id || "",
         email: data.email,
         name: response.user?.name || data.email.split("@")[0],
+        role: roleName,
         isAuthenticated: true,
       });
 

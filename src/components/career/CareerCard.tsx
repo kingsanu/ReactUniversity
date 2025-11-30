@@ -10,6 +10,9 @@ import FavoriteButton from "./FavoriteButton";
 import { usePrefetchCareers } from "@/hooks/useCareerQueries";
 import { useCareersStore } from "@/store/useCareersStore";
 import { useFavorites } from "@/hooks/useFavorites";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ArrowUpRight, TrendingUp, DollarSign, Globe, Briefcase } from "lucide-react";
 
 export default function CareerCard({ career }: { career: CareerRole }) {
   const router = useRouter();
@@ -34,129 +37,100 @@ export default function CareerCard({ career }: { career: CareerRole }) {
   const inCompare = compareList.includes(career.id);
 
   const matchScore = career.matchScore ?? 0;
-  const matchColor =
-    matchScore > 80 ? "#10b981" : matchScore > 60 ? "#f59e0b" : "#ef4444";
+  
+  // Determine match color and label
+  let matchColorClass = "text-red-600 bg-red-50 border-red-100";
+  let matchLabel = "Low Match";
+  if (matchScore > 80) {
+    matchColorClass = "text-emerald-600 bg-emerald-50 border-emerald-100";
+    matchLabel = "High Match";
+  } else if (matchScore > 60) {
+    matchColorClass = "text-amber-600 bg-amber-50 border-amber-100";
+    matchLabel = "Good Match";
+  }
 
   return (
     <motion.div
-      className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-xl transition-all duration-300 cursor-pointer group relative overflow-hidden"
+      className="bg-white rounded-3xl p-6 hover:shadow-xl transition-all duration-300 cursor-pointer group relative overflow-hidden border border-gray-100 h-full flex flex-col"
       layout
       onClick={() => router.push(`/careers/${career.id}`)}
       onMouseEnter={() => prefetch.prefetchCareer?.(career.id)}
     >
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600 text-xl font-bold shadow-sm">
-            {career.title.en?.charAt(0) || "C"}
-          </div>
-          <div>
-            <h4 className="font-bold text-gray-900 text-lg leading-tight">
-              {title}
-            </h4>
-            <div className="text-xs text-gray-500 mt-1">
-              {(career.industries || [])[0] || "General"}
-            </div>
+      {/* Hover Gradient Overlay */}
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
+      
+      <div className="flex items-start justify-between mb-5">
+        <div>
+          <h4 className="font-bold text-gray-900 text-lg leading-tight group-hover:text-indigo-600 transition-colors line-clamp-1">
+            {title}
+          </h4>
+          <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-1.5 font-medium">
+            <Briefcase className="h-3 w-3" />
+            {(career.industries || [])[0] || "General"}
           </div>
         </div>
 
-        {/* Match Score Indicator */}
-        <div className="flex flex-col items-center">
-          <div className="relative w-10 h-10 flex items-center justify-center">
-            <svg className="w-full h-full transform -rotate-90">
-              <circle
-                cx="20"
-                cy="20"
-                r="16"
-                fill="transparent"
-                stroke="#f3f4f6"
-                strokeWidth="4"
-              />
-              <circle
-                cx="20"
-                cy="20"
-                r="16"
-                fill="transparent"
-                stroke={matchColor}
-                strokeWidth="4"
-                strokeDasharray={`${2 * Math.PI * 16}`}
-                strokeDashoffset={`${
-                  2 * Math.PI * 16 * (1 - matchScore / 100)
-                }`}
-                strokeLinecap="round"
-              />
-            </svg>
-            <span className="absolute text-[10px] font-bold text-gray-700">
-              {matchScore}%
-            </span>
-          </div>
-          <span className="text-[10px] text-gray-400 mt-1">
-            {t("career.match", "Match")}
-          </span>
+        {/* Match Score Badge */}
+        <div className={`flex flex-col items-center justify-center px-2.5 py-1.5 rounded-lg border ${matchColorClass}`}>
+          <span className="text-sm font-bold leading-none">{matchScore}%</span>
+          <span className="text-[9px] font-medium uppercase tracking-wider opacity-80 mt-0.5">Match</span>
         </div>
       </div>
 
-      <p className="text-sm text-gray-600 mb-4 line-clamp-2 h-10">{short}</p>
+      <p className="text-sm text-gray-600 mb-6 line-clamp-2 leading-relaxed flex-grow">
+        {short}
+      </p>
 
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex flex-wrap gap-2 mb-6">
         {career.salaryRange?.median && (
-          <div className="flex items-center bg-gray-100 px-2 py-1 rounded text-xs">
-            <span className="font-semibold text-gray-700">
-              ${career.salaryRange.median.toLocaleString()}
-            </span>
-            <span className="ml-1 text-gray-500">/yr</span>
-          </div>
+          <Badge variant="secondary" className="bg-gray-50 text-gray-700 hover:bg-gray-100 border-gray-100 font-medium px-2.5 py-1">
+            <DollarSign className="h-3 w-3 mr-1 text-gray-400" />
+            ${(career.salaryRange.median / 1000).toFixed(0)}k/yr
+          </Badge>
         )}
         {career.remoteEligible && (
-          <div className="bg-green-50 text-green-700 px-2 py-1 rounded text-xs font-medium">
+          <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-100 font-medium px-2.5 py-1">
+            <Globe className="h-3 w-3 mr-1 text-blue-400" />
             Remote
-          </div>
+          </Badge>
         )}
-        <div className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs font-medium">
-          {career.demandStats?.growthPercent &&
-          career.demandStats.growthPercent > 0.05
-            ? "High Demand"
-            : "Stable"}
-        </div>
+        {career.demandStats?.growthPercent && career.demandStats.growthPercent > 0.05 && (
+          <Badge variant="secondary" className="bg-green-50 text-green-700 hover:bg-green-100 border-green-100 font-medium px-2.5 py-1">
+            <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
+            High Demand
+          </Badge>
+        )}
       </div>
 
-      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-        <div className="flex items-center space-x-2">
-          <button
+      <div className="flex items-center justify-between pt-4 border-t border-gray-50 mt-auto">
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={(e) => {
               e.stopPropagation();
               toggleCompare(career.id);
             }}
-            className={`text-xs font-medium px-3 py-1.5 rounded-full transition-colors ${
+            className={`text-xs font-medium px-3 h-8 rounded-full transition-all ${
               inCompare
-                ? "bg-indigo-600 text-white"
+                ? "bg-indigo-600 text-white hover:bg-indigo-700 hover:text-white"
                 : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100"
             }`}
           >
-            {inCompare
-              ? t("career.added", "Added")
-              : t("career.compare", "Compare")}
-          </button>
+            {inCompare ? t("career.added", "Added") : t("career.compare", "Compare")}
+          </Button>
         </div>
 
-        <div className="flex items-center space-x-3">
-          <FavoriteButton
-            isFavorite={isFavorite}
-            onToggle={() => toggleFavorite(career.id)}
-          />
-          <div className="text-gray-300 group-hover:text-indigo-500 transition-colors">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                clipRule="evenodd"
-              />
-            </svg>
+        <div className="flex items-center gap-1">
+          <div onClick={(e) => e.stopPropagation()}>
+            <FavoriteButton
+              isFavorite={isFavorite}
+              onToggle={() => toggleFavorite(career.id)}
+            />
           </div>
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-300 group-hover:text-indigo-500 transition-colors rounded-full hover:bg-indigo-50">
+            <ArrowUpRight className="h-4 w-4" />
+          </Button>
         </div>
       </div>
     </motion.div>

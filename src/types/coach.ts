@@ -16,6 +16,10 @@ export interface Coach {
   status?: string; // For admin view
   joinedAt?: string; // For admin view
   activeStudents?: number; // For admin view
+  contractStart?: string; // For admin view
+  contractEnd?: string; // For admin view
+  hourlyRate?: number;
+  currency?: string;
 }
 
 export interface OnboardingStatus {

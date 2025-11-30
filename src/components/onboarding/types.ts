@@ -9,6 +9,10 @@ export interface CoachOnboardingData {
     tags: string[];
     image: string | null; // URL or base64
   };
+  pricing: {
+    hourlyRate: number;
+    currency: string;
+  };
   availability: {
     timezone: string;
     weeklySchedule: WeeklySchedule[];
@@ -41,6 +45,10 @@ export const INITIAL_ONBOARDING_DATA: CoachOnboardingData = {
     languages: [],
     tags: [],
     image: null,
+  },
+  pricing: {
+    hourlyRate: 50,
+    currency: "USD",
   },
   availability: {
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,

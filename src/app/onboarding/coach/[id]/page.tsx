@@ -4,6 +4,7 @@ import React, { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { OnboardingLayout } from "@/components/onboarding/OnboardingLayout";
 import { PersonalInfoStep } from "@/components/onboarding/PersonalInfoStep";
+import { PricingStep } from "@/components/onboarding/PricingStep";
 import { AvailabilityStep } from "@/components/onboarding/AvailabilityStep";
 import { CalendarSyncStep } from "@/components/onboarding/CalendarSyncStep";
 import { PasswordStep } from "@/components/onboarding/PasswordStep";
@@ -14,6 +15,10 @@ const STEPS = [
   {
     title: "Personal Information",
     description: "Tell us about yourself and your coaching expertise.",
+  },
+  {
+    title: "Pricing",
+    description: "Set your hourly rate and currency.",
   },
   {
     title: "Availability",
@@ -140,20 +145,27 @@ export default function CoachOnboardingPage({ params }: { params: Promise<{ id: 
         />
       )}
       {currentStep === 2 && (
+        <PricingStep
+          data={data.pricing}
+          onNext={(pricing) => handleNext({ pricing })}
+          onBack={handleBack}
+        />
+      )}
+      {currentStep === 3 && (
         <AvailabilityStep
           data={data.availability}
           onNext={(availability) => handleNext({ availability })}
           onBack={handleBack}
         />
       )}
-      {currentStep === 3 && (
+      {currentStep === 4 && (
         <CalendarSyncStep
           data={data.calendarIntegrations}
           onNext={(calendarIntegrations) => handleNext({ calendarIntegrations })}
           onBack={handleBack}
         />
       )}
-      {currentStep === 4 && (
+      {currentStep === 5 && (
         <PasswordStep
           value={data.password || ""}
           onNext={(password) => handleNext({ password })}

@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
-import { Coach } from "@/types/coach";
+import { Coach, DaySchedule, TimeSlot } from "@/types/coach";
 import { toast } from "sonner";
-import { format } from "date-fns";
-import { Clock, Video, Globe, ChevronLeft } from "lucide-react";
+import { format, getDay } from "date-fns";
+import { Clock, Video, Globe, ChevronLeft, ChevronRight, Loader2, CalendarDays } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
@@ -19,19 +19,75 @@ interface BookingModalProps {
   onClose: () => void;
 }
 
-// Mock time slots
-const TIME_SLOTS = [
+// Default fallback time slots (used when coach has no availability set)
+const DEFAULT_TIME_SLOTS = [
   "09:00am", "09:30am", "10:00am", "10:30am",
   "11:00am", "11:30am", "12:00pm", "12:30pm",
   "01:00pm", "01:30pm", "02:00pm", "02:30pm",
   "03:00pm", "03:30pm", "04:00pm", "04:30pm"
 ];
 
+// Day name mapping
+const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+// Generate 30-min slots from a time range
+function generateSlotsFromRange(start: string, end: string): string[] {
+  const slots: string[] = [];
+  const [startHour, startMin] = start.split(":").map(Number);
+  const [endHour, endMin] = end.split(":").map(Number);
+  
+  let currentHour = startHour;
+  let currentMin = startMin;
+  
+  while (currentHour < endHour || (currentHour === endHour && currentMin < endMin)) {
+    const hour12 = currentHour % 12 || 12;
+    const meridian = currentHour < 12 ? "am" : "pm";
+    const timeStr = `${hour12.toString().padStart(2, '0')}:${currentMin.toString().padStart(2, '0')}${meridian}`;
+    slots.push(timeStr);
+    
+    currentMin += 30;
+    if (currentMin >= 60) {
+      currentMin = 0;
+      currentHour++;
+    }
+  }
+  
+  return slots;
+}
+
 export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [topic, setTopic] = useState("");
   const [step, setStep] = useState<"date-time" | "details">("date-time");
+  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+
+  // Get available slots based on coach availability and selected date
+  const availableTimeSlots = useMemo(() => {
+    if (!date || !coach?.availability?.weeklySchedule) {
+      return DEFAULT_TIME_SLOTS;
+    }
+
+    const dayIndex = getDay(date); // 0 = Sunday, 1 = Monday, etc.
+    const dayName = DAY_NAMES[dayIndex];
+    
+    const daySchedule = coach.availability.weeklySchedule.find(
+      (schedule: DaySchedule) => schedule.day === dayName && schedule.enabled
+    );
+
+    if (!daySchedule || !daySchedule.timeSlots || daySchedule.timeSlots.length === 0) {
+      return []; // No availability on this day
+    }
+
+    // Generate slots from all time ranges for the day
+    const allSlots: string[] = [];
+    daySchedule.timeSlots.forEach((slot: TimeSlot) => {
+      const slots = generateSlotsFromRange(slot.start, slot.end);
+      allSlots.push(...slots);
+    });
+
+    return allSlots;
+  }, [date, coach?.availability]);
 
   // Reset state when modal opens/closes
   useEffect(() => {
@@ -40,6 +96,7 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
       setSelectedTime(null);
       setTopic("");
       setDate(new Date());
+      setCurrentMonth(new Date());
     }
   }, [isOpen]);
 
@@ -143,68 +200,181 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
             {step === "date-time" ? (
               <>
                 {/* Column 2: Calendar */}
-                <div className="flex-1 p-8 border-r border-gray-100 flex flex-col items-center justify-start pt-10">
-                  <h2 className="text-lg font-semibold mb-6 w-full text-left pl-4">Select a Date & Time</h2>
+                <div className="flex-1 p-6 border-r border-gray-100 flex flex-col">
+                  <h2 className="text-lg font-semibold mb-4 text-gray-900">Select a Date & Time</h2>
+                  
+                  {/* Custom Calendar Header */}
+                  <div className="flex items-center justify-between mb-4 px-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 rounded-full hover:bg-gray-100"
+                      onClick={() => {
+                        const newMonth = new Date(currentMonth);
+                        newMonth.setMonth(newMonth.getMonth() - 1);
+                        setCurrentMonth(newMonth);
+                      }}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <span className="text-base font-semibold text-gray-900">
+                      {format(currentMonth, "MMMM yyyy")}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 rounded-full hover:bg-gray-100"
+                      onClick={() => {
+                        const newMonth = new Date(currentMonth);
+                        newMonth.setMonth(newMonth.getMonth() + 1);
+                        setCurrentMonth(newMonth);
+                      }}
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
                   <Calendar
                     mode="single"
                     selected={date}
-                    onSelect={setDate}
-                    className="p-0"
-                    classNames={{
-                      months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-                      month: "space-y-4",
-                      caption: "flex justify-between pt-1 relative items-center mb-4 px-2",
-                      caption_label: "text-base font-medium text-gray-900",
-                      nav: "space-x-1 flex items-center",
-                      nav_button: cn(
-                        "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 hover:bg-gray-100 rounded-md transition-colors"
-                      ),
-                      nav_button_previous: "",
-                      nav_button_next: "",
-                      table: "w-full border-collapse space-y-1",
-                      head_row: "flex mb-2",
-                      head_cell: "text-gray-400 rounded-md w-10 font-normal text-[0.8rem] uppercase tracking-wider",
-                      row: "flex w-full mt-2",
-                      cell: "h-10 w-10 text-center text-sm p-0 relative [&:has([aria-selected])]:bg-gray-100 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-                      day: cn(
-                        "h-10 w-10 p-0 font-normal aria-selected:opacity-100 hover:bg-gray-100 rounded-full transition-colors text-gray-700"
-                      ),
-                      day_selected: "bg-black text-white hover:bg-black hover:text-white focus:bg-black focus:text-white font-medium shadow-md",
-                      day_today: "bg-gray-50 text-gray-900 font-semibold",
-                      day_outside: "text-gray-300 opacity-50",
-                      day_disabled: "text-gray-300 opacity-50",
-                      day_hidden: "invisible",
+                    onSelect={(newDate) => {
+                      setDate(newDate);
+                      setSelectedTime(null); // Reset time when date changes
                     }}
-                    disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                    month={currentMonth}
+                    onMonthChange={setCurrentMonth}
+                    className="p-0 mx-auto"
+                    showOutsideDays={false}
+                    classNames={{
+                      months: "flex flex-col",
+                      month: "space-y-2",
+                      caption: "hidden", // Hide default caption since we use custom
+                      nav: "hidden", // Hide default nav
+                      month_grid: "w-full border-collapse",
+                      weekdays: "flex justify-around mb-2",
+                      weekday: "text-gray-400 font-medium text-xs uppercase w-10 text-center",
+                      week: "flex justify-around w-full",
+                      day: cn(
+                        "h-10 w-10 text-center text-sm relative flex items-center justify-center",
+                        "[&:has([aria-selected])]:bg-transparent"
+                      ),
+                      day_button: cn(
+                        "h-10 w-10 p-0 font-normal rounded-full transition-all duration-200",
+                        "hover:bg-blue-50 hover:text-blue-600",
+                        "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      ),
+                      selected: cn(
+                        "!bg-blue-600 !text-white font-semibold",
+                        "hover:!bg-blue-700 hover:!text-white",
+                        "shadow-md"
+                      ),
+                      today: "bg-gray-100 text-gray-900 font-semibold",
+                      outside: "text-gray-300 opacity-50 pointer-events-none",
+                      disabled: "text-gray-300 opacity-50 cursor-not-allowed",
+                      hidden: "invisible",
+                    }}
+                    disabled={(date) => {
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      return date < today;
+                    }}
                   />
+                  
+                  {/* Coach Timezone Info */}
+                  {coach?.availability?.timezone && (
+                    <div className="mt-4 pt-4 border-t border-gray-100 text-sm text-gray-500 flex items-center gap-2">
+                      <Globe className="h-4 w-4" />
+                      <span>Times shown in {coach.availability.timezone}</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Column 3: Time Slots */}
-                <div className="w-full md:w-[280px] p-6 bg-white flex flex-col h-[550px]">
-                  <div className="flex justify-between items-center mb-6">
-                    <h4 className="text-gray-900 font-medium">
-                      {date ? format(date, "EEEE, MMM d") : "Select date"}
+                <div className="w-full md:w-[260px] p-5 bg-gray-50/50 flex flex-col h-[550px]">
+                  <div className="mb-4">
+                    <h4 className="text-base font-semibold text-gray-900">
+                      {date ? format(date, "EEEE, MMM d") : "Select a date"}
                     </h4>
-                  </div>
-                  
-                  <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-2.5">
-                    {date ? (
-                      TIME_SLOTS.map((time) => (
-                        <Button
-                          key={time}
-                          variant="outline"
-                          className="w-full justify-center border border-gray-200 text-blue-600 font-semibold hover:bg-blue-50 hover:border-blue-600 hover:text-blue-700 h-11 transition-all rounded-md"
-                          onClick={() => handleTimeSelect(time)}
-                        >
-                          {time}
-                        </Button>
-                      ))
-                    ) : (
-                      <div className="flex items-center justify-center h-full text-gray-400 text-sm">
-                        Select a date
-                      </div>
+                    {date && availableTimeSlots.length > 0 && (
+                      <p className="text-sm text-gray-500 mt-1">
+                        {availableTimeSlots.length} slots available
+                      </p>
                     )}
                   </div>
+                  
+                  <div className="flex-1 overflow-y-auto pr-1 space-y-2 custom-scrollbar">
+                    {!date ? (
+                      <div className="flex flex-col items-center justify-center h-full text-gray-400 text-sm">
+                        <CalendarDays className="h-12 w-12 mb-3 opacity-30" />
+                        <p>Select a date to see available times</p>
+                      </div>
+                    ) : availableTimeSlots.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center h-full text-gray-400 text-sm text-center px-4">
+                        <Clock className="h-12 w-12 mb-3 opacity-30" />
+                        <p className="font-medium text-gray-600">No availability</p>
+                        <p className="mt-1">Coach is not available on this day. Please select another date.</p>
+                      </div>
+                    ) : (
+                      availableTimeSlots.map((time) => {
+                        const isPast = (() => {
+                          if (!date) return false;
+                          const today = new Date();
+                          const isToday = date.getDate() === today.getDate() &&
+                                        date.getMonth() === today.getMonth() &&
+                                        date.getFullYear() === today.getFullYear();
+                          
+                          if (!isToday) return false;
+
+                          const timeParts = time.match(/(\d+):(\d+)(am|pm)/i);
+                          if (!timeParts) return false;
+                          
+                          let hours = parseInt(timeParts[1]);
+                          const minutes = parseInt(timeParts[2]);
+                          const meridian = timeParts[3].toLowerCase();
+                          
+                          if (meridian === 'pm' && hours < 12) hours += 12;
+                          if (meridian === 'am' && hours === 12) hours = 0;
+                          
+                          const slotDate = new Date(date);
+                          slotDate.setHours(hours, minutes, 0, 0);
+                          
+                          return slotDate < new Date();
+                        })();
+
+                        const isSelected = selectedTime === time;
+
+                        return (
+                          <Button
+                            key={time}
+                            variant={isSelected ? "default" : "outline"}
+                            disabled={isPast}
+                            className={cn(
+                              "w-full justify-center font-medium h-11 transition-all rounded-lg",
+                              isSelected 
+                                ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-700 shadow-md" 
+                                : "border-gray-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700",
+                              isPast && "opacity-40 cursor-not-allowed hover:bg-transparent hover:border-gray-200 hover:text-gray-400 text-gray-400"
+                            )}
+                            onClick={() => !isPast && handleTimeSelect(time)}
+                          >
+                            {time}
+                          </Button>
+                        );
+                      })
+                    )}
+                  </div>
+                  
+                  {/* Continue Button */}
+                  {selectedTime && (
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <Button 
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white h-11 font-medium"
+                        onClick={() => setStep("details")}
+                      >
+                        Continue
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </>
             ) : (

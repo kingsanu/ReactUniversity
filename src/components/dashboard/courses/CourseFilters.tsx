@@ -11,9 +11,16 @@ import {
 } from "@/components/ui/select";
 import { CourseFilter, CourseSortOption } from "@/types/course";
 import { useTranslation } from "react-i18next";
-import { Search, Filter, X } from "lucide-react";
+import { Search, Filter, X, ChevronDown } from "lucide-react";
 import Fuse from "fuse.js";
 import { Course } from "@/types/course";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 
 interface CourseFiltersProps {
   filters: CourseFilter;
@@ -42,7 +49,6 @@ export function CourseFilters({
   searchCandidates,
 }: CourseFiltersProps) {
   const { t } = useTranslation();
-  const [isExpanded, setIsExpanded] = useState(false);
   const [suggestions, setSuggestions] = useState<Course[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
@@ -66,58 +72,15 @@ export function CourseFilters({
     }
   };
 
-  const handleCategoryChange = (value: string) => {
-    const currentCategories = filters.category || [];
-    const newCategories = currentCategories.includes(value)
-      ? currentCategories.filter((c) => c !== value)
-      : [...currentCategories, value];
+  const handleFilterChange = (key: keyof CourseFilter, value: string) => {
+    const currentValues = (filters[key] as string[]) || [];
+    const newValues = currentValues.includes(value)
+      ? currentValues.filter((v) => v !== value)
+      : [...currentValues, value];
+    
     onFiltersChange({
       ...filters,
-      category: newCategories.length > 0 ? newCategories : undefined,
-    });
-  };
-
-  const handleLanguageChange = (value: string) => {
-    const currentLanguages = filters.language || [];
-    const newLanguages = currentLanguages.includes(value)
-      ? currentLanguages.filter((l) => l !== value)
-      : [...currentLanguages, value];
-    onFiltersChange({
-      ...filters,
-      language: newLanguages.length > 0 ? newLanguages : undefined,
-    });
-  };
-
-  const handleDifficultyChange = (value: string) => {
-    const currentDifficulties = filters.difficulty || [];
-    const newDifficulties = currentDifficulties.includes(value as any)
-      ? currentDifficulties.filter((d) => d !== value)
-      : [...currentDifficulties, value as any];
-    onFiltersChange({
-      ...filters,
-      difficulty: newDifficulties.length > 0 ? newDifficulties : undefined,
-    });
-  };
-
-  const handleCountryChange = (value: string) => {
-    const currentCountries = filters.country || [];
-    const newCountries = currentCountries.includes(value)
-      ? currentCountries.filter((c) => c !== value)
-      : [...currentCountries, value];
-    onFiltersChange({
-      ...filters,
-      country: newCountries.length > 0 ? newCountries : undefined,
-    });
-  };
-
-  const handleRegionChange = (value: string) => {
-    const currentRegions = filters.region || [];
-    const newRegions = currentRegions.includes(value)
-      ? currentRegions.filter((r) => r !== value)
-      : [...currentRegions, value];
-    onFiltersChange({
-      ...filters,
-      region: newRegions.length > 0 ? newRegions : undefined,
+      [key]: newValues.length > 0 ? newValues : undefined,
     });
   };
 
@@ -129,206 +92,166 @@ export function CourseFilters({
     (filters.country && filters.country.length > 0) ||
     (filters.region && filters.region.length > 0);
 
-  return (
-    <div className="bg-white rounded-lg  mb-6">
-      {/* Search Bar */}
-      <div className="flex gap-4 mb-4">
-        <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-          <Input
-            placeholder={t("courses.searchCourses")}
-            value={filters.search || ""}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            className="pl-10"
-          />
-          {suggestions.length > 0 && (
-            <div className="absolute left-0 right-0 mt-12 bg-white shadow rounded z-20">
-              {suggestions.map((s, i) => (
-                <button
-                  key={s.id}
-                  className={`w-full text-left px-3 py-2 hover:bg-gray-50 ${
-                    i === selectedIndex ? "bg-gray-100" : ""
-                  }`}
-                  onClick={() => {
-                    onFiltersChange({ ...filters, search: s.title });
-                    setSuggestions([]);
-                    setSelectedIndex(-1);
-                  }}
-                >
-                  <div className="text-sm font-medium">{s.title}</div>
-                  <div className="text-xs text-gray-500">{s.provider}</div>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <Select value={sortBy} onValueChange={onSortChange}>
-          <SelectTrigger className="w-48">
-            <SelectValue placeholder={t("courses.sortBy")} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="recommended">
-              {t("courses.sort.recommended")}
-            </SelectItem>
-            <SelectItem value="rating">{t("courses.sort.rating")}</SelectItem>
-            <SelectItem value="enrollment">
-              {t("courses.sort.enrollment")}
-            </SelectItem>
-            <SelectItem value="newest">{t("courses.sort.newest")}</SelectItem>
-            <SelectItem value="duration">
-              {t("courses.sort.duration")}
-            </SelectItem>
-            <SelectItem value="title">{t("courses.sort.title")}</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Button
-          variant="outline"
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="flex items-center gap-2"
-        >
-          <Filter className="w-4 h-4" />
-          {t("courses.filters")}
-          {hasActiveFilters && (
-            <span className="bg-blue-600 text-white text-xs rounded-full px-1.5 py-0.5 ml-1">
-              {(filters.category?.length || 0) +
-                (filters.language?.length || 0) +
-                (filters.difficulty?.length || 0) +
-                (filters.country?.length || 0) +
-                (filters.region?.length || 0)}
+  const FilterDropdown = ({ 
+    title, 
+    options, 
+    selectedValues, 
+    filterKey 
+  }: { 
+    title: string; 
+    options: string[]; 
+    selectedValues?: string[]; 
+    filterKey: keyof CourseFilter;
+  }) => {
+    const count = selectedValues?.length || 0;
+    
+    return (
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline" className={`h-[50px] rounded-xl border-gray-200 bg-white text-gray-700 font-medium hover:bg-gray-50 justify-between min-w-[160px] ${count > 0 ? 'border-blue-200 bg-blue-50/50 text-blue-700' : ''}`}>
+            <span className="flex items-center gap-2">
+              {title}
+              {count > 0 && (
+                <Badge variant="secondary" className="bg-blue-100 text-blue-700 hover:bg-blue-100 h-5 px-1.5 text-[10px]">
+                  {count}
+                </Badge>
+              )}
             </span>
-          )}
-        </Button>
-
-        {hasActiveFilters && (
-          <Button
-            variant="ghost"
-            onClick={onClearFilters}
-            className="flex items-center gap-2"
-          >
-            <X className="w-4 h-4" />
-            {t("courses.clearFilters")}
+            <ChevronDown className="h-4 w-4 opacity-50" />
           </Button>
-        )}
-      </div>
+        </PopoverTrigger>
+        <PopoverContent className="w-[240px] p-3" align="start">
+          <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+            {options.map((option) => (
+              <div key={option} className="flex items-center space-x-2 p-1 hover:bg-gray-50 rounded-lg transition-colors">
+                <Checkbox 
+                  id={`${filterKey}-${option}`} 
+                  checked={selectedValues?.includes(option)}
+                  onCheckedChange={() => handleFilterChange(filterKey, option)}
+                  className="border-gray-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                />
+                <label
+                  htmlFor={`${filterKey}-${option}`}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex-1 py-1"
+                >
+                  {filterKey === 'difficulty' 
+                    ? t(`courses.difficulty.${option.toLowerCase()}`)
+                    : filterKey === 'category'
+                    ? t(`courses.categories.${option.toLowerCase()}`)
+                    : filterKey === 'language'
+                    ? t(`courses.languages.${option.toLowerCase()}`)
+                    : filterKey === 'country'
+                    ? t(`courses.countries.${option.toLowerCase()}`)
+                    : filterKey === 'region'
+                    ? t(`courses.regions.${option.toLowerCase()}`)
+                    : option}
+                </label>
+              </div>
+            ))}
+          </div>
+        </PopoverContent>
+      </Popover>
+    );
+  };
 
-      {/* Expanded Filters */}
-      {isExpanded && (
-        <div className="border-t pt-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* Categories */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t("courses.category")}
-              </label>
-              <div className="space-y-2 max-h-32 overflow-y-auto">
-                {availableFilters.categories.map((category) => (
-                  <label key={category} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={filters.category?.includes(category) || false}
-                      onChange={() => handleCategoryChange(category)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">
-                      {category}
-                    </span>
-                  </label>
+  return (
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-8">
+      <div className="flex flex-col gap-5">
+        <div className="flex flex-col md:flex-row gap-5">
+          {/* Search Bar */}
+          <div className="flex-1 relative group z-20">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+            </div>
+            <input
+              type="text"
+              placeholder={t("courses.searchCourses")}
+              className="block w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-base"
+              value={filters.search || ""}
+              onChange={(e) => handleSearchChange(e.target.value)}
+            />
+            {suggestions.length > 0 && (
+              <div className="absolute left-0 right-0 mt-2 bg-white shadow-xl rounded-xl border border-gray-100 overflow-hidden z-30 animate-in fade-in zoom-in-95 duration-200">
+                {suggestions.map((s, i) => (
+                  <button
+                    key={s.id}
+                    className={`w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0 ${
+                      i === selectedIndex ? "bg-gray-50" : ""
+                    }`}
+                    onClick={() => {
+                      onFiltersChange({ ...filters, search: s.title });
+                      setSuggestions([]);
+                      setSelectedIndex(-1);
+                    }}
+                  >
+                    <div className="text-sm font-semibold text-gray-900">{s.title}</div>
+                    <div className="text-xs text-gray-500 mt-0.5">{s.provider}</div>
+                  </button>
                 ))}
               </div>
-            </div>
+            )}
+          </div>
 
-            {/* Languages */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t("courses.language")}
-              </label>
-              <div className="space-y-2 max-h-32 overflow-y-auto">
-                {availableFilters.languages.map((language) => (
-                  <label key={language} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={filters.language?.includes(language) || false}
-                      onChange={() => handleLanguageChange(language)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">
-                      {language}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Difficulty */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t("courses.difficulty.label")}
-              </label>
-              <div className="space-y-2">
-                {availableFilters.difficulties.map((difficulty) => (
-                  <label key={difficulty} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={
-                        filters.difficulty?.includes(difficulty as any) || false
-                      }
-                      onChange={() => handleDifficultyChange(difficulty)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">
-                      {t(`courses.difficulty.${difficulty.toLowerCase()}`)}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Countries */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t("courses.country")}
-              </label>
-              <div className="space-y-2 max-h-32 overflow-y-auto">
-                {availableFilters.countries.map((country) => (
-                  <label key={country} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={filters.country?.includes(country) || false}
-                      onChange={() => handleCountryChange(country)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">
-                      {country}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Regions */}
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t("courses.region")}
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-32 overflow-y-auto">
-                {availableFilters.regions.map((region) => (
-                  <label key={region} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={filters.region?.includes(region) || false}
-                      onChange={() => handleRegionChange(region)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">{region}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
+          {/* Sort Dropdown */}
+          <div className="min-w-[200px]">
+            <Select value={sortBy} onValueChange={onSortChange}>
+              <SelectTrigger className="w-full h-[50px] rounded-xl border-gray-200 bg-white text-gray-700 font-medium focus:ring-blue-500/20 focus:border-blue-500 hover:bg-gray-50">
+                <SelectValue placeholder={t("courses.sortBy")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="recommended">{t("courses.sort.recommended")}</SelectItem>
+                <SelectItem value="rating">{t("courses.sort.rating")}</SelectItem>
+                <SelectItem value="enrollment">{t("courses.sort.enrollment")}</SelectItem>
+                <SelectItem value="newest">{t("courses.sort.newest")}</SelectItem>
+                <SelectItem value="duration">{t("courses.sort.duration")}</SelectItem>
+                <SelectItem value="title">{t("courses.sort.title")}</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
-      )}
+
+        {/* Filters Row */}
+        <div className="flex flex-wrap items-center gap-3">
+          <FilterDropdown 
+            title={t("courses.category")} 
+            options={availableFilters.categories} 
+            selectedValues={filters.category} 
+            filterKey="category"
+          />
+          
+          <FilterDropdown 
+            title={t("courses.difficulty.label")} 
+            options={availableFilters.difficulties} 
+            selectedValues={filters.difficulty} 
+            filterKey="difficulty"
+          />
+
+          <FilterDropdown 
+            title={t("courses.language")} 
+            options={availableFilters.languages} 
+            selectedValues={filters.language} 
+            filterKey="language"
+          />
+
+          <FilterDropdown 
+            title={t("courses.country")} 
+            options={availableFilters.countries} 
+            selectedValues={filters.country} 
+            filterKey="country"
+          />
+
+          {hasActiveFilters && (
+            <Button
+              variant="ghost"
+              onClick={onClearFilters}
+              className="h-[50px] px-4 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-xl ml-auto"
+            >
+              <X className="w-4 h-4 mr-2" />
+              {t("courses.clearFilters")}
+            </Button>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

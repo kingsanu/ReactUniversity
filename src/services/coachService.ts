@@ -76,15 +76,32 @@ export async function getCoaches(params: { page?: number; limit?: number; specia
   if (params.specialization) query.append("specialization", params.specialization);
   if (params.search) query.append("search", params.search);
 
-  const response = await fetch(`${API_BASE_URL}/api/v1/coaches?${query.toString()}`);
+  const response = await fetch(`${API_BASE_URL}/api/v1/coach?${query.toString()}`);
   if (!response.ok) throw new Error("Failed to fetch coaches");
   return response.json();
 }
 
 export async function getCoachDetails(coachId: string): Promise<Coach> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/coaches/${coachId}`);
+  const response = await fetch(`${API_BASE_URL}/api/v1/coach/${coachId}`);
   if (!response.ok) throw new Error("Failed to fetch coach details");
-  return response.json();
+  const json = await response.json();
+  return json.data;
+}
+
+// Get coach availability for a specific date (optional - falls back to weekly schedule if not implemented)
+export async function getCoachAvailableSlots(coachId: string, date: string): Promise<{ slots: string[] }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/coach/${coachId}/slots?date=${date}`);
+    if (!response.ok) {
+      // If endpoint doesn't exist, return empty - component will fall back to weekly schedule
+      console.warn("Coach slots endpoint not available, using weekly schedule fallback");
+      return { slots: [] };
+    }
+    return response.json();
+  } catch (error) {
+    console.warn("Error fetching coach slots:", error);
+    return { slots: [] };
+  }
 }
 
 export async function bookSession(data: { coachId: string; slot: { start: string; end: string }; topic: string; notes?: string }): Promise<BookingResponse> {
@@ -98,10 +115,21 @@ export async function bookSession(data: { coachId: string; slot: { start: string
   return response.json();
 }
 
+// --- User Sessions API ---
+
+export async function getUserSessions(status: 'upcoming' | 'past' | 'all' = 'all'): Promise<{ data: Booking[] }> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/bookings/me?status=${status}`, {
+    headers: getHeaders(),
+  });
+
+  if (!response.ok) throw new Error("Failed to fetch user sessions");
+  return response.json();
+}
+
 // --- Coach Dashboard APIs ---
 
 export async function getCoachSessions(status: 'upcoming' | 'past' | 'all' = 'all'): Promise<{ data: Booking[] }> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/coaches/me/sessions?status=${status}`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/coach/me/sessions?status=${status}`, {
     headers: getHeaders(),
   });
 
@@ -121,27 +149,29 @@ export async function rescheduleSession(bookingId: string, newSlot: { start: str
 }
 
 export async function getAvailability(): Promise<Availability> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/coaches/me/availability`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/coach/me/availability`, {
     headers: getHeaders(),
   });
 
   if (!response.ok) throw new Error("Failed to fetch availability");
-  return response.json();
+  const json = await response.json();
+  return json.data;
 }
 
 export async function updateAvailability(availability: Availability): Promise<Availability> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/coaches/me/availability`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/coach/me/availability`, {
     method: "PUT",
     headers: getHeaders(),
     body: JSON.stringify(availability),
   });
 
   if (!response.ok) throw new Error("Failed to update availability");
-  return response.json();
+  const json = await response.json();
+  return json.data;
 }
 
 export async function updateCoachProfile(data: Partial<Coach>): Promise<Coach> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/coaches/me`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/coach/me`, {
     method: "PUT",
     headers: getHeaders(),
     body: JSON.stringify(data),
@@ -165,7 +195,7 @@ export async function cancelSession(bookingId: string, reason: string): Promise<
 // --- Reviews ---
 
 export async function submitReview(coachId: string, data: { bookingId: string; rating: number; comment: string }): Promise<Review> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/coaches/${coachId}/reviews`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/coach/${coachId}/reviews`, {
     method: "POST",
     headers: getHeaders(),
     body: JSON.stringify(data),
@@ -191,16 +221,22 @@ export async function getAllCoachesAdmin(params: { page?: number; limit?: number
   return response.json();
 }
 
-export async function inviteCoach(email: string): Promise<{ message: string; invitationId: string }> {
+export async function inviteCoach(data: { 
+  email: string; 
+  name?: string; 
+  contractStart?: string; 
+  contractEnd?: string;
+}): Promise<{ message: string; invitationId: string }> {
   const response = await fetch(`${API_BASE_URL}/authapi/invite-coach`, {
     method: "POST",
     headers: getHeaders(),
-    body: JSON.stringify({ email }),
+    body: JSON.stringify(data),
   });
 
   if (!response.ok) throw new Error("Failed to invite coach");
   return response.json();
 }
+
 
 export async function inviteCoachBulk(file: File): Promise<any[]> {
   const formData = new FormData();

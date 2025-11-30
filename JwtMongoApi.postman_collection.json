@@ -14,13 +14,22 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/authapi/test",
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/authapi/test?userId={{userId}}",
               "protocol": "https",
               "host": [
                 "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
-              "path": ["authapi", "test"]
-            }
+              "path": ["authapi", "test"],
+              "query": [
+                {
+                  "key": "userId",
+                  "value": "{{userId}}",
+                  "description": "Optional: User ID to retrieve a specific user. If not provided, returns all users.",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Test API endpoint to verify database connection and retrieve user information.\n\n**Without userId parameter:**\n- Returns all users in the system\n- Includes user count and full user list with roleName\n\n**With userId parameter:**\n- Returns single user matching the provided ID\n- Returns 404 if user not found\n\n**Response includes:**\n- id, name, email, roleId, roleName, isActive, createdAt, updatedAt"
           }
         },
         {
@@ -213,6 +222,31 @@
           }
         },
         {
+          "name": "Change Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"NewPassword123\"\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/authapi/change-password",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["authapi", "change-password"]
+            },
+            "description": "Change user password by email address. Finds the user by email (case-insensitive) and updates their password. Password must be at least 6 characters long and contain at least one uppercase letter, one lowercase letter, and one number.\n\n**Requirements:**\n- Valid email address\n- Password must meet strength requirements (min 6 chars, uppercase, lowercase, number)\n- User must exist in the system\n\n**Security:**\n- Password is hashed using SHA256 before storage\n- Email lookup is case-insensitive"
+          }
+        },
+        {
           "name": "Activate All Members",
           "request": {
             "method": "PUT",
@@ -367,7 +401,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"personalInfo\": {\n    \"name\": \"Sarah Wilson\",\n    \"title\": \"Senior Career Coach\",\n    \"bio\": \"Experienced leader in tech with 10+ years of experience...\",\n    \"specialization\": \"Tech Leadership\",\n    \"location\": \"San Francisco, CA\",\n    \"languages\": [\"English\", \"Spanish\"],\n    \"tags\": [\"Leadership\", \"Management\", \"Tech\"],\n    \"image\": \"https://storage.example.com/coaches/profile_123.jpg\"\n  },\n  \"availability\": {\n    \"timezone\": \"America/Los_Angeles\",\n    \"weeklySchedule\": [\n      {\n        \"day\": \"Monday\",\n        \"enabled\": true,\n        \"timeSlots\": [\n          { \"start\": \"09:00\", \"end\": \"12:00\" },\n          { \"start\": \"13:00\", \"end\": \"17:00\" }\n        ]\n      },\n      {\n        \"day\": \"Tuesday\",\n        \"enabled\": true,\n        \"timeSlots\": [\n          { \"start\": \"09:00\", \"end\": \"12:00\" },\n          { \"start\": \"13:00\", \"end\": \"17:00\" }\n        ]\n      },\n      {\n        \"day\": \"Wednesday\",\n        \"enabled\": false,\n        \"timeSlots\": []\n      },\n      {\n        \"day\": \"Thursday\",\n        \"enabled\": true,\n        \"timeSlots\": [\n          { \"start\": \"09:00\", \"end\": \"12:00\" }\n        ]\n      },\n      {\n        \"day\": \"Friday\",\n        \"enabled\": true,\n        \"timeSlots\": [\n          { \"start\": \"09:00\", \"end\": \"17:00\" }\n        ]\n      },\n      {\n        \"day\": \"Saturday\",\n        \"enabled\": false,\n        \"timeSlots\": []\n      },\n      {\n        \"day\": \"Sunday\",\n        \"enabled\": false,\n        \"timeSlots\": []\n      }\n    ]\n  },\n  \"calendarIntegrations\": {\n    \"google\": {\n      \"connected\": false\n    },\n    \"outlook\": {\n      \"connected\": false\n    }\n  }\n}"
+                  "raw": "{\n  \"personalInfo\": {\n    \"name\": \"Sarah Wilson\",\n    \"title\": \"Senior Career Coach\",\n    \"bio\": \"Experienced leader in tech with 10+ years of experience...\",\n    \"specialization\": \"Tech Leadership\",\n    \"location\": \"San Francisco, CA\",\n    \"languages\": [\"English\", \"Spanish\"],\n    \"tags\": [\"Leadership\", \"Management\", \"Tech\"],\n    \"image\": \"https://storage.example.com/coaches/profile_123.jpg\"\n  },\n  \"availability\": {\n    \"timezone\": \"America/Los_Angeles\",\n    \"weeklySchedule\": [\n      {\n        \"day\": \"Monday\",\n        \"enabled\": true,\n        \"timeSlots\": [\n          { \"start\": \"09:00\", \"end\": \"12:00\" },\n          { \"start\": \"13:00\", \"end\": \"17:00\" }\n        ]\n      },\n      {\n        \"day\": \"Tuesday\",\n        \"enabled\": true,\n        \"timeSlots\": [\n          { \"start\": \"09:00\", \"end\": \"12:00\" },\n          { \"start\": \"13:00\", \"end\": \"17:00\" }\n        ]\n      },\n      {\n        \"day\": \"Wednesday\",\n        \"enabled\": false,\n        \"timeSlots\": []\n      },\n      {\n        \"day\": \"Thursday\",\n        \"enabled\": true,\n        \"timeSlots\": [\n          { \"start\": \"09:00\", \"end\": \"12:00\" }\n        ]\n      },\n      {\n        \"day\": \"Friday\",\n        \"enabled\": true,\n        \"timeSlots\": [\n          { \"start\": \"09:00\", \"end\": \"17:00\" }\n        ]\n      },\n      {\n        \"day\": \"Saturday\",\n        \"enabled\": false,\n        \"timeSlots\": []\n      },\n      {\n        \"day\": \"Sunday\",\n        \"enabled\": false,\n        \"timeSlots\": []\n      }\n    ]\n  },\n  \"calendarIntegrations\": {\n    \"google\": {\n      \"connected\": false\n    },\n    \"outlook\": {\n      \"connected\": false\n    }\n  },\n  \"hourlyRate\": 75.50,\n  \"currency\": \"USD\",\n  \"password\": \"optional-password\"\n}"
                 },
                 "url": {
                   "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/{{coachId}}/onboarding",
@@ -377,7 +411,7 @@
                   ],
                   "path": ["api", "v1", "coach", "{{coachId}}", "onboarding"]
                 },
-                "description": "Submit coach onboarding data including profile, availability, and calendar preferences."
+                "description": "Submit coach onboarding data including profile, availability, calendar preferences, pricing information, and optional password.\n\n**Request Body Fields:**\n- `personalInfo`: Required - Personal information (name, title, bio, specialization, location, languages, tags, image)\n- `availability`: Required - Weekly schedule with timezone and time slots\n- `calendarIntegrations`: Optional - Google and Outlook calendar integration settings\n- `hourlyRate`: Optional (nullable) - Coach's hourly rate as a decimal number\n- `currency`: Optional (nullable) - Currency code (e.g., \"USD\", \"EUR\", \"GBP\") - max 10 characters\n- `password`: Optional - Password to set for the coach account (will be hashed before storage)"
               }
             },
             {
@@ -465,6 +499,22 @@
                   ]
                 },
                 "description": "Get paginated list of available coaches. Only returns coaches with completed onboarding."
+              }
+            },
+            {
+              "name": "Get All Coaches",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/all",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "coach", "all"]
+                },
+                "description": "Get all coaches without any filtering. Returns all coaches regardless of onboarding status or active status. No pagination - returns all coaches in one response."
               }
             },
             {
@@ -687,6 +737,36 @@
                   "path": ["api", "v1", "bookings", "{{bookingId}}", "cancel"]
                 },
                 "description": "Cancel a booking. Can be triggered by coach or student."
+              }
+            },
+            {
+              "name": "Create Meeting",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"attendeeEmails\": [\n    \"student1@example.com\",\n    \"student2@example.com\",\n    \"student3@example.com\"\n  ],\n  \"startTime\": \"2024-12-20T10:00:00Z\",\n  \"endTime\": \"2024-12-20T11:00:00Z\",\n  \"title\": \"Career Coaching Session\",\n  \"description\": \"Group session on resume building and interview skills\",\n  \"location\": \"Virtual Meeting\",\n  \"sendEmailInvitations\": true\n}"
+                },
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/meetings",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "meetings"]
+                },
+                "description": "Create a Google Calendar meeting for multiple attendees. Requires Google Calendar to be connected first. Creates a calendar event, generates a Google Meet link, and sends email invitations to all attendees.\n\n**Requirements:**\n- Coach must be logged in\n- Google Calendar must be connected (use /api/v1/auth/google/url first)\n- At least one attendee email required\n- Start time must be in the future\n- End time must be after start time\n\n**Features:**\n- Automatically creates Google Calendar event\n- Generates Google Meet video link\n- Sends email invitations to all attendees\n- Refreshes access token automatically if expired"
               }
             }
           ]

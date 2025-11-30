@@ -2,20 +2,41 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { sidebarData } from "./data";
+import { sidebarData, coachSidebarData } from "./data";
 import { cn } from "@/lib/utils";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { useTranslation } from "react-i18next";
+import {
+  LayoutDashboard,
+  BarChart2,
+  Briefcase,
+  GraduationCap,
+  CreditCard,
+  Calendar,
+  FileText,
+  Settings,
+  LogOut,
+  ChevronDown,
+  User,
+  BookOpen,
+  Target,
+  Users
+} from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-// Icon mapping - in a real app, use proper icon library
-const IconMap = {
-  dashboard: "🏠",
-  analytics: "📊",
-  career: "📋",
-  opportunities: "💼",
-  learning: "🎓",
-  assessments: "📝",
-  subscriptions: "💳",
+// Icon mapping
+const IconMap: Record<string, any> = {
+  dashboard: LayoutDashboard,
+  analytics: BarChart2,
+  career: Briefcase,
+  opportunities: Target,
+  learning: GraduationCap,
+  assessments: FileText,
+  subscriptions: CreditCard,
+  sessions: Calendar,
+  settings: Settings,
+  people: Users,
+  resources: BookOpen
 };
 
 interface SidebarProps {
@@ -26,10 +47,13 @@ interface SidebarProps {
 
 export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
   const [expandedItems, setExpandedItems] = useState<string[]>(["analytics"]);
-  const { logout } = useGlobalStore();
+  const { logout, user } = useGlobalStore();
   const router = useRouter();
   const pathname = usePathname();
   const { t } = useTranslation();
+
+  // Select sidebar data based on user role (case-insensitive)
+  const currentSidebarData = user.role && user.role.toLowerCase() === "coach" ? coachSidebarData : sidebarData;
 
   const toggleExpanded = (itemId: string) => {
     setExpandedItems((prev) =>
@@ -40,7 +64,7 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
   };
 
   const isItemActive = (itemPath: string) => {
-    return pathname === itemPath;
+    return pathname === itemPath || pathname.startsWith(`${itemPath}/`);
   };
 
   const handleLogout = () => {
@@ -53,7 +77,7 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
       {/* Mobile Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
           onClick={onClose}
         />
       )}
@@ -61,84 +85,71 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed lg:static inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white h-screen flex flex-col transform transition-transform duration-300 ease-in-out",
+          "fixed lg:static inset-y-0 left-0 z-50 w-72 bg-gradient-to-b from-slate-900 to-slate-950 text-white h-screen flex flex-col transform transition-transform duration-300 ease-in-out border-r border-slate-800 shadow-2xl",
           isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
           className
         )}
       >
         {/* Logo */}
-        <div className="p-6">
+        <div className="p-6 border-b border-slate-800/50">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
-                <span className="text-white font-bold text-sm">
-                  {sidebarData.logo.icon}
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <span className="text-white font-bold text-lg">
+                  {currentSidebarData.logo.icon}
                 </span>
               </div>
-              <span className="text-xl font-bold">{sidebarData.logo.text}</span>
+              <span className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
+                {currentSidebarData.logo.text}
+              </span>
             </div>
             {/* Mobile Close Button */}
             <button
               onClick={onClose}
-              className="lg:hidden p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-800"
+              className="lg:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
             >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+              <XIcon className="w-6 h-6" />
             </button>
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 space-y-1">
-          {sidebarData.navigation.map((item) => {
+        <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
+          {currentSidebarData.navigation.map((item) => {
             const isExpanded = expandedItems.includes(item.id);
             const hasSubmenu = item.submenu && item.submenu.length > 0;
             const isActive = isItemActive(item.path);
+            const Icon = IconMap[item.icon as keyof typeof IconMap] || FileText;
 
             return (
-              <div key={item.id}>
+              <div key={item.id} className="mb-1">
                 {/* Main Menu Item */}
                 <div
                   className={cn(
-                    "flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer",
+                    "group flex items-center justify-between px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer border border-transparent",
                     isActive
-                      ? "bg-blue-600 text-white"
-                      : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                      ? "bg-white/10 backdrop-blur-sm text-white border-white/5 shadow-sm"
+                      : "text-slate-400 hover:bg-slate-800/50 hover:text-white hover:border-slate-700/50"
                   )}
-                  onClick={() => hasSubmenu && toggleExpanded(item.id)}
+                  onClick={() => hasSubmenu ? toggleExpanded(item.id) : router.push(item.path)}
                 >
-                  <Link href={item.path} className="flex items-center flex-1">
-                    <span className="mr-3 text-base">
-                      {IconMap[item.icon as keyof typeof IconMap] || "📄"}
-                    </span>
+                  <div className="flex items-center flex-1">
+                    <Icon className={cn("w-5 h-5 mr-3 transition-colors", isActive ? "text-blue-400" : "text-slate-500 group-hover:text-slate-300")} />
                     <span>{t(item.name)}</span>
-                  </Link>
+                  </div>
                   {hasSubmenu && (
-                    <span
+                    <ChevronDown
                       className={cn(
-                        "text-xs transition-transform",
-                        isExpanded ? "rotate-180" : ""
+                        "w-4 h-4 text-slate-500 transition-transform duration-200",
+                        isExpanded ? "rotate-180 text-slate-300" : ""
                       )}
-                    >
-                      ▼
-                    </span>
+                    />
                   )}
                 </div>
 
                 {/* Submenu */}
                 {hasSubmenu && isExpanded && (
-                  <div className="ml-6 mt-1 space-y-1">
+                  <div className="ml-4 mt-1 pl-4 border-l border-slate-800 space-y-1">
                     {item.submenu?.map((subItem) => {
                       const isSubItemActive = isItemActive(subItem.path);
                       return (
@@ -146,10 +157,10 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
                           key={subItem.path}
                           href={subItem.path}
                           className={cn(
-                            "block px-3 py-2 text-xs rounded transition-colors",
+                            "block px-3 py-2 text-sm rounded-lg transition-all duration-200",
                             isSubItemActive
-                              ? "text-white bg-gray-800"
-                              : "text-gray-400 hover:text-white hover:bg-gray-800"
+                              ? "text-white bg-blue-600/20 font-medium"
+                              : "text-slate-500 hover:text-white hover:bg-slate-800/50"
                           )}
                         >
                           {t(subItem.name)}
@@ -163,17 +174,48 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
           })}
         </nav>
 
-        {/* Logout */}
-        <div className="p-4">
+        {/* User Profile & Logout */}
+        <div className="p-4 border-t border-slate-800/50 bg-slate-950/30">
+          <div className="flex items-center gap-3 mb-4 px-2">
+            <Avatar className="h-10 w-10 border border-slate-700">
+              <AvatarImage src={`/api/users/${user?.id}/avatar`} />
+              <AvatarFallback className="bg-slate-800 text-slate-300">
+                {user?.name?.charAt(0).toUpperCase() || "U"}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-white truncate">{user?.name || "User"}</p>
+              <p className="text-xs text-slate-500 truncate capitalize">{user?.role || "Member"}</p>
+            </div>
+          </div>
+          
           <button
             onClick={handleLogout}
-            className="flex items-center w-full px-3 py-2.5 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+            className="flex items-center justify-center w-full px-4 py-2.5 text-sm font-medium text-red-400 hover:text-white hover:bg-red-500/10 rounded-xl transition-all duration-200 border border-transparent hover:border-red-500/20"
           >
-            <span className="mr-3">🚪</span>
+            <LogOut className="w-4 h-4 mr-2" />
             <span>{t("common.logout")}</span>
           </button>
         </div>
       </aside>
     </>
+  );
+}
+
+function XIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M6 18L18 6M6 6l12 12"
+      />
+    </svg>
   );
 }

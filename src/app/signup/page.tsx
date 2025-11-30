@@ -160,10 +160,15 @@ export default function SignupPage() {
       // on signup success, call login to get token
       const loginRes = await loginApi(data.email, data.password);
       localStorage.setItem("token", loginRes.token);
+      
+      // Extract role name from login response
+      const roleName = loginRes.user?.role?.name || null;
+      
       setUser({
-        id: "",
+        id: loginRes.user?.id || "",
         email: data.email,
         name: `${data.firstName} ${data.lastName}`,
+        role: roleName,
         isAuthenticated: true,
       });
       router.push("/dashboard");

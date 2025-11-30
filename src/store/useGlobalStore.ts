@@ -111,6 +111,7 @@ interface GlobalState {
     email: string | null;
     name: string | null;
     role: string | null;
+    contractEnd?: string | null;
     isAuthenticated: boolean;
   };
   setUser: (user: Partial<GlobalState["user"]>) => void;
@@ -160,6 +161,11 @@ interface GlobalState {
   // Navigation
   sidebarCollapsed: boolean;
   toggleSidebar: () => void;
+
+  // Settings
+  platformFee: number;
+  setPlatformFee: (fee: number) => void;
+  fetchSettings: () => Promise<void>;
 }
 
 // Initial Resume Data
@@ -733,6 +739,23 @@ export const useGlobalStore = create<GlobalState>()(
         sidebarCollapsed: false,
         toggleSidebar: () =>
           set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
+
+        // Settings
+        platformFee: 15, // Default value
+        setPlatformFee: (fee) => set({ platformFee: fee }),
+        fetchSettings: async () => {
+          try {
+            const response = await fetch("/api/admin/settings");
+            if (response.ok) {
+              const data = await response.json();
+              if (typeof data.platformFee === "number") {
+                set({ platformFee: data.platformFee });
+              }
+            }
+          } catch (error) {
+            console.error("Failed to fetch settings:", error);
+          }
+        },
       }),
       {
         name: "timcare-global-store",

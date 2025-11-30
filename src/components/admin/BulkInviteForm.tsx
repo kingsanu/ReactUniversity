@@ -12,6 +12,8 @@ import Papa from "papaparse";
 interface CoachData {
   fullName: string;
   email: string;
+  contractStart?: string;
+  contractEnd?: string;
 }
 
 export function BulkInviteForm() {
@@ -28,7 +30,7 @@ export function BulkInviteForm() {
   };
 
   const downloadTemplate = () => {
-    const csvContent = "fullName,email\nJohn Doe,john@example.com\nJane Smith,jane@example.com";
+    const csvContent = "fullName,email,contractStart,contractEnd\nJohn Doe,john@example.com,2024-01-01,2024-12-31\nJane Smith,jane@example.com,2024-02-01,2025-01-31";
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     if (link.download !== undefined) {
@@ -76,7 +78,9 @@ export function BulkInviteForm() {
           const coachesToInvite = validData.map(row => ({
             email: row.email,
             fullName: row.fullName,
-            password: generatePassword()
+            password: generatePassword(),
+            contractStart: row.contractStart,
+            contractEnd: row.contractEnd,
           }));
 
           const response = await signupCoachBulk(coachesToInvite);
