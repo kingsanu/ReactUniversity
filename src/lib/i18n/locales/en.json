@@ -398,6 +398,48 @@
       "africa": "Africa"
     }
   },
+  "coaching": {
+    "featuredCoaches": "Featured Coaches",
+    "featuredDescription": "Top-rated mentors ready to help you grow",
+    "viewAllCoaches": "View All Coaches",
+    "bookSession": "Book Session",
+    "viewSchedule": "View Schedule",
+    "contactForAvailability": "Contact for availability",
+    "viewDetails": "View Details",
+    "bookNow": "Book Now",
+    "from": "from",
+    "booking": {
+      "fillAllFields": "Please fill in all fields",
+      "successMessage": "Session booked with {{name}} on {{date}} at {{time}}",
+      "errorMessage": "Failed to book session. Please try again.",
+      "back": "Back",
+      "coach": "Coach",
+      "meetingDuration": "30 Min Meeting",
+      "duration": "30 min",
+      "platform": "Google Meet",
+      "selectDateTime": "Select a Date & Time",
+      "timesShownIn": "Times shown in {{timezone}}",
+      "selectDate": "Select a date",
+      "slotsAvailable": "{{count}} slots available",
+      "selectDatePrompt": "Select a date to see available times",
+      "noAvailability": "No availability",
+      "noAvailabilityMessage": "Coach is not available on this day. Please select another date.",
+      "continue": "Continue",
+      "enterDetails": "Enter Details",
+      "topicLabel": "What would you like to discuss?",
+      "selectTopic": "Select a topic",
+      "topics": {
+        "careerGuidance": "Career Guidance",
+        "interviewPrep": "Interview Prep",
+        "resumeReview": "Resume Review",
+        "skillDevelopment": "Skill Development"
+      },
+      "notesLabel": "Additional Notes (Optional)",
+      "notesPlaceholder": "Share anything that will help prepare for our meeting...",
+      "cancel": "Cancel",
+      "scheduleEvent": "Schedule Event"
+    }
+  },
   "courses_import": {
     "button": "Import Course",
     "title": "Import Course from URL",

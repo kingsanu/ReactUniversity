@@ -11,7 +11,10 @@ import { Coach } from "@/types/coach";
 import { motion } from "motion/react";
 import { Badge } from "@/components/ui/badge";
 
+import { useTranslation } from "react-i18next";
+
 export function FeaturedCoaches() {
+  const { t } = useTranslation();
   const [coaches, setCoaches] = useState<Coach[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -51,13 +54,13 @@ export function FeaturedCoaches() {
             <div className="p-2 bg-blue-100 rounded-lg">
               <Sparkles className="h-5 w-5 text-blue-600" />
             </div>
-            Featured Coaches
+            {t("coaching.featuredCoaches")}
           </h2>
-          <p className="text-gray-500 text-sm ml-11">Top-rated mentors ready to help you grow</p>
+          <p className="text-gray-500 text-sm ml-11">{t("coaching.featuredDescription")}</p>
         </div>
         <Button variant="ghost" asChild className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 group">
           <Link href="/dashboard/book-coach">
-            View All Coaches <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
+            {t("coaching.viewAllCoaches")} <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
           </Link>
         </Button>
       </div>
@@ -96,7 +99,7 @@ export function FeaturedCoaches() {
                 <div className="absolute top-4 right-6 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1.5 border border-gray-100">
                   <Star className="h-3.5 w-3.5 text-yellow-500 fill-yellow-500" />
                   <span className="font-bold text-xs text-gray-900">{coach.rating || "5.0"}</span>
-                  <span className="text-[10px] text-gray-500">({coach.reviews || 0})</span>
+                  <span className="text-[10px] text-gray-500">({Array.isArray(coach.reviews) ? coach.reviews.length : (coach.reviews || 0)})</span>
                 </div>
 
                 <div className="mt-14 space-y-4">
@@ -129,7 +132,7 @@ export function FeaturedCoaches() {
                     )}
                     {coach.hourlyRate && (
                       <div className="flex items-center gap-1.5 font-medium text-gray-900">
-                        <span className="text-gray-400 font-normal">from</span>
+                        <span className="text-gray-400 font-normal">{t("coaching.from")}</span>
                         ${coach.hourlyRate}/hr
                       </div>
                     )}
@@ -140,7 +143,7 @@ export function FeaturedCoaches() {
               <CardFooter className="p-6 pt-2 bg-gray-50/50 border-t border-gray-100">
                 <Button asChild className="w-full bg-gray-900 text-white hover:bg-blue-600 shadow-lg shadow-gray-200 hover:shadow-blue-200 transition-all h-11 rounded-xl font-medium">
                   <Link href={`/dashboard/book-coach/${coach.id}`}>
-                    Book Session
+                    {t("coaching.bookSession")}
                   </Link>
                 </Button>
               </CardFooter>

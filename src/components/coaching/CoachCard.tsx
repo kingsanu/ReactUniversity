@@ -9,12 +9,16 @@ import { Coach } from "@/types/coach";
 
 // Local interface removed in favor of shared type
 
+import { useTranslation } from "react-i18next";
+
 interface CoachCardProps {
   coach: Coach;
   onBook: (coach: Coach) => void;
 }
 
 export function CoachCard({ coach, onBook }: CoachCardProps) {
+  const { t } = useTranslation();
+
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 p-0 shadow-none">
       <CardHeader className="!p-0 ">
@@ -47,7 +51,7 @@ export function CoachCard({ coach, onBook }: CoachCardProps) {
           <div className="flex items-center text-sm text-gray-600">
             <Clock className="h-4 w-4 mr-2 text-gray-400" />
             {/* Simple availability display for now */}
-            {coach.availability ? "View Schedule" : "Contact for availability"}
+            {coach.availability ? t("coaching.viewSchedule") : t("coaching.contactForAvailability")}
           </div>
         </div>
 
@@ -66,11 +70,11 @@ export function CoachCard({ coach, onBook }: CoachCardProps) {
         <div className="flex gap-2">
           <Button variant="outline" size="sm" asChild>
             <Link href={`/dashboard/coaching/schedule/${coach.id}`}>
-              View Details
+              {t("coaching.viewDetails")}
             </Link>
           </Button>
           <Button size="sm" onClick={() => onBook(coach)}>
-            Book Now
+            {t("coaching.bookNow")}
           </Button>
         </div>
       </CardFooter>
