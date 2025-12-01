@@ -117,7 +117,7 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
         <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
           {currentSidebarData.navigation.map((item) => {
             const isExpanded = expandedItems.includes(item.id);
-            const hasSubmenu = item.submenu && item.submenu.length > 0;
+            const hasSubmenu = Array.isArray((item as any).submenu) && (item as any).submenu.length > 0;
             const isActive = isItemActive(item.path);
             const Icon = IconMap[item.icon as keyof typeof IconMap] || FileText;
 
@@ -150,7 +150,7 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
                 {/* Submenu */}
                 {hasSubmenu && isExpanded && (
                   <div className="ml-4 mt-1 pl-4 border-l border-slate-800 space-y-1">
-                    {item.submenu?.map((subItem) => {
+                    {(item as any).submenu?.map((subItem: any) => {
                       const isSubItemActive = isItemActive(subItem.path);
                       return (
                         <Link

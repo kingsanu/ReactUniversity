@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { Sidebar } from "./_components/Sidebar";
@@ -36,7 +37,7 @@ export default function DashboardPage() {
   // If user is a coach, render the coach dashboard with sidebar and header
   if (isCoach) {
     // Dynamically import the coach dashboard component
-    const CoachDashboard = require("@/app/dashboard/coaching/dashboard/page").default;
+    const CoachDashboard = dynamic(() => import("@/app/dashboard/coaching/dashboard/page"), { ssr: false });
     
     return (
       <div className="flex h-screen bg-gray-50">

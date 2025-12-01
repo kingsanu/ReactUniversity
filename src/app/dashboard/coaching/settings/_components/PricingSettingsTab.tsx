@@ -79,7 +79,7 @@ export function PricingSettingsTab({
     try {
       setIsSaving(true);
       const { updateCoachProfile } = await import("@/services/coachService");
-      const updatedResponse = await updateCoachProfile({
+      const updatedResponse: any = await updateCoachProfile({
         hourlyRate,
         currency,
       });

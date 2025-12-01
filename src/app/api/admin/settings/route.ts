@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 // In-memory store for settings (replace with DB in production)
-let settings = {
+const settings = {
   platformFee: 15,
 };
 

@@ -22,7 +22,7 @@ export function FeaturedCoaches() {
     const fetchCoaches = async () => {
       try {
         const response = await getCoaches({ limit: 3 });
-        // @ts-ignore - API response structure mismatch fix
+        // @ts-expect-error - API response structure mismatch fix
         setCoaches(response.data.data || response.data);
       } catch (error) {
         console.error("Failed to fetch featured coaches:", error);

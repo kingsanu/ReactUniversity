@@ -19,9 +19,10 @@ export function Calendar<T extends DateValue>({
   className,
   ...props
 }: CalendarPrimitiveProps<T>) {
+  const resolvedClassName = typeof className === "function" ? className(props as any) : className;
   return (
     <CalendarPrimitive
-      className={twMerge("w-fit", className)}
+      className={twMerge("w-fit", resolvedClassName as unknown as string)}
       {...props}
     >
       <header className="flex items-center justify-between pb-4 px-1">

@@ -24,7 +24,7 @@ export default function BookCoachPage() {
     const fetchCoaches = async () => {
       try {
         const { getCoaches } = await import("@/services/coachService");
-        const response = await getCoaches({ search });
+        const response: any = await getCoaches({ search });
         console.log("API Response:", response);
         
         // Handle different response structures
