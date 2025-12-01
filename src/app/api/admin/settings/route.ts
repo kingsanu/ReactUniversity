@@ -12,8 +12,8 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    
-    if (typeof body.platformFee === 'number') {
+
+    if (typeof body.platformFee === "number") {
       settings.platformFee = body.platformFee;
     }
 

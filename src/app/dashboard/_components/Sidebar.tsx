@@ -20,7 +20,7 @@ import {
   User,
   BookOpen,
   Target,
-  Users
+  Users,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -36,7 +36,7 @@ const IconMap: Record<string, any> = {
   sessions: Calendar,
   settings: Settings,
   people: Users,
-  resources: BookOpen
+  resources: BookOpen,
 };
 
 interface SidebarProps {
@@ -53,7 +53,10 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
   const { t } = useTranslation();
 
   // Select sidebar data based on user role (case-insensitive)
-  const currentSidebarData = user.role && user.role.toLowerCase() === "coach" ? coachSidebarData : sidebarData;
+  const currentSidebarData =
+    user.role && user.role.toLowerCase() === "coach"
+      ? coachSidebarData
+      : sidebarData;
 
   const toggleExpanded = (itemId: string) => {
     setExpandedItems((prev) =>
@@ -117,7 +120,9 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
         <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
           {currentSidebarData.navigation.map((item) => {
             const isExpanded = expandedItems.includes(item.id);
-            const hasSubmenu = Array.isArray((item as any).submenu) && (item as any).submenu.length > 0;
+            const hasSubmenu =
+              Array.isArray((item as any).submenu) &&
+              (item as any).submenu.length > 0;
             const isActive = isItemActive(item.path);
             const Icon = IconMap[item.icon as keyof typeof IconMap] || FileText;
 
@@ -131,10 +136,21 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
                       ? "bg-white/10 backdrop-blur-sm text-white border-white/5 shadow-sm"
                       : "text-slate-400 hover:bg-slate-800/50 hover:text-white hover:border-slate-700/50"
                   )}
-                  onClick={() => hasSubmenu ? toggleExpanded(item.id) : router.push(item.path)}
+                  onClick={() =>
+                    hasSubmenu
+                      ? toggleExpanded(item.id)
+                      : router.push(item.path)
+                  }
                 >
                   <div className="flex items-center flex-1">
-                    <Icon className={cn("w-5 h-5 mr-3 transition-colors", isActive ? "text-blue-400" : "text-slate-500 group-hover:text-slate-300")} />
+                    <Icon
+                      className={cn(
+                        "w-5 h-5 mr-3 transition-colors",
+                        isActive
+                          ? "text-blue-400"
+                          : "text-slate-500 group-hover:text-slate-300"
+                      )}
+                    />
                     <span>{t(item.name)}</span>
                   </div>
                   {hasSubmenu && (
@@ -184,11 +200,15 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">{user?.name || "User"}</p>
-              <p className="text-xs text-slate-500 truncate capitalize">{user?.role || "Member"}</p>
+              <p className="text-sm font-medium text-white truncate">
+                {user?.name || "User"}
+              </p>
+              <p className="text-xs text-slate-500 truncate capitalize">
+                {user?.role || "Member"}
+              </p>
             </div>
           </div>
-          
+
           <button
             onClick={handleLogout}
             className="flex items-center justify-center w-full px-4 py-2.5 text-sm font-medium text-red-400 hover:text-white hover:bg-red-500/10 rounded-xl transition-all duration-200 border border-transparent hover:border-red-500/20"

@@ -19,7 +19,13 @@ import "@/utils/debugUserRole"; // Make debug user role function available globa
 import { Button } from "@/components/ui/button";
 import { Bell, Menu, User } from "lucide-react";
 import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
-import { DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function DashboardPage() {
@@ -37,8 +43,11 @@ export default function DashboardPage() {
   // If user is a coach, render the coach dashboard with sidebar and header
   if (isCoach) {
     // Dynamically import the coach dashboard component
-    const CoachDashboard = dynamic(() => import("@/app/dashboard/coaching/dashboard/page"), { ssr: false });
-    
+    const CoachDashboard = dynamic(
+      () => import("@/app/dashboard/coaching/dashboard/page"),
+      { ssr: false }
+    );
+
     return (
       <div className="flex h-screen bg-gray-50">
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
@@ -69,7 +78,7 @@ export default function DashboardPage() {
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={`/api/users/${user.id}/avatar`} />
                       <AvatarFallback>
-                        {user.name?.charAt(0).toUpperCase() || 'C'}
+                        {user.name?.charAt(0).toUpperCase() || "C"}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
@@ -78,19 +87,31 @@ export default function DashboardPage() {
                   <DropdownMenuLabel>
                     <div className="flex flex-col">
                       <span className="font-medium">{user.name}</span>
-                      <span className="text-xs text-gray-500">{user.email}</span>
+                      <span className="text-xs text-gray-500">
+                        {user.email}
+                      </span>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => router.push("/dashboard/coaching/profile")}>
+                  <DropdownMenuItem
+                    onClick={() => router.push("/dashboard/coaching/profile")}
+                  >
                     <User className="mr-2 h-4 w-4" />
                     Profile
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => router.push("/dashboard/coaching/settings")}>
+                  <DropdownMenuItem
+                    onClick={() => router.push("/dashboard/coaching/settings")}
+                  >
                     Settings
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => { useGlobalStore.getState().logout(); router.push("/login"); }} className="text-red-600">
+                  <DropdownMenuItem
+                    onClick={() => {
+                      useGlobalStore.getState().logout();
+                      router.push("/login");
+                    }}
+                    className="text-red-600"
+                  >
                     Logout
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -108,51 +129,50 @@ export default function DashboardPage() {
 
   // Otherwise, render the student dashboard
   return (
-
     <div className="flex h-screen bg-gray-50">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div className="flex-1 flex flex-col overflow-hidden lg:ml-0">
         <TopNav onMenuClick={() => setSidebarOpen(true)} />
 
-          <main className="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
-            {/* Action Cards */}
-            <ActionCards />
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
+          {/* Action Cards */}
+          <ActionCards />
 
-            {/* Featured Coaches Section */}
-            <FeaturedCoaches />
+          {/* Featured Coaches Section */}
+          <FeaturedCoaches />
 
-            {/* Top Row - Assessment Progress and Key Metrics */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Assessment Progress */}
-              <div className="lg:col-span-1">
-                <AssessmentProgressCard />
-              </div>
-
-              {/* Key Results */}
-              <div className="lg:col-span-1 grid grid-cols-1 md:grid-cols-1 gap-6">
-                <PCAResults />
-                <MILResults />
-              </div>
+          {/* Top Row - Assessment Progress and Key Metrics */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Assessment Progress */}
+            <div className="lg:col-span-1">
+              <AssessmentProgressCard />
             </div>
 
-            {/* Main Content Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Left: Competency Chart */}
-              <div className="lg:col-span-2">
-                <CompetencyChart />
-              </div>
+            {/* Key Results */}
+            <div className="lg:col-span-1 grid grid-cols-1 md:grid-cols-1 gap-6">
+              <PCAResults />
+              <MILResults />
+            </div>
+          </div>
 
-              {/* Right: Career Matches (Top 3) */}
-              <div>
-                <Top3Careers />
-              </div>
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left: Competency Chart */}
+            <div className="lg:col-span-2">
+              <CompetencyChart />
             </div>
 
-            {/* Opportunities Table */}
-            <OpportunitiesTable />
-          </main>
-        </div>
+            {/* Right: Career Matches (Top 3) */}
+            <div>
+              <Top3Careers />
+            </div>
+          </div>
+
+          {/* Opportunities Table */}
+          <OpportunitiesTable />
+        </main>
       </div>
-    );
-  }
+    </div>
+  );
+}

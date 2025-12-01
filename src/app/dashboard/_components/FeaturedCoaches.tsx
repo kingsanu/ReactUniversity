@@ -38,7 +38,10 @@ export function FeaturedCoaches() {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[1, 2, 3].map((i) => (
-          <Card key={i} className="border-0 shadow-sm bg-white/50 animate-pulse h-[320px] rounded-2xl" />
+          <Card
+            key={i}
+            className="border-0 shadow-sm bg-white/50 animate-pulse h-[320px] rounded-2xl"
+          />
         ))}
       </div>
     );
@@ -56,11 +59,18 @@ export function FeaturedCoaches() {
             </div>
             {t("coaching.featuredCoaches")}
           </h2>
-          <p className="text-gray-500 text-sm ml-11">{t("coaching.featuredDescription")}</p>
+          <p className="text-gray-500 text-sm ml-11">
+            {t("coaching.featuredDescription")}
+          </p>
         </div>
-        <Button variant="ghost" asChild className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 group">
+        <Button
+          variant="ghost"
+          asChild
+          className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 group"
+        >
           <Link href="/dashboard/book-coach">
-            {t("coaching.viewAllCoaches")} <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
+            {t("coaching.viewAllCoaches")}{" "}
+            <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
           </Link>
         </Button>
       </div>
@@ -91,32 +101,54 @@ export function FeaturedCoaches() {
                         {coach.name.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="absolute bottom-1 right-1 bg-green-500 h-4 w-4 rounded-full border-[3px] border-white shadow-sm" title="Available"></div>
+                    <div
+                      className="absolute bottom-1 right-1 bg-green-500 h-4 w-4 rounded-full border-[3px] border-white shadow-sm"
+                      title="Available"
+                    ></div>
                   </div>
                 </div>
 
                 {/* Rating Badge */}
                 <div className="absolute top-4 right-6 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1.5 border border-gray-100">
                   <Star className="h-3.5 w-3.5 text-yellow-500 fill-yellow-500" />
-                  <span className="font-bold text-xs text-gray-900">{coach.rating || "5.0"}</span>
-                  <span className="text-[10px] text-gray-500">({Array.isArray(coach.reviews) ? coach.reviews.length : (coach.reviews || 0)})</span>
+                  <span className="font-bold text-xs text-gray-900">
+                    {coach.rating || "5.0"}
+                  </span>
+                  <span className="text-[10px] text-gray-500">
+                    (
+                    {Array.isArray(coach.reviews)
+                      ? coach.reviews.length
+                      : coach.reviews || 0}
+                    )
+                  </span>
                 </div>
 
                 <div className="mt-14 space-y-4">
                   <div>
-                    <h3 className="font-bold text-xl text-gray-900 leading-tight mb-1 group-hover:text-blue-600 transition-colors">{coach.name}</h3>
-                    <p className="text-sm font-medium text-blue-600">{coach.title}</p>
+                    <h3 className="font-bold text-xl text-gray-900 leading-tight mb-1 group-hover:text-blue-600 transition-colors">
+                      {coach.name}
+                    </h3>
+                    <p className="text-sm font-medium text-blue-600">
+                      {coach.title}
+                    </p>
                   </div>
 
                   {/* Tags */}
                   <div className="flex flex-wrap gap-2">
                     {coach.tags?.slice(0, 3).map((tag) => (
-                      <Badge key={tag} variant="secondary" className="bg-gray-50 text-gray-600 hover:bg-gray-100 font-normal border-gray-100">
+                      <Badge
+                        key={tag}
+                        variant="secondary"
+                        className="bg-gray-50 text-gray-600 hover:bg-gray-100 font-normal border-gray-100"
+                      >
                         {tag}
                       </Badge>
                     ))}
                     {(coach.tags?.length || 0) > 3 && (
-                      <Badge variant="secondary" className="bg-gray-50 text-gray-400 font-normal border-gray-100">
+                      <Badge
+                        variant="secondary"
+                        className="bg-gray-50 text-gray-400 font-normal border-gray-100"
+                      >
                         +{(coach.tags?.length || 0) - 3}
                       </Badge>
                     )}
@@ -127,12 +159,16 @@ export function FeaturedCoaches() {
                     {coach.location && (
                       <div className="flex items-center gap-1.5">
                         <MapPin className="h-3.5 w-3.5 text-gray-400" />
-                        <span className="truncate max-w-[120px]">{coach.location}</span>
+                        <span className="truncate max-w-[120px]">
+                          {coach.location}
+                        </span>
                       </div>
                     )}
                     {coach.hourlyRate && (
                       <div className="flex items-center gap-1.5 font-medium text-gray-900">
-                        <span className="text-gray-400 font-normal">{t("coaching.from")}</span>
+                        <span className="text-gray-400 font-normal">
+                          {t("coaching.from")}
+                        </span>
                         ${coach.hourlyRate}/hr
                       </div>
                     )}
@@ -141,7 +177,10 @@ export function FeaturedCoaches() {
               </CardContent>
 
               <CardFooter className="p-6 pt-2 bg-gray-50/50 border-t border-gray-100">
-                <Button asChild className="w-full bg-gray-900 text-white hover:bg-blue-600 shadow-lg shadow-gray-200 hover:shadow-blue-200 transition-all h-11 rounded-xl font-medium">
+                <Button
+                  asChild
+                  className="w-full bg-gray-900 text-white hover:bg-blue-600 shadow-lg shadow-gray-200 hover:shadow-blue-200 transition-all h-11 rounded-xl font-medium"
+                >
                   <Link href={`/dashboard/book-coach/${coach.id}`}>
                     {t("coaching.bookSession")}
                   </Link>

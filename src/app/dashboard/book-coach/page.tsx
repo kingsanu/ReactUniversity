@@ -26,7 +26,7 @@ export default function BookCoachPage() {
         const { getCoaches } = await import("@/services/coachService");
         const response: any = await getCoaches({ search });
         console.log("API Response:", response);
-        
+
         // Handle different response structures
         // API might return { data: Coach[] } or { data: { data: Coach[] } }
         let coachesData: any[] = [];
@@ -39,7 +39,7 @@ export default function BookCoachPage() {
             coachesData = response.data.data;
           }
         }
-        
+
         console.log("Parsed coaches:", coachesData);
         setCoaches(coachesData);
       } catch (error) {
