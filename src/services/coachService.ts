@@ -6,7 +6,13 @@ import {
   Booking,
   BookingResponse,
   Availability,
-  Review
+  Review,
+  CoachAnalytics,
+  StudentSummary,
+  StudentDetails,
+  Payout,
+  BankAccount,
+  Notification,
 } from "../types/coach";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -27,8 +33,12 @@ const getHeaders = (isMultipart = false) => {
 
 // --- Onboarding Endpoints ---
 
-export async function getOnboardingStatus(coachId: string): Promise<OnboardingStatus> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/coach/${coachId}/onboarding-status`);
+export async function getOnboardingStatus(
+  coachId: string
+): Promise<OnboardingStatus> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/coach/${coachId}/onboarding-status`
+  );
   if (!response.ok) throw new Error("Failed to get onboarding status");
   const json = await response.json();
   return json.data;
@@ -48,36 +58,205 @@ export async function uploadProfileImage(file: File): Promise<{ url: string }> {
   return response.json();
 }
 
-export async function submitOnboardingData(coachId: string, data: OnboardingData): Promise<{ success: boolean; coachId: string; redirectUrl: string }> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/coach/${coachId}/onboarding`, {
-    method: "POST",
-    headers: getHeaders(),
-    body: JSON.stringify(data),
-  });
+export async function submitOnboardingData(
+  coachId: string,
+  data: OnboardingData
+): Promise<{ success: boolean; coachId: string; redirectUrl: string }> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/coach/${coachId}/onboarding`,
+    {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify(data),
+    }
+  );
 
   if (!response.ok) throw new Error("Failed to submit onboarding data");
   return response.json();
 }
 
-export async function getCalendarAuthUrl(provider: 'google' | 'outlook'): Promise<{ url: string }> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/auth/${provider}/url`, {
-    headers: getHeaders(),
-  });
+export async function getCalendarAuthUrl(
+  provider: "google" | "outlook",
+  email?: string
+): Promise<{ url: string }> {
+  const query = new URLSearchParams();
+  if (email) query.append("email", email);
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/auth/${provider}/url${
+      query.toString() ? `?${query.toString()}` : ""
+    }`,
+    {
+      headers: getHeaders(),
+    }
+  );
   if (!response.ok) throw new Error(`Failed to get ${provider} auth URL`);
-  return response.json();
+  const data = await response.json();
+  // Handle both 'url' and 'callbackurl' response formats and nested response payloads
+  // Some APIs return { data: { url: '...' } } while others return { url: '...' }
+  console.log(`API response for ${provider} calendar auth:`, data);
+  const nested = data && typeof data === "object" ? data.data || data : data;
+  const url =
+    nested?.url || nested?.callbackurl || data?.url || data?.callbackurl;
+  if (!url) {
+    throw new Error(
+      `API did not return a valid URL. Response: ${JSON.stringify(data)}`
+    );
+  }
+  return { url };
 }
 
 // --- User Side APIs ---
 
-export async function getCoaches(params: { page?: number; limit?: number; specialization?: string; search?: string } = {}): Promise<CoachesResponse> {
+export async function getCoaches(
+  params: {
+    page?: number;
+    limit?: number;
+    specialization?: string;
+    search?: string;
+  } = {}
+): Promise<CoachesResponse> {
   const query = new URLSearchParams();
   if (params.page) query.append("page", params.page.toString());
   if (params.limit) query.append("limit", params.limit.toString());
-  if (params.specialization) query.append("specialization", params.specialization);
+  if (params.specialization)
+    query.append("specialization", params.specialization);
   if (params.search) query.append("search", params.search);
 
-  const response = await fetch(`${API_BASE_URL}/api/v1/coach?${query.toString()}`);
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/coach?${query.toString()}`
+  );
   if (!response.ok) throw new Error("Failed to fetch coaches");
+  return response.json();
+}
+
+// --- New Coach Dashboard APIs ---
+export async function getCoachAnalytics(): Promise<{ data: CoachAnalytics }> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/coach/me/analytics`, {
+    headers: getHeaders(),
+  });
+  if (!response.ok) throw new Error("Failed to fetch coach analytics");
+  return response.json();
+}
+
+export async function getCoachAnalyticsReport(
+  startDate?: string,
+  endDate?: string,
+  type: "csv" | "pdf" = "pdf"
+): Promise<Blob | { data: any }> {
+  const query = new URLSearchParams();
+  if (startDate) query.append("startDate", startDate);
+  if (endDate) query.append("endDate", endDate);
+  if (type) query.append("type", type);
+  const url = `${API_BASE_URL}/api/v1/coach/me/analytics/report?${query.toString()}`;
+  const response = await fetch(url, { headers: getHeaders() });
+  if (!response.ok) throw new Error("Failed to fetch analytics report");
+  // If we request pdf/csv the API might return a file, attempt to return blob
+  const contentType = response.headers.get("content-type") || "";
+  if (
+    contentType.includes("application/pdf") ||
+    contentType.includes("text/csv")
+  ) {
+    return response.blob();
+  }
+  return response.json();
+}
+
+export async function getBookingNotes(
+  bookingId: string
+): Promise<{ notes: string }> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/bookings/${bookingId}/notes`,
+    {
+      headers: getHeaders(),
+    }
+  );
+  if (!response.ok) throw new Error("Failed to fetch booking notes");
+  return response.json();
+}
+
+export async function updateBookingNotes(
+  bookingId: string,
+  notes: string
+): Promise<{ success: boolean; notes: string }> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/bookings/${bookingId}/notes`,
+    {
+      method: "PUT",
+      headers: getHeaders(),
+      body: JSON.stringify({ notes }),
+    }
+  );
+  if (!response.ok) throw new Error("Failed to update booking notes");
+  return response.json();
+}
+
+export async function getCoachStudents(): Promise<{ data: StudentSummary[] }> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/coach/me/students`, {
+    headers: getHeaders(),
+  });
+  if (!response.ok) throw new Error("Failed to fetch coach students");
+  return response.json();
+}
+
+export async function getCoachStudentById(
+  studentId: string
+): Promise<{ data: StudentDetails }> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/coach/me/students/${studentId}`,
+    {
+      headers: getHeaders(),
+    }
+  );
+  if (!response.ok) throw new Error("Failed to fetch coach student details");
+  return response.json();
+}
+
+export async function getCoachPayouts(): Promise<{ data: Payout[] }> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/coach/me/payouts`, {
+    headers: getHeaders(),
+  });
+  if (!response.ok) throw new Error("Failed to fetch payouts");
+  return response.json();
+}
+
+export async function getCoachBankAccount(): Promise<{ data: BankAccount }> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/coach/me/bank-account`, {
+    headers: getHeaders(),
+  });
+  if (!response.ok) throw new Error("Failed to fetch bank account info");
+  return response.json();
+}
+
+export async function linkCoachBankAccount(): Promise<{
+  onboardingUrl: string;
+}> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/coach/me/bank-account`, {
+    method: "POST",
+    headers: getHeaders(),
+  });
+  if (!response.ok) throw new Error("Failed to initiate bank account linking");
+  return response.json();
+}
+
+export async function getNotifications(): Promise<{ data: Notification[] }> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/notifications`, {
+    headers: getHeaders(),
+  });
+  if (!response.ok) throw new Error("Failed to fetch notifications");
+  return response.json();
+}
+
+export async function markNotificationRead(
+  notificationId: string
+): Promise<{ success: boolean }> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/notifications/${notificationId}/read`,
+    {
+      method: "PUT",
+      headers: getHeaders(),
+    }
+  );
+  if (!response.ok) throw new Error("Failed to mark notification as read");
   return response.json();
 }
 
@@ -89,12 +268,19 @@ export async function getCoachDetails(coachId: string): Promise<Coach> {
 }
 
 // Get coach availability for a specific date (optional - falls back to weekly schedule if not implemented)
-export async function getCoachAvailableSlots(coachId: string, date: string): Promise<{ slots: string[] }> {
+export async function getCoachAvailableSlots(
+  coachId: string,
+  date: string
+): Promise<{ slots: string[] }> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/coach/${coachId}/slots?date=${date}`);
+    const response = await fetch(
+      `${API_BASE_URL}/api/v1/coach/${coachId}/slots?date=${date}`
+    );
     if (!response.ok) {
       // If endpoint doesn't exist, return empty - component will fall back to weekly schedule
-      console.warn("Coach slots endpoint not available, using weekly schedule fallback");
+      console.warn(
+        "Coach slots endpoint not available, using weekly schedule fallback"
+      );
       return { slots: [] };
     }
     return response.json();
@@ -104,7 +290,12 @@ export async function getCoachAvailableSlots(coachId: string, date: string): Pro
   }
 }
 
-export async function bookSession(data: { coachId: string; slot: { start: string; end: string }; topic: string; notes?: string }): Promise<BookingResponse> {
+export async function bookSession(data: {
+  coachId: string;
+  slot: { start: string; end: string };
+  topic: string;
+  notes?: string;
+}): Promise<BookingResponse> {
   const response = await fetch(`${API_BASE_URL}/api/v1/bookings`, {
     method: "POST",
     headers: getHeaders(),
@@ -117,10 +308,15 @@ export async function bookSession(data: { coachId: string; slot: { start: string
 
 // --- User Sessions API ---
 
-export async function getUserSessions(status: 'upcoming' | 'past' | 'all' = 'all'): Promise<{ data: Booking[] }> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/bookings/me?status=${status}`, {
-    headers: getHeaders(),
-  });
+export async function getUserSessions(
+  status: "upcoming" | "past" | "all" = "all"
+): Promise<{ data: Booking[] }> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/bookings/me?status=${status}`,
+    {
+      headers: getHeaders(),
+    }
+  );
 
   if (!response.ok) throw new Error("Failed to fetch user sessions");
   return response.json();
@@ -128,21 +324,32 @@ export async function getUserSessions(status: 'upcoming' | 'past' | 'all' = 'all
 
 // --- Coach Dashboard APIs ---
 
-export async function getCoachSessions(status: 'upcoming' | 'past' | 'all' = 'all'): Promise<{ data: Booking[] }> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/coach/me/sessions?status=${status}`, {
-    headers: getHeaders(),
-  });
+export async function getCoachSessions(
+  status: "upcoming" | "past" | "all" = "all"
+): Promise<{ data: Booking[] }> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/coach/me/sessions?status=${status}`,
+    {
+      headers: getHeaders(),
+    }
+  );
 
   if (!response.ok) throw new Error("Failed to fetch sessions");
   return response.json();
 }
 
-export async function rescheduleSession(bookingId: string, newSlot: { start: string; end: string }): Promise<BookingResponse> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/bookings/${bookingId}/reschedule`, {
-    method: "PUT",
-    headers: getHeaders(),
-    body: JSON.stringify({ newSlot }),
-  });
+export async function rescheduleSession(
+  bookingId: string,
+  newSlot: { start: string; end: string }
+): Promise<BookingResponse> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/bookings/${bookingId}/reschedule`,
+    {
+      method: "PUT",
+      headers: getHeaders(),
+      body: JSON.stringify({ newSlot }),
+    }
+  );
 
   if (!response.ok) throw new Error("Failed to reschedule session");
   return response.json();
@@ -158,7 +365,9 @@ export async function getAvailability(): Promise<Availability> {
   return json.data;
 }
 
-export async function updateAvailability(availability: Availability): Promise<Availability> {
+export async function updateAvailability(
+  availability: Availability
+): Promise<Availability> {
   const response = await fetch(`${API_BASE_URL}/api/v1/coach/me/availability`, {
     method: "PUT",
     headers: getHeaders(),
@@ -181,12 +390,18 @@ export async function updateCoachProfile(data: Partial<Coach>): Promise<Coach> {
   return response.json();
 }
 
-export async function cancelSession(bookingId: string, reason: string): Promise<BookingResponse> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/bookings/${bookingId}/cancel`, {
-    method: "POST",
-    headers: getHeaders(),
-    body: JSON.stringify({ reason }),
-  });
+export async function cancelSession(
+  bookingId: string,
+  reason: string
+): Promise<BookingResponse> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/bookings/${bookingId}/cancel`,
+    {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify({ reason }),
+    }
+  );
 
   if (!response.ok) throw new Error("Failed to cancel session");
   return response.json();
@@ -194,12 +409,18 @@ export async function cancelSession(bookingId: string, reason: string): Promise<
 
 // --- Reviews ---
 
-export async function submitReview(coachId: string, data: { bookingId: string; rating: number; comment: string }): Promise<Review> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/coach/${coachId}/reviews`, {
-    method: "POST",
-    headers: getHeaders(),
-    body: JSON.stringify(data),
-  });
+export async function submitReview(
+  coachId: string,
+  data: { bookingId: string; rating: number; comment: string }
+): Promise<Review> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/coach/${coachId}/reviews`,
+    {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify(data),
+    }
+  );
 
   if (!response.ok) throw new Error("Failed to submit review");
   return response.json();
@@ -207,24 +428,29 @@ export async function submitReview(coachId: string, data: { bookingId: string; r
 
 // --- Admin APIs ---
 
-export async function getAllCoachesAdmin(params: { page?: number; limit?: number; search?: string } = {}): Promise<CoachesResponse> {
+export async function getAllCoachesAdmin(
+  params: { page?: number; limit?: number; search?: string } = {}
+): Promise<CoachesResponse> {
   const query = new URLSearchParams();
   if (params.page) query.append("page", params.page.toString());
   if (params.limit) query.append("limit", params.limit.toString());
   if (params.search) query.append("search", params.search);
 
-  const response = await fetch(`${API_BASE_URL}/authapi/coaches?${query.toString()}`, {
-    headers: getHeaders(),
-  });
+  const response = await fetch(
+    `${API_BASE_URL}/authapi/coaches?${query.toString()}`,
+    {
+      headers: getHeaders(),
+    }
+  );
 
   if (!response.ok) throw new Error("Failed to fetch coaches (admin)");
   return response.json();
 }
 
-export async function inviteCoach(data: { 
-  email: string; 
-  name?: string; 
-  contractStart?: string; 
+export async function inviteCoach(data: {
+  email: string;
+  name?: string;
+  contractStart?: string;
   contractEnd?: string;
 }): Promise<{ message: string; invitationId: string }> {
   const response = await fetch(`${API_BASE_URL}/authapi/invite-coach`, {
@@ -236,7 +462,6 @@ export async function inviteCoach(data: {
   if (!response.ok) throw new Error("Failed to invite coach");
   return response.json();
 }
-
 
 export async function inviteCoachBulk(file: File): Promise<any[]> {
   const formData = new FormData();
@@ -252,7 +477,9 @@ export async function inviteCoachBulk(file: File): Promise<any[]> {
   return response.json();
 }
 
-export async function signupCoachBulk(coaches: { fullName: string; email: string; password?: string }[]): Promise<any[]> {
+export async function signupCoachBulk(
+  coaches: { fullName: string; email: string; password?: string }[]
+): Promise<any[]> {
   const response = await fetch(`${API_BASE_URL}/authapi/signup-coach-bulk`, {
     method: "POST",
     headers: getHeaders(),
@@ -262,7 +489,6 @@ export async function signupCoachBulk(coaches: { fullName: string; email: string
   if (!response.ok) throw new Error("Failed to bulk signup coaches");
   return response.json();
 }
-
 
 // --- Test Function ---
 

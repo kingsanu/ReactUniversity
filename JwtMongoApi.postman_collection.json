@@ -418,22 +418,23 @@
               "name": "Get Google Calendar Auth URL",
               "request": {
                 "method": "GET",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "Bearer {{token}}",
-                    "type": "text"
-                  }
-                ],
+                "header": [],
                 "url": {
-                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/auth/google/url",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/auth/google/url?email={{email}}",
                   "protocol": "https",
                   "host": [
                     "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
-                  "path": ["api", "v1", "auth", "google", "url"]
+                  "path": ["api", "v1", "auth", "google", "url"],
+                  "query": [
+                    {
+                      "key": "email",
+                      "value": "{{email}}",
+                      "description": "User email address (required)"
+                    }
+                  ]
                 },
-                "description": "Get Google Calendar OAuth consent URL for calendar integration."
+                "description": "Get Google Calendar OAuth consent URL for calendar integration. No authentication required. Passes user email as query parameter to identify the user.\n\n**Query Parameters:**\n- email: User's email address (required)\n\n**Returns:**\n- OAuth URL that can be used to redirect user to Google consent screen\n- User ID is encoded in the state parameter for callback identification"
               }
             },
             {
@@ -802,6 +803,327 @@
                   "path": ["api", "v1", "coach", "{{coachId}}", "reviews"]
                 },
                 "description": "Submit a review for a coach after a completed session. Rating must be between 1-5."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Analytics & Reports",
+          "item": [
+            {
+              "name": "Get Analytics",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/me/analytics",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "coach", "me", "analytics"]
+                },
+                "description": "Get coach analytics and performance metrics including total earnings, sessions, average rating, active students, earnings history (12 months), session distribution by topic, and recent activity.\n\n**Returns:**\n- Total earnings (calculated from completed sessions)\n- Total sessions count\n- Average rating from reviews\n- Active students count\n- Earnings history for last 12 months\n- Session distribution by topic\n- Recent activity (bookings and reviews)"
+              }
+            },
+            {
+              "name": "Get Analytics Report",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/me/analytics/report?startDate=2024-01-01&endDate=2024-12-31&type=csv",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "coach", "me", "analytics", "report"],
+                  "query": [
+                    {
+                      "key": "startDate",
+                      "value": "2024-01-01",
+                      "description": "Start date for report (YYYY-MM-DD)"
+                    },
+                    {
+                      "key": "endDate",
+                      "value": "2024-12-31",
+                      "description": "End date for report (YYYY-MM-DD)"
+                    },
+                    {
+                      "key": "type",
+                      "value": "csv",
+                      "description": "Report format: 'csv' or 'pdf' (default: 'csv')"
+                    }
+                  ]
+                },
+                "description": "Generate and download analytics report as CSV or PDF. Returns a downloadable file with session details, earnings, and performance metrics.\n\n**Query Parameters:**\n- startDate: Start date for report period (optional, defaults to 1 month ago)\n- endDate: End date for report period (optional, defaults to now)\n- type: Report format - 'csv' or 'pdf' (default: 'csv')\n\n**Note:** PDF generation not yet implemented, use type=csv"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Session Notes Management",
+          "item": [
+            {
+              "name": "Get Booking Notes",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/bookings/{{bookingId}}/notes",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "bookings", "{{bookingId}}", "notes"]
+                },
+                "description": "Get notes for a specific booking/session. Returns both student notes (pre-session) and coach notes (post-session). Accessible by both coach and student."
+              }
+            },
+            {
+              "name": "Update Booking Notes",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"notes\": \"Student showed great progress in understanding career goals. Recommended focusing on networking skills.\"\n}"
+                },
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/bookings/{{bookingId}}/notes",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "bookings", "{{bookingId}}", "notes"]
+                },
+                "description": "Update coach notes for a booking/session. Only the coach who owns the session can update coach notes. Student notes are set during booking creation."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Student Management",
+          "item": [
+            {
+              "name": "Get My Students",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/me/students",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "coach", "me", "students"]
+                },
+                "description": "Get list of all students who have booked sessions with this coach. Returns student information including total sessions, completed sessions, last session date, and average rating.\n\n**Returns:**\n- List of students with their session statistics\n- Total count of students\n- Each student includes: studentId, name, email, totalSessions, completedSessions, lastSessionDate, averageRating"
+              }
+            },
+            {
+              "name": "Get Student Details",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/me/students/{{studentId}}",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "coach", "me", "students", "{{studentId}}"]
+                },
+                "description": "Get detailed view of a specific student including all sessions with this coach, coach notes, and reviews.\n\n**Returns:**\n- Student information\n- Session statistics (total, completed, first/last session dates)\n- Average rating from this student\n- Complete list of all sessions with this coach including coach notes and reviews"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Payouts & Banking",
+          "item": [
+            {
+              "name": "Get Payouts",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/me/payouts",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "coach", "me", "payouts"]
+                },
+                "description": "Get payout history for the coach. Returns all payouts with their status, amounts, and transaction details.\n\n**Returns:**\n- List of payouts (pending, processing, completed, failed)\n- Total payouts amount\n- Pending payouts amount\n- Each payout includes: id, amount, currency, status, requestedAt, processedAt, transactionId, notes"
+              }
+            },
+            {
+              "name": "Get Bank Account",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/me/bank-account",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "coach", "me", "bank-account"]
+                },
+                "description": "Get bank account information and connection status. Returns whether bank account is connected, account details (last 4 digits), and Stripe onboarding link if needed.\n\n**Returns:**\n- IsConnected: Whether bank account is linked\n- AccountType: Type of account (checking/savings)\n- Last4: Last 4 digits of account\n- BankName: Name of bank\n- AccountHolderName: Name on account\n- OnboardingLink: Stripe Connect onboarding URL (if needed)\n- RequiresOnboarding: Whether Stripe onboarding is required"
+              }
+            },
+            {
+              "name": "Link Bank Account",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"accountNumber\": \"1234567890\",\n  \"routingNumber\": \"110000000\",\n  \"accountHolderName\": \"John Doe\",\n  \"bankName\": \"Example Bank\",\n  \"accountType\": \"checking\",\n  \"provider\": \"stripe\"\n}"
+                },
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/me/bank-account",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "coach", "me", "bank-account"]
+                },
+                "description": "Link or update bank account for payouts. Supports both Stripe Connect (recommended) and manual entry.\n\n**Request Body:**\n- accountNumber: Bank account number (optional for Stripe)\n- routingNumber: Bank routing number (optional for Stripe)\n- accountHolderName: Name on account\n- bankName: Name of bank\n- accountType: 'checking' or 'savings'\n- provider: 'stripe' (default) or 'manual'\n\n**Note:** For Stripe Connect, an onboarding link will be generated. For manual entry, account will be marked as connected immediately."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Notifications",
+          "item": [
+            {
+              "name": "Get Notifications",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/notifications",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "notifications"]
+                },
+                "description": "Get all notifications for the authenticated user. Returns notifications sorted by most recent first.\n\n**Returns:**\n- List of notifications\n- Total count\n- Unread count\n- Each notification includes: id, type, title, message, isRead, createdAt, relatedEntityId, relatedEntityType"
+              }
+            },
+            {
+              "name": "Mark Notification as Read",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/notifications/{{notificationId}}/read",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "notifications", "{{notificationId}}", "read"]
+                },
+                "description": "Mark a specific notification as read. Updates the notification's read status and records the read timestamp."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin/Management",
+          "item": [
+            {
+              "name": "Get Users Without Coach Profile",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/users-without-profile",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "coach", "users-without-profile"]
+                },
+                "description": "Get list of users who have the COACH role but don't have a corresponding Coach entity/profile. This endpoint helps identify users who need to complete their coach profile setup.\n\n**Returns:**\n- List of users with COACH role who haven't created a Coach profile\n- Each user includes: userId, name, email, roleId, roleName, createdDate, updatedAt, isActive\n- Total count of users without profiles\n\n**Use Cases:**\n- Identify coaches who need to complete onboarding\n- Admin dashboard for tracking incomplete profiles\n- Data synchronization verification\n- Onboarding status monitoring"
               }
             }
           ]

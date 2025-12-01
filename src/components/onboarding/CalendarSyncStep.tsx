@@ -6,21 +6,103 @@ import { cn } from "@/lib/utils";
 
 interface CalendarSyncStepProps {
   data: CoachOnboardingData["calendarIntegrations"];
+  email: string;
   onNext: (data: CoachOnboardingData["calendarIntegrations"]) => void;
   onBack: () => void;
 }
 
-export function CalendarSyncStep({ data, onNext, onBack }: CalendarSyncStepProps) {
+export function CalendarSyncStep({
+  data,
+  email,
+  onNext,
+  onBack,
+}: CalendarSyncStepProps) {
   const [integrations, setIntegrations] = React.useState(data);
 
   const handleConnect = async (provider: "google" | "outlook") => {
     try {
       const { getCalendarAuthUrl } = await import("@/services/coachService");
-      const { url } = await getCalendarAuthUrl(provider);
+      const { url } = await getCalendarAuthUrl(provider, email);
+      console.log(`Calendar auth URL for ${provider}:`, url);
+      // Parse and inspect redirect_uri param if present
+      try {
+        const parsed = new URL(url);
+        const redirectUriEncoded = parsed.searchParams.get("redirect_uri");
+        if (redirectUriEncoded) {
+          const redirectUri = decodeURIComponent(redirectUriEncoded);
+          console.log(`OAuth redirect_uri decoded:`, redirectUri);
+          try {
+            const parsedRedirect = new URL(redirectUri);
+            console.log(
+              `OAuth redirect_uri host:`,
+              parsedRedirect.hostname,
+              `path:`,
+              parsedRedirect.pathname
+            );
+            if (
+              parsedRedirect.pathname.includes("/onboarding/coach/undefined")
+            ) {
+              console.warn(
+                "Redirect URI contains onboarding/coach/undefined - likely backend missing coach id in state"
+              );
+            }
+          } catch (_e) {
+            // ignore parse errors
+          }
+        }
+      } catch (_e) {
+        // ignore parse errors for log
+      }
+
+      // Validate that we got a proper external OAuth URL
+      if (!url || !url.startsWith("http")) {
+        throw new Error(`Invalid auth URL received: ${url}`);
+      }
+
+      // Check if it's redirecting back to our app (indicates API issue)
+      try {
+        const parsed = new URL(url);
+        const hostname = parsed.hostname || "";
+        const currentHost = window.location.hostname;
+        // Block only if the top-level host is the same as our app (internal redirect), not if our domain appears inside redirect_uri query param
+        if (
+          hostname === currentHost ||
+          url.includes("onboarding/coach/undefined")
+        ) {
+          console.error(
+            `API returned internal redirect URL instead of OAuth URL:`,
+            url
+          );
+          alert(
+            `Calendar integration is not available yet. The API returned: ${url}`
+          );
+          return;
+        }
+      } catch (err) {
+        console.warn(
+          "Failed to parse URL from API, continuing with validation (may be invalid):",
+          err
+        );
+      }
+
+      // Additional check for common OAuth providers
+      const isOAuthUrl =
+        url.includes("google.com") ||
+        url.includes("microsoft.com") ||
+        url.includes("accounts.google.com") ||
+        url.includes("login.microsoftonline.com");
+      if (!isOAuthUrl) {
+        console.warn(`URL doesn't appear to be an OAuth URL:`, url);
+        alert(`Unexpected redirect URL received. Please contact support.`);
+        return;
+      }
+
       // Redirect to auth URL
       window.location.href = url;
     } catch (error) {
       console.error(`Failed to get ${provider} auth URL:`, error);
+      const message = (error && (error as any).message) || String(error);
+      alert(`Failed to connect calendar: ${message}`);
       // Fallback for demo/testing if API fails or is not implemented
       setIntegrations((prev) => ({
         ...prev,
@@ -40,21 +122,24 @@ export function CalendarSyncStep({ data, onNext, onBack }: CalendarSyncStepProps
           <ShieldCheck className="h-5 w-5" />
         </div>
         <div>
-          <h3 className="text-green-900 font-semibold">Why connect your calendar?</h3>
+          <h3 className="text-green-900 font-semibold">
+            Why connect your calendar?
+          </h3>
           <p className="text-sm text-green-700/80 mt-1">
-            We'll automatically check for conflicts so you never get double-booked. 
-            We only access your free/busy status, not your event details.
+            We'll automatically check for conflicts so you never get
+            double-booked. We only access your free/busy status, not your event
+            details.
           </p>
         </div>
       </div>
 
       <div className="grid gap-4">
         {/* Google Calendar */}
-        <div 
+        <div
           className={cn(
             "relative group p-6 border rounded-2xl transition-all duration-300 flex items-center justify-between",
-            integrations.google 
-              ? "border-blue-200 bg-blue-50/30 shadow-sm" 
+            integrations.google
+              ? "border-blue-200 bg-blue-50/30 shadow-sm"
               : "border-gray-200 hover:border-gray-300 hover:shadow-md bg-white"
           )}
         >
@@ -64,8 +149,12 @@ export function CalendarSyncStep({ data, onNext, onBack }: CalendarSyncStepProps
               <span className="font-bold text-blue-600 text-xl">G</span>
             </div>
             <div>
-              <h4 className="font-bold text-gray-900 text-lg">Google Calendar</h4>
-              <p className="text-sm text-gray-500">Connect your Gmail or G Suite calendar</p>
+              <h4 className="font-bold text-gray-900 text-lg">
+                Google Calendar
+              </h4>
+              <p className="text-sm text-gray-500">
+                Connect your Gmail or G Suite calendar
+              </p>
             </div>
           </div>
           <Button
@@ -74,8 +163,8 @@ export function CalendarSyncStep({ data, onNext, onBack }: CalendarSyncStepProps
             onClick={() => handleConnect("google")}
             className={cn(
               "min-w-[120px] transition-all",
-              integrations.google 
-                ? "border-blue-200 text-blue-700 hover:bg-blue-100 hover:text-blue-800 bg-blue-50" 
+              integrations.google
+                ? "border-blue-200 text-blue-700 hover:bg-blue-100 hover:text-blue-800 bg-blue-50"
                 : "bg-black text-white hover:bg-gray-800"
             )}
           >
@@ -90,11 +179,11 @@ export function CalendarSyncStep({ data, onNext, onBack }: CalendarSyncStepProps
         </div>
 
         {/* Outlook Calendar */}
-        <div 
+        <div
           className={cn(
             "relative group p-6 border rounded-2xl transition-all duration-300 flex items-center justify-between",
-            integrations.outlook 
-              ? "border-blue-200 bg-blue-50/30 shadow-sm" 
+            integrations.outlook
+              ? "border-blue-200 bg-blue-50/30 shadow-sm"
               : "border-gray-200 hover:border-gray-300 hover:shadow-md bg-white"
           )}
         >
@@ -103,8 +192,12 @@ export function CalendarSyncStep({ data, onNext, onBack }: CalendarSyncStepProps
               <Mail className="h-6 w-6 text-blue-500" />
             </div>
             <div>
-              <h4 className="font-bold text-gray-900 text-lg">Outlook Calendar</h4>
-              <p className="text-sm text-gray-500">Connect Office 365 or Exchange</p>
+              <h4 className="font-bold text-gray-900 text-lg">
+                Outlook Calendar
+              </h4>
+              <p className="text-sm text-gray-500">
+                Connect Office 365 or Exchange
+              </p>
             </div>
           </div>
           <Button
@@ -113,8 +206,8 @@ export function CalendarSyncStep({ data, onNext, onBack }: CalendarSyncStepProps
             onClick={() => handleConnect("outlook")}
             className={cn(
               "min-w-[120px] transition-all",
-              integrations.outlook 
-                ? "border-blue-200 text-blue-700 hover:bg-blue-100 hover:text-blue-800 bg-blue-50" 
+              integrations.outlook
+                ? "border-blue-200 text-blue-700 hover:bg-blue-100 hover:text-blue-800 bg-blue-50"
                 : "bg-black text-white hover:bg-gray-800"
             )}
           >
@@ -130,11 +223,15 @@ export function CalendarSyncStep({ data, onNext, onBack }: CalendarSyncStepProps
       </div>
 
       <div className="flex justify-between pt-8 border-t border-gray-100">
-        <Button variant="ghost" onClick={onBack} className="text-gray-500 hover:text-gray-900">
+        <Button
+          variant="ghost"
+          onClick={onBack}
+          className="text-gray-500 hover:text-gray-900"
+        >
           Back
         </Button>
-        <Button 
-          onClick={handleSubmit} 
+        <Button
+          onClick={handleSubmit}
           className="bg-black text-white hover:bg-gray-800 px-8 h-12 text-base shadow-lg shadow-black/10 hover:shadow-xl hover:-translate-y-0.5 transition-all"
         >
           Complete Setup <ArrowRight className="ml-2 h-4 w-4" />

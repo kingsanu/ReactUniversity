@@ -10,13 +10,11 @@ import {
   Search, 
   Filter,
   User,
-  FileText,
-  CheckCircle,
-  XCircle,
-  AlertCircle
+  FileText
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -46,10 +44,13 @@ export default function SessionsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+  const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<string>("upcoming");
   
   // State for Notes Dialog
   const [isNotesOpen, setIsNotesOpen] = useState(false);
   const [selectedSession, setSelectedSession] = useState<any>(null);
+  const [isConfirmCancelOpen, setIsConfirmCancelOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -138,13 +139,42 @@ export default function SessionsPage() {
     
     if (!matchesSearch) return false;
 
-    if (activeTab === "all") return true;
+    if (activeTab === "all") {
+      // also apply statusFilter if provided
+      if (statusFilter) return session.status === statusFilter;
+      return true;
+    }
     if (activeTab === "upcoming") return session.status === "confirmed" || session.status === "rescheduled";
     if (activeTab === "past") return session.status === "completed";
     if (activeTab === "cancelled") return session.status === "cancelled";
     
     return true;
   });
+
+  // Sorting
+  const sortedSessions = filteredSessions.slice().sort((a, b) => {
+    if (sortBy === 'newest') return (new Date(b.startTime || b.slot?.start || 0).getTime() || 0) - (new Date(a.startTime || a.slot?.start || 0).getTime() || 0);
+    if (sortBy === 'oldest') return (new Date(a.startTime || a.slot?.start || 0).getTime() || 0) - (new Date(b.startTime || b.slot?.start || 0).getTime() || 0);
+    // default upcoming: put confirmed/rescheduled first then by date
+    const aPriority = a.status === 'confirmed' || a.status === 'rescheduled' ? 0 : 1;
+    const bPriority = b.status === 'confirmed' || b.status === 'rescheduled' ? 0 : 1;
+    if (aPriority !== bPriority) return aPriority - bPriority;
+    return (new Date(a.startTime || a.slot?.start || 0).getTime() || 0) - (new Date(b.startTime || b.slot?.start || 0).getTime() || 0);
+  });
+
+  const groupedSessions: Record<string, any[]> = sortedSessions.reduce((acc, s) => {
+    const key = s?.date || 'TBD';
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(s);
+    return acc;
+  }, {} as Record<string, any[]>);
+
+  const counts = {
+    all: sessions.length,
+    upcoming: sessions.filter(s => s.status === 'confirmed' || s.status === 'rescheduled').length,
+    past: sessions.filter(s => s.status === 'completed').length,
+    cancelled: sessions.filter(s => s.status === 'cancelled').length,
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -187,17 +217,70 @@ export default function SessionsPage() {
         </Button>
       </div>
 
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card className="border-none shadow-sm">
+          <CardContent>
+            <div className="text-sm text-muted-foreground">Total</div>
+            <div className="text-2xl font-bold">{sessions.length}</div>
+          </CardContent>
+        </Card>
+        <Card className="border-none shadow-sm">
+          <CardContent>
+            <div className="text-sm text-muted-foreground">Upcoming</div>
+            <div className="text-2xl font-bold">{sessions.filter(s => s.status === 'confirmed' || s.status === 'rescheduled').length}</div>
+          </CardContent>
+        </Card>
+        <Card className="border-none shadow-sm">
+          <CardContent>
+            <div className="text-sm text-muted-foreground">Past</div>
+            <div className="text-2xl font-bold">{sessions.filter(s => s.status === 'completed').length}</div>
+          </CardContent>
+        </Card>
+        <Card className="border-none shadow-sm">
+          <CardContent>
+            <div className="text-sm text-muted-foreground">Cancelled</div>
+            <div className="text-2xl font-bold">{sessions.filter(s => s.status === 'cancelled').length}</div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Filters and Search */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-lg border shadow-sm">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto">
           <TabsList>
-            <TabsTrigger value="all">All Sessions</TabsTrigger>
-            <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-            <TabsTrigger value="past">Past</TabsTrigger>
-            <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
+            <TabsTrigger value="all">All Sessions <span className="text-sm text-muted-foreground ml-2">({counts.all})</span></TabsTrigger>
+            <TabsTrigger value="upcoming">Upcoming <span className="text-sm text-muted-foreground ml-2">({counts.upcoming})</span></TabsTrigger>
+            <TabsTrigger value="past">Past <span className="text-sm text-muted-foreground ml-2">({counts.past})</span></TabsTrigger>
+            <TabsTrigger value="cancelled">Cancelled <span className="text-sm text-muted-foreground ml-2">({counts.cancelled})</span></TabsTrigger>
           </TabsList>
         </Tabs>
 
+        <div className="flex gap-2 items-center">
+          <Select value={statusFilter || ''} onValueChange={(v) => setStatusFilter(v || null)}>
+            <SelectTrigger className="w-[200px] bg-white">
+              <Filter className="mr-2 h-4 w-4 text-gray-500" />
+              <SelectValue placeholder="All statuses" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">All statuses</SelectItem>
+              <SelectItem value="confirmed">Upcoming</SelectItem>
+              <SelectItem value="rescheduled">Rescheduled</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="w-[180px] bg-white">
+              <SelectValue placeholder="Sort" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="upcoming">Upcoming</SelectItem>
+              <SelectItem value="newest">Newest</SelectItem>
+              <SelectItem value="oldest">Oldest</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         <div className="relative w-full md:w-72">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input 
@@ -211,12 +294,13 @@ export default function SessionsPage() {
 
       {/* Sessions List */}
       <div className="space-y-4">
-        {isLoading ? (
+        {isLoading && (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
             <p className="mt-4 text-gray-500">Loading sessions...</p>
           </div>
-        ) : filteredSessions.length === 0 ? (
+        )}
+        {!isLoading && sortedSessions.length === 0 && (
           <div className="text-center py-16 bg-white rounded-lg border border-dashed">
             <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900">No sessions found</h3>
@@ -224,9 +308,15 @@ export default function SessionsPage() {
               {searchQuery ? "Try adjusting your search terms" : "You don't have any sessions in this category"}
             </p>
           </div>
-        ) : (
-          filteredSessions.map((session) => (
-            <Card key={session.id} className="hover:shadow-md transition-shadow">
+        )}
+        {!isLoading && sortedSessions.length > 0 && (
+          <>
+            {Object.entries(groupedSessions).map(([dateKey, daySessions]: [string, any[]]) => {
+              return (
+              <div key={dateKey} className="space-y-2">
+                <div className="text-sm text-muted-foreground font-medium">{dateKey}</div>
+                {daySessions.map((session: any) => (
+                  <Card key={session.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row justify-between gap-6">
                   {/* Left: Student & Topic */}
@@ -237,11 +327,17 @@ export default function SessionsPage() {
                         {session.studentName?.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
-                    <div>
-                      <h3 className="font-semibold text-lg text-gray-900">{session.topic}</h3>
+                    <div className="cursor-pointer" onClick={() => handleViewProfile(session.studentId)} role="button" aria-label="View student profile">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-semibold text-lg text-gray-900">{session.topic}</h3>
+                        <Badge className="text-xs bg-muted/50 text-gray-700">{session.topic}</Badge>
+                      </div>
                       <div className="flex items-center gap-2 text-gray-500 mt-1">
                         <User className="h-3.5 w-3.5" />
-                        <span className="text-sm">{session.studentName}</span>
+                        <span className="inline-flex items-center gap-2 text-sm">
+                          <span className={`h-2 w-2 rounded-full ${session.status === 'cancelled' ? 'bg-red-500' : session.status === 'completed' ? 'bg-green-500' : 'bg-blue-500'}`} />
+                          {session.studentName}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -290,18 +386,37 @@ export default function SessionsPage() {
                             <DropdownMenuItem className="text-orange-600">
                               Reschedule
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-600">
+                            <DropdownMenuItem
+                              className="text-red-600"
+                              onClick={() => {
+                                setSelectedSession(session);
+                                setIsConfirmCancelOpen(true);
+                              }}
+                            >
                               Cancel Session
                             </DropdownMenuItem>
                           </>
                         )}
                       </DropdownMenuContent>
                     </DropdownMenu>
+                    {/* Quick actions shown on hover */}
+                    {session.status === 'confirmed' && (
+                      <Button variant="ghost" size="icon" onClick={() => setSelectedSession(session)} title="Reschedule">
+                        <Calendar className="h-4 w-4" />
+                      </Button>
+                    )}
+                    {session.amount && (
+                      <div className="ml-2 text-sm font-medium text-gray-900">{typeof session.amount === 'number' ? `$${session.amount}` : session.amount}</div>
+                    )}
                   </div>
                 </div>
               </CardContent>
             </Card>
-          ))
+                ))}
+              </div>
+              )
+            })}
+          </>
         )}
       </div>
 
@@ -321,6 +436,26 @@ export default function SessionsPage() {
           </div>
           <DialogFooter>
             <Button onClick={() => setIsNotesOpen(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Cancel Confirmation Dialog */}
+      <Dialog open={isConfirmCancelOpen} onOpenChange={setIsConfirmCancelOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cancel Session</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to cancel this session with {selectedSession?.studentName}? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setIsConfirmCancelOpen(false)}>No, keep session</Button>
+            <Button className="bg-red-600 text-white" onClick={() => {
+              // Placeholder cancel flow
+              toast.success('Session cancelled');
+              setIsConfirmCancelOpen(false);
+            }}>Yes, cancel</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

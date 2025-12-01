@@ -8,7 +8,15 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { CoachOnboardingData } from "./types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Upload, User, Briefcase, MapPin, Globe, Tag, DollarSign } from "lucide-react";
+import {
+  Upload,
+  User,
+  Briefcase,
+  MapPin,
+  Globe,
+  Tag,
+  DollarSign,
+} from "lucide-react";
 
 const personalInfoSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -28,7 +36,9 @@ interface PersonalInfoStepProps {
 }
 
 export function PersonalInfoStep({ data, onNext }: PersonalInfoStepProps) {
-  const [imagePreview, setImagePreview] = React.useState<string | null>(data.image);
+  const [imagePreview, setImagePreview] = React.useState<string | null>(
+    data.image
+  );
 
   const {
     register,
@@ -101,48 +111,62 @@ export function PersonalInfoStep({ data, onNext }: PersonalInfoStepProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="name" className="text-gray-700 font-medium">Full Name</Label>
+          <Label htmlFor="name" className="text-gray-700 font-medium">
+            Full Name
+          </Label>
           <div className="relative">
             <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input 
-              id="name" 
-              {...register("name")} 
-              className="pl-9 bg-gray-50/30 border-gray-200 focus:bg-white transition-all h-11" 
-              placeholder="e.g. Sarah Wilson" 
+            <Input
+              id="name"
+              {...register("name")}
+              className="pl-9 bg-gray-50/30 border-gray-200 focus:bg-white transition-all h-11"
+              placeholder="e.g. Sarah Wilson"
             />
           </div>
-          {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
+          {errors.name && (
+            <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
+          )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="title" className="text-gray-700 font-medium">Job Title</Label>
+          <Label htmlFor="title" className="text-gray-700 font-medium">
+            Job Title
+          </Label>
           <div className="relative">
             <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input 
-              id="title" 
-              {...register("title")} 
-              className="pl-9 bg-gray-50/30 border-gray-200 focus:bg-white transition-all h-11" 
-              placeholder="e.g. Senior Career Coach" 
+            <Input
+              id="title"
+              {...register("title")}
+              className="pl-9 bg-gray-50/30 border-gray-200 focus:bg-white transition-all h-11"
+              placeholder="e.g. Senior Career Coach"
             />
           </div>
-          {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title.message}</p>}
+          {errors.title && (
+            <p className="text-red-500 text-xs mt-1">{errors.title.message}</p>
+          )}
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="bio" className="text-gray-700 font-medium">Bio</Label>
+        <Label htmlFor="bio" className="text-gray-700 font-medium">
+          Bio
+        </Label>
         <Textarea
           id="bio"
           {...register("bio")}
           placeholder="Tell us about your experience and coaching style..."
           className="min-h-[120px] bg-gray-50/30 border-gray-200 focus:bg-white transition-all resize-none p-4"
         />
-        {errors.bio && <p className="text-red-500 text-xs mt-1">{errors.bio.message}</p>}
+        {errors.bio && (
+          <p className="text-red-500 text-xs mt-1">{errors.bio.message}</p>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="specialization" className="text-gray-700 font-medium">Primary Specialization</Label>
+          <Label htmlFor="specialization" className="text-gray-700 font-medium">
+            Primary Specialization
+          </Label>
           <div className="relative">
             <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
@@ -153,28 +177,38 @@ export function PersonalInfoStep({ data, onNext }: PersonalInfoStepProps) {
             />
           </div>
           {errors.specialization && (
-            <p className="text-red-500 text-xs mt-1">{errors.specialization.message}</p>
+            <p className="text-red-500 text-xs mt-1">
+              {errors.specialization.message}
+            </p>
           )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="location" className="text-gray-700 font-medium">Location</Label>
+          <Label htmlFor="location" className="text-gray-700 font-medium">
+            Location
+          </Label>
           <div className="relative">
             <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input 
-              id="location" 
-              {...register("location")} 
-              className="pl-9 bg-gray-50/30 border-gray-200 focus:bg-white transition-all h-11" 
-              placeholder="e.g. San Francisco, CA" 
+            <Input
+              id="location"
+              {...register("location")}
+              className="pl-9 bg-gray-50/30 border-gray-200 focus:bg-white transition-all h-11"
+              placeholder="e.g. San Francisco, CA"
             />
           </div>
-          {errors.location && <p className="text-red-500 text-xs mt-1">{errors.location.message}</p>}
+          {errors.location && (
+            <p className="text-red-500 text-xs mt-1">
+              {errors.location.message}
+            </p>
+          )}
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="languages" className="text-gray-700 font-medium">Languages</Label>
+          <Label htmlFor="languages" className="text-gray-700 font-medium">
+            Languages
+          </Label>
           <div className="relative">
             <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
@@ -184,12 +218,18 @@ export function PersonalInfoStep({ data, onNext }: PersonalInfoStepProps) {
               placeholder="e.g. English, Spanish"
             />
           </div>
-          {errors.languages && <p className="text-red-500 text-xs mt-1">{errors.languages.message}</p>}
+          {errors.languages && (
+            <p className="text-red-500 text-xs mt-1">
+              {errors.languages.message}
+            </p>
+          )}
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="tags" className="text-gray-700 font-medium">Skills / Tags</Label>
+        <Label htmlFor="tags" className="text-gray-700 font-medium">
+          Skills / Tags
+        </Label>
         <div className="relative">
           <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
@@ -199,10 +239,15 @@ export function PersonalInfoStep({ data, onNext }: PersonalInfoStepProps) {
             placeholder="e.g. Leadership, Management, Public Speaking"
           />
         </div>
-        {errors.tags && <p className="text-red-500 text-xs mt-1">{errors.tags.message}</p>}
+        {errors.tags && (
+          <p className="text-red-500 text-xs mt-1">{errors.tags.message}</p>
+        )}
       </div>
 
-      <Button type="submit" className="w-full bg-black text-white hover:bg-gray-800 h-12 text-base font-medium rounded-lg shadow-lg shadow-black/10 transition-all hover:shadow-xl hover:-translate-y-0.5">
+      <Button
+        type="submit"
+        className="w-full bg-black text-white hover:bg-gray-800 h-12 text-base font-medium rounded-lg shadow-lg shadow-black/10 transition-all hover:shadow-xl hover:-translate-y-0.5"
+      >
         Continue to Availability
       </Button>
     </form>

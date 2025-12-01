@@ -1,16 +1,39 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { DollarSign, Info } from "lucide-react";
 import { toast } from "sonner";
 import { useGlobalStore } from "@/store/useGlobalStore";
 
-export function PricingSettingsTab() {
+interface PricingSettingsTabProps {
+  coachDetails?: any | null;
+  isLoading?: boolean;
+  onUpdated?: (newData: any) => void;
+}
+
+export function PricingSettingsTab({
+  coachDetails,
+  isLoading: isParentLoading,
+  onUpdated,
+}: PricingSettingsTabProps) {
   const { user, platformFee, fetchSettings } = useGlobalStore();
   const [hourlyRate, setHourlyRate] = useState<number>(0);
   const currency = "USD";
@@ -23,6 +46,12 @@ export function PricingSettingsTab() {
   }, [fetchSettings]);
 
   useEffect(() => {
+    if (coachDetails) {
+      setHourlyRate(coachDetails.hourlyRate || 0);
+      setIsLoading(false);
+      return;
+    }
+
     const fetchPricing = async () => {
       try {
         setIsLoading(true);
@@ -31,6 +60,7 @@ export function PricingSettingsTab() {
           const data = await getCoachDetails(user.id);
           if (data) {
             setHourlyRate(data.hourlyRate || 0);
+            if (onUpdated) onUpdated(data);
           }
         }
       } catch (error) {
@@ -43,18 +73,29 @@ export function PricingSettingsTab() {
     if (user?.id) {
       fetchPricing();
     }
-  }, [user?.id]);
+  }, [user?.id, coachDetails]);
 
   const handleSave = async () => {
     try {
       setIsSaving(true);
       const { updateCoachProfile } = await import("@/services/coachService");
-      
-      await updateCoachProfile({
+      const updatedResponse = await updateCoachProfile({
         hourlyRate,
-        currency
+        currency,
       });
-      
+      // If update returned an updated coach details, notify parent; otherwise re-fetch
+      try {
+        if (updatedResponse && typeof updatedResponse === "object") {
+          if (onUpdated) onUpdated(updatedResponse?.data || updatedResponse);
+        } else if (user?.id) {
+          const { getCoachDetails } = await import("@/services/coachService");
+          const reloaded = await getCoachDetails(user.id);
+          if (reloaded && onUpdated) onUpdated(reloaded);
+        }
+      } catch (e) {
+        // swallow: best-effort refresh
+        console.warn("Failed to refresh coach details after save", e);
+      }
       toast.success("Pricing updated successfully");
     } catch (error) {
       console.error("Failed to update pricing:", error);
@@ -68,7 +109,7 @@ export function PricingSettingsTab() {
   const feeAmount = (hourlyRate * platformFee) / 100;
   const yourEarnings = hourlyRate - feeAmount;
 
-  if (isLoading) {
+  if (isParentLoading || isLoading) {
     return <div className="p-8 text-center">Loading pricing...</div>;
   }
 
@@ -129,26 +170,30 @@ export function PricingSettingsTab() {
             <div className="p-3 bg-white rounded border">
               <p className="text-xs text-muted-foreground mb-1">Client Pays</p>
               <p className="font-semibold text-gray-900">
-                {currency === 'USD' ? '$' : currency} {hourlyRate.toFixed(2)}
+                {currency === "USD" ? "$" : currency} {hourlyRate.toFixed(2)}
               </p>
             </div>
             <div className="p-3 bg-white rounded border">
               <p className="text-xs text-muted-foreground mb-1">Platform Fee</p>
               <p className="font-semibold text-red-600">
-                - {currency === 'USD' ? '$' : currency} {feeAmount.toFixed(2)}
+                - {currency === "USD" ? "$" : currency} {feeAmount.toFixed(2)}
               </p>
             </div>
             <div className="p-3 bg-green-50 rounded border border-green-100">
               <p className="text-xs text-green-700 mb-1">You Earn</p>
               <p className="font-bold text-green-700">
-                {currency === 'USD' ? '$' : currency} {yourEarnings.toFixed(2)}
+                {currency === "USD" ? "$" : currency} {yourEarnings.toFixed(2)}
               </p>
             </div>
           </div>
         </div>
       </CardContent>
       <CardFooter className="flex justify-end border-t pt-6">
-        <Button onClick={handleSave} disabled={isSaving} className="bg-black text-white hover:bg-gray-800">
+        <Button
+          onClick={handleSave}
+          disabled={isSaving}
+          className="bg-black text-white hover:bg-gray-800"
+        >
           {isSaving ? "Saving..." : "Save Changes"}
         </Button>
       </CardFooter>

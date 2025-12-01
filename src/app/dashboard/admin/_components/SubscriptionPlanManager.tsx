@@ -556,7 +556,6 @@ export function SubscriptionPlanManager() {
                 ))}
               </ul>
             </div>
-
           </motion.div>
         ))}
       </div>

@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -15,14 +21,30 @@ import {
 import { Loader2, Download, FileText } from "lucide-react";
 import { toast } from "sonner";
 
-export function BillingSettingsTab() {
+interface BillingSettingsTabProps {
+  billingCurrent?: any | null;
+  billingHistory?: any[] | null;
+  isLoading?: boolean;
+}
+
+export function BillingSettingsTab({
+  billingCurrent,
+  billingHistory: billingHistoryProp,
+  isLoading: parentLoading,
+}: BillingSettingsTabProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [currentPeriod, setCurrentPeriod] = useState<any>(null);
   const [billingHistory, setBillingHistory] = useState<any[]>([]);
 
   useEffect(() => {
+    if (billingCurrent || billingHistoryProp) {
+      setCurrentPeriod(billingCurrent || null);
+      setBillingHistory(billingHistoryProp || []);
+      setIsLoading(false);
+      return;
+    }
     fetchBillingData();
-  }, []);
+  }, [billingCurrent, billingHistoryProp]);
 
   const fetchBillingData = async () => {
     try {
@@ -34,8 +56,8 @@ export function BillingSettingsTab() {
       setCurrentPeriod({
         period: "Nov 1 - Nov 30, 2024",
         totalBookings: 24,
-        totalRevenue: 2400.00,
-        platformFeeAmount: 360.00,
+        totalRevenue: 2400.0,
+        platformFeeAmount: 360.0,
         status: "pending",
         dueDate: "Dec 5, 2024",
       });
@@ -69,7 +91,7 @@ export function BillingSettingsTab() {
     }
   };
 
-  if (isLoading) {
+  if (parentLoading || isLoading) {
     return (
       <Card>
         <CardContent className="flex items-center justify-center py-12">
@@ -94,22 +116,32 @@ export function BillingSettingsTab() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">Total Bookings</p>
-                <p className="text-2xl font-bold">{currentPeriod?.totalBookings}</p>
+                <p className="text-2xl font-bold">
+                  {currentPeriod?.totalBookings}
+                </p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">Total Revenue</p>
-                <p className="text-2xl font-bold">${currentPeriod?.totalRevenue.toFixed(2)}</p>
+                <p className="text-2xl font-bold">
+                  ${currentPeriod?.totalRevenue.toFixed(2)}
+                </p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Platform Fee (15%)</p>
+                <p className="text-sm text-muted-foreground">
+                  Platform Fee (15%)
+                </p>
                 <p className="text-2xl font-bold text-red-600">
                   ${currentPeriod?.platformFeeAmount.toFixed(2)}
                 </p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">Status</p>
-                <Badge className={getStatusColor(currentPeriod?.status)} variant="secondary">
-                  {currentPeriod?.status.charAt(0).toUpperCase() + currentPeriod?.status.slice(1)}
+                <Badge
+                  className={getStatusColor(currentPeriod?.status)}
+                  variant="secondary"
+                >
+                  {currentPeriod?.status.charAt(0).toUpperCase() +
+                    currentPeriod?.status.slice(1)}
                 </Badge>
               </div>
             </div>
@@ -131,8 +163,9 @@ export function BillingSettingsTab() {
 
             <div className="text-sm text-muted-foreground">
               <p>
-                <strong>Note:</strong> Platform fees are calculated based on completed coaching sessions. 
-                You'll receive an invoice at the end of each billing period.
+                <strong>Note:</strong> Platform fees are calculated based on
+                completed coaching sessions. You'll receive an invoice at the
+                end of each billing period.
               </p>
             </div>
           </div>
@@ -175,8 +208,12 @@ export function BillingSettingsTab() {
                         ${bill.platformFeeAmount.toFixed(2)}
                       </TableCell>
                       <TableCell>
-                        <Badge className={getStatusColor(bill.status)} variant="secondary">
-                          {bill.status.charAt(0).toUpperCase() + bill.status.slice(1)}
+                        <Badge
+                          className={getStatusColor(bill.status)}
+                          variant="secondary"
+                        >
+                          {bill.status.charAt(0).toUpperCase() +
+                            bill.status.slice(1)}
                         </Badge>
                       </TableCell>
                       <TableCell>

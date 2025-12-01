@@ -23,9 +23,7 @@ interface PricingStepProps {
 
 const PLATFORM_FEE_PERCENTAGE = 15;
 
-const CURRENCIES = [
-  { code: "USD", symbol: "$", name: "US Dollar" },
-];
+const CURRENCIES = [{ code: "USD", symbol: "$", name: "US Dollar" }];
 
 export function PricingStep({ data, onNext, onBack }: PricingStepProps) {
   const [hourlyRate, setHourlyRate] = useState(data.hourlyRate || 50);
@@ -81,7 +79,8 @@ export function PricingStep({ data, onNext, onBack }: PricingStepProps) {
             <p className="text-sm text-red-600">{errors.hourlyRate}</p>
           )}
           <p className="text-sm text-muted-foreground">
-            Set your hourly coaching rate (minimum {selectedCurrency?.symbol}10, maximum {selectedCurrency?.symbol}500)
+            Set your hourly coaching rate (minimum {selectedCurrency?.symbol}10,
+            maximum {selectedCurrency?.symbol}500)
           </p>
         </div>
 
@@ -95,7 +94,9 @@ export function PricingStep({ data, onNext, onBack }: PricingStepProps) {
                   Earnings Breakdown
                 </p>
                 <p>
-                  Our platform charges a {PLATFORM_FEE_PERCENTAGE}% service fee to cover payment processing, platform maintenance, and support.
+                  Our platform charges a {PLATFORM_FEE_PERCENTAGE}% service fee
+                  to cover payment processing, platform maintenance, and
+                  support.
                 </p>
               </div>
             </div>
@@ -104,7 +105,8 @@ export function PricingStep({ data, onNext, onBack }: PricingStepProps) {
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Client pays:</span>
                 <span className="font-medium">
-                  {selectedCurrency?.symbol}{hourlyRate.toFixed(2)}/hour
+                  {selectedCurrency?.symbol}
+                  {hourlyRate.toFixed(2)}/hour
                 </span>
               </div>
               <div className="flex justify-between text-sm">
@@ -112,23 +114,27 @@ export function PricingStep({ data, onNext, onBack }: PricingStepProps) {
                   Platform fee ({PLATFORM_FEE_PERCENTAGE}%):
                 </span>
                 <span className="text-red-600">
-                  -{selectedCurrency?.symbol}{platformFee.toFixed(2)}
+                  -{selectedCurrency?.symbol}
+                  {platformFee.toFixed(2)}
                 </span>
               </div>
               <div className="h-px bg-border my-2" />
               <div className="flex justify-between text-base font-semibold">
                 <span>You earn:</span>
                 <span className="text-green-600">
-                  {selectedCurrency?.symbol}{yourEarnings.toFixed(2)}/hour
+                  {selectedCurrency?.symbol}
+                  {yourEarnings.toFixed(2)}/hour
                 </span>
               </div>
             </div>
 
             <div className="mt-4 p-3 bg-background rounded-md border">
               <p className="text-xs text-muted-foreground">
-                <strong>Example:</strong> If you complete 20 hours of coaching per month, you'll earn approximately{" "}
+                <strong>Example:</strong> If you complete 20 hours of coaching
+                per month, you'll earn approximately{" "}
                 <span className="font-semibold text-foreground">
-                  {selectedCurrency?.symbol}{(yourEarnings * 20).toFixed(2)}/month
+                  {selectedCurrency?.symbol}
+                  {(yourEarnings * 20).toFixed(2)}/month
                 </span>
               </p>
             </div>
@@ -137,7 +143,12 @@ export function PricingStep({ data, onNext, onBack }: PricingStepProps) {
       </div>
 
       <div className="flex gap-3">
-        <Button type="button" variant="outline" onClick={onBack} className="flex-1">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onBack}
+          className="flex-1"
+        >
           Back
         </Button>
         <Button type="submit" className="flex-1">

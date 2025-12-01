@@ -1,13 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FiBell, FiSearch, FiUser } from "react-icons/fi";
+import { getNotifications } from "@/services/coachService";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 
 export function TopNav() {
   const [query, setQuery] = useState("");
+  const [unreadCount, setUnreadCount] = useState<number>(0);
   const { t } = useTranslation();
 
   console.log("TopNav rendered with translations");
+
+  useEffect(() => {
+    const loadNotifications = async () => {
+      try {
+        const res = await getNotifications();
+        const notifications = res?.data || [];
+        const unread = notifications.filter((n: any) => !n.read).length;
+        setUnreadCount(unread);
+      } catch (error) {
+        console.warn("Failed to load notifications", error);
+      }
+    };
+    loadNotifications();
+  }, []);
 
   return (
     <header className="flex items-center justify-between bg-white px-6 py-4 shadow">
@@ -39,7 +55,14 @@ export function TopNav() {
             className="pl-10 pr-4 py-1 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        <FiBell className="text-xl text-gray-600 hover:text-gray-900 cursor-pointer transition" />
+        <div className="relative">
+          <FiBell className="text-xl text-gray-600 hover:text-gray-900 cursor-pointer transition" />
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+              {unreadCount}
+            </span>
+          )}
+        </div>
         <div className="border-l border-gray-300 h-6 mx-2"></div>
         <FiUser className="text-2xl text-gray-600 hover:text-gray-900 cursor-pointer transition" />
       </div>

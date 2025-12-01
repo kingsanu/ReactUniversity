@@ -1,6 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import {
+  getCoachDetails,
+  getAvailability,
+  getCoachBankAccount,
+  getCoachPayouts,
+} from "@/services/coachService";
+import { useGlobalStore } from "@/store/useGlobalStore";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { DollarSign, Calendar, CreditCard, FileText } from "lucide-react";
@@ -11,6 +18,42 @@ import { BillingSettingsTab } from "./_components/BillingSettingsTab";
 
 export default function CoachSettingsPage() {
   const [activeTab, setActiveTab] = useState("pricing");
+  const [coachDetails, setCoachDetails] = useState<any | null>(null);
+  const [availability, setAvailability] = useState<any | null>(null);
+  const [bankAccount, setBankAccount] = useState<any | null>(null);
+  const [payouts, setPayouts] = useState<any[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const { user } = useGlobalStore();
+
+  useEffect(() => {
+    const preloadSettings = async () => {
+      try {
+        setIsLoading(true);
+        if (!user?.id) return;
+        const [detailsRes, availabilityRes, bankRes, payoutsRes] =
+          await Promise.all([
+            getCoachDetails(user.id),
+            getAvailability(),
+            getCoachBankAccount(),
+            getCoachPayouts(),
+          ]);
+
+        // Service response shapes vary: some return the raw object, others return { data: object }
+        // Normalize results into the simplest usable form for the UI.
+        setCoachDetails((detailsRes as any) || null);
+        setAvailability((availabilityRes as any) || null);
+        setBankAccount((bankRes as any)?.data || (bankRes as any) || null);
+        setPayouts((payoutsRes as any)?.data || (payoutsRes as any) || []);
+      } catch (e) {
+        console.error("Failed to preload settings data:", e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    // only preload once user is set
+    if (user?.id) preloadSettings();
+  }, []);
 
   return (
     <div className="container max-w-4xl mx-auto py-8 px-6">
@@ -21,7 +64,11 @@ export default function CoachSettingsPage() {
         </p>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="space-y-6"
+      >
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="pricing" className="flex items-center gap-2">
             <DollarSign className="h-4 w-4" />
@@ -41,22 +88,42 @@ export default function CoachSettingsPage() {
           </TabsTrigger>
         </TabsList>
 
-
-
         <TabsContent value="pricing">
-          <PricingSettingsTab />
+          <PricingSettingsTab
+            coachDetails={coachDetails}
+            isLoading={isLoading}
+            onUpdated={(newData: any) =>
+              setCoachDetails((prev: any) => ({ ...prev, ...(newData || {}) }))
+            }
+          />
         </TabsContent>
 
         <TabsContent value="availability">
-          <AvailabilitySettingsTab />
+          <AvailabilitySettingsTab
+            availability={availability}
+            isLoading={isLoading}
+            onUpdated={(newData: any) =>
+              setAvailability((prev: any) => ({ ...prev, ...(newData || {}) }))
+            }
+          />
         </TabsContent>
 
         <TabsContent value="payments">
-          <PaymentSettingsTab />
+          <PaymentSettingsTab
+            bankAccount={bankAccount}
+            payouts={payouts}
+            isLoading={isLoading}
+            onBankAccountUpdated={(bank: any) => setBankAccount(bank)}
+            onPayoutsUpdated={(p) => setPayouts(p)}
+          />
         </TabsContent>
 
         <TabsContent value="billing">
-          <BillingSettingsTab />
+          <BillingSettingsTab
+            billingCurrent={null}
+            billingHistory={null}
+            isLoading={isLoading}
+          />
         </TabsContent>
       </Tabs>
     </div>

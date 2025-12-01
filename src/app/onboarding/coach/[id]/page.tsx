@@ -8,7 +8,10 @@ import { PricingStep } from "@/components/onboarding/PricingStep";
 import { AvailabilityStep } from "@/components/onboarding/AvailabilityStep";
 import { CalendarSyncStep } from "@/components/onboarding/CalendarSyncStep";
 import { PasswordStep } from "@/components/onboarding/PasswordStep";
-import { CoachOnboardingData, INITIAL_ONBOARDING_DATA } from "@/components/onboarding/types";
+import {
+  CoachOnboardingData,
+  INITIAL_ONBOARDING_DATA,
+} from "@/components/onboarding/types";
 import { toast } from "sonner";
 
 const STEPS = [
@@ -34,12 +37,19 @@ const STEPS = [
   },
 ];
 
-export default function CoachOnboardingPage({ params }: { params: Promise<{ id: string }> }) {
+export default function CoachOnboardingPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = use(params);
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
-  const [data, setData] = useState<CoachOnboardingData>(INITIAL_ONBOARDING_DATA);
+  const [data, setData] = useState<CoachOnboardingData>(
+    INITIAL_ONBOARDING_DATA
+  );
   const [coachId, setCoachId] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -48,7 +58,8 @@ export default function CoachOnboardingPage({ params }: { params: Promise<{ id: 
         const { getOnboardingStatus } = await import("@/services/coachService");
         const status = await getOnboardingStatus(id);
         setCoachId(status.userId);
-        
+        setEmail(status.email);
+
         // Pre-fill data if available
         setData((prev) => ({
           ...prev,
@@ -90,27 +101,25 @@ export default function CoachOnboardingPage({ params }: { params: Promise<{ id: 
     try {
       setIsLoading(true);
       const { submitOnboardingData } = await import("@/services/coachService");
-      
+
       // Transform data to match API expectation
       const apiData = {
         ...finalData,
         calendarIntegrations: {
           google: { connected: finalData.calendarIntegrations.google },
-          outlook: { connected: finalData.calendarIntegrations.outlook }
-        }
+          outlook: { connected: finalData.calendarIntegrations.outlook },
+        },
       };
-
-
 
       if (!coachId) {
         throw new Error("Coach ID not found");
       }
 
       const response = await submitOnboardingData(coachId, apiData);
-      
+
       console.log("Onboarding submitted:", response);
       toast.success("Onboarding completed successfully!");
-      
+
       // Redirect to dashboard
       router.push(response.redirectUrl || `/dashboard/coaching/dashboard`);
     } catch (error) {
@@ -161,7 +170,10 @@ export default function CoachOnboardingPage({ params }: { params: Promise<{ id: 
       {currentStep === 4 && (
         <CalendarSyncStep
           data={data.calendarIntegrations}
-          onNext={(calendarIntegrations) => handleNext({ calendarIntegrations })}
+          email={email}
+          onNext={(calendarIntegrations) =>
+            handleNext({ calendarIntegrations })
+          }
           onBack={handleBack}
         />
       )}

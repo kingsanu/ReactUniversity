@@ -27,7 +27,7 @@ export interface OnboardingStatus {
   userId: string;
   email: string;
   name?: string;
-  status: 'invited' | 'onboarding_started' | 'completed';
+  status: "invited" | "onboarding_started" | "completed";
   invitedAt?: string;
 }
 
@@ -90,7 +90,7 @@ export interface Booking {
   startTime?: string; // Flattened for easier UI consumption if needed, or use slot
   endTime?: string;
   slot?: BookingSlot;
-  status: 'confirmed' | 'rescheduled' | 'cancelled' | 'completed';
+  status: "confirmed" | "rescheduled" | "cancelled" | "completed";
   meetingLink?: string;
 }
 
@@ -118,4 +118,71 @@ export interface BookingResponse {
   status: string;
   meetingLink?: string;
   newStartTime?: string; // For reschedule response
+}
+
+// --- New types for Analytics, Payouts, Bank Account, Notifications, and Students ---
+export interface EarningsHistoryItem {
+  month: string;
+  amount: number;
+}
+
+export interface SessionDistributionItem {
+  topic: string;
+  count: number;
+}
+
+export interface RecentActivityItem {
+  id: string;
+  type: string;
+  message: string;
+  date: string;
+}
+
+export interface CoachAnalytics {
+  totalEarnings: number;
+  totalSessions: number;
+  averageRating: number;
+  activeStudents: number;
+  earningsHistory: EarningsHistoryItem[];
+  sessionDistribution: SessionDistributionItem[];
+  recentActivity: RecentActivityItem[];
+}
+
+export interface Payout {
+  id: string;
+  amount: number;
+  currency: string;
+  date: string;
+  status: string; // e.g., paid, pending
+}
+
+export interface BankAccount {
+  id: string;
+  provider: string; // e.g., stripe
+  status: string; // connected, disconnected
+  onboardingUrl?: string; // if available
+  email?: string;
+  last4?: string;
+}
+
+export interface Notification {
+  id: string;
+  type: string; // e.g., booking, message, system
+  message: string;
+  date: string;
+  read: boolean;
+}
+
+export interface StudentSummary {
+  id: string;
+  name: string;
+  email?: string;
+  image?: string;
+  lastBookedAt?: string;
+  totalSessions?: number;
+}
+
+export interface StudentDetails extends StudentSummary {
+  activity?: RecentActivityItem[];
+  sessions?: Booking[];
 }
