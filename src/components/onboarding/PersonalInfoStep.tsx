@@ -18,7 +18,6 @@ const personalInfoSchema = z.object({
   location: z.string().min(2, "Location is required"),
   languages: z.string().min(2, "At least one language is required"),
   tags: z.string().min(2, "At least one tag is required"),
-  hourlyRate: z.coerce.number().min(1, "Hourly rate must be at least $1"),
 });
 
 type PersonalInfoFormValues = z.infer<typeof personalInfoSchema>;
@@ -173,24 +172,7 @@ export function PersonalInfoStep({ data, onNext }: PersonalInfoStepProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <Label htmlFor="hourlyRate" className="text-gray-700 font-medium">Hourly Rate (USD)</Label>
-          <div className="relative">
-            <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input 
-              id="hourlyRate" 
-              type="number"
-              step="1"
-              min="1"
-              {...register("hourlyRate")} 
-              className="pl-9 bg-gray-50/30 border-gray-200 focus:bg-white transition-all h-11" 
-              placeholder="e.g. 50" 
-            />
-          </div>
-          {errors.hourlyRate && <p className="text-red-500 text-xs mt-1">{errors.hourlyRate.message}</p>}
-        </div>
-
+      <div className="grid grid-cols-1 gap-6">
         <div className="space-y-2">
           <Label htmlFor="languages" className="text-gray-700 font-medium">Languages</Label>
           <div className="relative">

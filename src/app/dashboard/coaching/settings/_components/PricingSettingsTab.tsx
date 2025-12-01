@@ -13,7 +13,7 @@ import { useGlobalStore } from "@/store/useGlobalStore";
 export function PricingSettingsTab() {
   const { user, platformFee, fetchSettings } = useGlobalStore();
   const [hourlyRate, setHourlyRate] = useState<number>(0);
-  const [currency, setCurrency] = useState("USD");
+  const currency = "USD";
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -31,7 +31,6 @@ export function PricingSettingsTab() {
           const data = await getCoachDetails(user.id);
           if (data) {
             setHourlyRate(data.hourlyRate || 0);
-            setCurrency(data.currency || "USD");
           }
         }
       } catch (error) {
@@ -85,16 +84,12 @@ export function PricingSettingsTab() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <Label htmlFor="currency">Currency</Label>
-            <Select value={currency} onValueChange={setCurrency}>
+            <Select value="USD" disabled>
               <SelectTrigger>
                 <SelectValue placeholder="Select currency" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="USD">USD ($)</SelectItem>
-                <SelectItem value="EUR">EUR (€)</SelectItem>
-                <SelectItem value="GBP">GBP (£)</SelectItem>
-                <SelectItem value="CAD">CAD ($)</SelectItem>
-                <SelectItem value="AUD">AUD ($)</SelectItem>
               </SelectContent>
             </Select>
           </div>

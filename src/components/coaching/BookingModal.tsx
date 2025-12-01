@@ -12,7 +12,6 @@ import { format, getDay } from "date-fns";
 import { Clock, Video, Globe, ChevronLeft, ChevronRight, Loader2, CalendarDays } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { useTranslation } from "react-i18next";
 
 interface BookingModalProps {
   coach: Coach | null;
@@ -57,7 +56,6 @@ function generateSlotsFromRange(start: string, end: string): string[] {
 }
 
 export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
-  const { t } = useTranslation();
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [topic, setTopic] = useState("");
@@ -109,7 +107,7 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
 
   const handleBook = async () => {
     if (!date || !selectedTime || !topic || !coach) {
-      toast.error(t("coaching.booking.fillAllFields"));
+      toast.error("Please fill in all fields");
       return;
     }
 
@@ -145,11 +143,11 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
         notes: "" // Add notes field to state if needed
       });
 
-      toast.success(t("coaching.booking.successMessage", { name: coach?.name, date: format(date, "PPP"), time: selectedTime }));
+      toast.success(`Session booked with ${coach?.name} on ${format(date, "PPP")} at ${selectedTime}`);
       onClose();
     } catch (error) {
       console.error("Booking failed:", error);
-      toast.error(t("coaching.booking.errorMessage"));
+      toast.error("Failed to book session. Please try again.");
     }
   };
 
@@ -169,25 +167,25 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
                   onClick={() => setStep("date-time")}
                   className="mb-4 -ml-2 text-gray-500 hover:text-gray-900"
                 >
-                  <ChevronLeft className="h-4 w-4 mr-1" /> {t("coaching.booking.back")}
+                  <ChevronLeft className="h-4 w-4 mr-1" /> Back
                 </Button>
               )}
               <Avatar className="h-14 w-14 mb-4 border border-gray-100 shadow-sm">
                 <AvatarImage src={coach.image} alt={coach.name} />
                 <AvatarFallback>{coach.name.charAt(0)}</AvatarFallback>
               </Avatar>
-              <p className="text-gray-500 text-sm font-medium mb-1">{t("coaching.booking.coach")}</p>
+              <p className="text-gray-500 text-sm font-medium mb-1">Coach</p>
               <h3 className="text-lg font-bold text-gray-900 mb-1">{coach.name}</h3>
-              <p className="text-gray-900 font-semibold text-xl mb-6">{t("coaching.booking.meetingDuration")}</p>
+              <p className="text-gray-900 font-semibold text-xl mb-6">30 Min Meeting</p>
               
               <div className="space-y-4 text-gray-600 text-sm">
                 <div className="flex items-center">
                   <Clock className="h-4 w-4 mr-3 text-gray-400" />
-                  <span className="font-medium">{t("coaching.booking.duration")}</span>
+                  <span className="font-medium">30 min</span>
                 </div>
                 <div className="flex items-center">
                   <Video className="h-4 w-4 mr-3 text-gray-400" />
-                  <span className="font-medium">{t("coaching.booking.platform")}</span>
+                  <span className="font-medium">Google Meet</span>
                 </div>
                 <div className="flex items-center">
                   <Globe className="h-4 w-4 mr-3 text-gray-400" />
@@ -203,7 +201,7 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
               <>
                 {/* Column 2: Calendar */}
                 <div className="flex-1 p-6 border-r border-gray-100 flex flex-col">
-                  <h2 className="text-lg font-semibold mb-4 text-gray-900">{t("coaching.booking.selectDateTime")}</h2>
+                  <h2 className="text-lg font-semibold mb-4 text-gray-900">Select a Date & Time</h2>
                   
                   {/* Custom Calendar Header */}
                   <div className="flex items-center justify-between mb-4 px-2">
@@ -286,7 +284,7 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
                   {coach?.availability?.timezone && (
                     <div className="mt-4 pt-4 border-t border-gray-100 text-sm text-gray-500 flex items-center gap-2">
                       <Globe className="h-4 w-4" />
-                      <span>{t("coaching.booking.timesShownIn", { timezone: coach.availability.timezone })}</span>
+                      <span>Times shown in {coach.availability.timezone}</span>
                     </div>
                   )}
                 </div>
@@ -295,11 +293,11 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
                 <div className="w-full md:w-[260px] p-5 bg-gray-50/50 flex flex-col h-[550px]">
                   <div className="mb-4">
                     <h4 className="text-base font-semibold text-gray-900">
-                      {date ? format(date, "EEEE, MMM d") : t("coaching.booking.selectDate")}
+                      {date ? format(date, "EEEE, MMM d") : "Select a date"}
                     </h4>
                     {date && availableTimeSlots.length > 0 && (
                       <p className="text-sm text-gray-500 mt-1">
-                        {t("coaching.booking.slotsAvailable", { count: availableTimeSlots.length })}
+                        {availableTimeSlots.length} slots available
                       </p>
                     )}
                   </div>
@@ -308,13 +306,13 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
                     {!date ? (
                       <div className="flex flex-col items-center justify-center h-full text-gray-400 text-sm">
                         <CalendarDays className="h-12 w-12 mb-3 opacity-30" />
-                        <p>{t("coaching.booking.selectDatePrompt")}</p>
+                        <p>Select a date to see available times</p>
                       </div>
                     ) : availableTimeSlots.length === 0 ? (
                       <div className="flex flex-col items-center justify-center h-full text-gray-400 text-sm text-center px-4">
                         <Clock className="h-12 w-12 mb-3 opacity-30" />
-                        <p className="font-medium text-gray-600">{t("coaching.booking.noAvailability")}</p>
-                        <p className="mt-1">{t("coaching.booking.noAvailabilityMessage")}</p>
+                        <p className="font-medium text-gray-600">No availability</p>
+                        <p className="mt-1">Coach is not available on this day. Please select another date.</p>
                       </div>
                     ) : (
                       availableTimeSlots.map((time) => {
@@ -373,7 +371,7 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
                         className="w-full bg-blue-600 hover:bg-blue-700 text-white h-11 font-medium"
                         onClick={() => setStep("details")}
                       >
-                        {t("coaching.booking.continue")}
+                        Continue
                       </Button>
                     </div>
                   )}
@@ -382,28 +380,28 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
             ) : (
               // Details Step
               <div className="flex-1 p-10 animate-in fade-in slide-in-from-right-4 duration-300">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">{t("coaching.booking.enterDetails")}</h2>
+                <h2 className="text-xl font-bold text-gray-900 mb-6">Enter Details</h2>
                 <div className="max-w-md space-y-6">
                   <div className="grid gap-2">
-                    <Label htmlFor="topic" className="text-gray-700 font-medium">{t("coaching.booking.topicLabel")}</Label>
+                    <Label htmlFor="topic" className="text-gray-700 font-medium">What would you like to discuss?</Label>
                     <Select onValueChange={setTopic} value={topic}>
                       <SelectTrigger className="h-11 border-gray-300 focus:ring-black focus:ring-offset-0">
-                        <SelectValue placeholder={t("coaching.booking.selectTopic")} />
+                        <SelectValue placeholder="Select a topic" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="career-guidance">{t("coaching.booking.topics.careerGuidance")}</SelectItem>
-                        <SelectItem value="interview-prep">{t("coaching.booking.topics.interviewPrep")}</SelectItem>
-                        <SelectItem value="resume-review">{t("coaching.booking.topics.resumeReview")}</SelectItem>
-                        <SelectItem value="skill-development">{t("coaching.booking.topics.skillDevelopment")}</SelectItem>
+                        <SelectItem value="career-guidance">Career Guidance</SelectItem>
+                        <SelectItem value="interview-prep">Interview Prep</SelectItem>
+                        <SelectItem value="resume-review">Resume Review</SelectItem>
+                        <SelectItem value="skill-development">Skill Development</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   
                   <div className="grid gap-2">
-                    <Label htmlFor="notes" className="text-gray-700 font-medium">{t("coaching.booking.notesLabel")}</Label>
+                    <Label htmlFor="notes" className="text-gray-700 font-medium">Additional Notes (Optional)</Label>
                     <textarea 
                       className="flex min-h-[120px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
-                      placeholder={t("coaching.booking.notesPlaceholder")}
+                      placeholder="Share anything that will help prepare for our meeting..."
                     />
                   </div>
 
@@ -413,13 +411,13 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
                       onClick={() => setStep("date-time")}
                       className="h-11 px-6 border-gray-300 text-gray-700 hover:bg-gray-50"
                     >
-                      {t("coaching.booking.cancel")}
+                      Cancel
                     </Button>
                     <Button 
                       className="h-11 px-8 bg-black text-white hover:bg-gray-800" 
                       onClick={handleBook}
                     >
-                      {t("coaching.booking.scheduleEvent")}
+                      Schedule Event
                     </Button>
                   </div>
                 </div>

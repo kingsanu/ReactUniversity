@@ -302,7 +302,7 @@
     "allIndustries": "All industries"
   },
   "courses": {
-    "discoverCourses": "Expand your knowledge with our curated collection of courses. Filter by category, difficulty, and more to find your next learning path.",
+    "discoverCourses": "Discover courses to enhance your skills and advance your career",
     "searchAndFilter": "Search & Filter",
     "recommendedForYou": "Recommended for You",
     "allCourses": "All Courses",
@@ -353,92 +353,7 @@
     "showingResults": "Showing {{count}} of {{total}} courses",
     "totalCourses": "Total Courses",
     "avgRating": "Average Rating",
-    "enrollments": "Enrollments",
-    "featuredCourse": "Featured Course",
-    "startLearningNow": "Start Learning Now",
-    "rating": "Rating",
-    "duration": "Duration",
-    "level": "Level",
-    "providedBy": "Provided by {{provider}}",
-    "allTopics": "All Topics",
-    "personalizedRecommendations": "Personalized courses based on your profile and interests",
-    "findCoursesDescription": "Find courses that match your interests",
-    "hoursPerWeek": "h/week",
-    "coursesAvailable": "courses available",
-    "categories": {
-      "technology": "Technology",
-      "business": "Business",
-      "design": "Design",
-      "language": "Language",
-      "science": "Science",
-      "arts": "Arts"
-    },
-    "languages": {
-      "english": "English",
-      "spanish": "Spanish",
-      "french": "French",
-      "german": "German",
-      "chinese": "Chinese",
-      "japanese": "Japanese"
-    },
-    "countries": {
-      "united states": "United States",
-      "united kingdom": "United Kingdom",
-      "canada": "Canada",
-      "spain": "Spain",
-      "germany": "Germany",
-      "australia": "Australia"
-    },
-    "regions": {
-      "north america": "North America",
-      "europe": "Europe",
-      "asia": "Asia",
-      "latin america": "Latin America",
-      "middle east": "Middle East",
-      "africa": "Africa"
-    }
-  },
-  "coaching": {
-    "featuredCoaches": "Featured Coaches",
-    "featuredDescription": "Top-rated mentors ready to help you grow",
-    "viewAllCoaches": "View All Coaches",
-    "bookSession": "Book Session",
-    "viewSchedule": "View Schedule",
-    "contactForAvailability": "Contact for availability",
-    "viewDetails": "View Details",
-    "bookNow": "Book Now",
-    "from": "from",
-    "booking": {
-      "fillAllFields": "Please fill in all fields",
-      "successMessage": "Session booked with {{name}} on {{date}} at {{time}}",
-      "errorMessage": "Failed to book session. Please try again.",
-      "back": "Back",
-      "coach": "Coach",
-      "meetingDuration": "30 Min Meeting",
-      "duration": "30 min",
-      "platform": "Google Meet",
-      "selectDateTime": "Select a Date & Time",
-      "timesShownIn": "Times shown in {{timezone}}",
-      "selectDate": "Select a date",
-      "slotsAvailable": "{{count}} slots available",
-      "selectDatePrompt": "Select a date to see available times",
-      "noAvailability": "No availability",
-      "noAvailabilityMessage": "Coach is not available on this day. Please select another date.",
-      "continue": "Continue",
-      "enterDetails": "Enter Details",
-      "topicLabel": "What would you like to discuss?",
-      "selectTopic": "Select a topic",
-      "topics": {
-        "careerGuidance": "Career Guidance",
-        "interviewPrep": "Interview Prep",
-        "resumeReview": "Resume Review",
-        "skillDevelopment": "Skill Development"
-      },
-      "notesLabel": "Additional Notes (Optional)",
-      "notesPlaceholder": "Share anything that will help prepare for our meeting...",
-      "cancel": "Cancel",
-      "scheduleEvent": "Schedule Event"
-    }
+    "enrollments": "Enrollments"
   },
   "courses_import": {
     "button": "Import Course",

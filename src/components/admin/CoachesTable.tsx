@@ -116,148 +116,171 @@ export function CoachesTable() {
   });
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between gap-4">
-          <CardTitle>All Coaches</CardTitle>
-          <div className="flex items-center gap-3">
-            <Select value={contractFilter} onValueChange={setContractFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter by contract" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Contracts</SelectItem>
-                <SelectItem value="active">Active (30+ days)</SelectItem>
-                <SelectItem value="expiring">Expiring Soon</SelectItem>
-                <SelectItem value="expired">Expired</SelectItem>
-              </SelectContent>
-            </Select>
-            <div className="relative w-64">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search coaches..."
-                className="pl-8"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
+    <div className="space-y-6">
+      {/* Filters Bar */}
+      <div className="sticky top-4 z-20 bg-white/80 backdrop-blur-xl border border-gray-200/50 shadow-sm rounded-2xl p-2 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="flex items-center gap-2 w-full md:w-auto">
+          <Select value={contractFilter} onValueChange={setContractFilter}>
+            <SelectTrigger className="w-full md:w-[200px] h-11 bg-gray-50/50 border-transparent focus:bg-white focus:border-blue-500/20 focus:ring-4 focus:ring-blue-500/10 rounded-xl transition-all">
+              <SelectValue placeholder="Filter by contract" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Contracts</SelectItem>
+              <SelectItem value="active">Active (30+ days)</SelectItem>
+              <SelectItem value="expiring">Expiring Soon</SelectItem>
+              <SelectItem value="expired">Expired</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
+
+        <div className="relative w-full md:w-80 group">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+          <Input
+            placeholder="Search coaches..."
+            className="pl-10 h-11 bg-gray-50/50 border-transparent focus:bg-white focus:border-blue-500/20 focus:ring-4 focus:ring-blue-500/10 rounded-xl transition-all"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+      </div>
+
+      {/* Table Container */}
+      <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-gray-50/50 hover:bg-gray-50/50 border-b border-gray-100">
+              <TableHead className="py-4 pl-6 font-semibold text-gray-900">Coach</TableHead>
+              <TableHead className="font-semibold text-gray-900">Status</TableHead>
+              <TableHead className="font-semibold text-gray-900">Specialization</TableHead>
+              <TableHead className="font-semibold text-gray-900">Contract Period</TableHead>
+              <TableHead className="font-semibold text-gray-900">Contract Status</TableHead>
+              <TableHead className="font-semibold text-gray-900">Students</TableHead>
+              <TableHead className="pr-6 text-right font-semibold text-gray-900">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Specialization</TableHead>
-                <TableHead>Contract Start</TableHead>
-                <TableHead>Contract End</TableHead>
-                <TableHead>Contract Status</TableHead>
-                <TableHead>Students</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableCell colSpan={7} className="h-32 text-center">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+                    <p className="text-sm text-gray-500">Loading coaches...</p>
+                  </div>
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={9} className="h-24 text-center">
-                    <div className="flex justify-center items-center">
-                      <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : filteredCoaches.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={9} className="h-24 text-center">
-                    No coaches found.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredCoaches.map((coach) => {
-                  const contractStatus = getContractStatus(coach.contractEnd);
-                  return (
-                    <TableRow key={coach.id}>
-                      <TableCell className="font-medium">{coach.name || coach.fullName}</TableCell>
-                      <TableCell>{coach.email || "N/A"}</TableCell>
-                      <TableCell>
-                        <Badge className={getStatusColor(coach.status)} variant="secondary">
-                          {(coach.status || "Unknown").charAt(0).toUpperCase() + (coach.status || "unknown").slice(1)}
+            ) : filteredCoaches.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="h-32 text-center">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <p className="text-lg font-medium text-gray-900">No coaches found</p>
+                    <p className="text-sm text-gray-500">Try adjusting your search or filters</p>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredCoaches.map((coach) => {
+                const contractStatus = getContractStatus(coach.contractEnd);
+                return (
+                  <TableRow key={coach.id} className="group hover:bg-gray-50/50 transition-colors border-gray-100">
+                    <TableCell className="py-4 pl-6">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-600 font-bold border border-white shadow-sm">
+                          {coach.image ? (
+                            <img src={coach.image} alt={coach.name} className="h-full w-full rounded-full object-cover" />
+                          ) : (
+                            (coach.name || coach.fullName || "?").charAt(0).toUpperCase()
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-900">{coach.name || coach.fullName}</p>
+                          <p className="text-xs text-gray-500">{coach.email}</p>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={`${getStatusColor(coach.status)} border-0 px-2.5 py-0.5 rounded-md font-medium capitalize shadow-none`}>
+                        {coach.status || "Unknown"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm text-gray-600 font-medium">{coach.specialization || "—"}</span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col text-xs text-gray-500">
+                        <span>{coach.contractStart ? new Date(coach.contractStart).toLocaleDateString() : "—"}</span>
+                        <span className="text-gray-300">to</span>
+                        <span>{coach.contractEnd ? new Date(coach.contractEnd).toLocaleDateString() : "—"}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {contractStatus ? (
+                        <Badge className={`${contractStatus.color} border-0 px-2.5 py-0.5 rounded-md font-medium shadow-none`}>
+                          {contractStatus.label}
                         </Badge>
-                      </TableCell>
-                      <TableCell>{coach.specialization || "N/A"}</TableCell>
-                      <TableCell>
-                        {coach.contractStart ? new Date(coach.contractStart).toLocaleDateString() : "N/A"}
-                      </TableCell>
-                      <TableCell>
-                        {coach.contractEnd ? new Date(coach.contractEnd).toLocaleDateString() : "N/A"}
-                      </TableCell>
-                      <TableCell>
-                        {contractStatus ? (
-                          <Badge className={contractStatus.color} variant="secondary">
-                            {contractStatus.label}
-                          </Badge>
-                        ) : (
-                          <span className="text-sm text-muted-foreground">No contract</span>
-                        )}
-                      </TableCell>
-                      <TableCell>{coach.activeStudents || 0}</TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <span className="sr-only">Open menu</span>
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                      ) : (
+                        <span className="text-sm text-gray-400">—</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-semibold text-gray-900">{coach.activeStudents || 0}</span>
+                        <span className="text-xs text-gray-500">active</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="pr-6 text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48 rounded-xl p-1 shadow-xl border-gray-100">
+                          <DropdownMenuLabel className="px-2 py-1.5 text-xs text-gray-500 font-normal">Actions</DropdownMenuLabel>
+                          <DropdownMenuItem
+                            className="rounded-lg cursor-pointer focus:bg-gray-50"
+                            onClick={() => {
+                                if (coach.email) {
+                                    navigator.clipboard.writeText(coach.email);
+                                    toast.success("Email copied");
+                                }
+                            }}
+                          >
+                            Copy Email
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator className="bg-gray-100 my-1" />
+                          <DropdownMenuItem className="rounded-lg cursor-pointer focus:bg-gray-50">View Details</DropdownMenuItem>
+                          <DropdownMenuItem className="rounded-lg cursor-pointer focus:bg-gray-50">Edit Coach</DropdownMenuItem>
+                          {coach.status === "invited" && (
                             <DropdownMenuItem
-                              onClick={() => {
-                                  if (coach.email) {
-                                      navigator.clipboard.writeText(coach.email);
-                                      toast.success("Email copied to clipboard");
-                                  }
+                              className="rounded-lg cursor-pointer text-blue-600 focus:text-blue-700 focus:bg-blue-50"
+                              onClick={async () => {
+                                if (!coach.email) return;
+                                try {
+                                  const { inviteCoach } = await import("@/services/coachService");
+                                  await inviteCoach({ email: coach.email });
+                                  toast.success(`Invitation resent`);
+                                } catch (error) {
+                                  toast.error("Failed to resend");
+                                }
                               }}
                             >
-                              Copy Email
+                              <Mail className="mr-2 h-4 w-4" />
+                              Resend Invite
                             </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem>View Details</DropdownMenuItem>
-                            <DropdownMenuItem>Edit Coach</DropdownMenuItem>
-                            {coach.status === "invited" && (
-                              <DropdownMenuItem
-                                onClick={async () => {
-                                  if (!coach.email) return;
-                                  try {
-                                    const { inviteCoach } = await import("@/services/coachService");
-                                    await inviteCoach({ email: coach.email });
-                                    toast.success(`Invitation resent to ${coach.email}`);
-                                  } catch (error) {
-                                    toast.error("Failed to resend invitation");
-                                  }
-                                }}
-                              >
-                                <Mail className="mr-2 h-4 w-4" />
-                                Resend Invite
-                              </DropdownMenuItem>
-                            )}
-                            <DropdownMenuItem className="text-red-600">
-                              Deactivate
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
+                          )}
+                          <DropdownMenuItem className="rounded-lg cursor-pointer text-red-600 focus:text-red-700 focus:bg-red-50">
+                            Deactivate
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
   );
 }

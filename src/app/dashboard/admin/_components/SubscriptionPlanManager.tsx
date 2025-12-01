@@ -557,69 +557,9 @@ export function SubscriptionPlanManager() {
               </ul>
             </div>
 
-            {/* Actions */}
-            <div className="flex space-x-2">
-              {plan.isMockData ? (
-                <button
-                  disabled
-                  className="w-full bg-gray-400 text-white px-3 py-2 rounded-lg text-sm font-medium cursor-not-allowed"
-                  title="Cannot edit mock data. Create real plans first."
-                >
-                  Edit (Mock)
-                </button>
-              ) : (
-                <button
-                  onClick={() => handleEdit(plan)}
-                  className="w-full bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-                >
-                  Edit
-                </button>
-              )}
-            </div>
-
-            {/* Metadata */}
-            <div className="mt-4 pt-4 border-t border-gray-200 text-xs text-gray-500">
-              <p>Created: {new Date(plan.createdAt).toLocaleDateString()}</p>
-              <p>Updated: {new Date(plan.updatedAt).toLocaleDateString()}</p>
-            </div>
           </motion.div>
         ))}
       </div>
-
-      {/* Empty State */}
-      {plans.length === 0 && (
-        <div className="text-center py-12">
-          <svg
-            className="w-16 h-16 text-gray-400 mx-auto mb-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-            />
-          </svg>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            No subscription plans
-          </h3>
-          <p className="text-gray-600 mb-4">
-            Create your first subscription plan to get started.
-          </p>
-          <button
-            onClick={() => {
-              setShowCreateModal(true);
-              setEditingPlan(null);
-              resetForm();
-            }}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Create Plan
-          </button>
-        </div>
-      )}
 
       {/* Create/Edit Modal */}
       {showCreateModal && (

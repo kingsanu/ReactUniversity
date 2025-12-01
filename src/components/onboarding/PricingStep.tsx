@@ -25,17 +25,13 @@ const PLATFORM_FEE_PERCENTAGE = 15;
 
 const CURRENCIES = [
   { code: "USD", symbol: "$", name: "US Dollar" },
-  { code: "EUR", symbol: "€", name: "Euro" },
-  { code: "GBP", symbol: "£", name: "British Pound" },
-  { code: "INR", symbol: "₹", name: "Indian Rupee" },
 ];
 
 export function PricingStep({ data, onNext, onBack }: PricingStepProps) {
   const [hourlyRate, setHourlyRate] = useState(data.hourlyRate || 50);
-  const [currency, setCurrency] = useState(data.currency || "USD");
   const [errors, setErrors] = useState<{ hourlyRate?: string }>({});
 
-  const selectedCurrency = CURRENCIES.find((c) => c.code === currency);
+  const selectedCurrency = CURRENCIES[0]; // Always USD
   const platformFee = (hourlyRate * PLATFORM_FEE_PERCENTAGE) / 100;
   const yourEarnings = hourlyRate - platformFee;
 
@@ -56,29 +52,13 @@ export function PricingStep({ data, onNext, onBack }: PricingStepProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validate()) {
-      onNext({ hourlyRate, currency });
+      onNext({ hourlyRate, currency: "USD" });
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="currency">Currency</Label>
-          <Select value={currency} onValueChange={setCurrency}>
-            <SelectTrigger id="currency">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {CURRENCIES.map((curr) => (
-                <SelectItem key={curr.code} value={curr.code}>
-                  {curr.symbol} {curr.name} ({curr.code})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
         <div className="space-y-2">
           <Label htmlFor="hourlyRate">
             Hourly Rate ({selectedCurrency?.symbol})
