@@ -26,7 +26,12 @@ export type CampusSetting = "urban" | "suburban" | "rural";
 /**
  * Degree levels offered
  */
-export type DegreeLevel = "Associate" | "Bachelor" | "Master" | "Doctorate" | "Certificate";
+export type DegreeLevel =
+  | "Associate"
+  | "Bachelor"
+  | "Master"
+  | "Doctorate"
+  | "Certificate";
 
 /**
  * Fields of study
@@ -172,10 +177,10 @@ export interface University {
  * Match breakdown for recommendations
  */
 export interface MatchBreakdown {
-  personalityMatch: number;   // PCA-based (0-100)
-  academicMatch: number;      // MIL-based (0-100)
-  careerAlignment: number;    // Career goals (0-100)
-  preferencesMatch: number;   // User preferences (0-100)
+  personalityMatch: number; // PCA-based (0-100)
+  academicMatch: number; // MIL-based (0-100)
+  careerAlignment: number; // Career goals (0-100)
+  preferencesMatch: number; // User preferences (0-100)
 }
 
 /**
@@ -323,11 +328,36 @@ export interface UniversityComparison {
  */
 export interface UniversityFilterOptions {
   countries: { code: string; name: string; nameEs?: string; count: number }[];
-  types: { value: UniversityType; label: string; labelEs: string; count: number }[];
-  degrees: { value: DegreeLevel; label: string; labelEs: string; count: number }[];
-  fields: { value: FieldOfStudy; label: string; labelEs: string; count: number }[];
-  campusSizes: { value: CampusSize; label: string; labelEs: string; count: number }[];
-  settings: { value: CampusSetting; label: string; labelEs: string; count: number }[];
+  types: {
+    value: UniversityType;
+    label: string;
+    labelEs: string;
+    count: number;
+  }[];
+  degrees: {
+    value: DegreeLevel;
+    label: string;
+    labelEs: string;
+    count: number;
+  }[];
+  fields: {
+    value: FieldOfStudy;
+    label: string;
+    labelEs: string;
+    count: number;
+  }[];
+  campusSizes: {
+    value: CampusSize;
+    label: string;
+    labelEs: string;
+    count: number;
+  }[];
+  settings: {
+    value: CampusSetting;
+    label: string;
+    labelEs: string;
+    count: number;
+  }[];
   tuitionRange: { min: number; max: number; currency: string };
   rankingRange: { min: number; max: number };
 }

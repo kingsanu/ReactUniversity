@@ -5,6 +5,7 @@ This document outlines the backend API routes needed for the University Suggesti
 ## Overview
 
 The University Suggestions module recommends universities based on:
+
 - **PCA Assessment** - Personality traits for major/program matching
 - **MIL/LIA Assessment** - Cognitive abilities for academic rigor matching
 - **Career Goals** - Target career alignment with university programs
@@ -24,14 +25,14 @@ interface University {
   logo: string;
   coverImage?: string;
   type: "public" | "private" | "community";
-  
+
   // Location
   country: string;
   state?: string;
   city: string;
   address?: string;
   coordinates?: { lat: number; lng: number };
-  
+
   // Rankings & Stats
   ranking: {
     global?: number;
@@ -45,13 +46,13 @@ interface University {
   studentCount?: number;
   facultyCount?: number;
   studentFacultyRatio?: number;
-  
+
   // Academics
   programs: UniversityProgram[];
   majors: string[];
   researchAreas?: string[];
   accreditations?: string[];
-  
+
   // Financial
   tuition: {
     inState?: number;
@@ -65,19 +66,19 @@ interface University {
     averageAid?: number;
     percentReceivingAid?: number;
   };
-  
+
   // Campus Life
   campusSize?: "small" | "medium" | "large";
   setting?: "urban" | "suburban" | "rural";
   housing?: boolean;
   athletics?: boolean;
-  
+
   // Contact & Links
   website: string;
   admissionsUrl?: string;
   email?: string;
   phone?: string;
-  
+
   // Metadata
   description: string;
   highlights?: string[];
@@ -108,10 +109,10 @@ interface UniversityRecommendation {
   university: University;
   matchScore: number; // 0-100
   matchBreakdown: {
-    personalityMatch: number;   // PCA-based
-    academicMatch: number;      // MIL-based
-    careerAlignment: number;    // Career goals
-    preferencesMatch: number;   // User preferences
+    personalityMatch: number; // PCA-based
+    academicMatch: number; // MIL-based
+    careerAlignment: number; // Career goals
+    preferencesMatch: number; // User preferences
   };
   matchReasons: {
     en: string[];
@@ -133,6 +134,7 @@ interface UniversityRecommendation {
 **Description:** Search and filter universities with pagination support.
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 Content-Type: application/json
@@ -158,11 +160,13 @@ Content-Type: application/json
 | `lang` | string | No | `en` | Language: `en` or `es` |
 
 **Request Example:**
+
 ```http
 GET /api/v1/universities?country=US,MX&type=public&degree=Bachelor&tuitionMax=30000&sort=ranking&page=1&limit=20
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -193,7 +197,11 @@ GET /api/v1/universities?country=US,MX&type=public&degree=Bachelor&tuitionMax=30
         "campusSize": "medium",
         "setting": "urban",
         "description": "World-leading research university...",
-        "highlights": ["#1 Engineering", "Top Research Output", "92% Employment Rate"],
+        "highlights": [
+          "#1 Engineering",
+          "Top Research Output",
+          "92% Employment Rate"
+        ],
         "programCount": 53
       }
     ],
@@ -205,7 +213,12 @@ GET /api/v1/universities?country=US,MX&type=public&degree=Bachelor&tuitionMax=30
     },
     "filters": {
       "availableCountries": ["US", "MX", "CA", "UK", "ES"],
-      "availableFields": ["Engineering", "Business", "Computer Science", "Medicine"],
+      "availableFields": [
+        "Engineering",
+        "Business",
+        "Computer Science",
+        "Medicine"
+      ],
       "tuitionRange": { "min": 0, "max": 75000 }
     }
   }
@@ -213,6 +226,7 @@ GET /api/v1/universities?country=US,MX&type=public&degree=Bachelor&tuitionMax=30
 ```
 
 **Where Used:**
+
 - `src/app/dashboard/university/page.tsx` - University catalog page
 - `src/hooks/useUniversityQueries.ts` - Data fetching hook
 
@@ -225,6 +239,7 @@ GET /api/v1/universities?country=US,MX&type=public&degree=Bachelor&tuitionMax=30
 **Description:** Get complete details for a specific university.
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
@@ -241,6 +256,7 @@ Authorization: Bearer <token>
 | `includePrograms` | boolean | No | Include full program list (default: true) |
 
 **Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -282,12 +298,26 @@ Authorization: Bearer <token>
           "duration": 4,
           "credits": 180,
           "description": "Comprehensive CS program...",
-          "careerOutcomes": ["Software Engineer", "Data Scientist", "Product Manager"],
-          "requiredCompetencies": ["Problem Solving", "Analytical Thinking", "Creativity"],
+          "careerOutcomes": [
+            "Software Engineer",
+            "Data Scientist",
+            "Product Manager"
+          ],
+          "requiredCompetencies": [
+            "Problem Solving",
+            "Analytical Thinking",
+            "Creativity"
+          ],
           "matchingPersonalityTraits": ["C", "D"]
         }
       ],
-      "majors": ["Computer Science", "Engineering", "Business", "Medicine", "Law"],
+      "majors": [
+        "Computer Science",
+        "Engineering",
+        "Business",
+        "Medicine",
+        "Law"
+      ],
       "researchAreas": ["AI", "Biotechnology", "Clean Energy", "Medicine"],
       "accreditations": ["WASC", "AACSB", "ABET"],
       "tuition": {
@@ -329,6 +359,7 @@ Authorization: Bearer <token>
 ```
 
 **Where Used:**
+
 - `src/components/dashboard/University/UniversityDetailsModal.tsx` - Details modal
 
 ---
@@ -340,6 +371,7 @@ Authorization: Bearer <token>
 **Description:** Get AI-powered personalized university recommendations based on user's assessments and preferences.
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
@@ -355,8 +387,9 @@ Authorization: Bearer <token>
 | `lang` | string | No | Language: `en` or `es` |
 
 **Recommendation Algorithm:**
+
 ```
-Total Score = (PersonalityMatch × 0.30) + (AcademicMatch × 0.25) + 
+Total Score = (PersonalityMatch × 0.30) + (AcademicMatch × 0.25) +
               (CareerAlignment × 0.25) + (PreferencesMatch × 0.20)
 
 Where:
@@ -367,6 +400,7 @@ Where:
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -438,6 +472,7 @@ Where:
 ```
 
 **Where Used:**
+
 - `src/app/dashboard/university/page.tsx` - Recommendations section
 - `src/components/dashboard/University/UniversityStats.tsx` - Match insights
 - `src/hooks/useUniversityQueries.ts` - React Query hook
@@ -451,6 +486,7 @@ Where:
 **Description:** Get aggregated statistics about user's university recommendations.
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
@@ -461,6 +497,7 @@ Authorization: Bearer <token>
 | `lang` | string | No | Language: `en` or `es` |
 
 **Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -506,6 +543,7 @@ Authorization: Bearer <token>
 ```
 
 **Where Used:**
+
 - `src/components/dashboard/University/UniversityStats.tsx` - Stats display
 
 ---
@@ -517,6 +555,7 @@ Authorization: Bearer <token>
 **Description:** Toggle favorite status for a university.
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 Content-Type: application/json
@@ -528,6 +567,7 @@ Content-Type: application/json
 | `id` | string | Yes | University ID |
 
 **Request Body:**
+
 ```json
 {
   "action": "save" | "unsave"
@@ -535,6 +575,7 @@ Content-Type: application/json
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -548,6 +589,7 @@ Content-Type: application/json
 ```
 
 **Where Used:**
+
 - `src/components/dashboard/University/UniversityCard.tsx` - Favorite button
 - `src/hooks/useUniversityQueries.ts` - Mutation hook
 
@@ -560,6 +602,7 @@ Content-Type: application/json
 **Description:** Get list of user's favorited universities.
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
@@ -572,6 +615,7 @@ Authorization: Bearer <token>
 | `lang` | string | No | Language: `en` or `es` |
 
 **Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -579,7 +623,9 @@ Authorization: Bearer <token>
     "favorites": [
       {
         "universityId": "uni_stanford_001",
-        "university": { /* University object */ },
+        "university": {
+          /* University object */
+        },
         "favoritedAt": "2024-12-03T10:30:00Z",
         "matchScore": 94,
         "notes": "Top choice for CS"
@@ -596,6 +642,7 @@ Authorization: Bearer <token>
 ```
 
 **Where Used:**
+
 - `src/app/dashboard/university/page.tsx` - Favorites tab
 - `src/hooks/useUniversityQueries.ts` - Query hook
 
@@ -608,12 +655,14 @@ Authorization: Bearer <token>
 **Description:** Get side-by-side comparison of multiple universities.
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 Content-Type: application/json
 ```
 
 **Request Body:**
+
 ```json
 {
   "universityIds": ["uni_stanford_001", "uni_mit_001", "uni_berkeley_001"],
@@ -622,6 +671,7 @@ Content-Type: application/json
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -668,8 +718,13 @@ Content-Type: application/json
       }
     ],
     "comparisonFields": [
-      "ranking", "acceptanceRate", "tuition", "graduationRate", 
-      "studentCount", "setting", "financialAid"
+      "ranking",
+      "acceptanceRate",
+      "tuition",
+      "graduationRate",
+      "studentCount",
+      "setting",
+      "financialAid"
     ],
     "recommendation": {
       "bestOverall": "uni_stanford_001",
@@ -681,6 +736,7 @@ Content-Type: application/json
 ```
 
 **Where Used:**
+
 - `src/components/dashboard/University/UniversityCompareModal.tsx` - Comparison view
 
 ---
@@ -692,11 +748,13 @@ Content-Type: application/json
 **Description:** Get available filter options with counts.
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -751,6 +809,7 @@ Authorization: Bearer <token>
 ```
 
 **Where Used:**
+
 - `src/components/dashboard/University/UniversityFilters.tsx` - Filter sidebar
 
 ---
@@ -764,6 +823,7 @@ Authorization: Bearer <token>
 **Description:** Get all universities with admin-level details.
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 X-Admin-Role: admin
@@ -778,6 +838,7 @@ X-Admin-Role: admin
 | `limit` | number | No | Items per page |
 
 **Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -809,6 +870,7 @@ X-Admin-Role: admin
 **Description:** Create a new university entry.
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 X-Admin-Role: admin
@@ -816,6 +878,7 @@ Content-Type: application/json
 ```
 
 **Request Body:**
+
 ```json
 {
   "name": "Stanford University",
@@ -846,11 +909,14 @@ Content-Type: application/json
 ```
 
 **Response (201 Created):**
+
 ```json
 {
   "success": true,
   "data": {
-    "university": { /* Full university object */ }
+    "university": {
+      /* Full university object */
+    }
   },
   "message": "University created successfully"
 }
@@ -865,6 +931,7 @@ Content-Type: application/json
 **Description:** Update an existing university.
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 X-Admin-Role: admin
@@ -872,6 +939,7 @@ Content-Type: application/json
 ```
 
 **Request Body:** (Partial update supported)
+
 ```json
 {
   "ranking": { "global": 2, "national": 2 },
@@ -885,11 +953,14 @@ Content-Type: application/json
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "success": true,
   "data": {
-    "university": { /* Updated university object */ }
+    "university": {
+      /* Updated university object */
+    }
   },
   "message": "University updated successfully"
 }
@@ -904,12 +975,14 @@ Content-Type: application/json
 **Description:** Soft delete a university (sets isActive to false).
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 X-Admin-Role: admin
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -926,12 +999,14 @@ X-Admin-Role: admin
 **Description:** Toggle the active status of a university.
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 X-Admin-Role: admin
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -947,17 +1022,18 @@ X-Admin-Role: admin
 
 ## Error Responses
 
-| Status Code | Description |
-|-------------|-------------|
-| 400 | Invalid request parameters |
-| 401 | Unauthorized - invalid/missing token |
-| 403 | Forbidden - admin access required |
-| 404 | University not found |
-| 409 | Conflict - duplicate entry |
-| 422 | Validation error |
-| 500 | Internal server error |
+| Status Code | Description                          |
+| ----------- | ------------------------------------ |
+| 400         | Invalid request parameters           |
+| 401         | Unauthorized - invalid/missing token |
+| 403         | Forbidden - admin access required    |
+| 404         | University not found                 |
+| 409         | Conflict - duplicate entry           |
+| 422         | Validation error                     |
+| 500         | Internal server error                |
 
 **Error Response Format:**
+
 ```json
 {
   "success": false,
@@ -975,30 +1051,30 @@ X-Admin-Role: admin
 
 ### Scoring Factors
 
-| Factor | Weight | Data Source | Description |
-|--------|--------|-------------|-------------|
-| Personality Match | 30% | PCA Assessment | Matches D,I,S,C scores with program personality requirements |
-| Academic Match | 25% | MIL Assessment | Matches cognitive abilities with program academic rigor |
-| Career Alignment | 25% | User Preferences | Matches target career with program career outcomes |
-| Preferences Match | 20% | User Profile | Matches location, budget, campus preferences |
+| Factor            | Weight | Data Source      | Description                                                  |
+| ----------------- | ------ | ---------------- | ------------------------------------------------------------ |
+| Personality Match | 30%    | PCA Assessment   | Matches D,I,S,C scores with program personality requirements |
+| Academic Match    | 25%    | MIL Assessment   | Matches cognitive abilities with program academic rigor      |
+| Career Alignment  | 25%    | User Preferences | Matches target career with program career outcomes           |
+| Preferences Match | 20%    | User Profile     | Matches location, budget, campus preferences                 |
 
 ### Personality-Program Matching Matrix
 
-| PCA Trait | Best Program Types | Example Fields |
-|-----------|-------------------|----------------|
-| High D (Dominance) | Leadership, Management, Competitive | Business, Law, Politics |
-| High I (Influence) | Communication, Creative, Social | Marketing, Arts, Psychology |
-| High S (Steadiness) | Supportive, Structured, Team-based | Healthcare, Education, HR |
+| PCA Trait                  | Best Program Types                    | Example Fields                |
+| -------------------------- | ------------------------------------- | ----------------------------- |
+| High D (Dominance)         | Leadership, Management, Competitive   | Business, Law, Politics       |
+| High I (Influence)         | Communication, Creative, Social       | Marketing, Arts, Psychology   |
+| High S (Steadiness)        | Supportive, Structured, Team-based    | Healthcare, Education, HR     |
 | High C (Conscientiousness) | Analytical, Detail-oriented, Research | Engineering, Science, Finance |
 
 ### Academic Rigor Matching (MIL-based)
 
-| MIL Score Range | Recommended Program Rigor |
-|-----------------|--------------------------|
-| 90-100% | Top-tier research universities, highly competitive programs |
-| 75-89% | Competitive programs at reputable universities |
-| 60-74% | Standard programs at good universities |
-| Below 60% | Programs with additional support, community colleges |
+| MIL Score Range | Recommended Program Rigor                                   |
+| --------------- | ----------------------------------------------------------- |
+| 90-100%         | Top-tier research universities, highly competitive programs |
+| 75-89%          | Competitive programs at reputable universities              |
+| 60-74%          | Standard programs at good universities                      |
+| Below 60%       | Programs with additional support, community colleges        |
 
 ---
 
@@ -1044,29 +1120,30 @@ CREATE INDEX idx_favorites_user ON university_favorites(user_id);
 
 ### Components That Use These APIs
 
-| Component | API Routes Used |
-|-----------|-----------------|
-| `UniversityPage` | Search, Recommendations, Filters |
-| `UniversityCard` | Favorite toggle |
-| `UniversityDetailsModal` | Get Details |
-| `UniversityFilters` | Get Filters |
-| `UniversityStats` | Recommendation Stats |
-| `UniversityCompareModal` | Compare |
-| `AdminUniversityManager` | Admin CRUD routes |
+| Component                | API Routes Used                  |
+| ------------------------ | -------------------------------- |
+| `UniversityPage`         | Search, Recommendations, Filters |
+| `UniversityCard`         | Favorite toggle                  |
+| `UniversityDetailsModal` | Get Details                      |
+| `UniversityFilters`      | Get Filters                      |
+| `UniversityStats`        | Recommendation Stats             |
+| `UniversityCompareModal` | Compare                          |
+| `AdminUniversityManager` | Admin CRUD routes                |
 
 ### React Query Keys
 
 ```typescript
 const universityKeys = {
-  all: ['universities'] as const,
-  lists: () => [...universityKeys.all, 'list'] as const,
-  list: (filters: UniversityFilters) => [...universityKeys.lists(), filters] as const,
-  details: () => [...universityKeys.all, 'detail'] as const,
+  all: ["universities"] as const,
+  lists: () => [...universityKeys.all, "list"] as const,
+  list: (filters: UniversityFilters) =>
+    [...universityKeys.lists(), filters] as const,
+  details: () => [...universityKeys.all, "detail"] as const,
   detail: (id: string) => [...universityKeys.details(), id] as const,
-  recommendations: () => [...universityKeys.all, 'recommendations'] as const,
-  stats: () => [...universityKeys.all, 'stats'] as const,
-  favorites: () => [...universityKeys.all, 'favorites'] as const,
-  filters: () => [...universityKeys.all, 'filters'] as const,
-  compare: (ids: string[]) => [...universityKeys.all, 'compare', ids] as const,
+  recommendations: () => [...universityKeys.all, "recommendations"] as const,
+  stats: () => [...universityKeys.all, "stats"] as const,
+  favorites: () => [...universityKeys.all, "favorites"] as const,
+  filters: () => [...universityKeys.all, "filters"] as const,
+  compare: (ids: string[]) => [...universityKeys.all, "compare", ids] as const,
 };
 ```

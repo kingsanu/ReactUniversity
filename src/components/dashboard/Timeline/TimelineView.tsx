@@ -47,7 +47,10 @@ const IconMap: Record<TimelineIcon, React.ElementType> = {
 /**
  * Color classes for different timeline colors
  */
-const colorClasses: Record<TimelineColor, { bg: string; border: string; text: string; dot: string }> = {
+const colorClasses: Record<
+  TimelineColor,
+  { bg: string; border: string; text: string; dot: string }
+> = {
   green: {
     bg: "bg-emerald-50 dark:bg-emerald-950/30",
     border: "border-emerald-200 dark:border-emerald-800",
@@ -89,7 +92,10 @@ const colorClasses: Record<TimelineColor, { bg: string; border: string; text: st
 /**
  * Assessment type badge styles
  */
-const typeBadgeStyles: Record<AssessmentType, { bg: string; text: string; label: { en: string; sp: string } }> = {
+const typeBadgeStyles: Record<
+  AssessmentType,
+  { bg: string; text: string; label: { en: string; sp: string } }
+> = {
   pca: {
     bg: "bg-violet-100 dark:bg-violet-900/40",
     text: "text-violet-700 dark:text-violet-300",
@@ -115,7 +121,10 @@ const typeBadgeStyles: Record<AssessmentType, { bg: string; text: string; label:
 /**
  * Format date for display
  */
-function formatEventDate(dateString: string, language: "english" | "spanish"): string {
+function formatEventDate(
+  dateString: string,
+  language: "english" | "spanish"
+): string {
   const date = new Date(dateString);
   const locale = language === "spanish" ? es : enUS;
 
@@ -140,7 +149,10 @@ function formatEventTime(dateString: string): string {
 /**
  * Get relative time
  */
-function getRelativeTime(dateString: string, language: "english" | "spanish"): string {
+function getRelativeTime(
+  dateString: string,
+  language: "english" | "spanish"
+): string {
   const date = new Date(dateString);
   const locale = language === "spanish" ? es : enUS;
   return formatDistanceToNow(date, { addSuffix: true, locale });
@@ -398,19 +410,27 @@ function EventMetadata({
           <>
             <div>
               <span className="text-gray-500 dark:text-gray-400">D:</span>
-              <span className="ml-2 font-medium">{metadata.scores.dominance}</span>
+              <span className="ml-2 font-medium">
+                {metadata.scores.dominance}
+              </span>
             </div>
             <div>
               <span className="text-gray-500 dark:text-gray-400">I:</span>
-              <span className="ml-2 font-medium">{metadata.scores.influence}</span>
+              <span className="ml-2 font-medium">
+                {metadata.scores.influence}
+              </span>
             </div>
             <div>
               <span className="text-gray-500 dark:text-gray-400">S:</span>
-              <span className="ml-2 font-medium">{metadata.scores.steadiness}</span>
+              <span className="ml-2 font-medium">
+                {metadata.scores.steadiness}
+              </span>
             </div>
             <div>
               <span className="text-gray-500 dark:text-gray-400">C:</span>
-              <span className="ml-2 font-medium">{metadata.scores.conscientiousness}</span>
+              <span className="ml-2 font-medium">
+                {metadata.scores.conscientiousness}
+              </span>
             </div>
           </>
         )}
@@ -503,7 +523,11 @@ function groupEventsByDate(
 /**
  * Main Timeline View Component
  */
-export function TimelineView({ events, isLoading, onEventClick }: TimelineViewProps) {
+export function TimelineView({
+  events,
+  isLoading,
+  onEventClick,
+}: TimelineViewProps) {
   const { language } = useGlobalStore();
 
   if (isLoading) {

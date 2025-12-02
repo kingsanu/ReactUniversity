@@ -51,7 +51,9 @@ function getIconForType(
 /**
  * Get color for status
  */
-function getColorForStatus(status: TimelineEventStatus): TimelineEvent["color"] {
+function getColorForStatus(
+  status: TimelineEventStatus
+): TimelineEvent["color"] {
   switch (status) {
     case "completed":
       return "green";
@@ -79,8 +81,7 @@ function transformMILToEvents(
     // Only include exams that have been started or completed
     if (exam.status === "not_started") return;
 
-    const examName =
-      MIL_EXAM_NAMES[exam.examType]?.[language] || exam.examName;
+    const examName = MIL_EXAM_NAMES[exam.examType]?.[language] || exam.examName;
 
     // Add completion event if completed
     if (exam.status === "completed" && exam.completionDate) {
@@ -94,8 +95,12 @@ function transformMILToEvents(
             : `${examName} Completed`,
         description:
           language === "sp"
-            ? `Subtest completado con ${exam.scorePercentage.toFixed(1)}% de puntuación`
-            : `Subtest completed with ${exam.scorePercentage.toFixed(1)}% score`,
+            ? `Subtest completado con ${exam.scorePercentage.toFixed(
+                1
+              )}% de puntuación`
+            : `Subtest completed with ${exam.scorePercentage.toFixed(
+                1
+              )}% score`,
         timestamp: exam.completionDate,
         status: "completed",
         metadata: {
@@ -171,10 +176,7 @@ function transformEvaluationToEvents(
         id: `eval_created_${group.id}_${group.createdAt}`,
         type: "evaluation",
         eventType: "group_created",
-        title:
-          language === "sp"
-            ? `Evaluador Agregado`
-            : `Evaluator Added`,
+        title: language === "sp" ? `Evaluador Agregado` : `Evaluator Added`,
         description:
           language === "sp"
             ? `${group.evaluatorName} (${groupLabel}) agregado como evaluador`
@@ -205,9 +207,7 @@ function transformEvaluationToEvents(
         type: "evaluation",
         eventType: "response_received",
         title:
-          language === "sp"
-            ? `Evaluación Recibida`
-            : `Evaluation Received`,
+          language === "sp" ? `Evaluación Recibida` : `Evaluation Received`,
         description:
           language === "sp"
             ? `${group.evaluatorName} completó la evaluación 360°`
@@ -255,7 +255,8 @@ async function transformPCAToEvents(
       events.push({
         id: `pca_started_${pcaStatus.pcaCod || userId}`,
         type: "pca",
-        eventType: pcaStatus.status === "completed" ? "completed" : "in_progress",
+        eventType:
+          pcaStatus.status === "completed" ? "completed" : "in_progress",
         title:
           language === "sp"
             ? pcaStatus.status === "completed"
@@ -412,12 +413,13 @@ export async function getTimelineEvents(
   try {
     // Fetch data from all sources in parallel
     const [milData, evalGroups, pcaEvents] = await Promise.all([
-      getUserExamHistory(userId, language === "sp" ? "spanish" : "english").catch(
-        (err) => {
-          console.warn("Failed to fetch MIL data:", err);
-          return null;
-        }
-      ),
+      getUserExamHistory(
+        userId,
+        language === "sp" ? "spanish" : "english"
+      ).catch((err) => {
+        console.warn("Failed to fetch MIL data:", err);
+        return null;
+      }),
       getUserEvaluationGroups(
         userId,
         language === "sp" ? "spanish" : "english"
@@ -441,7 +443,8 @@ export async function getTimelineEvents(
 
     // Sort by timestamp (newest first)
     allEvents.sort(
-      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      (a, b) =>
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     );
 
     // Apply filters
@@ -593,7 +596,15 @@ export function prepareCSVExport(
 ): string {
   const headers =
     language === "sp"
-      ? ["Fecha", "Tipo", "Evento", "Título", "Descripción", "Estado", "Puntuación"]
+      ? [
+          "Fecha",
+          "Tipo",
+          "Evento",
+          "Título",
+          "Descripción",
+          "Estado",
+          "Puntuación",
+        ]
       : ["Date", "Type", "Event", "Title", "Description", "Status", "Score"];
 
   const rows = events.map((event) => {
@@ -656,14 +667,20 @@ export async function exportTimeline(
 
   if (config.format === "csv") {
     const csvContent = prepareCSVExport(events, language);
-    const filename = `assessment_timeline_${new Date().toISOString().split("T")[0]}.csv`;
+    const filename = `assessment_timeline_${
+      new Date().toISOString().split("T")[0]
+    }.csv`;
     downloadFile(csvContent, filename, "text/csv;charset=utf-8;");
   } else if (config.format === "pdf") {
     // For PDF, we'll need a backend route or client-side PDF generation
     // For now, trigger CSV download with a note
-    console.warn("PDF export requires backend implementation. Falling back to CSV.");
+    console.warn(
+      "PDF export requires backend implementation. Falling back to CSV."
+    );
     const csvContent = prepareCSVExport(events, language);
-    const filename = `assessment_timeline_${new Date().toISOString().split("T")[0]}.csv`;
+    const filename = `assessment_timeline_${
+      new Date().toISOString().split("T")[0]
+    }.csv`;
     downloadFile(csvContent, filename, "text/csv;charset=utf-8;");
   }
 }

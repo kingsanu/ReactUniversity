@@ -2,7 +2,14 @@
 
 import React from "react";
 import { motion } from "motion/react";
-import { Star, MapPin, Heart, HeartOff, GraduationCap, ArrowRight } from "lucide-react";
+import {
+  Star,
+  MapPin,
+  Heart,
+  HeartOff,
+  GraduationCap,
+  ArrowRight,
+} from "lucide-react";
 import { UniversityCardProps } from "@/types/university";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -21,7 +28,10 @@ export function UniversityCard({
 }: UniversityCardProps) {
   const { language } = useGlobalStore();
   const tuition =
-    university.tuition.international ?? university.tuition.outOfState ?? university.tuition.inState ?? 0;
+    university.tuition.international ??
+    university.tuition.outOfState ??
+    university.tuition.inState ??
+    0;
 
   return (
     <motion.div
@@ -31,7 +41,7 @@ export function UniversityCard({
       className={cn(
         "relative flex flex-col rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden",
         "hover:shadow-md transition-shadow",
-        variant === "featured" && "border-primary/40 ring-1 ring-primary/20",
+        variant === "featured" && "border-primary/40 ring-1 ring-primary/20"
       )}
     >
       {/* Header banner */}
@@ -47,13 +57,21 @@ export function UniversityCard({
             <div className="h-12 w-12 rounded-lg bg-white shadow flex items-center justify-center overflow-hidden">
               {university.logo ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={university.logo} alt={university.name} className="h-full w-full object-contain p-1" />
+                <img
+                  src={university.logo}
+                  alt={university.name}
+                  className="h-full w-full object-contain p-1"
+                />
               ) : (
-                <span className="text-sm font-semibold">{university.shortName || university.name.slice(0, 3)}</span>
+                <span className="text-sm font-semibold">
+                  {university.shortName || university.name.slice(0, 3)}
+                </span>
               )}
             </div>
             <div>
-              <h3 className="text-base font-semibold text-white line-clamp-1">{university.name}</h3>
+              <h3 className="text-base font-semibold text-white line-clamp-1">
+                {university.name}
+              </h3>
               <p className="text-xs text-slate-200 flex items-center gap-1">
                 <MapPin className="h-3 w-3" />
                 <span>
@@ -69,7 +87,9 @@ export function UniversityCard({
                 <span className="text-xs">/100</span>
               </div>
               <p className="text-[10px] text-emerald-100">
-                {language === "spanish" ? "Coincidencia total" : "Overall match"}
+                {language === "spanish"
+                  ? "Coincidencia total"
+                  : "Overall match"}
               </p>
             </div>
           )}
@@ -88,12 +108,14 @@ export function UniversityCard({
           {university.ranking.global && (
             <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-900/30 px-2 py-0.5 text-[10px] text-amber-700 dark:text-amber-300">
               <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-              {language === "spanish" ? "Ranking global" : "Global rank"}: #{university.ranking.global}
+              {language === "spanish" ? "Ranking global" : "Global rank"}: #
+              {university.ranking.global}
             </span>
           )}
           {university.acceptanceRate && (
             <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 text-[10px] text-emerald-700 dark:text-emerald-300">
-              {language === "spanish" ? "Aceptación" : "Acceptance"}: {university.acceptanceRate}%
+              {language === "spanish" ? "Aceptación" : "Acceptance"}:{" "}
+              {university.acceptanceRate}%
             </span>
           )}
         </div>
@@ -115,7 +137,9 @@ export function UniversityCard({
                 ${tuition.toLocaleString()} {university.tuition.currency}
               </p>
               <p className="text-[10px] text-slate-500">
-                {language === "spanish" ? "por año (aprox.)" : "per year (approx.)"}
+                {language === "spanish"
+                  ? "por año (aprox.)"
+                  : "per year (approx.)"}
               </p>
             </div>
           )}
@@ -144,7 +168,7 @@ export function UniversityCard({
               "inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[11px] transition-colors",
               isFavorite
                 ? "border-rose-500 bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-300"
-                : "border-slate-300 text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800",
+                : "border-slate-300 text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
             )}
           >
             {isFavorite ? (
@@ -163,7 +187,7 @@ export function UniversityCard({
                 "inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[11px] transition-colors",
                 isCompareSelected
                   ? "border-blue-500 bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300"
-                  : "border-slate-300 text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800",
+                  : "border-slate-300 text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
               )}
             >
               <span>{language === "spanish" ? "Comparar" : "Compare"}</span>
@@ -177,7 +201,9 @@ export function UniversityCard({
           className="h-8 px-2 text-xs gap-1"
           onClick={() => onViewDetails?.(university)}
         >
-          <span>{language === "spanish" ? "Ver detalles" : "View details"}</span>
+          <span>
+            {language === "spanish" ? "Ver detalles" : "View details"}
+          </span>
           <ArrowRight className="h-3 w-3" />
         </Button>
       </div>

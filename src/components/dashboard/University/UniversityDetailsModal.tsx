@@ -3,9 +3,20 @@
 import React from "react";
 import { motion } from "motion/react";
 import { UniversityDetailsModalProps } from "@/types/university";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Globe2, ExternalLink, GraduationCap, TrendingUp } from "lucide-react";
+import {
+  MapPin,
+  Globe2,
+  ExternalLink,
+  GraduationCap,
+  TrendingUp,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useGlobalStore } from "@/store/useGlobalStore";
 
@@ -39,9 +50,15 @@ export function UniversityDetailsModal({
                 <div className="h-12 w-12 rounded-lg bg-white shadow flex items-center justify-center overflow-hidden">
                   {university.logo ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={university.logo} alt={university.name} className="h-full w-full object-contain p-1" />
+                    <img
+                      src={university.logo}
+                      alt={university.name}
+                      className="h-full w-full object-contain p-1"
+                    />
                   ) : (
-                    <span className="text-sm font-semibold">{university.shortName || university.name.slice(0, 3)}</span>
+                    <span className="text-sm font-semibold">
+                      {university.shortName || university.name.slice(0, 3)}
+                    </span>
                   )}
                 </div>
                 <div>
@@ -64,7 +81,9 @@ export function UniversityDetailsModal({
                     <span className="text-2xl font-bold">{matchScore}</span>
                     <span className="text-xs">/100</span>
                   </div>
-                  <p className="text-[11px]">{t("Overall match", "Coincidencia total")}</p>
+                  <p className="text-[11px]">
+                    {t("Overall match", "Coincidencia total")}
+                  </p>
                 </motion.div>
               )}
             </div>
@@ -82,7 +101,10 @@ export function UniversityDetailsModal({
                 <div className="rounded-lg border bg-emerald-50/40 dark:bg-emerald-900/10 p-3">
                   <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-200 mb-1 flex items-center gap-1">
                     <TrendingUp className="h-3 w-3" />
-                    {t("Why this university fits you", "Por qué esta universidad encaja contigo")}
+                    {t(
+                      "Why this university fits you",
+                      "Por qué esta universidad encaja contigo"
+                    )}
                   </p>
                   <ul className="space-y-1.5 text-[11px] text-emerald-900 dark:text-emerald-100">
                     {matchReasons.map((r, idx) => (
@@ -108,7 +130,9 @@ export function UniversityDetailsModal({
                         className="rounded-lg border bg-card/40 px-3 py-2 text-xs flex items-center justify-between gap-2"
                       >
                         <div>
-                          <p className="font-medium text-foreground line-clamp-1">{p.name}</p>
+                          <p className="font-medium text-foreground line-clamp-1">
+                            {p.name}
+                          </p>
                           <p className="text-[11px] text-muted-foreground">
                             {p.degree} • {p.field}
                           </p>
@@ -139,26 +163,42 @@ export function UniversityDetailsModal({
                 <div className="grid grid-cols-2 gap-2">
                   {university.ranking.global && (
                     <div>
-                      <p className="text-[10px] text-muted-foreground">{t("Global rank", "Ranking global")}</p>
-                      <p className="text-sm font-semibold">#{university.ranking.global}</p>
+                      <p className="text-[10px] text-muted-foreground">
+                        {t("Global rank", "Ranking global")}
+                      </p>
+                      <p className="text-sm font-semibold">
+                        #{university.ranking.global}
+                      </p>
                     </div>
                   )}
                   {university.acceptanceRate && (
                     <div>
-                      <p className="text-[10px] text-muted-foreground">{t("Acceptance", "Aceptación")}</p>
-                      <p className="text-sm font-semibold">{university.acceptanceRate}%</p>
+                      <p className="text-[10px] text-muted-foreground">
+                        {t("Acceptance", "Aceptación")}
+                      </p>
+                      <p className="text-sm font-semibold">
+                        {university.acceptanceRate}%
+                      </p>
                     </div>
                   )}
                   {university.graduationRate && (
                     <div>
-                      <p className="text-[10px] text-muted-foreground">{t("Graduation", "Graduación")}</p>
-                      <p className="text-sm font-semibold">{university.graduationRate}%</p>
+                      <p className="text-[10px] text-muted-foreground">
+                        {t("Graduation", "Graduación")}
+                      </p>
+                      <p className="text-sm font-semibold">
+                        {university.graduationRate}%
+                      </p>
                     </div>
                   )}
                   {university.employmentRate && (
                     <div>
-                      <p className="text-[10px] text-muted-foreground">{t("Employment", "Empleabilidad")}</p>
-                      <p className="text-sm font-semibold">{university.employmentRate}%</p>
+                      <p className="text-[10px] text-muted-foreground">
+                        {t("Employment", "Empleabilidad")}
+                      </p>
+                      <p className="text-sm font-semibold">
+                        {university.employmentRate}%
+                      </p>
                     </div>
                   )}
                 </div>
@@ -166,15 +206,25 @@ export function UniversityDetailsModal({
                 {university.tuition && (
                   <div className="mt-2 border-t pt-2">
                     <p className="text-[10px] text-muted-foreground mb-1">
-                      {t("Estimated tuition per year", "Matrícula estimada por año")}
+                      {t(
+                        "Estimated tuition per year",
+                        "Matrícula estimada por año"
+                      )}
                     </p>
                     <p className="text-sm font-semibold">
                       $
-                      {(university.tuition.international ?? university.tuition.outOfState ?? university.tuition.inState ?? 0).toLocaleString()}{" "}
+                      {(
+                        university.tuition.international ??
+                        university.tuition.outOfState ??
+                        university.tuition.inState ??
+                        0
+                      ).toLocaleString()}{" "}
                       {university.tuition.currency}
                     </p>
                     <p className="text-[10px] text-muted-foreground">
-                      {language === "spanish" ? "Referencia aproximada" : "Approximate reference"}
+                      {language === "spanish"
+                        ? "Referencia aproximada"
+                        : "Approximate reference"}
                     </p>
                   </div>
                 )}
@@ -228,7 +278,11 @@ export function UniversityDetailsModal({
               {university.tags && university.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
                   {university.tags.map((tag) => (
-                    <Badge key={tag} variant="outline" className="text-[10px] px-2 py-0.5">
+                    <Badge
+                      key={tag}
+                      variant="outline"
+                      className="text-[10px] px-2 py-0.5"
+                    >
                       {tag}
                     </Badge>
                   ))}

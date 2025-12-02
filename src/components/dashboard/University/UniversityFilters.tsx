@@ -1,8 +1,19 @@
 "use client";
 
 import React from "react";
-import { SlidersHorizontal, Globe2, DollarSign, GraduationCap, Filter, X } from "lucide-react";
-import { UniversityFiltersProps, DegreeLevel, FieldOfStudy } from "@/types/university";
+import {
+  SlidersHorizontal,
+  Globe2,
+  DollarSign,
+  GraduationCap,
+  Filter,
+  X,
+} from "lucide-react";
+import {
+  UniversityFiltersProps,
+  DegreeLevel,
+  FieldOfStudy,
+} from "@/types/university";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +21,15 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { useGlobalStore } from "@/store/useGlobalStore";
 
-function Chip({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
+function Chip({
+  active,
+  label,
+  onClick,
+}: {
+  active: boolean;
+  label: string;
+  onClick: () => void;
+}) {
   return (
     <button
       type="button"
@@ -19,7 +38,7 @@ function Chip({ active, label, onClick }: { active: boolean; label: string; onCl
         "inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-colors",
         active
           ? "border-primary bg-primary/10 text-primary"
-          : "border-border bg-background text-muted-foreground hover:bg-muted",
+          : "border-border bg-background text-muted-foreground hover:bg-muted"
       )}
     >
       {label}
@@ -28,7 +47,12 @@ function Chip({ active, label, onClick }: { active: boolean; label: string; onCl
   );
 }
 
-export function UniversityFilters({ filters, onFiltersChange, filterOptions, isLoading }: UniversityFiltersProps) {
+export function UniversityFilters({
+  filters,
+  onFiltersChange,
+  filterOptions,
+  isLoading,
+}: UniversityFiltersProps) {
   const { language } = useGlobalStore();
   const [search, setSearch] = React.useState(filters.search ?? "");
 
@@ -54,16 +78,21 @@ export function UniversityFilters({ filters, onFiltersChange, filterOptions, isL
   };
 
   const tuitionMin = filters.tuitionMin ?? filterOptions?.tuitionRange.min ?? 0;
-  const tuitionMax = filters.tuitionMax ?? filterOptions?.tuitionRange.max ?? 80000;
+  const tuitionMax =
+    filters.tuitionMax ?? filterOptions?.tuitionRange.max ?? 80000;
 
   const handleTuitionChange = (value: number, type: "min" | "max") => {
     const clamped = Math.min(
       Math.max(value, filterOptions?.tuitionRange.min ?? 0),
-      filterOptions?.tuitionRange.max ?? 80000,
+      filterOptions?.tuitionRange.max ?? 80000
     );
     const nextMin = type === "min" ? clamped : tuitionMin;
     const nextMax = type === "max" ? clamped : tuitionMax;
-    onFiltersChange({ ...filters, tuitionMin: nextMin, tuitionMax: Math.max(nextMin, nextMax) });
+    onFiltersChange({
+      ...filters,
+      tuitionMin: nextMin,
+      tuitionMax: Math.max(nextMin, nextMax),
+    });
   };
 
   const resetAll = () => {
@@ -97,7 +126,10 @@ export function UniversityFilters({ filters, onFiltersChange, filterOptions, isL
           {t("Search", "Buscar")}
         </label>
         <Input
-          placeholder={t("Search by name, city, country", "Buscar por nombre, ciudad, país")}
+          placeholder={t(
+            "Search by name, city, country",
+            "Buscar por nombre, ciudad, país"
+          )}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="h-9 text-xs"
@@ -118,9 +150,14 @@ export function UniversityFilters({ filters, onFiltersChange, filterOptions, isL
               active={filters.countries?.includes(c.code) ?? false}
               onClick={() => {
                 const current = new Set(filters.countries ?? []);
-                current.has(c.code) ? current.delete(c.code) : current.add(c.code);
+                current.has(c.code)
+                  ? current.delete(c.code)
+                  : current.add(c.code);
                 const next = Array.from(current);
-                onFiltersChange({ ...filters, countries: next.length ? next : undefined });
+                onFiltersChange({
+                  ...filters,
+                  countries: next.length ? next : undefined,
+                });
               }}
             />
           ))}
@@ -134,7 +171,9 @@ export function UniversityFilters({ filters, onFiltersChange, filterOptions, isL
           <span>{t("Degree level", "Nivel de grado")}</span>
         </div>
         <div className="flex flex-wrap gap-1.5">
-          {(["Associate", "Bachelor", "Master", "Doctorate"] as DegreeLevel[]).map((deg) => (
+          {(
+            ["Associate", "Bachelor", "Master", "Doctorate"] as DegreeLevel[]
+          ).map((deg) => (
             <Chip
               key={deg}
               label={deg}
@@ -178,14 +217,18 @@ export function UniversityFilters({ filters, onFiltersChange, filterOptions, isL
             type="number"
             className="h-8 w-24 text-xs"
             value={tuitionMin}
-            onChange={(e) => handleTuitionChange(Number(e.target.value) || 0, "min")}
+            onChange={(e) =>
+              handleTuitionChange(Number(e.target.value) || 0, "min")
+            }
           />
           <span className="text-[11px] text-muted-foreground">-</span>
           <Input
             type="number"
             className="h-8 w-24 text-xs"
             value={tuitionMax}
-            onChange={(e) => handleTuitionChange(Number(e.target.value) || 0, "max")}
+            onChange={(e) =>
+              handleTuitionChange(Number(e.target.value) || 0, "max")
+            }
           />
         </div>
       </div>
@@ -194,26 +237,40 @@ export function UniversityFilters({ filters, onFiltersChange, filterOptions, isL
       <div className="space-y-3 rounded-lg border bg-card/40 px-3 py-3">
         <div className="flex items-center justify-between gap-2">
           <div className="space-y-0.5">
-            <p className="text-xs font-medium">{t("Financial aid", "Ayuda financiera")}</p>
+            <p className="text-xs font-medium">
+              {t("Financial aid", "Ayuda financiera")}
+            </p>
             <p className="text-[11px] text-muted-foreground">
-              {t("Show universities with scholarships", "Solo con becas o apoyo")}
+              {t(
+                "Show universities with scholarships",
+                "Solo con becas o apoyo"
+              )}
             </p>
           </div>
           <Switch
             checked={!!filters.hasFinancialAid}
-            onCheckedChange={(val) => onFiltersChange({ ...filters, hasFinancialAid: val || undefined })}
+            onCheckedChange={(val) =>
+              onFiltersChange({ ...filters, hasFinancialAid: val || undefined })
+            }
           />
         </div>
         <div className="flex items-center justify-between gap-2">
           <div className="space-y-0.5">
-            <p className="text-xs font-medium">{t("On-campus housing", "Residencias estudiantiles")}</p>
+            <p className="text-xs font-medium">
+              {t("On-campus housing", "Residencias estudiantiles")}
+            </p>
             <p className="text-[11px] text-muted-foreground">
-              {t("Include only universities with housing", "Solo universidades con alojamiento")}
+              {t(
+                "Include only universities with housing",
+                "Solo universidades con alojamiento"
+              )}
             </p>
           </div>
           <Switch
             checked={!!filters.hasHousing}
-            onCheckedChange={(val) => onFiltersChange({ ...filters, hasHousing: val || undefined })}
+            onCheckedChange={(val) =>
+              onFiltersChange({ ...filters, hasHousing: val || undefined })
+            }
           />
         </div>
       </div>

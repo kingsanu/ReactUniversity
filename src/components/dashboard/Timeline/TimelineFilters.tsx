@@ -24,20 +24,56 @@ import { useGlobalStore } from "@/store/useGlobalStore";
 /**
  * Assessment type options
  */
-const assessmentTypes: { value: AssessmentType; label: { en: string; sp: string }; color: string }[] = [
-  { value: "pca", label: { en: "PCA", sp: "PCA" }, color: "bg-violet-100 text-violet-700 border-violet-300" },
-  { value: "mil", label: { en: "LIA", sp: "LIA" }, color: "bg-cyan-100 text-cyan-700 border-cyan-300" },
-  { value: "evaluation", label: { en: "360°", sp: "360°" }, color: "bg-orange-100 text-orange-700 border-orange-300" },
-  { value: "course", label: { en: "Courses", sp: "Cursos" }, color: "bg-teal-100 text-teal-700 border-teal-300" },
+const assessmentTypes: {
+  value: AssessmentType;
+  label: { en: string; sp: string };
+  color: string;
+}[] = [
+  {
+    value: "pca",
+    label: { en: "PCA", sp: "PCA" },
+    color: "bg-violet-100 text-violet-700 border-violet-300",
+  },
+  {
+    value: "mil",
+    label: { en: "LIA", sp: "LIA" },
+    color: "bg-cyan-100 text-cyan-700 border-cyan-300",
+  },
+  {
+    value: "evaluation",
+    label: { en: "360°", sp: "360°" },
+    color: "bg-orange-100 text-orange-700 border-orange-300",
+  },
+  {
+    value: "course",
+    label: { en: "Courses", sp: "Cursos" },
+    color: "bg-teal-100 text-teal-700 border-teal-300",
+  },
 ];
 
 /**
  * Status options
  */
-const statusOptions: { value: TimelineEventStatus; label: { en: string; sp: string }; color: string }[] = [
-  { value: "completed", label: { en: "Completed", sp: "Completado" }, color: "bg-emerald-100 text-emerald-700 border-emerald-300" },
-  { value: "in_progress", label: { en: "In Progress", sp: "En Progreso" }, color: "bg-blue-100 text-blue-700 border-blue-300" },
-  { value: "not_started", label: { en: "Not Started", sp: "No Iniciado" }, color: "bg-gray-100 text-gray-700 border-gray-300" },
+const statusOptions: {
+  value: TimelineEventStatus;
+  label: { en: string; sp: string };
+  color: string;
+}[] = [
+  {
+    value: "completed",
+    label: { en: "Completed", sp: "Completado" },
+    color: "bg-emerald-100 text-emerald-700 border-emerald-300",
+  },
+  {
+    value: "in_progress",
+    label: { en: "In Progress", sp: "En Progreso" },
+    color: "bg-blue-100 text-blue-700 border-blue-300",
+  },
+  {
+    value: "not_started",
+    label: { en: "Not Started", sp: "No Iniciado" },
+    color: "bg-gray-100 text-gray-700 border-gray-300",
+  },
 ];
 
 /**
@@ -70,14 +106,19 @@ function FilterChip({ label, isActive, onClick, color }: FilterChipProps) {
 /**
  * Timeline Filters Component
  */
-export function TimelineFilters({ filters, onFiltersChange }: TimelineFiltersProps) {
+export function TimelineFilters({
+  filters,
+  onFiltersChange,
+}: TimelineFiltersProps) {
   const { language } = useGlobalStore();
   const langKey = language === "spanish" ? "sp" : "en";
   const locale = language === "spanish" ? es : enUS;
 
   const [searchValue, setSearchValue] = React.useState(filters.search || "");
   const [startDate, setStartDate] = React.useState<Date | undefined>(
-    filters.dateRange?.startDate ? new Date(filters.dateRange.startDate) : undefined
+    filters.dateRange?.startDate
+      ? new Date(filters.dateRange.startDate)
+      : undefined
   );
   const [endDate, setEndDate] = React.useState<Date | undefined>(
     filters.dateRange?.endDate ? new Date(filters.dateRange.endDate) : undefined
@@ -97,7 +138,10 @@ export function TimelineFilters({ filters, onFiltersChange }: TimelineFiltersPro
     const newTypes = currentTypes.includes(type)
       ? currentTypes.filter((t) => t !== type)
       : [...currentTypes, type];
-    onFiltersChange({ ...filters, types: newTypes.length > 0 ? newTypes : undefined });
+    onFiltersChange({
+      ...filters,
+      types: newTypes.length > 0 ? newTypes : undefined,
+    });
   };
 
   // Toggle status
@@ -106,7 +150,10 @@ export function TimelineFilters({ filters, onFiltersChange }: TimelineFiltersPro
     const newStatus = currentStatus.includes(status)
       ? currentStatus.filter((s) => s !== status)
       : [...currentStatus, status];
-    onFiltersChange({ ...filters, status: newStatus.length > 0 ? newStatus : undefined });
+    onFiltersChange({
+      ...filters,
+      status: newStatus.length > 0 ? newStatus : undefined,
+    });
   };
 
   // Update date range
@@ -115,12 +162,13 @@ export function TimelineFilters({ filters, onFiltersChange }: TimelineFiltersPro
     setEndDate(end);
     onFiltersChange({
       ...filters,
-      dateRange: start || end
-        ? {
-            startDate: start?.toISOString(),
-            endDate: end?.toISOString(),
-          }
-        : undefined,
+      dateRange:
+        start || end
+          ? {
+              startDate: start?.toISOString(),
+              endDate: end?.toISOString(),
+            }
+          : undefined,
     });
   };
 
@@ -148,7 +196,9 @@ export function TimelineFilters({ filters, onFiltersChange }: TimelineFiltersPro
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
-            placeholder={language === "spanish" ? "Buscar eventos..." : "Search events..."}
+            placeholder={
+              language === "spanish" ? "Buscar eventos..." : "Search events..."
+            }
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
             className="pl-9"
@@ -158,7 +208,10 @@ export function TimelineFilters({ filters, onFiltersChange }: TimelineFiltersPro
         {/* Date Range Picker */}
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" className="w-full sm:w-auto justify-start gap-2">
+            <Button
+              variant="outline"
+              className="w-full sm:w-auto justify-start gap-2"
+            >
               <Calendar className="h-4 w-4" />
               {startDate || endDate ? (
                 <span className="text-sm">
@@ -226,7 +279,9 @@ export function TimelineFilters({ filters, onFiltersChange }: TimelineFiltersPro
               label={type.label[langKey]}
               isActive={filters.types?.includes(type.value) || false}
               onClick={() => toggleType(type.value)}
-              color={filters.types?.includes(type.value) ? type.color : undefined}
+              color={
+                filters.types?.includes(type.value) ? type.color : undefined
+              }
             />
           ))}
         </div>
@@ -244,7 +299,11 @@ export function TimelineFilters({ filters, onFiltersChange }: TimelineFiltersPro
               label={status.label[langKey]}
               isActive={filters.status?.includes(status.value) || false}
               onClick={() => toggleStatus(status.value)}
-              color={filters.status?.includes(status.value) ? status.color : undefined}
+              color={
+                filters.status?.includes(status.value)
+                  ? status.color
+                  : undefined
+              }
             />
           ))}
         </div>
@@ -271,7 +330,10 @@ export function TimelineFilters({ filters, onFiltersChange }: TimelineFiltersPro
 /**
  * Compact filter bar for mobile/smaller screens
  */
-export function TimelineFiltersCompact({ filters, onFiltersChange }: TimelineFiltersProps) {
+export function TimelineFiltersCompact({
+  filters,
+  onFiltersChange,
+}: TimelineFiltersProps) {
   const { language } = useGlobalStore();
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -307,7 +369,10 @@ export function TimelineFiltersCompact({ filters, onFiltersChange }: TimelineFil
             placeholder={language === "spanish" ? "Buscar..." : "Search..."}
             value={filters.search || ""}
             onChange={(e) =>
-              onFiltersChange({ ...filters, search: e.target.value || undefined })
+              onFiltersChange({
+                ...filters,
+                search: e.target.value || undefined,
+              })
             }
             className="pl-9 h-9"
           />
@@ -317,7 +382,10 @@ export function TimelineFiltersCompact({ filters, onFiltersChange }: TimelineFil
       {/* Expandable Filter Panel */}
       {isOpen && (
         <div className="p-4 rounded-lg border bg-white dark:bg-gray-900">
-          <TimelineFilters filters={filters} onFiltersChange={onFiltersChange} />
+          <TimelineFilters
+            filters={filters}
+            onFiltersChange={onFiltersChange}
+          />
         </div>
       )}
     </div>

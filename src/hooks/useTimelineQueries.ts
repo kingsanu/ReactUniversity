@@ -59,16 +59,12 @@ export function useTimelineFilters(initialFilters: TimelineFilters = {}) {
     });
   }, []);
 
-  const setDateRange = useCallback(
-    (startDate?: string, endDate?: string) => {
-      setFilters((prev) => ({
-        ...prev,
-        dateRange:
-          startDate || endDate ? { startDate, endDate } : undefined,
-      }));
-    },
-    []
-  );
+  const setDateRange = useCallback((startDate?: string, endDate?: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      dateRange: startDate || endDate ? { startDate, endDate } : undefined,
+    }));
+  }, []);
 
   const setSearch = useCallback((search: string) => {
     setFilters((prev) => ({

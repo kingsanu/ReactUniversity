@@ -34,38 +34,62 @@ export function UniversityStats({ stats, isLoading }: UniversityStatsProps) {
         <Card>
           <CardContent className="flex h-24 flex-col justify-between p-3">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-medium">{t("Total matches", "Total coincidencias")}</span>
+              <span className="font-medium">
+                {t("Total matches", "Total coincidencias")}
+              </span>
               <TrendingUp className="h-4 w-4 text-primary" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{stats.overview.totalMatches}</p>
+              <p className="text-2xl font-bold">
+                {stats.overview.totalMatches}
+              </p>
               <p className="text-[11px] text-muted-foreground">
-                {t("Universities that fit your profile", "Universidades alineadas a tu perfil")}
+                {t(
+                  "Universities that fit your profile",
+                  "Universidades alineadas a tu perfil"
+                )}
               </p>
             </div>
           </CardContent>
         </Card>
       </motion.div>
 
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
+      >
         <Card>
           <CardContent className="flex h-24 flex-col justify-between p-3">
-            <p className="text-xs font-medium">{t("Top match", "Mejor coincidencia")}</p>
+            <p className="text-xs font-medium">
+              {t("Top match", "Mejor coincidencia")}
+            </p>
             <div>
-              <p className="text-2xl font-bold">{stats.overview.topMatchScore}</p>
+              <p className="text-2xl font-bold">
+                {stats.overview.topMatchScore}
+              </p>
               <p className="text-[11px] text-muted-foreground">
-                {t("Highest recommendation score", "Puntaje de recomendación más alto")}
+                {t(
+                  "Highest recommendation score",
+                  "Puntaje de recomendación más alto"
+                )}
               </p>
             </div>
           </CardContent>
         </Card>
       </motion.div>
 
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+      >
         <Card>
           <CardContent className="flex h-24 flex-col justify-between p-3">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-medium">{t("Focus area", "Área de enfoque")}</span>
+              <span className="font-medium">
+                {t("Focus area", "Área de enfoque")}
+              </span>
               <GraduationCap className="h-4 w-4 text-primary" />
             </div>
             <div>
@@ -73,24 +97,36 @@ export function UniversityStats({ stats, isLoading }: UniversityStatsProps) {
                 {topField?.field || t("Not available", "No disponible")}
               </p>
               <p className="text-[11px] text-muted-foreground">
-                {t("Best-matching field of study", "Campo de estudio con mejor ajuste")}
+                {t(
+                  "Best-matching field of study",
+                  "Campo de estudio con mejor ajuste"
+                )}
               </p>
             </div>
           </CardContent>
         </Card>
       </motion.div>
 
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+      >
         <Card>
           <CardContent className="flex h-24 flex-col justify-between p-3">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-medium">{t("Top region", "Mejor región")}</span>
+              <span className="font-medium">
+                {t("Top region", "Mejor región")}
+              </span>
               <MapPin className="h-4 w-4 text-primary" />
             </div>
             <div>
               <p className="text-sm font-semibold">{topCountry || "-"}</p>
               <p className="text-[11px] text-muted-foreground">
-                {t("Country with strongest matches", "País con mejores coincidencias")}
+                {t(
+                  "Country with strongest matches",
+                  "País con mejores coincidencias"
+                )}
               </p>
             </div>
           </CardContent>

@@ -11,7 +11,10 @@ import {
   DegreeLevel,
   FieldOfStudy,
 } from "@/types/university";
-import { getMockUniversities, getMockUniversityById } from "@/data/mockUniversities";
+import {
+  getMockUniversities,
+  getMockUniversityById,
+} from "@/data/mockUniversities";
 
 // --- Helper functions ---
 
@@ -20,17 +23,30 @@ function normalizeScore(score: number, min = 0, max = 100): number {
   return Math.min(max, Math.max(min, score));
 }
 
-function filterUniversities(universities: University[], filters: UniversityFilters): University[] {
+function filterUniversities(
+  universities: University[],
+  filters: UniversityFilters
+): University[] {
   return universities.filter((uni) => {
     if (filters.search) {
       const q = filters.search.toLowerCase();
-      const haystack = `${uni.name} ${uni.city} ${uni.country} ${uni.majors.join(" ")}`.toLowerCase();
+      const haystack = `${uni.name} ${uni.city} ${
+        uni.country
+      } ${uni.majors.join(" ")}`.toLowerCase();
       if (!haystack.includes(q)) return false;
     }
-    if (filters.countries && filters.countries.length > 0 && !filters.countries.includes(uni.country)) {
+    if (
+      filters.countries &&
+      filters.countries.length > 0 &&
+      !filters.countries.includes(uni.country)
+    ) {
       return false;
     }
-    if (filters.types && filters.types.length > 0 && !filters.types.includes(uni.type)) {
+    if (
+      filters.types &&
+      filters.types.length > 0 &&
+      !filters.types.includes(uni.type)
+    ) {
       return false;
     }
     if (filters.degrees && filters.degrees.length > 0) {
@@ -39,23 +55,48 @@ function filterUniversities(universities: University[], filters: UniversityFilte
     }
     if (filters.fields && filters.fields.length > 0) {
       const uniFields = new Set(uni.programs.map((p) => p.field));
-      if (!filters.fields.some((f) => uniFields.has(f as FieldOfStudy))) return false;
+      if (!filters.fields.some((f) => uniFields.has(f as FieldOfStudy)))
+        return false;
     }
     if (filters.tuitionMin != null || filters.tuitionMax != null) {
-      const tuition = uni.tuition.international ?? uni.tuition.outOfState ?? uni.tuition.inState ?? 0;
-      if (filters.tuitionMin != null && tuition < filters.tuitionMin) return false;
-      if (filters.tuitionMax != null && tuition > filters.tuitionMax) return false;
+      const tuition =
+        uni.tuition.international ??
+        uni.tuition.outOfState ??
+        uni.tuition.inState ??
+        0;
+      if (filters.tuitionMin != null && tuition < filters.tuitionMin)
+        return false;
+      if (filters.tuitionMax != null && tuition > filters.tuitionMax)
+        return false;
     }
-    if (filters.rankingMax != null && uni.ranking.global && uni.ranking.global > filters.rankingMax) {
+    if (
+      filters.rankingMax != null &&
+      uni.ranking.global &&
+      uni.ranking.global > filters.rankingMax
+    ) {
       return false;
     }
-    if (filters.acceptanceRateMin != null && uni.acceptanceRate && uni.acceptanceRate < filters.acceptanceRateMin) {
+    if (
+      filters.acceptanceRateMin != null &&
+      uni.acceptanceRate &&
+      uni.acceptanceRate < filters.acceptanceRateMin
+    ) {
       return false;
     }
-    if (filters.campusSizes && filters.campusSizes.length > 0 && uni.campusSize && !filters.campusSizes.includes(uni.campusSize)) {
+    if (
+      filters.campusSizes &&
+      filters.campusSizes.length > 0 &&
+      uni.campusSize &&
+      !filters.campusSizes.includes(uni.campusSize)
+    ) {
       return false;
     }
-    if (filters.settings && filters.settings.length > 0 && uni.setting && !filters.settings.includes(uni.setting)) {
+    if (
+      filters.settings &&
+      filters.settings.length > 0 &&
+      uni.setting &&
+      !filters.settings.includes(uni.setting)
+    ) {
       return false;
     }
     if (filters.hasFinancialAid && !uni.financialAid?.scholarshipsAvailable) {
@@ -85,7 +126,11 @@ function paginate<T>(items: T[], page: number, limit: number) {
 
 // --- Public service functions (mocked for now) ---
 
-export async function fetchUniversities(filters: UniversityFilters, page = 1, limit = 20): Promise<UniversityListResponse> {
+export async function fetchUniversities(
+  filters: UniversityFilters,
+  page = 1,
+  limit = 20
+): Promise<UniversityListResponse> {
   const all = getMockUniversities().filter((u) => u.isActive);
   const filtered = filterUniversities(all, filters);
   const { items, total, totalPages } = paginate(filtered, page, limit);
@@ -98,7 +143,8 @@ export async function fetchUniversities(filters: UniversityFilters, page = 1, li
   all.forEach((u) => {
     allCountries.set(u.country, (allCountries.get(u.country) ?? 0) + 1);
     u.programs.forEach((p) => allFields.add(p.field));
-    const t = u.tuition.international ?? u.tuition.outOfState ?? u.tuition.inState ?? 0;
+    const t =
+      u.tuition.international ?? u.tuition.outOfState ?? u.tuition.inState ?? 0;
     if (t > 0) {
       minTuition = Math.min(minTuition, t);
       maxTuition = Math.max(maxTuition, t);
@@ -114,7 +160,9 @@ export async function fetchUniversities(filters: UniversityFilters, page = 1, li
       totalPages,
     },
     filters: {
-      availableCountries: Array.from(allCountries.entries()).map(([code, count]) => ({ code, name: code, count })),
+      availableCountries: Array.from(allCountries.entries()).map(
+        ([code, count]) => ({ code, name: code, count })
+      ),
       availableFields: Array.from(allFields),
       tuitionRange: {
         min: Number.isFinite(minTuition) ? minTuition : 0,
@@ -124,11 +172,15 @@ export async function fetchUniversities(filters: UniversityFilters, page = 1, li
   };
 }
 
-export async function fetchUniversityById(id: string): Promise<University | null> {
+export async function fetchUniversityById(
+  id: string
+): Promise<University | null> {
   return getMockUniversityById(id) ?? null;
 }
 
-export async function fetchUniversityRecommendations(userId: string): Promise<UniversityRecommendationsResponse> {
+export async function fetchUniversityRecommendations(
+  userId: string
+): Promise<UniversityRecommendationsResponse> {
   const all = getMockUniversities().filter((u) => u.isActive);
 
   const recommendations: UniversityRecommendation[] = all.map((uni, index) => {
@@ -148,7 +200,7 @@ export async function fetchUniversityRecommendations(userId: string): Promise<Un
       breakdown.personalityMatch * 0.3 +
         breakdown.academicMatch * 0.25 +
         breakdown.careerAlignment * 0.25 +
-        breakdown.preferencesMatch * 0.2,
+        breakdown.preferencesMatch * 0.2
     );
 
     const reasonsEn: string[] = [
@@ -175,7 +227,9 @@ export async function fetchUniversityRecommendations(userId: string): Promise<Un
         en: reasonsEn,
         es: reasonsEs,
       },
-      recommendedPrograms: uni.programs.slice(0, 2).map((p) => ({ ...p, matchScore: matchScore - 5 })),
+      recommendedPrograms: uni.programs
+        .slice(0, 2)
+        .map((p) => ({ ...p, matchScore: matchScore - 5 })),
       rank: index + 1,
     };
   });
@@ -195,14 +249,21 @@ export async function fetchUniversityRecommendations(userId: string): Promise<Un
   };
 }
 
-export async function fetchUniversityRecommendationStats(userId: string): Promise<UniversityRecommendationStats> {
+export async function fetchUniversityRecommendationStats(
+  userId: string
+): Promise<UniversityRecommendationStats> {
   const { recommendations } = await fetchUniversityRecommendations(userId);
 
   const scores = recommendations.map((r) => r.matchScore);
-  const averageMatchScore = scores.reduce((a, b) => a + b, 0) / (scores.length || 1);
+  const averageMatchScore =
+    scores.reduce((a, b) => a + b, 0) / (scores.length || 1);
   const topMatchScore = Math.max(...scores, 0);
-  const excellentMatches = recommendations.filter((r) => r.matchScore >= 85).length;
-  const goodMatches = recommendations.filter((r) => r.matchScore >= 70 && r.matchScore < 85).length;
+  const excellentMatches = recommendations.filter(
+    (r) => r.matchScore >= 85
+  ).length;
+  const goodMatches = recommendations.filter(
+    (r) => r.matchScore >= 70 && r.matchScore < 85
+  ).length;
 
   const byDegree: UniversityRecommendationStats["byDegree"] = {
     Associate: { count: 0, avgScore: 0 },
@@ -212,8 +273,14 @@ export async function fetchUniversityRecommendationStats(userId: string): Promis
     Certificate: { count: 0, avgScore: 0 },
   };
 
-  const byField: Record<string, { count: number; avgScore: number; totalScore: number }> = {};
-  const byCountry: Record<string, { count: number; avgScore: number; totalScore: number }> = {};
+  const byField: Record<
+    string,
+    { count: number; avgScore: number; totalScore: number }
+  > = {};
+  const byCountry: Record<
+    string,
+    { count: number; avgScore: number; totalScore: number }
+  > = {};
 
   recommendations.forEach((rec) => {
     const uni = rec.university;
@@ -272,10 +339,19 @@ export async function fetchUniversityRecommendationStats(userId: string): Promis
     },
     byDegree,
     byField: Object.fromEntries(
-      (Object.keys(byField) as string[]).map((field) => [field, { count: byField[field].count, avgScore: byField[field].avgScore }]),
+      (Object.keys(byField) as string[]).map((field) => [
+        field,
+        { count: byField[field].count, avgScore: byField[field].avgScore },
+      ])
     ),
     byCountry: Object.fromEntries(
-      (Object.keys(byCountry) as string[]).map((country) => [country, { count: byCountry[country].count, avgScore: byCountry[country].avgScore }]),
+      (Object.keys(byCountry) as string[]).map((country) => [
+        country,
+        {
+          count: byCountry[country].count,
+          avgScore: byCountry[country].avgScore,
+        },
+      ])
     ),
     topRecommendedFields,
     assessmentInsights: {
@@ -291,7 +367,9 @@ export async function fetchUniversityRecommendationStats(userId: string): Promis
   };
 }
 
-export async function fetchUniversityFavorites(userId: string): Promise<UniversityFavorite[]> {
+export async function fetchUniversityFavorites(
+  userId: string
+): Promise<UniversityFavorite[]> {
   // Mock: return top 2 recommendations as favorites
   const { recommendations } = await fetchUniversityRecommendations(userId);
   return recommendations.slice(0, 2).map((rec) => ({
@@ -303,7 +381,9 @@ export async function fetchUniversityFavorites(userId: string): Promise<Universi
   }));
 }
 
-export async function compareUniversities(ids: string[]): Promise<UniversityComparison> {
+export async function compareUniversities(
+  ids: string[]
+): Promise<UniversityComparison> {
   const all = getMockUniversities();
   const selected = ids
     .map((id) => all.find((u) => u.id === id))
@@ -348,14 +428,20 @@ export async function fetchUniversityFilterOptions(): Promise<UniversityFilterOp
   all.forEach((u) => {
     countriesMap.set(u.country, (countriesMap.get(u.country) ?? 0) + 1);
     typesMap.set(u.type, (typesMap.get(u.type) ?? 0) + 1);
-    if (u.campusSize) campusSizesMap.set(u.campusSize, (campusSizesMap.get(u.campusSize) ?? 0) + 1);
-    if (u.setting) settingsMap.set(u.setting, (settingsMap.get(u.setting) ?? 0) + 1);
+    if (u.campusSize)
+      campusSizesMap.set(
+        u.campusSize,
+        (campusSizesMap.get(u.campusSize) ?? 0) + 1
+      );
+    if (u.setting)
+      settingsMap.set(u.setting, (settingsMap.get(u.setting) ?? 0) + 1);
     if (u.ranking.global) {
       minRank = Math.min(minRank, u.ranking.global);
       maxRank = Math.max(maxRank, u.ranking.global);
     }
 
-    const tuition = u.tuition.international ?? u.tuition.outOfState ?? u.tuition.inState ?? 0;
+    const tuition =
+      u.tuition.international ?? u.tuition.outOfState ?? u.tuition.inState ?? 0;
     if (tuition > 0) {
       minTuition = Math.min(minTuition, tuition);
       maxTuition = Math.max(maxTuition, tuition);

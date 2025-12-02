@@ -3,7 +3,12 @@
 import React from "react";
 import { motion } from "motion/react";
 import { useGlobalStore } from "@/store/useGlobalStore";
-import { useUniversityList, useUniversityRecommendations, useUniversityStats, useUniversityFiltersOptions } from "@/hooks/useUniversityQueries";
+import {
+  useUniversityList,
+  useUniversityRecommendations,
+  useUniversityStats,
+  useUniversityFiltersOptions,
+} from "@/hooks/useUniversityQueries";
 import { University, UniversityFilters } from "@/types/university";
 import UniversityCard from "@/components/dashboard/University/UniversityCard";
 import UniversityFiltersPanel from "@/components/dashboard/University/UniversityFilters";
@@ -20,7 +25,8 @@ export default function UniversityPage() {
   const userId = user?.id ?? "mock-user";
   const [filters, setFilters] = React.useState<UniversityFilters>({});
   const [viewMode, setViewMode] = React.useState<"grid" | "list">("grid");
-  const [selectedUniversity, setSelectedUniversity] = React.useState<University | null>(null);
+  const [selectedUniversity, setSelectedUniversity] =
+    React.useState<University | null>(null);
   const [activeTab, setActiveTab] = React.useState("recommended");
 
   const listQuery = useUniversityList(filters, 1, 20);
@@ -30,19 +36,25 @@ export default function UniversityPage() {
 
   const t = (en: string, es: string) => (language === "spanish" ? es : en);
 
-  const universities = (activeTab === "recommended" && recoQuery.data
-    ? recoQuery.data.recommendations.map((r) => r.university)
-    : listQuery.data?.universities) as University[] | undefined;
+  const universities = (
+    activeTab === "recommended" && recoQuery.data
+      ? recoQuery.data.recommendations.map((r) => r.university)
+      : listQuery.data?.universities
+  ) as University[] | undefined;
 
   const recommendationMap = new Map(
-    recoQuery.data?.recommendations.map((r) => [r.university.id, r]) ?? [],
+    recoQuery.data?.recommendations.map((r) => [r.university.id, r]) ?? []
   );
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-950 to-slate-900 py-8">
       <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4">
         {/* Header */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-3"
+        >
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-primary/70 mb-1">
@@ -54,21 +66,30 @@ export default function UniversityPage() {
               <p className="mt-1 max-w-2xl text-sm text-slate-300">
                 {t(
                   "Discover universities that match your profile, assessments, and career goals.",
-                  "Descubre universidades que encajan con tu perfil, evaluaciones y metas profesionales.",
+                  "Descubre universidades que encajan con tu perfil, evaluaciones y metas profesionales."
                 )}
               </p>
             </div>
-            <Link href="/dashboard" className="hidden sm:inline-flex text-xs text-slate-400 hover:text-primary">
+            <Link
+              href="/dashboard"
+              className="hidden sm:inline-flex text-xs text-slate-400 hover:text-primary"
+            >
               {t("Back to dashboard", "Volver al panel")}
             </Link>
           </div>
 
-          <UniversityStats stats={statsQuery.data} isLoading={statsQuery.isLoading} />
+          <UniversityStats
+            stats={statsQuery.data}
+            isLoading={statsQuery.isLoading}
+          />
         </motion.div>
 
         <div className="grid gap-6 lg:grid-cols-[280px,1fr]">
           {/* Filters */}
-          <motion.aside initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }}>
+          <motion.aside
+            initial={{ opacity: 0, x: -12 }}
+            animate={{ opacity: 1, x: 0 }}
+          >
             <Card className="border-slate-800 bg-slate-950/60 backdrop-blur">
               <CardContent className="p-4">
                 <UniversityFiltersPanel
@@ -82,7 +103,11 @@ export default function UniversityPage() {
           </motion.aside>
 
           {/* Main content */}
-          <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+          <motion.section
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-4"
+          >
             <Card className="border-slate-800 bg-slate-950/60 backdrop-blur">
               <CardContent className="flex flex-wrap items-center justify-between gap-3 p-3">
                 <Tabs
@@ -91,11 +116,17 @@ export default function UniversityPage() {
                   className="w-full sm:w-auto"
                 >
                   <TabsList className="bg-slate-900/70">
-                    <TabsTrigger value="recommended" className="flex items-center gap-1 text-xs">
+                    <TabsTrigger
+                      value="recommended"
+                      className="flex items-center gap-1 text-xs"
+                    >
                       <Compass className="h-3 w-3" />
                       {t("Recommended", "Recomendadas")}
                     </TabsTrigger>
-                    <TabsTrigger value="all" className="flex items-center gap-1 text-xs">
+                    <TabsTrigger
+                      value="all"
+                      className="flex items-center gap-1 text-xs"
+                    >
                       <Star className="h-3 w-3" />
                       {t("All universities", "Todas las universidades")}
                     </TabsTrigger>
@@ -128,7 +159,10 @@ export default function UniversityPage() {
                 {recoQuery.isLoading && (
                   <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                     {Array.from({ length: 6 }).map((_, i) => (
-                      <Card key={i} className="h-64 animate-pulse border-slate-800 bg-slate-900/60" />
+                      <Card
+                        key={i}
+                        className="h-64 animate-pulse border-slate-800 bg-slate-900/60"
+                      />
                     ))}
                   </div>
                 )}
@@ -136,72 +170,84 @@ export default function UniversityPage() {
                 {recoQuery.error && (
                   <Card className="border-red-500/40 bg-red-950/40">
                     <CardContent className="p-4 text-sm text-red-100">
-                      {t("Unable to load recommendations.", "No se pudieron cargar las recomendaciones.")}
+                      {t(
+                        "Unable to load recommendations.",
+                        "No se pudieron cargar las recomendaciones."
+                      )}
                     </CardContent>
                   </Card>
                 )}
 
-                {!recoQuery.isLoading && universities && universities.length > 0 && (
-                  <div
-                    className={
-                      viewMode === "grid"
-                        ? "grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
-                        : "space-y-3"
-                    }
-                  >
-                    {universities.map((u) => {
-                      const rec = recommendationMap.get(u.id);
-                      return (
-                        <UniversityCard
-                          key={u.id}
-                          university={u}
-                          matchScore={rec?.matchScore}
-                          matchReasons={rec?.matchReasonsArray?.[
-                            language === "spanish" ? "es" : "en"
-                          ]}
-                          onViewDetails={setSelectedUniversity}
-                        />
-                      );
-                    })}
-                  </div>
-                )}
+                {!recoQuery.isLoading &&
+                  universities &&
+                  universities.length > 0 && (
+                    <div
+                      className={
+                        viewMode === "grid"
+                          ? "grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
+                          : "space-y-3"
+                      }
+                    >
+                      {universities.map((u) => {
+                        const rec = recommendationMap.get(u.id);
+                        return (
+                          <UniversityCard
+                            key={u.id}
+                            university={u}
+                            matchScore={rec?.matchScore}
+                            matchReasons={
+                              rec?.matchReasonsArray?.[
+                                language === "spanish" ? "es" : "en"
+                              ]
+                            }
+                            onViewDetails={setSelectedUniversity}
+                          />
+                        );
+                      })}
+                    </div>
+                  )}
               </TabsContent>
 
               <TabsContent value="all" className="space-y-4">
                 {listQuery.isLoading && (
                   <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                     {Array.from({ length: 6 }).map((_, i) => (
-                      <Card key={i} className="h-64 animate-pulse border-slate-800 bg-slate-900/60" />
-                    ))}
-                  </div>
-                )}
-                {!listQuery.isLoading && !listQuery.data?.universities.length && (
-                  <Card className="border-slate-800 bg-slate-900/60">
-                    <CardContent className="p-6 text-center text-sm text-slate-300">
-                      {t(
-                        "No universities found with the current filters.",
-                        "No se encontraron universidades con los filtros actuales.",
-                      )}
-                    </CardContent>
-                  </Card>
-                )}
-                {!listQuery.isLoading && listQuery.data?.universities.length && (
-                  <div
-                    className={
-                      viewMode === "grid"
-                        ? "grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
-                        : "space-y-3"
-                    }
-                  >
-                    {listQuery.data.universities.map((u) => (
-                      <UniversityCard
-                        key={u.id}
-                        university={u}
-                        onViewDetails={setSelectedUniversity}
+                      <Card
+                        key={i}
+                        className="h-64 animate-pulse border-slate-800 bg-slate-900/60"
                       />
                     ))}
                   </div>
                 )}
+                {!listQuery.isLoading &&
+                  !listQuery.data?.universities.length && (
+                    <Card className="border-slate-800 bg-slate-900/60">
+                      <CardContent className="p-6 text-center text-sm text-slate-300">
+                        {t(
+                          "No universities found with the current filters.",
+                          "No se encontraron universidades con los filtros actuales."
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
+                {!listQuery.isLoading &&
+                  listQuery.data?.universities.length && (
+                    <div
+                      className={
+                        viewMode === "grid"
+                          ? "grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
+                          : "space-y-3"
+                      }
+                    >
+                      {listQuery.data.universities.map((u) => (
+                        <UniversityCard
+                          key={u.id}
+                          university={u}
+                          onViewDetails={setSelectedUniversity}
+                        />
+                      ))}
+                    </div>
+                  )}
               </TabsContent>
             </Tabs>
           </motion.section>
@@ -212,7 +258,9 @@ export default function UniversityPage() {
           isOpen={!!selectedUniversity}
           onClose={() => setSelectedUniversity(null)}
           matchScore={
-            selectedUniversity ? recommendationMap.get(selectedUniversity.id)?.matchScore : undefined
+            selectedUniversity
+              ? recommendationMap.get(selectedUniversity.id)?.matchScore
+              : undefined
           }
           matchBreakdown={
             selectedUniversity
@@ -221,14 +269,14 @@ export default function UniversityPage() {
           }
           matchReasons={
             selectedUniversity
-              ? recommendationMap.get(selectedUniversity.id)?.matchReasonsArray?.[
-                  language === "spanish" ? "es" : "en"
-                ]
+              ? recommendationMap.get(selectedUniversity.id)
+                  ?.matchReasonsArray?.[language === "spanish" ? "es" : "en"]
               : undefined
           }
           recommendedPrograms={
             selectedUniversity
-              ? recommendationMap.get(selectedUniversity.id)?.recommendedPrograms
+              ? recommendationMap.get(selectedUniversity.id)
+                  ?.recommendedPrograms
               : undefined
           }
         />

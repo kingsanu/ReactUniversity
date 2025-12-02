@@ -36,7 +36,14 @@ interface StatCardProps {
   delay?: number;
 }
 
-function StatCard({ icon: Icon, label, value, subValue, color, delay = 0 }: StatCardProps) {
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+  subValue,
+  color,
+  delay = 0,
+}: StatCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -58,7 +65,9 @@ function StatCard({ icon: Icon, label, value, subValue, color, delay = 0 }: Stat
               <p className="text-sm text-muted-foreground truncate">{label}</p>
               <p className="text-xl font-bold">{value}</p>
               {subValue && (
-                <p className="text-xs text-muted-foreground truncate">{subValue}</p>
+                <p className="text-xs text-muted-foreground truncate">
+                  {subValue}
+                </p>
               )}
             </div>
           </div>
@@ -71,7 +80,15 @@ function StatCard({ icon: Icon, label, value, subValue, color, delay = 0 }: Stat
 /**
  * Progress ring component
  */
-function ProgressRing({ progress, size = 80, strokeWidth = 8 }: { progress: number; size?: number; strokeWidth?: number }) {
+function ProgressRing({
+  progress,
+  size = 80,
+  strokeWidth = 8,
+}: {
+  progress: number;
+  size?: number;
+  strokeWidth?: number;
+}) {
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   const offset = circumference - (progress / 100) * circumference;
@@ -124,7 +141,14 @@ interface BreakdownItemProps {
   isCompleted: boolean;
 }
 
-function BreakdownItem({ icon: Icon, label, status, detail, color, isCompleted }: BreakdownItemProps) {
+function BreakdownItem({
+  icon: Icon,
+  label,
+  status,
+  detail,
+  color,
+  isCompleted,
+}: BreakdownItemProps) {
   return (
     <div className="flex items-center gap-3 py-2">
       <div
@@ -153,11 +177,7 @@ function BreakdownItem({ icon: Icon, label, status, detail, color, isCompleted }
             : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
         )}
       >
-        {status === "completed"
-          ? "✓"
-          : status === "in_progress"
-          ? "..."
-          : "—"}
+        {status === "completed" ? "✓" : status === "in_progress" ? "..." : "—"}
       </span>
     </div>
   );
@@ -193,11 +213,13 @@ export function TimelineStats({ stats, isLoading }: TimelineStatsProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           icon={TrendingUp}
-          label={language === "spanish" ? "Progreso General" : "Overall Progress"}
+          label={
+            language === "spanish" ? "Progreso General" : "Overall Progress"
+          }
           value={`${stats.overallCompletion.percentage}%`}
-          subValue={`${stats.overallCompletion.completedAssessments}/${stats.overallCompletion.totalAssessments} ${
-            language === "spanish" ? "evaluaciones" : "assessments"
-          }`}
+          subValue={`${stats.overallCompletion.completedAssessments}/${
+            stats.overallCompletion.totalAssessments
+          } ${language === "spanish" ? "evaluaciones" : "assessments"}`}
           color="bg-primary"
           delay={0}
         />
@@ -251,35 +273,49 @@ export function TimelineStats({ stats, isLoading }: TimelineStatsProps) {
                   status={stats.assessmentBreakdown.pca.status}
                   detail={
                     stats.assessmentBreakdown.pca.score
-                      ? `${language === "spanish" ? "Puntuación" : "Score"}: ${stats.assessmentBreakdown.pca.score}%`
+                      ? `${language === "spanish" ? "Puntuación" : "Score"}: ${
+                          stats.assessmentBreakdown.pca.score
+                        }%`
                       : language === "spanish"
                       ? "Análisis de Competencias"
                       : "Competence Analysis"
                   }
                   color="bg-violet-100 dark:bg-violet-900/30"
-                  isCompleted={stats.assessmentBreakdown.pca.status === "completed"}
+                  isCompleted={
+                    stats.assessmentBreakdown.pca.status === "completed"
+                  }
                 />
                 <BreakdownItem
                   icon={Brain}
                   label="LIA"
                   status={stats.assessmentBreakdown.mil.status}
-                  detail={`${stats.assessmentBreakdown.mil.completedSubtests}/${stats.assessmentBreakdown.mil.totalSubtests} subtests${
+                  detail={`${stats.assessmentBreakdown.mil.completedSubtests}/${
+                    stats.assessmentBreakdown.mil.totalSubtests
+                  } subtests${
                     stats.assessmentBreakdown.mil.averageScore
-                      ? ` • ${stats.assessmentBreakdown.mil.averageScore.toFixed(0)}% avg`
+                      ? ` • ${stats.assessmentBreakdown.mil.averageScore.toFixed(
+                          0
+                        )}% avg`
                       : ""
                   }`}
                   color="bg-cyan-100 dark:bg-cyan-900/30"
-                  isCompleted={stats.assessmentBreakdown.mil.status === "completed"}
+                  isCompleted={
+                    stats.assessmentBreakdown.mil.status === "completed"
+                  }
                 />
                 <BreakdownItem
                   icon={Users}
                   label="360°"
                   status={stats.assessmentBreakdown.evaluation.status}
-                  detail={`${stats.assessmentBreakdown.evaluation.completedEvaluations}/${stats.assessmentBreakdown.evaluation.totalEvaluators} ${
+                  detail={`${
+                    stats.assessmentBreakdown.evaluation.completedEvaluations
+                  }/${stats.assessmentBreakdown.evaluation.totalEvaluators} ${
                     language === "spanish" ? "evaluaciones" : "evaluations"
                   }`}
                   color="bg-orange-100 dark:bg-orange-900/30"
-                  isCompleted={stats.assessmentBreakdown.evaluation.status === "completed"}
+                  isCompleted={
+                    stats.assessmentBreakdown.evaluation.status === "completed"
+                  }
                 />
                 <BreakdownItem
                   icon={BookOpen}

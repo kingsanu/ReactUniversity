@@ -5,6 +5,7 @@ This document outlines the backend API routes needed for the Assessment Timeline
 ## Overview
 
 The timeline feature aggregates events from 4 assessment sources:
+
 - **PCA** (Personal Competence Analysis)
 - **MIL/LIA** (Labor Intelligence Assessment - 5 subtests)
 - **360° Evaluation** (Multi-rater feedback)
@@ -21,6 +22,7 @@ The timeline feature aggregates events from 4 assessment sources:
 **Description:** Retrieves all assessment events for the authenticated user, aggregated chronologically from all assessment types.
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 Content-Type: application/json
@@ -38,11 +40,13 @@ Content-Type: application/json
 | `limit` | number | No | Items per page (default: 50) |
 
 **Request Example:**
+
 ```http
 GET /api/v1/assessments/me/timeline?types=pca,mil&status=completed&startDate=2024-01-01&lang=en
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -153,6 +157,7 @@ GET /api/v1/assessments/me/timeline?types=pca,mil&status=completed&startDate=202
 ```
 
 **Where Used:**
+
 - `src/app/dashboard/timeline/page.tsx` - Main timeline page
 - `src/hooks/useTimelineQueries.ts` - React Query hook for data fetching
 - `src/components/dashboard/Timeline/TimelineView.tsx` - Timeline visualization
@@ -166,12 +171,14 @@ GET /api/v1/assessments/me/timeline?types=pca,mil&status=completed&startDate=202
 **Description:** Exports timeline data in PDF or CSV format.
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 Content-Type: application/json
 ```
 
 **Request Body:**
+
 ```json
 {
   "format": "pdf",
@@ -186,18 +193,19 @@ Content-Type: application/json
 }
 ```
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `format` | string | Yes | Export format: `pdf` or `csv` |
-| `dateRange` | object | No | Date range filter |
-| `dateRange.startDate` | string (ISO 8601) | No | Start date |
-| `dateRange.endDate` | string (ISO 8601) | No | End date |
-| `filterTypes` | string[] | No | Assessment types to include |
-| `filterStatus` | string[] | No | Status filters |
-| `includeDetails` | boolean | No | Include detailed metadata (default: true) |
-| `language` | string | No | Language for export: `en` or `sp` |
+| Field                 | Type              | Required | Description                               |
+| --------------------- | ----------------- | -------- | ----------------------------------------- |
+| `format`              | string            | Yes      | Export format: `pdf` or `csv`             |
+| `dateRange`           | object            | No       | Date range filter                         |
+| `dateRange.startDate` | string (ISO 8601) | No       | Start date                                |
+| `dateRange.endDate`   | string (ISO 8601) | No       | End date                                  |
+| `filterTypes`         | string[]          | No       | Assessment types to include               |
+| `filterStatus`        | string[]          | No       | Status filters                            |
+| `includeDetails`      | boolean           | No       | Include detailed metadata (default: true) |
+| `language`            | string            | No       | Language for export: `en` or `sp`         |
 
 **Response (200 OK - PDF):**
+
 ```
 Content-Type: application/pdf
 Content-Disposition: attachment; filename="assessment_timeline_2024-12-02.pdf"
@@ -206,6 +214,7 @@ Content-Disposition: attachment; filename="assessment_timeline_2024-12-02.pdf"
 ```
 
 **Response (200 OK - CSV):**
+
 ```
 Content-Type: text/csv
 Content-Disposition: attachment; filename="assessment_timeline_2024-12-02.csv"
@@ -217,6 +226,7 @@ Date,Type,Event,Title,Description,Status,Score
 ```
 
 **Where Used:**
+
 - `src/components/dashboard/Timeline/TimelineExport.tsx` - Export button component
 - `src/services/timelineService.ts` - Export service function
 
@@ -229,6 +239,7 @@ Date,Type,Event,Title,Description,Status,Score
 **Description:** Retrieves aggregated statistics for the timeline dashboard header.
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
@@ -240,6 +251,7 @@ Authorization: Bearer <token>
 | `lang` | string | No | Language: `en` or `sp` |
 
 **Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -291,6 +303,7 @@ Authorization: Bearer <token>
 ```
 
 **Where Used:**
+
 - `src/components/dashboard/Timeline/TimelineStats.tsx` - Statistics cards
 - `src/hooks/useTimelineQueries.ts` - React Query hook
 
@@ -299,35 +312,39 @@ Authorization: Bearer <token>
 ## Event Types Reference
 
 ### PCA Events
-| Event Type | Description |
-|------------|-------------|
-| `created` | PCA assessment created/started |
-| `in_progress` | Assessment is being taken |
-| `completed` | Assessment finished with results |
+
+| Event Type    | Description                      |
+| ------------- | -------------------------------- |
+| `created`     | PCA assessment created/started   |
+| `in_progress` | Assessment is being taken        |
+| `completed`   | Assessment finished with results |
 
 ### MIL/LIA Events
-| Event Type | Description |
-|------------|-------------|
-| `started` | Subtest started |
-| `completed` | Subtest completed with score |
+
+| Event Type     | Description                     |
+| -------------- | ------------------------------- |
+| `started`      | Subtest started                 |
+| `completed`    | Subtest completed with score    |
 | `time_expired` | Subtest ended due to time limit |
 
 ### 360° Evaluation Events
-| Event Type | Description |
-|------------|-------------|
-| `group_created` | Evaluator group added |
-| `invitation_sent` | Invitation email sent |
-| `response_received` | Evaluator completed feedback |
-| `completed` | All required evaluations received |
+
+| Event Type          | Description                       |
+| ------------------- | --------------------------------- |
+| `group_created`     | Evaluator group added             |
+| `invitation_sent`   | Invitation email sent             |
+| `response_received` | Evaluator completed feedback      |
+| `completed`         | All required evaluations received |
 
 ### Course Events
-| Event Type | Description |
-|------------|-------------|
-| `enrolled` | User enrolled in course |
+
+| Event Type         | Description             |
+| ------------------ | ----------------------- |
+| `enrolled`         | User enrolled in course |
 | `progress_updated` | Course progress updated |
 | `module_completed` | Course module completed |
-| `completed` | Course fully completed |
-| `dropped` | User dropped the course |
+| `completed`        | Course fully completed  |
+| `dropped`          | User dropped the course |
 
 ---
 
@@ -346,21 +363,24 @@ Until these routes are implemented, the frontend can aggregate timeline data fro
 
 ```typescript
 // src/services/timelineService.ts
-export async function getTimelineEvents(userId: string, filters: TimelineFilters) {
+export async function getTimelineEvents(
+  userId: string,
+  filters: TimelineFilters
+) {
   // Fetch from existing services
   const [milData, evalData, pcaData] = await Promise.all([
     getUserExamHistory(userId),
     getUserEvaluationGroups(userId),
-    checkPCAStatus(userId)
+    checkPCAStatus(userId),
   ]);
-  
+
   // Transform and aggregate into timeline events
   const events = [
     ...transformMILToEvents(milData),
     ...transformEvalToEvents(evalData),
-    ...transformPCAToEvents(pcaData)
+    ...transformPCAToEvents(pcaData),
   ];
-  
+
   // Sort chronologically and apply filters
   return sortAndFilter(events, filters);
 }
@@ -376,15 +396,16 @@ export async function getTimelineEvents(userId: string, filters: TimelineFilters
 
 ## Error Responses
 
-| Status Code | Description |
-|-------------|-------------|
-| 400 | Invalid request parameters |
-| 401 | Unauthorized - invalid/missing token |
-| 403 | Forbidden - user doesn't have access |
-| 404 | User not found |
-| 500 | Internal server error |
+| Status Code | Description                          |
+| ----------- | ------------------------------------ |
+| 400         | Invalid request parameters           |
+| 401         | Unauthorized - invalid/missing token |
+| 403         | Forbidden - user doesn't have access |
+| 404         | User not found                       |
+| 500         | Internal server error                |
 
 **Error Response Format:**
+
 ```json
 {
   "success": false,
