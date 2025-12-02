@@ -32,11 +32,12 @@ const navItems = [
 
 const subMenuItems = {
   "Career Planning": [
-    { name: "Career Paths Explorer", path: "/dashboard/careers" },
-    { name: "University Suggestions", path: "/dashboard/university" },
-    { name: "Assessments", path: "/dashboard/assessments" },
-    { name: "Progress Milestones", path: "/dashboard/progress" },
-    { name: "Benchmark", path: "/dashboard/benchmark" },
+     { name: "Career Paths Explorer", path: "/dashboard/careers" },
+     { name: "University Suggestions", path: "/dashboard/university" },
+     { name: "Assessments", path: "/dashboard/assessments" },
+     { name: "Progress Timeline", path: "/dashboard/timeline" },
+     { name: "Progress Milestones", path: "/dashboard/progress" },
+     { name: "Benchmark", path: "/dashboard/benchmark" },
   ],
   "Learning & Tools": [
     { name: "Course Catalog", path: "/dashboard/courses" },
