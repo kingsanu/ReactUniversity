@@ -559,5 +559,11 @@
       "sciences": "Ciencias",
       "socialSciences": "Ciencias Sociales"
     }
+  },
+  "coaching": {
+    "featuredCoaches": "Coaches Destacados",
+    "featuredDescription": "Conecta con coaches expertos para acelerar tu crecimiento profesional",
+    "viewAllCoaches": "Ver Todos los Coaches",
+    "bookSession": "Reservar Sesión"
   }
 }

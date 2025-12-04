@@ -560,5 +560,11 @@
       "sciences": "Sciences",
       "socialSciences": "Social Sciences"
     }
+  },
+  "coaching": {
+    "featuredCoaches": "Featured Coaches",
+    "featuredDescription": "Connect with expert coaches to accelerate your career growth",
+    "viewAllCoaches": "View All Coaches",
+    "bookSession": "Book Session"
   }
 }

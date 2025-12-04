@@ -435,7 +435,7 @@ export async function getTimelineEvents(
     const evalEvents = transformEvaluationToEvents(evalGroups, language);
 
     // Combine all events
-    let allEvents: TimelineEvent[] = [
+    const allEvents: TimelineEvent[] = [
       ...milEvents,
       ...evalEvents,
       ...pcaEvents,

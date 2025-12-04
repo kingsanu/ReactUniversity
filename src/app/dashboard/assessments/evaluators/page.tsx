@@ -189,7 +189,7 @@ export default function EvaluatorsPage() {
             groupType: targetGroup.type,
             groupId: apiEvaluator.id, // Set groupId to the same as id since each evaluator is a group
             invitationToken: apiEvaluator.invitationToken || "",
-            invitationSent: false, // Don't assume sent status - let API track this
+            invitationSent: apiEvaluator.isEmailSent || false,
             responseReceived: apiEvaluator.isEvaluationCompleted || false,
             isActive: !apiEvaluator.isTokenUsed,
           };
@@ -1169,23 +1169,51 @@ export default function EvaluatorsPage() {
                                 )}
                               </div>
                               <div className="flex items-center space-x-2">
-                                {evaluator.invitationSent ? (
-                                  <span
-                                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                      evaluator.responseReceived
-                                        ? "bg-green-100 text-green-800"
-                                        : "bg-yellow-100 text-yellow-800"
-                                    }`}
-                                  >
-                                    {evaluator.responseReceived
-                                      ? "Completed"
-                                      : "Pending Response"}
-                                  </span>
-                                ) : (
-                                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                    Not Sent
-                                  </span>
-                                )}
+                                {(() => {
+                                  const apiEvaluator = apiEvaluators.find(
+                                    (e) => e.id === evaluator.id
+                                  );
+                                  if (apiEvaluator) {
+                                    if (apiEvaluator.isEvaluationCompleted) {
+                                      return (
+                                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                          Completed
+                                        </span>
+                                      );
+                                    } else if (apiEvaluator.isEmailSent) {
+                                      return (
+                                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                          Sent
+                                        </span>
+                                      );
+                                    } else {
+                                      return (
+                                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                          Not Sent
+                                        </span>
+                                      );
+                                    }
+                                  } else {
+                                    // Fallback to old logic
+                                    return evaluator.invitationSent ? (
+                                      <span
+                                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                          evaluator.responseReceived
+                                            ? "bg-green-100 text-green-800"
+                                            : "bg-yellow-100 text-yellow-800"
+                                        }`}
+                                      >
+                                        {evaluator.responseReceived
+                                          ? "Completed"
+                                          : "Pending Response"}
+                                      </span>
+                                    ) : (
+                                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                        Not Sent
+                                      </span>
+                                    );
+                                  }
+                                })()}
                               </div>
                             </div>
                           </div>
