@@ -500,6 +500,7 @@ export interface EvaluationGroupProgress {
   isTokenUsed: boolean;
   isEvaluationCompleted: boolean;
   createdAt: string;
+  isEmailSent?: boolean;
 }
 
 export interface EvaluationGroupWithId extends EvaluationGroupProgress {

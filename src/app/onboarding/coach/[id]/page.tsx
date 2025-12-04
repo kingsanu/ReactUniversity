@@ -52,6 +52,39 @@ export default function CoachOnboardingPage({
   const [email, setEmail] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
 
+  // Load data from localStorage on mount
+  useEffect(() => {
+    const savedData = localStorage.getItem(`onboarding_data_${id}`);
+    const savedStep = localStorage.getItem(`onboarding_step_${id}`);
+
+    if (savedData) {
+      try {
+        const parsedData = JSON.parse(savedData);
+        setData((prev) => ({ ...prev, ...parsedData }));
+      } catch (e) {
+        console.error("Error parsing saved onboarding data", e);
+      }
+    }
+
+    if (savedStep) {
+      setCurrentStep(parseInt(savedStep));
+    }
+  }, [id]);
+
+  // Save data to localStorage whenever it changes
+  useEffect(() => {
+    if (data !== INITIAL_ONBOARDING_DATA) {
+      localStorage.setItem(`onboarding_data_${id}`, JSON.stringify(data));
+    }
+  }, [data, id]);
+
+  // Save current step to localStorage
+  useEffect(() => {
+    localStorage.setItem(`onboarding_step_${id}`, currentStep.toString());
+  }, [currentStep, id]);
+
+
+
   useEffect(() => {
     const fetchStatus = async () => {
       try {
@@ -60,14 +93,20 @@ export default function CoachOnboardingPage({
         setCoachId(status.userId);
         setEmail(status.email);
 
-        // Pre-fill data if available
-        setData((prev) => ({
-          ...prev,
-          personalInfo: {
-            ...prev.personalInfo,
-            name: status.name || prev.personalInfo.name,
-          },
-        }));
+        // Pre-fill data if available and not already populated from localStorage
+        setData((prev) => {
+          // Only update name if it's missing in current state
+          if (!prev.personalInfo.name && status.name) {
+            return {
+              ...prev,
+              personalInfo: {
+                ...prev.personalInfo,
+                name: status.name,
+              },
+            };
+          }
+          return prev;
+        });
       } catch (error) {
         console.error("Failed to fetch onboarding status:", error);
         // toast.error("Failed to verify invitation.");
@@ -119,6 +158,12 @@ export default function CoachOnboardingPage({
 
       console.log("Onboarding submitted:", response);
       toast.success("Onboarding completed successfully!");
+
+      // Clear localStorage on successful submission
+      localStorage.removeItem(`onboarding_data_${id}`);
+      localStorage.removeItem(`onboarding_step_${id}`);
+
+
 
       // Redirect to dashboard
       router.push(response.redirectUrl || `/dashboard/coaching/dashboard`);

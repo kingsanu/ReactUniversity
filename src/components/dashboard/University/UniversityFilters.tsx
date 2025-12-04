@@ -65,14 +65,22 @@ export function UniversityFilters({
 
   const toggleDegree = (degree: DegreeLevel) => {
     const current = new Set(filters.degrees ?? []);
-    current.has(degree) ? current.delete(degree) : current.add(degree);
+    if (current.has(degree)) {
+      current.delete(degree);
+    } else {
+      current.add(degree);
+    }
     const next = Array.from(current);
     onFiltersChange({ ...filters, degrees: next.length ? next : undefined });
   };
 
   const toggleField = (field: FieldOfStudy) => {
     const current = new Set(filters.fields ?? []);
-    current.has(field) ? current.delete(field) : current.add(field);
+    if (current.has(field)) {
+      current.delete(field);
+    } else {
+      current.add(field);
+    }
     const next = Array.from(current);
     onFiltersChange({ ...filters, fields: next.length ? next : undefined });
   };
@@ -150,9 +158,11 @@ export function UniversityFilters({
               active={filters.countries?.includes(c.code) ?? false}
               onClick={() => {
                 const current = new Set(filters.countries ?? []);
-                current.has(c.code)
-                  ? current.delete(c.code)
-                  : current.add(c.code);
+                if (current.has(c.code)) {
+                  current.delete(c.code);
+                } else {
+                  current.add(c.code);
+                }
                 const next = Array.from(current);
                 onFiltersChange({
                   ...filters,
