@@ -6,8 +6,8 @@ import {
   Globe2,
   DollarSign,
   GraduationCap,
-  Filter,
   X,
+  Search,
 } from "lucide-react";
 import {
   UniversityFiltersProps,
@@ -17,9 +17,9 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-// Using a simple range slider input instead of shadcn Slider for now
 import { Switch } from "@/components/ui/switch";
 import { useGlobalStore } from "@/store/useGlobalStore";
+import { motion } from "motion/react";
 
 function Chip({
   active,
@@ -31,19 +31,20 @@ function Chip({
   onClick: () => void;
 }) {
   return (
-    <button
+    <motion.button
+      whileTap={{ scale: 0.98 }}
       type="button"
       onClick={onClick}
       className={cn(
-        "inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-colors",
+        "inline-flex items-center rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all duration-200",
         active
-          ? "border-primary bg-primary/10 text-primary"
-          : "border-border bg-background text-muted-foreground hover:bg-muted"
+          ? "border-blue-200 bg-blue-50 text-blue-700 shadow-sm ring-1 ring-blue-200"
+          : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50 hover:border-gray-300"
       )}
     >
       {label}
-      {active && <X className="ml-1 h-3 w-3" />}
-    </button>
+      {active && <X className="ml-1.5 h-3 w-3 opacity-60" />}
+    </motion.button>
   );
 }
 
@@ -111,46 +112,45 @@ export function UniversityFilters({
   const t = (en: string, es: string) => (language === "spanish" ? es : en);
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between pb-2 border-b border-gray-100">
         <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-primary" />
-          <h3 className="text-sm font-semibold">{t("Filters", "Filtros")}</h3>
+          <SlidersHorizontal className="h-4 w-4 text-gray-900" />
+          <h3 className="text-sm font-bold text-gray-900">{t("Filters", "Filtros")}</h3>
         </div>
         <Button
           variant="ghost"
           size="sm"
-          className="h-7 px-2 text-[11px] text-muted-foreground"
+          className="h-7 px-2 text-[11px] text-gray-500 hover:text-red-600 hover:bg-red-50"
           onClick={resetAll}
         >
-          <X className="mr-1 h-3 w-3" />
-          {t("Clear", "Limpiar")}
+          {t("Reset", "Limpiar")}
         </Button>
       </div>
 
       {/* Search */}
-      <div className="space-y-1">
-        <label className="text-xs font-medium text-muted-foreground">
-          {t("Search", "Buscar")}
-        </label>
-        <Input
-          placeholder={t(
-            "Search by name, city, country",
-            "Buscar por nombre, ciudad, país"
-          )}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="h-9 text-xs"
-        />
+      <div className="space-y-2">
+        <div className="relative">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+          <Input
+            placeholder={t(
+              "Search universities...",
+              "Buscar universidades..."
+            )}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="h-9 pl-8 text-xs bg-gray-50 border-gray-200 focus:bg-white focus:border-blue-200 transition-all rounded-lg"
+          />
+        </div>
       </div>
 
       {/* Location */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+      <div className="space-y-3">
+        <div className="flex items-center gap-1.5 text-xs font-bold text-gray-400 uppercase tracking-wider">
           <Globe2 className="h-3 w-3" />
           <span>{t("Location", "Ubicación")}</span>
         </div>
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-2">
           {filterOptions?.countries.slice(0, 6).map((c) => (
             <Chip
               key={c.code}
@@ -175,12 +175,12 @@ export function UniversityFilters({
       </div>
 
       {/* Degree levels */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+      <div className="space-y-3">
+        <div className="flex items-center gap-1.5 text-xs font-bold text-gray-400 uppercase tracking-wider">
           <GraduationCap className="h-3 w-3" />
-          <span>{t("Degree level", "Nivel de grado")}</span>
+          <span>{t("Degree", "Grado")}</span>
         </div>
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-2">
           {(
             ["Associate", "Bachelor", "Master", "Doctorate"] as DegreeLevel[]
           ).map((deg) => (
@@ -195,11 +195,11 @@ export function UniversityFilters({
       </div>
 
       {/* Fields of study */}
-      <div className="space-y-2">
-        <p className="text-xs font-medium text-muted-foreground">
+      <div className="space-y-3">
+        <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
           {t("Field of study", "Área de estudio")}
         </p>
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-2">
           {(filterOptions?.fields || []).slice(0, 8).map((f) => (
             <Chip
               key={f.value}
@@ -212,49 +212,44 @@ export function UniversityFilters({
       </div>
 
       {/* Tuition slider */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <DollarSign className="h-3 w-3" />
-            <span>{t("Tuition per year", "Matrícula anual")}</span>
-          </div>
-          <span className="text-[11px]">
-            ${tuitionMin.toLocaleString()} - ${tuitionMax.toLocaleString()} USD
-          </span>
+      <div className="space-y-3">
+        <div className="flex items-center gap-1.5 text-xs font-bold text-gray-400 uppercase tracking-wider">
+          <DollarSign className="h-3 w-3" />
+          <span>{t("Tuition / Year", "Matrícula / Año")}</span>
         </div>
         <div className="flex items-center gap-2">
-          <Input
-            type="number"
-            className="h-8 w-24 text-xs"
-            value={tuitionMin}
-            onChange={(e) =>
-              handleTuitionChange(Number(e.target.value) || 0, "min")
-            }
-          />
-          <span className="text-[11px] text-muted-foreground">-</span>
-          <Input
-            type="number"
-            className="h-8 w-24 text-xs"
-            value={tuitionMax}
-            onChange={(e) =>
-              handleTuitionChange(Number(e.target.value) || 0, "max")
-            }
-          />
+          <div className="relative flex-1">
+            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-medium text-gray-400">$</span>
+            <Input
+              type="number"
+              className="h-8 pl-6 pr-2 text-xs bg-white border-gray-200 focus:border-blue-200 rounded-lg"
+              value={tuitionMin}
+              onChange={(e) =>
+                handleTuitionChange(Number(e.target.value) || 0, "min")
+              }
+            />
+          </div>
+          <span className="text-[10px] text-gray-300">—</span>
+          <div className="relative flex-1">
+            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-medium text-gray-400">$</span>
+            <Input
+              type="number"
+              className="h-8 pl-6 pr-2 text-xs bg-white border-gray-200 focus:border-blue-200 rounded-lg"
+              value={tuitionMax}
+              onChange={(e) =>
+                handleTuitionChange(Number(e.target.value) || 0, "max")
+              }
+            />
+          </div>
         </div>
       </div>
 
       {/* Toggles */}
-      <div className="space-y-3 rounded-lg border bg-card/40 px-3 py-3">
-        <div className="flex items-center justify-between gap-2">
+      <div className="space-y-3 pt-2 border-t border-gray-100">
+        <div className="flex items-center justify-between gap-2 py-1">
           <div className="space-y-0.5">
-            <p className="text-xs font-medium">
+            <p className="text-xs font-medium text-gray-700">
               {t("Financial aid", "Ayuda financiera")}
-            </p>
-            <p className="text-[11px] text-muted-foreground">
-              {t(
-                "Show universities with scholarships",
-                "Solo con becas o apoyo"
-              )}
             </p>
           </div>
           <Switch
@@ -262,18 +257,13 @@ export function UniversityFilters({
             onCheckedChange={(val) =>
               onFiltersChange({ ...filters, hasFinancialAid: val || undefined })
             }
+            className="scale-75 data-[state=checked]:bg-blue-600"
           />
         </div>
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between gap-2 py-1">
           <div className="space-y-0.5">
-            <p className="text-xs font-medium">
-              {t("On-campus housing", "Residencias estudiantiles")}
-            </p>
-            <p className="text-[11px] text-muted-foreground">
-              {t(
-                "Include only universities with housing",
-                "Solo universidades con alojamiento"
-              )}
+            <p className="text-xs font-medium text-gray-700">
+              {t("On-campus housing", "Residencias")}
             </p>
           </div>
           <Switch
@@ -281,6 +271,7 @@ export function UniversityFilters({
             onCheckedChange={(val) =>
               onFiltersChange({ ...filters, hasHousing: val || undefined })
             }
+            className="scale-75 data-[state=checked]:bg-blue-600"
           />
         </div>
       </div>

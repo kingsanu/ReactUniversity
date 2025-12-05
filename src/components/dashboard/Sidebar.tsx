@@ -35,6 +35,7 @@ const subMenuItems = {
     { name: "Career Paths Explorer", path: "/dashboard/careers" },
     { name: "University Suggestions", path: "/dashboard/university" },
     { name: "Assessments", path: "/dashboard/assessments" },
+    { name: "Assessment Timeline", path: "/dashboard/assessments/timeline" },
     { name: "Progress Timeline", path: "/dashboard/timeline" },
     { name: "Progress Milestones", path: "/dashboard/progress" },
     { name: "Benchmark", path: "/dashboard/benchmark" },
@@ -66,7 +67,7 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 space-y-2">
+      <nav className="flex-1 space-y-2 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
         {navItems.map((item) => {
           const isActive = pathname === item.path;
           const Icon = item.icon;

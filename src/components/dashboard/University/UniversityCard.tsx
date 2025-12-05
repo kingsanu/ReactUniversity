@@ -9,11 +9,14 @@ import {
   HeartOff,
   GraduationCap,
   ArrowRight,
+  TrendingUp,
+  Eye,
 } from "lucide-react";
 import { UniversityCardProps } from "@/types/university";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useGlobalStore } from "@/store/useGlobalStore";
+import { Badge } from "@/components/ui/badge";
 
 export function UniversityCard({
   university,
@@ -27,6 +30,8 @@ export function UniversityCard({
   variant = "default",
 }: UniversityCardProps) {
   const { language } = useGlobalStore();
+  const t = (en: string, es: string) => (language === "spanish" ? es : en);
+  
   const tuition =
     university.tuition.international ??
     university.tuition.outOfState ??
@@ -39,173 +44,163 @@ export function UniversityCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
       className={cn(
-        "relative flex flex-col rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden",
-        "hover:shadow-md transition-shadow",
-        variant === "featured" && "border-primary/40 ring-1 ring-primary/20"
+        "group relative flex flex-col rounded-2xl border bg-white transition-all duration-300",
+        "hover:shadow-lg hover:border-gray-200 hover:-translate-y-1",
+        variant === "featured" ? "border-blue-100 ring-1 ring-blue-50" : "border-gray-100"
       )}
     >
-      {/* Header banner */}
-      <div className="relative h-32 w-full bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900">
-        {university.coverImage && (
+      {/* Header Image Area */}
+      <div className="relative h-40 w-full overflow-hidden rounded-t-2xl bg-gray-50">
+        {university.coverImage ? (
           <div
-            className="absolute inset-0 opacity-60 bg-cover bg-center"
+            className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
             style={{ backgroundImage: `url(${university.coverImage})` }}
           />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100" />
         )}
-        <div className="relative h-full flex items-end justify-between p-4 gap-3">
-          <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-lg bg-white shadow flex items-center justify-center overflow-hidden">
-              {university.logo ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={university.logo}
-                  alt={university.name}
-                  className="h-full w-full object-contain p-1"
-                />
-              ) : (
-                <span className="text-sm font-semibold">
-                  {university.shortName || university.name.slice(0, 3)}
-                </span>
-              )}
-            </div>
-            <div>
-              <h3 className="text-base font-semibold text-white line-clamp-1">
-                {university.name}
-              </h3>
-              <p className="text-xs text-slate-200 flex items-center gap-1">
-                <MapPin className="h-3 w-3" />
-                <span>
-                  {university.city}, {university.country}
-                </span>
-              </p>
-            </div>
+        
+        {/* Featured Badge */}
+        {variant === "featured" && (
+          <div className="absolute top-3 left-3">
+            <Badge className="bg-blue-600/90 hover:bg-blue-600 text-white border-none shadow-sm backdrop-blur-sm">
+              {t("Recommended", "Recomendado")}
+            </Badge>
           </div>
-          {typeof matchScore === "number" && (
-            <div className="flex flex-col items-end">
-              <div className="flex items-baseline gap-1 text-emerald-300">
-                <span className="text-lg font-bold">{matchScore}</span>
-                <span className="text-xs">/100</span>
-              </div>
-              <p className="text-[10px] text-emerald-100">
-                {language === "spanish"
-                  ? "Coincidencia total"
-                  : "Overall match"}
-              </p>
-            </div>
-          )}
+        )}
+
+        {/* Match Score Badge */}
+        {typeof matchScore === "number" && (
+          <div className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 text-xs font-bold text-emerald-600 shadow-sm backdrop-blur-sm">
+            <TrendingUp className="h-3.5 w-3.5" />
+            {matchScore}%
+          </div>
+        )}
+
+        {/* Quick View Button (Visible on Hover) */}
+        <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <Button
+            size="sm"
+            variant="secondary"
+            className="bg-white/90 hover:bg-white text-gray-900 shadow-sm backdrop-blur-sm gap-2 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300"
+            onClick={() => onViewDetails?.(university)}
+          >
+            <Eye className="h-4 w-4" />
+            {t("Quick View", "Vista Rápida")}
+          </Button>
         </div>
       </div>
 
-      {/* Body */}
-      <div className="flex flex-1 flex-col gap-3 p-4">
-        {/* Tags & quick info */}
-        <div className="flex flex-wrap items-center gap-2 text-xs">
+      {/* Logo & Main Info */}
+      <div className="relative px-5 pt-12 pb-5 flex-1 flex flex-col">
+        {/* Logo (Floating) */}
+        <div className="absolute -top-8 left-5 h-16 w-16 overflow-hidden rounded-xl border-4 border-white bg-white shadow-sm">
+          {university.logo ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={university.logo}
+              alt={university.name}
+              className="h-full w-full object-contain p-2"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-gray-50 text-xs font-bold text-gray-400">
+              {university.shortName || university.name.slice(0, 2)}
+            </div>
+          )}
+        </div>
+
+        <div className="mb-4">
+          <h3 className="text-lg font-bold text-gray-900 line-clamp-1 group-hover:text-blue-600 transition-colors">
+            {university.name}
+          </h3>
+          <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
+            <MapPin className="h-3.5 w-3.5 shrink-0" />
+            <span className="line-clamp-1">
+              {university.city}, {university.country}
+            </span>
+          </div>
+        </div>
+
+        {/* Quick Stats Grid */}
+        <div className="grid grid-cols-2 gap-3 mb-5">
+          <div className="flex flex-col gap-0.5 p-2.5 rounded-lg bg-gray-50/80 border border-gray-100/50">
+            <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wide">
+              {t("Rank", "Ranking")}
+            </span>
+            <div className="flex items-center gap-1.5 text-sm font-bold text-gray-700">
+              <Star className="h-3.5 w-3.5 text-amber-400 fill-amber-400" />
+              #{university.ranking.global || "-"}
+            </div>
+          </div>
+          <div className="flex flex-col gap-0.5 p-2.5 rounded-lg bg-gray-50/80 border border-gray-100/50">
+            <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wide">
+              {t("Tuition", "Matrícula")}
+            </span>
+            <div className="flex items-center gap-1.5 text-sm font-bold text-gray-700">
+              <span className="truncate">
+                {tuition > 0 
+                  ? `$${(tuition / 1000).toFixed(1)}k` 
+                  : "-"}
+              </span>
+              <span className="text-[10px] font-normal text-gray-400">/yr</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Tags */}
+        <div className="flex flex-wrap gap-1.5 mb-5 mt-auto">
           {university.type && (
-            <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] uppercase tracking-wide">
+            <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-[10px] font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
               {university.type}
             </span>
           )}
-          {university.ranking.global && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-900/30 px-2 py-0.5 text-[10px] text-amber-700 dark:text-amber-300">
-              <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-              {language === "spanish" ? "Ranking global" : "Global rank"}: #
-              {university.ranking.global}
+          {university.programs.slice(0, 2).map((p, i) => (
+            <span key={i} className="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-[10px] font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">
+              {p.degree}
             </span>
-          )}
-          {university.acceptanceRate && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 text-[10px] text-emerald-700 dark:text-emerald-300">
-              {language === "spanish" ? "Aceptación" : "Acceptance"}:{" "}
-              {university.acceptanceRate}%
+          ))}
+          {university.programs.length > 2 && (
+            <span className="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-[10px] font-medium text-gray-500">
+              +{university.programs.length - 2}
             </span>
           )}
         </div>
 
-        {/* Degrees & tuition */}
-        <div className="flex items-center justify-between gap-2 text-xs">
-          <div className="flex items-center gap-1 text-slate-600 dark:text-slate-300">
-            <GraduationCap className="h-3 w-3" />
-            <span>
-              {university.programs
-                .map((p) => p.degree)
-                .filter((v, i, a) => a.indexOf(v) === i)
-                .join(" • ")}
-            </span>
-          </div>
-          {tuition > 0 && (
-            <div className="text-right">
-              <p className="text-xs font-semibold text-slate-900 dark:text-slate-100">
-                ${tuition.toLocaleString()} {university.tuition.currency}
-              </p>
-              <p className="text-[10px] text-slate-500">
-                {language === "spanish"
-                  ? "por año (aprox.)"
-                  : "per year (approx.)"}
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Match reasons */}
-        {matchReasons && matchReasons.length > 0 && (
-          <ul className="mt-1 space-y-1 text-[11px] text-slate-600 dark:text-slate-300">
-            {matchReasons.slice(0, 2).map((reason, idx) => (
-              <li key={idx} className="flex items-start gap-1">
-                <span className="mt-0.5 h-1 w-1 rounded-full bg-emerald-500" />
-                <span className="line-clamp-2">{reason}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      {/* Footer actions */}
-      <div className="flex items-center justify-between gap-2 border-t px-4 py-3 bg-slate-50/60 dark:bg-slate-900/40">
-        <div className="flex items-center gap-2 text-xs">
-          <button
-            type="button"
-            onClick={() => onFavoriteToggle?.(university.id)}
-            className={cn(
-              "inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[11px] transition-colors",
-              isFavorite
-                ? "border-rose-500 bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-300"
-                : "border-slate-300 text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
-            )}
+        {/* Actions */}
+        <div className="flex items-center gap-2 pt-4 border-t border-gray-100">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="flex-1 justify-between text-xs font-semibold hover:bg-blue-50 hover:text-blue-600 group/btn"
+            onClick={() => onViewDetails?.(university)}
           >
-            {isFavorite ? (
-              <Heart className="h-3 w-3 fill-current" />
-            ) : (
-              <HeartOff className="h-3 w-3" />
-            )}
-            <span>{language === "spanish" ? "Guardar" : "Save"}</span>
-          </button>
-
-          {onCompare && (
-            <button
-              type="button"
-              onClick={() => onCompare(university)}
+            {t("View Details", "Ver Detalles")}
+            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover/btn:translate-x-0.5" />
+          </Button>
+          
+          <div className="flex items-center gap-1 border-l border-gray-100 pl-2">
+            <Button
+              variant="ghost"
+              size="icon"
               className={cn(
-                "inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[11px] transition-colors",
-                isCompareSelected
-                  ? "border-blue-500 bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300"
-                  : "border-slate-300 text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+                "h-8 w-8 rounded-full transition-all duration-200",
+                isFavorite 
+                  ? "text-rose-500 bg-rose-50 hover:bg-rose-100" 
+                  : "text-gray-400 hover:text-rose-500 hover:bg-rose-50"
               )}
+              onClick={(e) => {
+                e.stopPropagation();
+                onFavoriteToggle?.(university.id);
+              }}
             >
-              <span>{language === "spanish" ? "Comparar" : "Compare"}</span>
-            </button>
-          )}
+              {isFavorite ? (
+                <Heart className="h-4 w-4 fill-current" />
+              ) : (
+                <Heart className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
         </div>
-
-        <Button
-          size="sm"
-          variant="ghost"
-          className="h-8 px-2 text-xs gap-1"
-          onClick={() => onViewDetails?.(university)}
-        >
-          <span>
-            {language === "spanish" ? "Ver detalles" : "View details"}
-          </span>
-          <ArrowRight className="h-3 w-3" />
-        </Button>
       </div>
     </motion.div>
   );

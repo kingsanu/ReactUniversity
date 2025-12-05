@@ -10,12 +10,18 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   MapPin,
   Globe2,
   ExternalLink,
   GraduationCap,
   TrendingUp,
+  Building2,
+  Users,
+  Award,
+  DollarSign,
+  CheckCircle2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useGlobalStore } from "@/store/useGlobalStore";
@@ -34,259 +40,220 @@ export function UniversityDetailsModal({
 
   const t = (en: string, es: string) => (language === "spanish" ? es : en);
 
+  const tuition =
+    university.tuition.international ??
+    university.tuition.outOfState ??
+    university.tuition.inState ??
+    0;
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl p-0 overflow-hidden">
-        <DialogHeader className="p-0">
-          <div className="relative h-32 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900">
-            {university.coverImage && (
-              <div
-                className="absolute inset-0 opacity-50 bg-cover bg-center"
-                style={{ backgroundImage: `url(${university.coverImage})` }}
-              />
-            )}
-            <div className="relative flex h-full items-end justify-between px-5 pb-4">
-              <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-lg bg-white shadow flex items-center justify-center overflow-hidden">
+      <DialogContent className="max-w-5xl p-0 overflow-hidden gap-0 border-none shadow-2xl">
+        {/* Header Section */}
+        <div className="relative h-64 w-full bg-slate-900">
+          {university.coverImage ? (
+            <div
+              className="absolute inset-0 bg-cover bg-center opacity-60"
+              style={{ backgroundImage: `url(${university.coverImage})` }}
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900" />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
+          
+          <div className="absolute bottom-0 left-0 right-0 p-8">
+            <div className="flex items-end justify-between gap-6">
+              <div className="flex items-end gap-6">
+                <div className="h-24 w-24 rounded-2xl bg-white shadow-xl flex items-center justify-center overflow-hidden border-4 border-white/10 backdrop-blur-sm">
                   {university.logo ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={university.logo}
                       alt={university.name}
-                      className="h-full w-full object-contain p-1"
+                      className="h-full w-full object-contain p-3"
                     />
                   ) : (
-                    <span className="text-sm font-semibold">
-                      {university.shortName || university.name.slice(0, 3)}
+                    <span className="text-xl font-bold text-gray-400">
+                      {university.shortName || university.name.slice(0, 2)}
                     </span>
                   )}
                 </div>
-                <div>
-                  <DialogTitle className="text-lg font-semibold text-white">
+                <div className="mb-2">
+                  <h2 className="text-3xl font-bold text-white mb-2 drop-shadow-sm">
                     {university.name}
-                  </DialogTitle>
-                  <p className="text-xs text-slate-200 flex items-center gap-1">
-                    <MapPin className="h-3 w-3" />
-                    {university.city}, {university.country}
-                  </p>
+                  </h2>
+                  <div className="flex items-center gap-4 text-slate-200">
+                    <div className="flex items-center gap-1.5">
+                      <MapPin className="h-4 w-4 text-blue-400" />
+                      <span className="font-medium">{university.city}, {university.country}</span>
+                    </div>
+                    <div className="w-1 h-1 rounded-full bg-slate-500" />
+                    <div className="flex items-center gap-1.5">
+                      <Building2 className="h-4 w-4 text-blue-400" />
+                      <span className="font-medium">{university.type}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
+
               {typeof matchScore === "number" && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex flex-col items-end text-emerald-200"
-                >
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-2xl font-bold">{matchScore}</span>
-                    <span className="text-xs">/100</span>
+                <div className="flex flex-col items-end mb-2">
+                  <div className="flex items-center gap-2 bg-emerald-500/20 backdrop-blur-md border border-emerald-500/30 px-4 py-2 rounded-xl">
+                    <TrendingUp className="h-5 w-5 text-emerald-400" />
+                    <span className="text-3xl font-bold text-emerald-400">{matchScore}%</span>
+                    <span className="text-xs font-medium text-emerald-200 uppercase tracking-wide ml-1">
+                      {t("Match", "Coincidencia")}
+                    </span>
                   </div>
-                  <p className="text-[11px]">
-                    {t("Overall match", "Coincidencia total")}
-                  </p>
-                </motion.div>
+                </div>
               )}
             </div>
           </div>
-        </DialogHeader>
-        <div className="max-h-[70vh] overflow-y-auto">
-          <div className="grid gap-5 px-5 py-4 md:grid-cols-[2fr,1.3fr]">
-            {/* Left: Description & programs */}
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground leading-relaxed">
+        </div>
+
+        {/* Content Section */}
+        <div className="flex flex-col lg:flex-row h-[600px]">
+          {/* Main Content (Left) */}
+          <div className="flex-1 overflow-y-auto p-8 space-y-8 bg-white">
+            {/* Description */}
+            <div>
+              <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <Building2 className="h-5 w-5 text-blue-600" />
+                {t("About", "Sobre la universidad")}
+              </h3>
+              <p className="text-gray-600 leading-relaxed text-base">
                 {university.description}
               </p>
-
-              {matchReasons && matchReasons.length > 0 && (
-                <div className="rounded-lg border bg-emerald-50/40 dark:bg-emerald-900/10 p-3">
-                  <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-200 mb-1 flex items-center gap-1">
-                    <TrendingUp className="h-3 w-3" />
-                    {t(
-                      "Why this university fits you",
-                      "Por qué esta universidad encaja contigo"
-                    )}
-                  </p>
-                  <ul className="space-y-1.5 text-[11px] text-emerald-900 dark:text-emerald-100">
-                    {matchReasons.map((r, idx) => (
-                      <li key={idx} className="flex items-start gap-1.5">
-                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                        <span>{r}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {recommendedPrograms && recommendedPrograms.length > 0 && (
-                <div className="space-y-2">
-                  <p className="text-xs font-semibold text-muted-foreground flex items-center gap-1">
-                    <GraduationCap className="h-3 w-3" />
-                    {t("Recommended programs", "Programas recomendados")}
-                  </p>
-                  <div className="space-y-2">
-                    {recommendedPrograms.map((p) => (
-                      <div
-                        key={p.id}
-                        className="rounded-lg border bg-card/40 px-3 py-2 text-xs flex items-center justify-between gap-2"
-                      >
-                        <div>
-                          <p className="font-medium text-foreground line-clamp-1">
-                            {p.name}
-                          </p>
-                          <p className="text-[11px] text-muted-foreground">
-                            {p.degree} • {p.field}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-[11px] text-emerald-600 dark:text-emerald-300 font-semibold">
-                            {p.matchScore.toFixed(0)} / 100
-                          </p>
-                          {p.duration && (
-                            <p className="text-[10px] text-muted-foreground">
-                              {p.duration} {t("years", "años")}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
 
-            {/* Right: stats & meta */}
-            <div className="space-y-3">
-              <div className="rounded-lg border bg-card/40 p-3 text-xs space-y-2">
-                <p className="text-[11px] font-semibold text-muted-foreground mb-1">
-                  {t("At a glance", "De un vistazo")}
-                </p>
-                <div className="grid grid-cols-2 gap-2">
-                  {university.ranking.global && (
-                    <div>
-                      <p className="text-[10px] text-muted-foreground">
-                        {t("Global rank", "Ranking global")}
-                      </p>
-                      <p className="text-sm font-semibold">
-                        #{university.ranking.global}
-                      </p>
+            {/* Match Analysis */}
+            {matchReasons && matchReasons.length > 0 && (
+              <div className="bg-emerald-50/50 rounded-2xl p-6 border border-emerald-100">
+                <h3 className="text-lg font-bold text-emerald-900 mb-4 flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                  {t("Why it's a great fit", "Por qué es una gran opción")}
+                </h3>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {matchReasons.map((r, idx) => (
+                    <div key={idx} className="flex items-start gap-3">
+                      <div className="mt-1.5 h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
+                      <span className="text-sm text-emerald-900 font-medium">{r}</span>
                     </div>
-                  )}
-                  {university.acceptanceRate && (
-                    <div>
-                      <p className="text-[10px] text-muted-foreground">
-                        {t("Acceptance", "Aceptación")}
-                      </p>
-                      <p className="text-sm font-semibold">
-                        {university.acceptanceRate}%
-                      </p>
-                    </div>
-                  )}
-                  {university.graduationRate && (
-                    <div>
-                      <p className="text-[10px] text-muted-foreground">
-                        {t("Graduation", "Graduación")}
-                      </p>
-                      <p className="text-sm font-semibold">
-                        {university.graduationRate}%
-                      </p>
-                    </div>
-                  )}
-                  {university.employmentRate && (
-                    <div>
-                      <p className="text-[10px] text-muted-foreground">
-                        {t("Employment", "Empleabilidad")}
-                      </p>
-                      <p className="text-sm font-semibold">
-                        {university.employmentRate}%
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {university.tuition && (
-                  <div className="mt-2 border-t pt-2">
-                    <p className="text-[10px] text-muted-foreground mb-1">
-                      {t(
-                        "Estimated tuition per year",
-                        "Matrícula estimada por año"
-                      )}
-                    </p>
-                    <p className="text-sm font-semibold">
-                      $
-                      {(
-                        university.tuition.international ??
-                        university.tuition.outOfState ??
-                        university.tuition.inState ??
-                        0
-                      ).toLocaleString()}{" "}
-                      {university.tuition.currency}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground">
-                      {language === "spanish"
-                        ? "Referencia aproximada"
-                        : "Approximate reference"}
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {university.highlights && university.highlights.length > 0 && (
-                <div className="rounded-lg border bg-card/40 p-3 text-xs">
-                  <p className="text-[11px] font-semibold text-muted-foreground mb-1">
-                    {t("Highlights", "Puntos destacados")}
-                  </p>
-                  <ul className="space-y-1.5">
-                    {university.highlights.map((h, idx) => (
-                      <li key={idx} className="flex items-start gap-1.5">
-                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary" />
-                        <span>{h}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              <div className="rounded-lg border bg-card/40 p-3 text-xs space-y-2">
-                <p className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1">
-                  <Globe2 className="h-3 w-3" />
-                  {t("Official links", "Enlaces oficiales")}
-                </p>
-                <div className="space-y-1.5">
-                  <a
-                    href={university.website}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline"
-                  >
-                    {t("University website", "Sitio web de la universidad")}
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
-                  {university.admissionsUrl && (
-                    <a
-                      href={university.admissionsUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline"
-                    >
-                      {t("Admissions page", "Página de admisiones")}
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
-                  )}
-                </div>
-              </div>
-
-              {university.tags && university.tags.length > 0 && (
-                <div className="flex flex-wrap gap-1.5">
-                  {university.tags.map((tag) => (
-                    <Badge
-                      key={tag}
-                      variant="outline"
-                      className="text-[10px] px-2 py-0.5"
-                    >
-                      {tag}
-                    </Badge>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Recommended Programs */}
+            {recommendedPrograms && recommendedPrograms.length > 0 && (
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <GraduationCap className="h-5 w-5 text-blue-600" />
+                  {t("Recommended Programs", "Programas Recomendados")}
+                </h3>
+                <div className="grid gap-3">
+                  {recommendedPrograms.map((p) => (
+                    <div
+                      key={p.id}
+                      className="group flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-gray-50/50 hover:bg-white hover:border-blue-200 hover:shadow-sm transition-all"
+                    >
+                      <div className="space-y-1">
+                        <h4 className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                          {p.name}
+                        </h4>
+                        <div className="flex items-center gap-3 text-xs text-gray-500">
+                          <span className="font-medium px-2 py-0.5 rounded-md bg-white border border-gray-200">
+                            {p.degree}
+                          </span>
+                          <span>{p.field}</span>
+                          {p.duration && <span>• {p.duration} {t("years", "años")}</span>}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-bold text-emerald-600">
+                          {p.matchScore.toFixed(0)}% {t("Match", "Ajuste")}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Sidebar (Right) */}
+          <div className="w-full lg:w-80 bg-gray-50 border-l border-gray-100 p-6 overflow-y-auto space-y-6">
+            {/* Quick Stats */}
+            <div className="space-y-4">
+              <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                {t("Key Statistics", "Estadísticas Clave")}
+              </h4>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+                  <div className="text-xs text-gray-500 mb-1">{t("Global Rank", "Ranking Global")}</div>
+                  <div className="text-lg font-bold text-gray-900 flex items-center gap-1">
+                    <Award className="h-4 w-4 text-amber-500" />
+                    #{university.ranking.global || "-"}
+                  </div>
+                </div>
+                <div className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+                  <div className="text-xs text-gray-500 mb-1">{t("Acceptance", "Aceptación")}</div>
+                  <div className="text-lg font-bold text-gray-900 flex items-center gap-1">
+                    <Users className="h-4 w-4 text-blue-500" />
+                    {university.acceptanceRate}%
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                <div className="flex items-center gap-2 mb-2">
+                  <DollarSign className="h-4 w-4 text-green-600" />
+                  <span className="text-sm font-bold text-gray-900">{t("Tuition", "Matrícula")}</span>
+                </div>
+                <div className="text-2xl font-bold text-gray-900">
+                  ${(tuition).toLocaleString()}
+                  <span className="text-sm font-normal text-gray-500 ml-1">
+                    {university.tuition.currency}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  {t("Estimated per year", "Estimado por año")}
+                </p>
+              </div>
+            </div>
+
+            {/* Highlights */}
+            {university.highlights && university.highlights.length > 0 && (
+              <div className="space-y-3">
+                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                  {t("Highlights", "Destacados")}
+                </h4>
+                <ul className="space-y-2">
+                  {university.highlights.map((h, idx) => (
+                    <li key={idx} className="flex items-start gap-2 text-sm text-gray-600">
+                      <CheckCircle2 className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" />
+                      <span>{h}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Links */}
+            <div className="space-y-3 pt-4 border-t border-gray-200">
+              <Button className="w-full justify-between" asChild>
+                <a href={university.website} target="_blank" rel="noreferrer">
+                  {t("Visit Website", "Visitar Sitio Web")}
+                  <ExternalLink className="h-4 w-4" />
+                </a>
+              </Button>
+              {university.admissionsUrl && (
+                <Button variant="outline" className="w-full justify-between" asChild>
+                  <a href={university.admissionsUrl} target="_blank" rel="noreferrer">
+                    {t("Admissions", "Admisiones")}
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                </Button>
               )}
             </div>
           </div>

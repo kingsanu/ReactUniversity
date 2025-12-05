@@ -13,6 +13,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { TimelineExportProps, TimelineExportConfig } from "@/types/timeline";
 import { useGlobalStore } from "@/store/useGlobalStore";
+import { pdf } from "@react-pdf/renderer";
+import { TimelinePDFDocument } from "./TimelinePDFDocument";
+import { saveAs } from "file-saver";
 
 /**
  * Timeline Export Component
@@ -25,21 +28,39 @@ export function TimelineExport({
   isExporting,
 }: TimelineExportProps) {
   const { language } = useGlobalStore();
+  const [isGeneratingPDF, setIsGeneratingPDF] = React.useState(false);
 
   const handleExport = async (format: "pdf" | "csv") => {
-    const config: TimelineExportConfig = {
-      format,
-      dateRange: filters.dateRange,
-      filterTypes: filters.types,
-      filterStatus: filters.status,
-      includeDetails: true,
-      language: language === "spanish" ? "sp" : "en",
-    };
-
-    await onExport(config);
+    if (format === "csv") {
+      const config: TimelineExportConfig = {
+        format,
+        dateRange: filters.dateRange,
+        filterTypes: filters.types,
+        filterStatus: filters.status,
+        includeDetails: true,
+        language: language === "spanish" ? "sp" : "en",
+      };
+      await onExport(config);
+    } else if (format === "pdf") {
+      setIsGeneratingPDF(true);
+      try {
+        const blob = await pdf(
+          <TimelinePDFDocument
+            events={events}
+            language={language === "spanish" ? "sp" : "en"}
+          />
+        ).toBlob();
+        saveAs(blob, `timeline-report-${new Date().toISOString().split("T")[0]}.pdf`);
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+      } finally {
+        setIsGeneratingPDF(false);
+      }
+    }
   };
 
   const eventCount = events.length;
+  const isLoading = isExporting || isGeneratingPDF;
 
   return (
     <DropdownMenu>
@@ -47,10 +68,10 @@ export function TimelineExport({
         <Button
           variant="outline"
           size="sm"
-          disabled={isExporting || eventCount === 0}
+          disabled={isLoading || eventCount === 0}
           className="gap-2"
         >
-          {isExporting ? (
+          {isLoading ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
               {language === "spanish" ? "Exportando..." : "Exporting..."}

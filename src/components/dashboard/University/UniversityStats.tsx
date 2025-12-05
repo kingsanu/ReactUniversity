@@ -3,9 +3,53 @@
 import React from "react";
 import { motion } from "motion/react";
 import { UniversityStatsProps } from "@/types/university";
-import { Card, CardContent } from "@/components/ui/card";
-import { TrendingUp, Globe2, GraduationCap, MapPin } from "lucide-react";
+import { TrendingUp, Globe2, GraduationCap, MapPin, Award } from "lucide-react";
 import { useGlobalStore } from "@/store/useGlobalStore";
+import { cn } from "@/lib/utils";
+
+interface StatCardProps {
+  label: string;
+  value: string | number;
+  subValue: string;
+  icon: React.ElementType;
+  delay?: number;
+  trend?: string;
+}
+
+function StatCard({ label, value, subValue, icon: Icon, delay = 0, trend }: StatCardProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay, duration: 0.4 }}
+      className="h-full"
+    >
+      <div className="h-full flex flex-col justify-between rounded-xl bg-white p-6 border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all duration-300 group">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gray-50 text-gray-600 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
+            <Icon className="h-5 w-5" strokeWidth={1.5} />
+          </div>
+          {trend && (
+            <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full uppercase tracking-wide">
+              <TrendingUp className="w-3 h-3" />
+              {trend}
+            </div>
+          )}
+        </div>
+        
+        <div>
+          <p className="text-sm font-medium text-gray-500 mb-1">{label}</p>
+          <p className="text-2xl font-bold text-gray-900 tracking-tight truncate" title={String(value)}>
+            {value}
+          </p>
+          <p className="text-xs text-gray-400 mt-1 font-medium truncate" title={subValue}>
+            {subValue}
+          </p>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
 export function UniversityStats({ stats, isLoading }: UniversityStatsProps) {
   const { language } = useGlobalStore();
@@ -13,11 +57,9 @@ export function UniversityStats({ stats, isLoading }: UniversityStatsProps) {
 
   if (isLoading) {
     return (
-      <div className="grid gap-3 md:grid-cols-4 animate-pulse">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <Card key={i}>
-            <CardContent className="h-20" />
-          </Card>
+          <div key={i} className="h-40 rounded-xl bg-gray-100 animate-pulse" />
         ))}
       </div>
     );
@@ -29,109 +71,39 @@ export function UniversityStats({ stats, isLoading }: UniversityStatsProps) {
   const topCountry = Object.entries(stats.byCountry)[0]?.[0];
 
   return (
-    <div className="grid gap-3 md:grid-cols-4">
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-        <Card>
-          <CardContent className="flex h-24 flex-col justify-between p-3">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-medium">
-                {t("Total matches", "Total coincidencias")}
-              </span>
-              <TrendingUp className="h-4 w-4 text-primary" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">
-                {stats.overview.totalMatches}
-              </p>
-              <p className="text-[11px] text-muted-foreground">
-                {t(
-                  "Universities that fit your profile",
-                  "Universidades alineadas a tu perfil"
-                )}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <StatCard
+        label={t("Total Matches", "Total Coincidencias")}
+        value={stats.overview.totalMatches}
+        subValue={t("Universities fitting your profile", "Universidades según tu perfil")}
+        icon={Globe2}
+        delay={0}
+      />
+      
+      <StatCard
+        label={t("Top Match Score", "Mejor Puntuación")}
+        value={`${stats.overview.topMatchScore}%`}
+        subValue={t("Highest recommendation score", "Puntaje más alto")}
+        icon={Award}
+        delay={0.1}
+        trend={t("High Fit", "Alta")}
+      />
 
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.05 }}
-      >
-        <Card>
-          <CardContent className="flex h-24 flex-col justify-between p-3">
-            <p className="text-xs font-medium">
-              {t("Top match", "Mejor coincidencia")}
-            </p>
-            <div>
-              <p className="text-2xl font-bold">
-                {stats.overview.topMatchScore}
-              </p>
-              <p className="text-[11px] text-muted-foreground">
-                {t(
-                  "Highest recommendation score",
-                  "Puntaje de recomendación más alto"
-                )}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+      <StatCard
+        label={t("Top Focus Area", "Área Principal")}
+        value={topField?.field || t("N/A", "N/A")}
+        subValue={t("Best matching field", "Mejor campo de estudio")}
+        icon={GraduationCap}
+        delay={0.2}
+      />
 
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-      >
-        <Card>
-          <CardContent className="flex h-24 flex-col justify-between p-3">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-medium">
-                {t("Focus area", "Área de enfoque")}
-              </span>
-              <GraduationCap className="h-4 w-4 text-primary" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold">
-                {topField?.field || t("Not available", "No disponible")}
-              </p>
-              <p className="text-[11px] text-muted-foreground">
-                {t(
-                  "Best-matching field of study",
-                  "Campo de estudio con mejor ajuste"
-                )}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15 }}
-      >
-        <Card>
-          <CardContent className="flex h-24 flex-col justify-between p-3">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-medium">
-                {t("Top region", "Mejor región")}
-              </span>
-              <MapPin className="h-4 w-4 text-primary" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold">{topCountry || "-"}</p>
-              <p className="text-[11px] text-muted-foreground">
-                {t(
-                  "Country with strongest matches",
-                  "País con mejores coincidencias"
-                )}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+      <StatCard
+        label={t("Top Region", "Mejor Región")}
+        value={topCountry || "-"}
+        subValue={t("Most matches found here", "Más coincidencias aquí")}
+        icon={MapPin}
+        delay={0.3}
+      />
     </div>
   );
 }

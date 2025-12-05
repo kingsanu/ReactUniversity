@@ -15,6 +15,8 @@ import {
   GraduationCap,
   ChevronDown,
   ChevronUp,
+  Calendar,
+  ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -52,39 +54,39 @@ const colorClasses: Record<
   { bg: string; border: string; text: string; dot: string }
 > = {
   green: {
-    bg: "bg-emerald-50 dark:bg-emerald-950/30",
-    border: "border-emerald-200 dark:border-emerald-800",
-    text: "text-emerald-700 dark:text-emerald-400",
+    bg: "bg-emerald-50",
+    border: "border-emerald-200",
+    text: "text-emerald-600",
     dot: "bg-emerald-500",
   },
   blue: {
-    bg: "bg-blue-50 dark:bg-blue-950/30",
-    border: "border-blue-200 dark:border-blue-800",
-    text: "text-blue-700 dark:text-blue-400",
+    bg: "bg-blue-50",
+    border: "border-blue-200",
+    text: "text-blue-600",
     dot: "bg-blue-500",
   },
   yellow: {
-    bg: "bg-amber-50 dark:bg-amber-950/30",
-    border: "border-amber-200 dark:border-amber-800",
-    text: "text-amber-700 dark:text-amber-400",
+    bg: "bg-amber-50",
+    border: "border-amber-200",
+    text: "text-amber-600",
     dot: "bg-amber-500",
   },
   red: {
-    bg: "bg-red-50 dark:bg-red-950/30",
-    border: "border-red-200 dark:border-red-800",
-    text: "text-red-700 dark:text-red-400",
+    bg: "bg-red-50",
+    border: "border-red-200",
+    text: "text-red-600",
     dot: "bg-red-500",
   },
   gray: {
-    bg: "bg-gray-50 dark:bg-gray-900/30",
-    border: "border-gray-200 dark:border-gray-700",
-    text: "text-gray-600 dark:text-gray-400",
+    bg: "bg-gray-50",
+    border: "border-gray-200",
+    text: "text-gray-600",
     dot: "bg-gray-400",
   },
   purple: {
-    bg: "bg-purple-50 dark:bg-purple-950/30",
-    border: "border-purple-200 dark:border-purple-800",
-    text: "text-purple-700 dark:text-purple-400",
+    bg: "bg-purple-50",
+    border: "border-purple-200",
+    text: "text-purple-600",
     dot: "bg-purple-500",
   },
 };
@@ -94,26 +96,30 @@ const colorClasses: Record<
  */
 const typeBadgeStyles: Record<
   AssessmentType,
-  { bg: string; text: string; label: { en: string; sp: string } }
+  { bg: string; text: string; border: string; label: { en: string; sp: string } }
 > = {
   pca: {
-    bg: "bg-violet-100 dark:bg-violet-900/40",
-    text: "text-violet-700 dark:text-violet-300",
+    bg: "bg-violet-50",
+    text: "text-violet-700",
+    border: "border-violet-200",
     label: { en: "PCA", sp: "PCA" },
   },
   mil: {
-    bg: "bg-cyan-100 dark:bg-cyan-900/40",
-    text: "text-cyan-700 dark:text-cyan-300",
+    bg: "bg-cyan-50",
+    text: "text-cyan-700",
+    border: "border-cyan-200",
     label: { en: "LIA", sp: "LIA" },
   },
   evaluation: {
-    bg: "bg-orange-100 dark:bg-orange-900/40",
-    text: "text-orange-700 dark:text-orange-300",
+    bg: "bg-orange-50",
+    text: "text-orange-700",
+    border: "border-orange-200",
     label: { en: "360°", sp: "360°" },
   },
   course: {
-    bg: "bg-teal-100 dark:bg-teal-900/40",
-    text: "text-teal-700 dark:text-teal-300",
+    bg: "bg-teal-50",
+    text: "text-teal-700",
+    border: "border-teal-200",
     label: { en: "Course", sp: "Curso" },
   },
 };
@@ -178,120 +184,133 @@ function TimelineEventCard({ event, isLast, onClick }: TimelineEventCardProps) {
   const hasMetadata = event.metadata && Object.keys(event.metadata).length > 0;
 
   return (
-    <div className="relative flex gap-4 pb-8 last:pb-0">
+    <div className="relative flex gap-6 pb-12 last:pb-0 group">
       {/* Timeline line */}
       {!isLast && (
-        <div className="absolute left-[19px] top-10 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-700" />
+        <div className="absolute left-[22px] top-12 bottom-0 w-px bg-gray-100" />
       )}
 
       {/* Timeline dot */}
-      <div
-        className={cn(
-          "relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2",
-          colors.bg,
-          colors.border
-        )}
-      >
-        <IconComponent className={cn("h-5 w-5", colors.text)} />
+      <div className="relative z-10 flex-shrink-0">
+        <div
+          className={cn(
+            "flex h-12 w-12 items-center justify-center rounded-full border bg-white transition-all duration-300 group-hover:scale-110",
+            colors.border,
+            colors.text
+          )}
+        >
+          <IconComponent className="h-5 w-5" strokeWidth={1.5} />
+        </div>
       </div>
 
       {/* Event content */}
       <motion.div
-        initial={{ opacity: 0, x: -10 }}
-        animate={{ opacity: 1, x: 0 }}
-        className={cn(
-          "flex-1 rounded-lg border p-4 transition-all hover:shadow-md cursor-pointer",
-          colors.bg,
-          colors.border
-        )}
-        onClick={() => onClick?.() || setIsExpanded(!isExpanded)}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex-1 min-w-0"
       >
-        {/* Header */}
-        <div className="flex items-start justify-between gap-2 mb-2">
-          <div className="flex items-center gap-2 flex-wrap">
-            {/* Type badge */}
-            <span
-              className={cn(
-                "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
-                typeStyle.bg,
-                typeStyle.text
-              )}
-            >
-              {typeStyle.label[langKey]}
-            </span>
+        <div
+          className={cn(
+            "rounded-xl border bg-white p-5 transition-all duration-300 hover:shadow-sm hover:border-gray-300 cursor-pointer",
+            "border-gray-100"
+          )}
+          onClick={() => onClick?.() || setIsExpanded(!isExpanded)}
+        >
+          {/* Header */}
+          <div className="flex items-start justify-between gap-4 mb-2">
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span
+                  className={cn(
+                    "inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide border",
+                    typeStyle.bg,
+                    typeStyle.text,
+                    typeStyle.border
+                  )}
+                >
+                  {typeStyle.label[langKey]}
+                </span>
+                <span className="text-xs text-gray-400 font-medium flex items-center gap-1">
+                  {formatEventTime(event.timestamp)}
+                </span>
+              </div>
+              <h4 className="font-semibold text-gray-900 text-lg leading-tight tracking-tight">
+                {event.title}
+              </h4>
+            </div>
 
-            {/* Status indicator */}
-            <span
-              className={cn(
-                "inline-flex items-center gap-1 text-xs font-medium",
-                colors.text
-              )}
-            >
-              <span className={cn("h-1.5 w-1.5 rounded-full", colors.dot)} />
-              {event.status === "completed"
-                ? language === "spanish"
-                  ? "Completado"
-                  : "Completed"
-                : event.status === "in_progress"
-                ? language === "spanish"
-                  ? "En Progreso"
-                  : "In Progress"
-                : language === "spanish"
-                ? "No Iniciado"
-                : "Not Started"}
+            {hasMetadata && (
+              <div
+                className={cn(
+                  "h-6 w-6 rounded-full flex items-center justify-center transition-transform duration-300 text-gray-400",
+                  isExpanded ? "rotate-180 bg-gray-50 text-gray-600" : ""
+                )}
+              >
+                <ChevronDown className="h-4 w-4" />
+              </div>
+            )}
+          </div>
+
+          <p className="text-sm text-gray-500 leading-relaxed mb-4 font-normal">
+            {event.description}
+          </p>
+
+          {/* Footer info */}
+          <div className="flex items-center justify-between pt-3 border-t border-gray-50">
+            <div className="flex items-center gap-2">
+              <span
+                className={cn(
+                  "inline-flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded-full",
+                  event.status === "completed"
+                    ? "bg-emerald-50 text-emerald-700"
+                    : event.status === "in_progress"
+                    ? "bg-blue-50 text-blue-700"
+                    : "bg-gray-50 text-gray-600"
+                )}
+              >
+                <span
+                  className={cn(
+                    "h-1.5 w-1.5 rounded-full",
+                    event.status === "completed"
+                      ? "bg-emerald-500"
+                      : event.status === "in_progress"
+                      ? "bg-blue-500"
+                      : "bg-gray-400"
+                  )}
+                />
+                {event.status === "completed"
+                  ? language === "spanish"
+                    ? "Completado"
+                    : "Completed"
+                  : event.status === "in_progress"
+                  ? language === "spanish"
+                    ? "En Progreso"
+                    : "In Progress"
+                  : language === "spanish"
+                  ? "No Iniciado"
+                  : "Not Started"}
+              </span>
+            </div>
+            <span className="text-xs text-gray-400 font-medium">
+              {getRelativeTime(event.timestamp, language)}
             </span>
           </div>
 
-          {/* Expand button */}
-          {hasMetadata && (
-            <button
-              className="p-1 rounded hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsExpanded(!isExpanded);
-              }}
-            >
-              {isExpanded ? (
-                <ChevronUp className="h-4 w-4 text-gray-500" />
-              ) : (
-                <ChevronDown className="h-4 w-4 text-gray-500" />
-              )}
-            </button>
-          )}
+          {/* Expanded metadata */}
+          <AnimatePresence>
+            {isExpanded && hasMetadata && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="mt-4 pt-4 border-t border-dashed border-gray-100 overflow-hidden"
+              >
+                <EventMetadata event={event} language={language} />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-
-        {/* Title & Description */}
-        <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">
-          {event.title}
-        </h4>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-          {event.description}
-        </p>
-
-        {/* Date & Time */}
-        <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-500">
-          <span>{formatEventDate(event.timestamp, language)}</span>
-          <span>•</span>
-          <span>{formatEventTime(event.timestamp)}</span>
-          <span className="text-gray-400">
-            ({getRelativeTime(event.timestamp, language)})
-          </span>
-        </div>
-
-        {/* Expanded metadata */}
-        <AnimatePresence>
-          {isExpanded && hasMetadata && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.2 }}
-              className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700"
-            >
-              <EventMetadata event={event} language={language} />
-            </motion.div>
-          )}
-        </AnimatePresence>
       </motion.div>
     </div>
   );
@@ -311,43 +330,43 @@ function EventMetadata({
 
   if (event.type === "mil") {
     return (
-      <div className="grid grid-cols-2 gap-3 text-sm">
+      <div className="grid grid-cols-2 gap-4 text-sm bg-gray-50/30 p-4 rounded-lg border border-gray-100/50">
         {metadata.scorePercentage !== undefined && (
-          <div>
-            <span className="text-gray-500 dark:text-gray-400">
-              {language === "spanish" ? "Puntuación" : "Score"}:
+          <div className="flex flex-col">
+            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold mb-1">
+              {language === "spanish" ? "Puntuación" : "Score"}
             </span>
-            <span className="ml-2 font-medium text-gray-900 dark:text-gray-100">
+            <span className="font-bold text-gray-900 text-lg tracking-tight">
               {metadata.scorePercentage.toFixed(1)}%
             </span>
           </div>
         )}
         {metadata.accuracyPercentage !== undefined && (
-          <div>
-            <span className="text-gray-500 dark:text-gray-400">
-              {language === "spanish" ? "Precisión" : "Accuracy"}:
+          <div className="flex flex-col">
+            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold mb-1">
+              {language === "spanish" ? "Precisión" : "Accuracy"}
             </span>
-            <span className="ml-2 font-medium text-gray-900 dark:text-gray-100">
+            <span className="font-bold text-gray-900 text-lg tracking-tight">
               {metadata.accuracyPercentage.toFixed(1)}%
             </span>
           </div>
         )}
         {metadata.correctAnswers !== undefined && (
-          <div>
-            <span className="text-gray-500 dark:text-gray-400">
-              {language === "spanish" ? "Correctas" : "Correct"}:
+          <div className="flex flex-col">
+            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold mb-1">
+              {language === "spanish" ? "Correctas" : "Correct"}
             </span>
-            <span className="ml-2 font-medium text-gray-900 dark:text-gray-100">
-              {metadata.correctAnswers}/{metadata.totalQuestions}
+            <span className="font-semibold text-gray-900">
+              {metadata.correctAnswers} <span className="text-gray-400 font-normal">/ {metadata.totalQuestions}</span>
             </span>
           </div>
         )}
         {metadata.timeSpent && (
-          <div>
-            <span className="text-gray-500 dark:text-gray-400">
-              {language === "spanish" ? "Tiempo" : "Time"}:
+          <div className="flex flex-col">
+            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold mb-1">
+              {language === "spanish" ? "Tiempo" : "Time"}
             </span>
-            <span className="ml-2 font-medium text-gray-900 dark:text-gray-100">
+            <span className="font-semibold text-gray-900">
               {metadata.timeSpent}
             </span>
           </div>
@@ -358,33 +377,36 @@ function EventMetadata({
 
   if (event.type === "evaluation") {
     return (
-      <div className="grid grid-cols-2 gap-3 text-sm">
+      <div className="grid grid-cols-2 gap-4 text-sm bg-gray-50/30 p-4 rounded-lg border border-gray-100/50">
         {metadata.evaluatorName && (
-          <div>
-            <span className="text-gray-500 dark:text-gray-400">
-              {language === "spanish" ? "Evaluador" : "Evaluator"}:
+          <div className="col-span-2 flex flex-col">
+            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold mb-1">
+              {language === "spanish" ? "Evaluador" : "Evaluator"}
             </span>
-            <span className="ml-2 font-medium text-gray-900 dark:text-gray-100">
+            <span className="font-semibold text-gray-900 flex items-center gap-2">
+              <div className="h-6 w-6 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 text-[10px] font-bold border border-blue-100">
+                {metadata.evaluatorName.charAt(0)}
+              </div>
               {metadata.evaluatorName}
             </span>
           </div>
         )}
         {metadata.relation && (
-          <div>
-            <span className="text-gray-500 dark:text-gray-400">
-              {language === "spanish" ? "Relación" : "Relation"}:
+          <div className="flex flex-col">
+            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold mb-1">
+              {language === "spanish" ? "Relación" : "Relation"}
             </span>
-            <span className="ml-2 font-medium text-gray-900 dark:text-gray-100">
+            <span className="font-medium text-gray-700 bg-white px-2 py-1 rounded border border-gray-100 self-start text-xs shadow-sm">
               {metadata.relation}
             </span>
           </div>
         )}
         {metadata.groupType && (
-          <div>
-            <span className="text-gray-500 dark:text-gray-400">
-              {language === "spanish" ? "Tipo" : "Type"}:
+          <div className="flex flex-col">
+            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold mb-1">
+              {language === "spanish" ? "Tipo" : "Type"}
             </span>
-            <span className="ml-2 font-medium text-gray-900 dark:text-gray-100">
+            <span className="font-medium text-gray-700 text-xs">
               {metadata.groupType}
             </span>
           </div>
@@ -395,53 +417,37 @@ function EventMetadata({
 
   if (event.type === "pca") {
     return (
-      <div className="grid grid-cols-2 gap-3 text-sm">
+      <div className="space-y-4 bg-gray-50/30 p-4 rounded-lg border border-gray-100/50">
         {metadata.overallScore !== undefined && (
-          <div className="col-span-2">
-            <span className="text-gray-500 dark:text-gray-400">
-              {language === "spanish" ? "Puntuación General" : "Overall Score"}:
+          <div className="flex items-center justify-between border-b border-gray-200/50 pb-3">
+            <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+              {language === "spanish" ? "Puntuación General" : "Overall Score"}
             </span>
-            <span className="ml-2 font-medium text-gray-900 dark:text-gray-100">
+            <span className="text-xl font-bold text-violet-600 tracking-tight">
               {metadata.overallScore}%
             </span>
           </div>
         )}
         {metadata.scores && (
-          <>
-            <div>
-              <span className="text-gray-500 dark:text-gray-400">D:</span>
-              <span className="ml-2 font-medium">
-                {metadata.scores.dominance}
-              </span>
-            </div>
-            <div>
-              <span className="text-gray-500 dark:text-gray-400">I:</span>
-              <span className="ml-2 font-medium">
-                {metadata.scores.influence}
-              </span>
-            </div>
-            <div>
-              <span className="text-gray-500 dark:text-gray-400">S:</span>
-              <span className="ml-2 font-medium">
-                {metadata.scores.steadiness}
-              </span>
-            </div>
-            <div>
-              <span className="text-gray-500 dark:text-gray-400">C:</span>
-              <span className="ml-2 font-medium">
-                {metadata.scores.conscientiousness}
-              </span>
-            </div>
-          </>
+          <div className="grid grid-cols-4 gap-2">
+            {Object.entries(metadata.scores).map(([key, value]: [string, any]) => (
+              <div key={key} className="flex flex-col items-center p-2 bg-white rounded-lg border border-gray-100 shadow-sm">
+                <span className="text-[10px] font-bold text-gray-400 uppercase mb-1">
+                  {key.charAt(0)}
+                </span>
+                <span className="font-bold text-gray-900">{value}</span>
+              </div>
+            ))}
+          </div>
         )}
         {metadata.pcaCod && (
-          <div className="col-span-2">
-            <span className="text-gray-500 dark:text-gray-400">
+          <div className="flex items-center gap-2 text-xs text-gray-500 pt-1">
+            <span className="font-medium">
               {language === "spanish" ? "Código" : "Code"}:
             </span>
-            <span className="ml-2 font-mono text-xs text-gray-700 dark:text-gray-300">
+            <code className="bg-white px-2 py-0.5 rounded text-gray-600 font-mono text-[10px] border border-gray-100">
               {metadata.pcaCod}
-            </span>
+            </code>
           </div>
         )}
       </div>
@@ -450,34 +456,43 @@ function EventMetadata({
 
   if (event.type === "course") {
     return (
-      <div className="grid grid-cols-2 gap-3 text-sm">
+      <div className="space-y-4 bg-gray-50/30 p-4 rounded-lg border border-gray-100/50">
         {metadata.courseTitle && (
-          <div className="col-span-2">
-            <span className="text-gray-500 dark:text-gray-400">
-              {language === "spanish" ? "Curso" : "Course"}:
+          <div className="flex flex-col">
+            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold mb-1">
+              {language === "spanish" ? "Curso" : "Course"}
             </span>
-            <span className="ml-2 font-medium text-gray-900 dark:text-gray-100">
+            <span className="font-bold text-gray-900 text-lg tracking-tight">
               {metadata.courseTitle}
             </span>
           </div>
         )}
+        
         {metadata.progress !== undefined && (
-          <div>
-            <span className="text-gray-500 dark:text-gray-400">
-              {language === "spanish" ? "Progreso" : "Progress"}:
-            </span>
-            <span className="ml-2 font-medium text-gray-900 dark:text-gray-100">
-              {metadata.progress.toFixed(0)}%
-            </span>
+          <div className="space-y-1.5">
+            <div className="flex justify-between text-xs mb-1">
+              <span className="text-gray-500 font-medium">
+                {language === "spanish" ? "Progreso" : "Progress"}
+              </span>
+              <span className="text-gray-900 font-bold">{metadata.progress.toFixed(0)}%</span>
+            </div>
+            <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-teal-500 rounded-full transition-all duration-500 ease-out" 
+                style={{ width: `${metadata.progress}%` }}
+              />
+            </div>
           </div>
         )}
+
         {metadata.completedModules !== undefined && (
-          <div>
-            <span className="text-gray-500 dark:text-gray-400">
-              {language === "spanish" ? "Módulos" : "Modules"}:
-            </span>
-            <span className="ml-2 font-medium text-gray-900 dark:text-gray-100">
-              {metadata.completedModules}/{metadata.totalModules}
+          <div className="flex items-center gap-2 text-sm text-gray-600 bg-white p-2 rounded-lg border border-gray-100 shadow-sm">
+            <BookOpen className="w-4 h-4 text-teal-500" />
+            <span>
+              <span className="font-bold text-gray-900">{metadata.completedModules}</span>
+              <span className="text-gray-400 mx-1">/</span>
+              <span>{metadata.totalModules}</span>
+              <span className="ml-1">{language === "spanish" ? "módulos" : "modules"}</span>
             </span>
           </div>
         )}
@@ -494,13 +509,12 @@ function EventMetadata({
 function groupEventsByDate(
   events: TimelineEvent[],
   language: "english" | "spanish"
-): { date: string; events: TimelineEvent[] }[] {
+): { date: string; events: TimelineEvent[]; isToday: boolean }[] {
   const groups: Map<string, TimelineEvent[]> = new Map();
 
   events.forEach((event) => {
     const date = new Date(event.timestamp);
     const dateKey = format(date, "yyyy-MM-dd");
-    const displayDate = formatEventDate(event.timestamp, language);
 
     if (!groups.has(dateKey)) {
       groups.set(dateKey, []);
@@ -509,10 +523,14 @@ function groupEventsByDate(
   });
 
   return Array.from(groups.entries())
-    .map(([dateKey, events]) => ({
-      date: formatEventDate(events[0].timestamp, language),
-      events,
-    }))
+    .map(([dateKey, events]) => {
+      const date = new Date(dateKey);
+      return {
+        date: formatEventDate(events[0].timestamp, language),
+        events,
+        isToday: isToday(date),
+      };
+    })
     .sort(
       (a, b) =>
         new Date(b.events[0].timestamp).getTime() -
@@ -541,19 +559,25 @@ export function TimelineView({
   const groupedEvents = groupEventsByDate(events, language);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10 pb-10">
       {groupedEvents.map((group, groupIndex) => (
-        <div key={group.date}>
+        <div key={group.date} className="relative">
           {/* Date header */}
-          <div className="sticky top-0 z-20 mb-4 flex items-center gap-3">
-            <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900 px-2 py-1 rounded">
+          <div className="sticky top-0 z-20 mb-8 flex items-center justify-center pointer-events-none">
+            <div 
+              className={cn(
+                "px-4 py-1.5 rounded-full text-xs font-bold shadow-sm border backdrop-blur-md transition-all duration-300 pointer-events-auto",
+                group.isToday 
+                  ? "bg-blue-600 text-white border-blue-600 shadow-blue-100" 
+                  : "bg-white/80 text-gray-600 border-gray-200"
+              )}
+            >
               {group.date}
-            </span>
-            <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+            </div>
           </div>
 
           {/* Events for this date */}
-          <div className="pl-2">
+          <div className="space-y-2">
             {group.events.map((event, eventIndex) => (
               <TimelineEventCard
                 key={event.id}
@@ -577,18 +601,17 @@ export function TimelineView({
  */
 function TimelineViewSkeleton() {
   return (
-    <div className="space-y-8 animate-pulse">
-      {[1, 2, 3].map((group) => (
+    <div className="space-y-12 animate-pulse p-4">
+      {[1, 2].map((group) => (
         <div key={group}>
-          <div className="mb-4 flex items-center gap-3">
-            <div className="h-6 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
-            <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+          <div className="flex justify-center mb-8">
+            <div className="h-8 w-32 bg-gray-100 rounded-full" />
           </div>
-          <div className="pl-2 space-y-6">
-            {[1, 2].map((item) => (
-              <div key={item} className="flex gap-4">
-                <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700" />
-                <div className="flex-1 h-32 rounded-lg bg-gray-200 dark:bg-gray-700" />
+          <div className="space-y-8">
+            {[1, 2, 3].map((item) => (
+              <div key={item} className="flex gap-6">
+                <div className="h-12 w-12 rounded-full bg-gray-100 shrink-0" />
+                <div className="flex-1 h-32 rounded-xl bg-gray-100" />
               </div>
             ))}
           </div>
@@ -603,20 +626,26 @@ function TimelineViewSkeleton() {
  */
 function TimelineEmptyState({ language }: { language: "english" | "spanish" }) {
   return (
-    <div className="flex flex-col items-center justify-center py-16 text-center">
-      <div className="h-16 w-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
+    <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-dashed border-gray-200 m-4">
+      <div className="h-16 w-16 rounded-full bg-gray-50 flex items-center justify-center mb-4">
         <Clock className="h-8 w-8 text-gray-400" />
       </div>
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+      <h3 className="text-lg font-bold text-gray-900 mb-2">
         {language === "spanish"
-          ? "No hay eventos en la línea de tiempo"
+          ? "No hay eventos"
           : "No timeline events"}
       </h3>
-      <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm">
+      <p className="text-sm text-gray-500 max-w-xs leading-relaxed">
         {language === "spanish"
-          ? "Completa evaluaciones y cursos para ver tu progreso aquí."
-          : "Complete assessments and courses to see your progress here."}
+          ? "Completa evaluaciones para ver tu progreso."
+          : "Complete assessments to see your progress."}
       </p>
+      <div className="mt-6">
+        <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors shadow-sm shadow-blue-100">
+          {language === "spanish" ? "Ir a Evaluaciones" : "Go to Assessments"}
+          <ArrowRight className="w-4 h-4" />
+        </button>
+      </div>
     </div>
   );
 }

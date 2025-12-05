@@ -181,6 +181,18 @@ export const sidebarData = {
       path: "/dashboard/assessments",
     },
     {
+      id: "university",
+      name: "University Suggestions",
+      icon: "learning",
+      path: "/dashboard/university",
+    },
+    {
+      id: "timeline",
+      name: "Timeline",
+      icon: "analytics",
+      path: "/dashboard/timeline",
+    },
+    {
       id: "career-paths",
       name: "nav.careerPaths",
       icon: "career",
