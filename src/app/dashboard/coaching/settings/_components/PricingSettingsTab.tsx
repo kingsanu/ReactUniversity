@@ -114,89 +114,91 @@ export function PricingSettingsTab({
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Pricing Settings</CardTitle>
-        <CardDescription>
+    <div className="p-6 sm:p-10 space-y-8">
+      <div>
+        <h2 className="text-xl font-bold text-gray-900">Pricing Settings</h2>
+        <p className="text-gray-500 font-medium mt-1">
           Set your hourly rate and currency for coaching sessions.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Label htmlFor="currency">Currency</Label>
-            <Select value="USD" disabled>
-              <SelectTrigger>
-                <SelectValue placeholder="Select currency" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="USD">USD ($)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        </p>
+      </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="rate">Hourly Rate</Label>
-            <div className="relative">
-              <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-              <Input
-                id="rate"
-                type="number"
-                min="0"
-                step="0.01"
-                className="pl-9"
-                value={hourlyRate}
-                onChange={(e) => setHourlyRate(parseFloat(e.target.value) || 0)}
-              />
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Set your rate per hour session.
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="space-y-3">
+          <Label htmlFor="currency" className="text-sm font-semibold text-gray-700">Currency</Label>
+          <Select value="USD" disabled>
+            <SelectTrigger className="h-12 rounded-xl bg-white border-gray-200">
+              <SelectValue placeholder="Select currency" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="USD">USD ($)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-3">
+          <Label htmlFor="rate" className="text-sm font-semibold text-gray-700">Hourly Rate</Label>
+          <div className="relative">
+            <DollarSign className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Input
+              id="rate"
+              type="number"
+              min="0"
+              step="0.01"
+              className="pl-12 h-12 rounded-xl bg-white border-gray-200 text-lg font-medium"
+              value={hourlyRate}
+              onChange={(e) => setHourlyRate(parseFloat(e.target.value) || 0)}
+            />
+          </div>
+          <p className="text-xs text-blue-600 font-medium">
+            This is what clients will see when booking.
+          </p>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-blue-100 bg-blue-50/50 p-6 sm:p-8">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+            <Info className="h-5 w-5 text-blue-600" />
+          </div>
+          <div>
+             <h3 className="font-bold text-gray-900">Earnings Breakdown</h3>
+             <p className="text-sm text-gray-500 font-medium">Platform fee: {platformFee}%</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+          <div className="p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Client Pays</p>
+            <p className="text-2xl font-extrabold text-gray-900">
+              {currency === "USD" ? "$" : currency} {hourlyRate.toFixed(2)}
+            </p>
+          </div>
+          <div className="p-4 bg-white rounded-xl border border-gray-100 shadow-sm relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-1 h-full bg-red-400" />
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Platform Fee</p>
+            <p className="text-2xl font-bold text-red-500">
+              - {currency === "USD" ? "$" : currency} {feeAmount.toFixed(2)}
+            </p>
+          </div>
+          <div className="p-4 bg-green-50 rounded-xl border border-green-100 shadow-sm relative overflow-hidden">
+             <div className="absolute top-0 right-0 w-16 h-16 bg-green-100/50 rounded-full -mr-8 -mt-8" />
+             <p className="text-xs font-bold text-green-700 uppercase tracking-widest mb-1">You Earn</p>
+             <p className="text-3xl font-extrabold text-green-700">
+              {currency === "USD" ? "$" : currency} {yourEarnings.toFixed(2)}
             </p>
           </div>
         </div>
+      </div>
 
-        <div className="rounded-lg border bg-muted/50 p-4">
-          <div className="flex items-start gap-2 mb-4">
-            <Info className="h-4 w-4 text-muted-foreground mt-0.5" />
-            <div className="text-sm">
-              <p className="font-medium mb-1">Earnings Breakdown</p>
-              <p className="text-muted-foreground">
-                Platform fee: {platformFee}%
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div className="p-3 bg-white rounded border">
-              <p className="text-xs text-muted-foreground mb-1">Client Pays</p>
-              <p className="font-semibold text-gray-900">
-                {currency === "USD" ? "$" : currency} {hourlyRate.toFixed(2)}
-              </p>
-            </div>
-            <div className="p-3 bg-white rounded border">
-              <p className="text-xs text-muted-foreground mb-1">Platform Fee</p>
-              <p className="font-semibold text-red-600">
-                - {currency === "USD" ? "$" : currency} {feeAmount.toFixed(2)}
-              </p>
-            </div>
-            <div className="p-3 bg-green-50 rounded border border-green-100">
-              <p className="text-xs text-green-700 mb-1">You Earn</p>
-              <p className="font-bold text-green-700">
-                {currency === "USD" ? "$" : currency} {yourEarnings.toFixed(2)}
-              </p>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-      <CardFooter className="flex justify-end border-t pt-6">
+      <div className="flex justify-end pt-4 border-t border-gray-100">
         <Button
           onClick={handleSave}
           disabled={isSaving}
-          className="bg-black text-white hover:bg-gray-800"
+          className="bg-gray-900 text-white hover:bg-black h-12 px-8 rounded-xl font-bold shadow-lg shadow-gray-900/10"
         >
           {isSaving ? "Saving..." : "Save Changes"}
         </Button>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 }

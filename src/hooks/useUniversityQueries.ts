@@ -19,7 +19,9 @@ import {
   fetchUniversityFavorites,
   compareUniversities,
   fetchUniversityFilterOptions,
+  toggleUniversityFavorite,
 } from "@/services/universityService";
+
 
 export const universityKeys = {
   all: ["universities"] as const,
@@ -107,3 +109,24 @@ export function useUniversityCompare(ids: string[]) {
     enabled: ids.length > 1,
   });
 }
+
+export function useUniversityFavoriteMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      universityId,
+      action,
+    }: {
+      universityId: string;
+      action: "save" | "unsave";
+    }) => toggleUniversityFavorite(universityId, action),
+    onSuccess: (_, { universityId }) => {
+      // Invalidate all favorites queries
+      queryClient.invalidateQueries({
+        queryKey: universityKeys.all,
+      });
+    },
+  });
+}
+

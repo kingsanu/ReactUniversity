@@ -3,6 +3,8 @@
 import { motion } from "motion/react";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { useDashboardAssessmentSummary } from "@/hooks/useAssessmentQueries";
+import { CheckCircle2, Circle, Clock, Brain, Target, Users } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function AssessmentProgressCard() {
   const { user } = useGlobalStore();
@@ -14,62 +16,27 @@ export function AssessmentProgressCard() {
     error 
   } = useDashboardAssessmentSummary(user?.id || '');
 
-  const getStatusIcon = (status: string) => {
+  const getAssessmentIcon = (type: string) => {
+    switch (type) {
+      case "pca":
+        return <Brain className="w-5 h-5 text-blue-600" />;
+      case "mil":
+        return <Target className="w-5 h-5 text-purple-600" />;
+      case "evaluation":
+        return <Users className="w-5 h-5 text-orange-600" />;
+      default:
+        return <Circle className="w-5 h-5 text-gray-400" />;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
     switch (status) {
       case "completed":
-        return (
-          <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-            <svg
-              className="w-5 h-5 text-green-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-          </div>
-        );
+        return "bg-green-50 text-green-700 border-green-100";
       case "in_progress":
-        return (
-          <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
-            <svg
-              className="w-5 h-5 text-yellow-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-        );
+        return "bg-amber-50 text-amber-700 border-amber-100";
       default:
-        return (
-          <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-            <svg
-              className="w-5 h-5 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-        );
+        return "bg-gray-50 text-gray-600 border-gray-100";
     }
   };
 
@@ -78,12 +45,12 @@ export function AssessmentProgressCard() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-xl shadow-lg p-6"
+        className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-full"
       >
-        <div className="animate-pulse">
-          <div className="h-6 bg-gray-200 rounded mb-4"></div>
-          <div className="h-4 bg-gray-200 rounded mb-4"></div>
-          <div className="h-20 bg-gray-200 rounded"></div>
+        <div className="animate-pulse space-y-4">
+          <div className="h-6 bg-gray-100 rounded w-1/3"></div>
+          <div className="h-4 bg-gray-100 rounded w-1/2"></div>
+          <div className="h-32 bg-gray-100 rounded-xl"></div>
         </div>
       </motion.div>
     );
@@ -97,74 +64,94 @@ export function AssessmentProgressCard() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-xl shadow-lg p-6"
+      className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-full flex flex-col"
     >
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">
-          Assessment Progress
-        </h3>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h3 className="text-lg font-bold text-gray-900">
+            Assessment Journey
+          </h3>
+          <p className="text-sm text-gray-500 mt-1">
+            Your professional growth path
+          </p>
+        </div>
         <div className="text-right">
-          <div className="text-2xl font-bold text-blue-600">
+          <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
             {assessmentData.overallCompletion}%
           </div>
-          <div className="text-xs text-gray-500">Complete</div>
         </div>
       </div>
 
       {/* Overall Progress Bar */}
-      <div className="mb-6">
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div
-            className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300"
-            style={{ width: `${assessmentData.overallCompletion}%` }}
+      <div className="mb-8">
+        <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${assessmentData.overallCompletion}%` }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            className="bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 h-full rounded-full"
           />
+        </div>
+        <div className="mt-2 flex justify-between text-xs text-gray-500 font-medium">
+          <span>Start</span>
+          <span>Professional Certified</span>
         </div>
       </div>
 
       {/* Individual Assessments */}
-      <div className="space-y-4">
-        {assessmentData.assessments.map((assessment: any) => (
-          <div
+      <div className="space-y-3 flex-1">
+        {assessmentData.assessments.map((assessment: any, index: number) => (
+          <motion.div
             key={assessment.type}
-            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className="group flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100"
           >
-            <div className="flex items-center space-x-3">
-              {getStatusIcon(assessment.status)}
+            <div className="flex items-center gap-4">
+              <div className={cn(
+                "w-10 h-10 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110",
+                assessment.type === 'pca' ? "bg-blue-50" :
+                assessment.type === 'mil' ? "bg-purple-50" : "bg-orange-50"
+              )}>
+                {getAssessmentIcon(assessment.type)}
+              </div>
               <div>
-                <div className="font-medium text-gray-900">
+                <div className="font-semibold text-gray-900">
                   {assessment.name}
                 </div>
-                <div className="text-sm text-gray-500 capitalize">
-                  {assessment.status.replace("_", " ")}
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className={cn(
+                    "text-[10px] px-2 py-0.5 rounded-full font-medium border uppercase tracking-wider",
+                    getStatusColor(assessment.status)
+                  )}>
+                    {assessment.status.replace("_", " ")}
+                  </span>
                 </div>
               </div>
             </div>
-            <div className="text-right">
-              <div className="text-sm font-medium text-gray-900">
-                {assessment.completion}%
-              </div>
-              {assessment.stats && Object.keys(assessment.stats).length > 0 && (
-                <div className="text-xs text-gray-500">
-                  {assessment.type === "mil" &&
-                    assessment.stats.totalAttempts > 0 &&
-                    `${assessment.stats.totalAttempts} sub assessments`}
-                  {assessment.type === "evaluation" &&
-                    assessment.stats.totalEvaluators > 0 &&
-                    `${assessment.stats.totalEvaluators} evaluators`}
+            
+            <div className="flex items-center gap-3">
+              {assessment.status === 'completed' ? (
+                <CheckCircle2 className="w-5 h-5 text-green-500" />
+              ) : (
+                <div className="text-sm font-medium text-gray-400">
+                  {assessment.completion}%
                 </div>
               )}
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
 
       {/* Quick Action */}
-      <div className="mt-6 pt-4 border-t border-gray-200">
+      <div className="mt-6 pt-4 border-t border-gray-100">
         <a
           href="/dashboard/assessments"
-          className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 px-4 rounded-lg text-center block font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-200"
+          className="group w-full flex items-center justify-center gap-2 bg-gray-900 text-white py-3 px-4 rounded-xl font-medium hover:bg-gray-800 transition-all duration-200 shadow-lg shadow-gray-900/10 hover:shadow-gray-900/20"
         >
-          View All Assessments
+          <span>Continue Assessment</span>
+          <Clock className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
         </a>
       </div>
     </motion.div>

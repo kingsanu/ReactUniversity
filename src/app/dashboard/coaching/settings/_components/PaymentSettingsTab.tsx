@@ -135,128 +135,115 @@ export function PaymentSettingsTab({
   }
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Stripe Connect</CardTitle>
-          <CardDescription>
-            Connect your Stripe account to receive payments directly.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {!stripeAccount?.connected ? (
-            <div className="space-y-4">
-              <div className="flex items-start gap-3 p-4 border rounded-lg bg-muted/50">
-                <CreditCard className="h-5 w-5 text-muted-foreground mt-0.5" />
-                <div className="flex-1">
-                  <h4 className="font-medium mb-1">Connect Stripe Account</h4>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Link your Stripe account to receive coaching payments
-                    directly. Stripe handles all payment processing securely.
-                  </p>
-                  <Button onClick={handleConnectStripe} disabled={isConnecting}>
-                    {isConnecting ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Connecting...
-                      </>
-                    ) : (
-                      <>
-                        <CreditCard className="mr-2 h-4 w-4" />
-                        Connect with Stripe
-                      </>
-                    )}
-                  </Button>
+    <div className="p-6 sm:p-10 space-y-8">
+      <div>
+        <h2 className="text-xl font-bold text-gray-900">Payments & Payouts</h2>
+        <p className="text-gray-500 font-medium mt-1">
+          Manage your Stripe connection and view payout history.
+        </p>
+      </div>
+
+      {!stripeAccount?.connected ? (
+        <div className="bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-100 rounded-2xl p-8 flex flex-col items-center text-center space-y-6 shadow-sm">
+          <div className="h-16 w-16 bg-white rounded-2xl shadow-md flex items-center justify-center">
+            <CreditCard className="h-8 w-8 text-indigo-600" />
+          </div>
+          <div className="max-w-md space-y-2">
+            <h3 className="text-xl font-bold text-gray-900">Connect with Stripe</h3>
+            <p className="text-gray-600">
+               Link your Stripe account to receive coaching payments directly. Stripe handles all payment processing securely.
+            </p>
+          </div>
+          
+          <Button 
+            onClick={handleConnectStripe} 
+            disabled={isConnecting}
+            className="bg-[#635BFF] hover:bg-[#544ee6] text-white px-8 py-6 rounded-xl font-bold text-lg shadow-lg shadow-indigo-200 transition-all hover:scale-105"
+          >
+            {isConnecting ? (
+              <>
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                Connecting...
+              </>
+            ) : (
+              <>
+                Connect Stripe Account
+              </>
+            )}
+          </Button>
+
+          <div className="pt-6 border-t border-indigo-100 w-full max-w-lg">
+             <p className="text-sm font-semibold text-gray-500 mb-3">WHAT YOU'LL NEED</p>
+             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-gray-600">
+               <div className="flex items-center justify-center gap-2">
+                 <div className="h-1.5 w-1.5 rounded-full bg-indigo-400" />
+                 Bank Details
+               </div>
+               <div className="flex items-center justify-center gap-2">
+                 <div className="h-1.5 w-1.5 rounded-full bg-indigo-400" />
+                 Tax Information
+               </div>
+               <div className="flex items-center justify-center gap-2">
+                 <div className="h-1.5 w-1.5 rounded-full bg-indigo-400" />
+                 Personal Info
+               </div>
+             </div>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          <div className="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-6 relative overflow-hidden">
+             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-100/50 rounded-full -mr-16 -mt-16" />
+             <div className="flex items-start gap-4 relative z-10">
+                <div className="h-12 w-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-emerald-600">
+                   <CheckCircle className="h-6 w-6" />
                 </div>
-              </div>
-
-              <div className="text-sm text-muted-foreground space-y-2">
-                <p className="font-medium">What you'll need:</p>
-                <ul className="list-disc pl-5 space-y-1">
-                  <li>Business or personal information</li>
-                  <li>Bank account details for payouts</li>
-                  <li>Tax identification number</li>
-                </ul>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex items-start gap-3 p-4 border rounded-lg bg-green-50 dark:bg-green-950">
-                <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
                 <div className="flex-1">
-                  <h4 className="font-medium mb-1">Stripe Connected</h4>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Your Stripe account is connected and ready to receive
-                    payments.
-                  </p>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Account ID:</span>
-                      <span className="font-mono">
-                        {stripeAccount.accountId}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Email:</span>
-                      <span>{stripeAccount.email}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">
-                        Bank Account:
-                      </span>
-                      <span>****{stripeAccount.last4}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Payouts:</span>
-                      <Badge
-                        variant={
-                          stripeAccount.payoutsEnabled ? "default" : "secondary"
-                        }
-                      >
-                        {stripeAccount.payoutsEnabled ? "Enabled" : "Pending"}
-                      </Badge>
-                    </div>
-                  </div>
+                   <h3 className="text-lg font-bold text-gray-900">Stripe Connected</h3>
+                   <p className="text-gray-600 text-sm mt-1">Your account is ready to receive payouts.</p>
+                   
+                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+                     <div className="bg-white p-3 rounded-xl border border-emerald-100/50 shadow-sm">
+                        <span className="text-xs font-bold text-gray-400 uppercase">Account Email</span>
+                        <p className="font-semibold text-gray-900 truncate">{stripeAccount.email}</p>
+                     </div>
+                     <div className="bg-white p-3 rounded-xl border border-emerald-100/50 shadow-sm">
+                        <span className="text-xs font-bold text-gray-400 uppercase">Bank Account</span>
+                        <p className="font-semibold text-gray-900">****{stripeAccount.last4}</p>
+                     </div>
+                   </div>
+
+                   <div className="flex gap-3 mt-6">
+                      <Button variant="outline" size="sm" asChild className="bg-white hover:bg-gray-50 border-gray-200">
+                        <a href="https://dashboard.stripe.com" target="_blank" rel="noopener noreferrer">
+                          <ExternalLink className="mr-2 h-4 w-4" />
+                          View Dashboard
+                        </a>
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={handleDisconnect} className="text-red-500 hover:text-red-600 hover:bg-red-50">
+                        Disconnect
+                      </Button>
+                   </div>
                 </div>
-              </div>
+             </div>
+          </div>
 
-              <div className="flex gap-3">
-                <Button variant="outline" size="sm" asChild>
-                  <a
-                    href="https://dashboard.stripe.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <ExternalLink className="mr-2 h-4 w-4" />
-                    Stripe Dashboard
-                  </a>
-                </Button>
-                <Button variant="outline" size="sm" onClick={handleDisconnect}>
-                  <XCircle className="mr-2 h-4 w-4" />
-                  Disconnect
-                </Button>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {stripeAccount?.connected && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Payout History</CardTitle>
-            <CardDescription>
-              View your recent payouts from Stripe.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8 text-muted-foreground">
-              <p>
-                No payouts yet. Complete coaching sessions to receive payments.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+          <div className="space-y-4">
+             <h3 className="text-lg font-bold text-gray-900">Payout History</h3>
+             {(!parentPayouts || parentPayouts.length === 0) ? (
+               <div className="bg-gray-50 rounded-2xl p-8 text-center border border-gray-100 border-dashed">
+                 <p className="text-gray-500 font-medium">No payouts yet. Complete sessions to start earning!</p>
+               </div>
+             ) : (
+                <div className="space-y-2">
+                  {/* Placeholder for list since we initially handle empty state */}
+                   <div className="bg-gray-50 rounded-2xl p-8 text-center border border-gray-100 border-dashed">
+                     <p className="text-gray-500 font-medium">No payout history available.</p>
+                   </div>
+                </div>
+             )}
+          </div>
+        </div>
       )}
     </div>
   );

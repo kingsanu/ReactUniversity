@@ -44,19 +44,7 @@ export async function getOnboardingStatus(
   return json.data;
 }
 
-export async function uploadProfileImage(file: File): Promise<{ url: string }> {
-  const formData = new FormData();
-  formData.append("file", file);
 
-  const response = await fetch(`${API_BASE_URL}/api/v1/upload`, {
-    method: "POST",
-    headers: getHeaders(true),
-    body: formData,
-  });
-
-  if (!response.ok) throw new Error("Failed to upload image");
-  return response.json();
-}
 
 export async function submitOnboardingData(
   coachId: string,
@@ -190,13 +178,7 @@ export async function updateBookingNotes(
   return response.json();
 }
 
-export async function getCoachStudents(): Promise<{ data: StudentSummary[] }> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/coach/me/students`, {
-    headers: getHeaders(),
-  });
-  if (!response.ok) throw new Error("Failed to fetch coach students");
-  return response.json();
-}
+
 
 export async function getCoachStudentById(
   studentId: string
@@ -509,4 +491,65 @@ export async function testCoachAPIs(): Promise<void> {
   } catch (error) {
     console.error("❌ Coach API test failed:", error);
   }
+}
+
+export async function uploadProfileImage(file: File): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = async () => {
+      try {
+        const base64Image = reader.result as string;
+        // Assuming the backend handles profile updates including the image via this endpoint
+        // or a specific avatar endpoint. Based on typical patterns and the user's provided JSON:
+        const response = await fetch(`${API_BASE_URL}/api/v1/coach/me`, {
+          method: "PUT",
+          headers: getHeaders(),
+          body: JSON.stringify({ image: base64Image }),
+        });
+
+        if (!response.ok) throw new Error("Failed to upload profile image");
+        const json = await response.json();
+        resolve(json);
+      } catch (error) {
+        reject(error);
+      }
+    };
+    reader.onerror = (error) => reject(error);
+  });
+}
+
+export async function getCoachStudents(params?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+}): Promise<{ data: any[]; total: number }> {
+  const query = new URLSearchParams();
+  if (params?.page) query.append("page", params.page.toString());
+  if (params?.limit) query.append("limit", params.limit.toString());
+  if (params?.search) query.append("search", params.search);
+
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/coach/me/students?${query.toString()}`,
+    {
+      headers: getHeaders(),
+    }
+  );
+
+  if (!response.ok) throw new Error("Failed to fetch students");
+  const json = await response.json();
+  return json.data;
+}
+
+export async function getCoachStudentDetails(studentId: string): Promise<any> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/coach/me/students/${studentId}`,
+    {
+      headers: getHeaders(),
+    }
+  );
+
+  if (!response.ok) throw new Error("Failed to fetch student details");
+  const json = await response.json();
+  return json.data;
 }

@@ -20,6 +20,10 @@ export interface Coach {
   contractEnd?: string; // For admin view
   hourlyRate?: number;
   currency?: string;
+  phone?: string;
+  website?: string;
+  linkedin?: string;
+  twitter?: string;
 }
 
 export interface OnboardingStatus {

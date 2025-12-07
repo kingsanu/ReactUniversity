@@ -134,7 +134,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"coach@example.com\"\n}"
+              "raw": "{\n  \"email\": \"coach@example.com\",\n  \"name\": \"John Doe\",\n  \"contractStart\": \"2025-12-01\",\n  \"contractEnd\": \"2026-12-01\"\n}"
             },
             "url": {
               "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/authapi/invite-coach",
@@ -144,7 +144,7 @@
               ],
               "path": ["authapi", "invite-coach"]
             },
-            "description": "Send invitation email to a user to register as a coach. Email contains a link to the coach onboarding page."
+            "description": "Send invitation email to a user to register as a coach. Email contains a secure token-based link to the coach onboarding page. The invitation token expires after 7 days. If user doesn't exist, a new user will be created without a password (password must be set during onboarding).\n\n**Request Body:**\n- email (required): Coach email address\n- name (optional): Coach full name. If not provided, will be extracted from email\n- contractStart (optional): Contract start date in ISO format (e.g., \"2025-12-01\")\n- contractEnd (optional): Contract end date in ISO format (e.g., \"2026-12-01\")"
           }
         },
         {
@@ -170,7 +170,7 @@
               ],
               "path": ["authapi", "invite-coach-bulk"]
             },
-            "description": "Invite multiple coaches via Excel file upload. Excel file must contain 'fullName' (or 'full_name' or 'name') and 'email' columns. File must be .xlsx or .xls format and less than 10MB. Returns detailed results for each coach invitation."
+            "description": "Invite multiple coaches via Excel or CSV file upload. File must contain 'fullName' (or 'full_name' or 'name') and 'email' columns. Optional columns: 'contractStartDate' (or 'contract_start_date', 'startdate', 'start_date') and 'contractEndDate' (or 'contract_end_date', 'enddate', 'end_date'). Supports .xlsx, .xls, or .csv formats. File must be less than 10MB. Each coach receives a secure token-based invitation link that expires after 7 days. If users don't exist, they will be created without passwords (passwords must be set during onboarding). Returns detailed results for each coach invitation."
           }
         },
         {
@@ -218,7 +218,58 @@
                 "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["authapi", "change-role"]
-            }
+            },
+            "description": "Change user role by user ID and role ID. Separate API endpoint for role management.\n\n**Requirements:**\n- Valid user ID\n- Valid role ID\n- Role must exist and be active\n- User must exist in the system\n\n**Validation:**\n- Validates user exists\n- Validates role exists and is active\n- Prevents changing to the same role\n\n**Response:**\n- Returns updated user information\n- Includes old and new role details\n- User ID, name, email, role information\n\n**Security:**\n- Enhanced logging for audit trail\n- Better error messages\n- Prevents unnecessary role changes"
+          }
+        },
+        {
+          "name": "Change Email",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"newEmail\": \"newemail@example.com\"\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/authapi/change-email",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["authapi", "change-email"]
+            },
+            "description": "Change user email address by user ID. Ensures email uniqueness - no duplicate emails allowed.\n\n**Requirements:**\n- Valid user ID\n- Valid email address format\n- New email must be different from current email\n- Email must not already exist for another active user\n\n**Validation:**\n- Email format validation\n- Email uniqueness check (case-insensitive)\n- Prevents changing to the same email\n- Only checks active users for duplicates\n\n**Response:**\n- Returns updated user information including old and new email\n- Includes user ID, name, role information\n\n**Security:**\n- Email is normalized to lowercase\n- Comprehensive logging for audit trail\n- Prevents duplicate email addresses across all active users"
+          }
+        },
+        {
+          "name": "Change Email",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"newEmail\": \"newemail@example.com\"\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/authapi/change-email",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["authapi", "change-email"]
+            },
+            "description": "Change user email address by user ID. Ensures email uniqueness - no duplicate emails allowed.\n\n**Requirements:**\n- Valid user ID\n- Valid email address format\n- New email must be different from current email\n- Email must not already exist for another active user\n\n**Validation:**\n- Email format validation\n- Email uniqueness check (case-insensitive)\n- Prevents changing to the same email\n- Only checks active users for duplicates\n\n**Response:**\n- Returns updated user information including old and new email\n- Includes user ID, name, role information\n\n**Security:**\n- Email is normalized to lowercase\n- Comprehensive logging for audit trail\n- Prevents duplicate email addresses across all active users"
           }
         },
         {
@@ -3729,6 +3780,132 @@
       ]
     },
     {
+      "name": "Assessment Timeline",
+      "item": [
+        {
+          "name": "Get Timeline Events",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/assessments/me/timeline?types=pca,mil&status=completed&startDate=2024-01-01&lang=en&page=1&limit=50",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "assessments", "me", "timeline"],
+              "query": [
+                {
+                  "key": "types",
+                  "value": "pca,mil",
+                  "description": "Filter by assessment type: pca, mil, evaluation, course (comma-separated)"
+                },
+                {
+                  "key": "status",
+                  "value": "completed",
+                  "description": "Filter by status: not_started, in_progress, completed (comma-separated)"
+                },
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01",
+                  "description": "Filter events from this date (ISO 8601)"
+                },
+                {
+                  "key": "endDate",
+                  "value": "",
+                  "description": "Filter events until this date (ISO 8601)",
+                  "disabled": true
+                },
+                {
+                  "key": "lang",
+                  "value": "en",
+                  "description": "Language: en or sp"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (default: 1)"
+                },
+                {
+                  "key": "limit",
+                  "value": "50",
+                  "description": "Items per page (default: 50, max: 100)"
+                }
+              ]
+            },
+            "description": "Retrieves all assessment events for the authenticated user, aggregated chronologically from all assessment types (PCA, MIL, Evaluation, Courses).\n\n**Event Types:**\n- **PCA**: Personal Competence Analysis events\n- **MIL**: Labor Intelligence Assessment subtest events\n- **Evaluation**: 360° evaluation group and response events\n- **Course**: Course enrollment and completion events\n\n**Response includes:**\n- Chronologically sorted events with metadata\n- Summary statistics (total events, by type, by status, date range)\n- Pagination information\n\n**Use Cases:**\n- Display timeline view of all assessment activities\n- Track progress across different assessment types\n- Filter by type, status, or date range\n- Export assessment history"
+          }
+        },
+        {
+          "name": "Get Timeline Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/assessments/me/timeline/stats?period=all&lang=en",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "assessments", "me", "timeline", "stats"],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "all",
+                  "description": "Time period: week, month, quarter, year, all (default: all)"
+                },
+                {
+                  "key": "lang",
+                  "value": "en",
+                  "description": "Language: en or sp"
+                }
+              ]
+            },
+            "description": "Retrieves aggregated statistics for the timeline dashboard header.\n\n**Statistics include:**\n- Overall completion percentage and counts\n- Recent activity (last activity date, events this week/month)\n- Assessment breakdown:\n  - PCA status and completion\n  - MIL status (completed subtests, average score)\n  - Evaluation status (completed evaluations, total evaluators)\n  - Course status (enrolled, in progress, completed, average progress)\n- Milestones (achieved vs total, next milestone)\n\n**Use Cases:**\n- Dashboard summary cards\n- Progress tracking\n- Quick overview of assessment status"
+          }
+        },
+        {
+          "name": "Export Timeline Data",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"format\": \"csv\",\n  \"dateRange\": {\n    \"startDate\": \"2024-01-01T00:00:00Z\",\n    \"endDate\": \"2024-12-31T23:59:59Z\"\n  },\n  \"filterTypes\": [\"pca\", \"mil\", \"evaluation\", \"course\"],\n  \"filterStatus\": [\"completed\", \"in_progress\"],\n  \"includeDetails\": true,\n  \"language\": \"en\"\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/assessments/me/timeline/export",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "assessments", "me", "timeline", "export"]
+            },
+            "description": "Exports timeline data in CSV or PDF format.\n\n**Export Formats:**\n- **CSV**: Comma-separated values file with all timeline events\n- **PDF**: PDF document (requires additional libraries - currently returns error)\n\n**Request Body:**\n- **format**: Export format (\"csv\" or \"pdf\")\n- **dateRange**: Optional date range filter\n- **filterTypes**: Optional array of assessment types to include\n- **filterStatus**: Optional array of status filters\n- **includeDetails**: Include detailed metadata (default: true)\n- **language**: Language for export (\"en\" or \"sp\")\n\n**CSV Format:**\n- Headers: Date, Type, Event, Title, Description, Status, Score\n- One row per timeline event\n- Chronologically sorted (most recent first)\n\n**Use Cases:**\n- Download assessment history for records\n- Share timeline data with counselors\n- Generate reports for analysis\n- Archive assessment activities"
+          }
+        }
+      ]
+    },
+    {
       "name": "Email API",
       "item": [
         {
@@ -4514,6 +4691,564 @@
           }
         }
       ]
+    },
+    {
+      "name": "Universities",
+      "item": [
+        {
+          "name": "Search Universities",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/universities?search=&country=&type=&degree=&field=&tuitionMin=&tuitionMax=&rankingMax=&acceptanceRateMin=&campusSize=&setting=&sort=recommended&page=1&limit=20&lang=en",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "universities"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Text search (name, location, programs)",
+                  "disabled": true
+                },
+                {
+                  "key": "country",
+                  "value": "",
+                  "description": "Comma-separated country codes (e.g., US,MX,CA)",
+                  "disabled": true
+                },
+                {
+                  "key": "type",
+                  "value": "",
+                  "description": "Comma-separated types: public,private,community",
+                  "disabled": true
+                },
+                {
+                  "key": "degree",
+                  "value": "",
+                  "description": "Comma-separated degrees: Associate,Bachelor,Master,Doctorate,Certificate",
+                  "disabled": true
+                },
+                {
+                  "key": "field",
+                  "value": "",
+                  "description": "Comma-separated fields: Technology,Engineering,Business,etc",
+                  "disabled": true
+                },
+                {
+                  "key": "tuitionMin",
+                  "value": "",
+                  "description": "Minimum tuition (USD)",
+                  "disabled": true
+                },
+                {
+                  "key": "tuitionMax",
+                  "value": "",
+                  "description": "Maximum tuition (USD)",
+                  "disabled": true
+                },
+                {
+                  "key": "rankingMax",
+                  "value": "",
+                  "description": "Maximum ranking (e.g., top 100)",
+                  "disabled": true
+                },
+                {
+                  "key": "acceptanceRateMin",
+                  "value": "",
+                  "description": "Minimum acceptance rate %",
+                  "disabled": true
+                },
+                {
+                  "key": "campusSize",
+                  "value": "",
+                  "description": "Comma-separated: small,medium,large",
+                  "disabled": true
+                },
+                {
+                  "key": "setting",
+                  "value": "",
+                  "description": "Comma-separated: urban,suburban,rural",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "recommended",
+                  "description": "Sort: recommended,ranking,name,tuition,acceptance"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Items per page"
+                },
+                {
+                  "key": "lang",
+                  "value": "en",
+                  "description": "Language: en or es"
+                }
+              ]
+            },
+            "description": "Search and filter universities with pagination support"
+          }
+        },
+        {
+          "name": "Get University by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/universities/{{universityId}}?lang=en&includePrograms=true",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "universities", "{{universityId}}"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "en",
+                  "description": "Language: en or es"
+                },
+                {
+                  "key": "includePrograms",
+                  "value": "true",
+                  "description": "Include full program list"
+                }
+              ]
+            },
+            "description": "Get complete details for a specific university"
+          }
+        },
+        {
+          "name": "Get Recommendations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/universities/recommendations?degree=&field=&country=&limit=10&includeReasons=true&lang=en",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "universities", "recommendations"],
+              "query": [
+                {
+                  "key": "degree",
+                  "value": "",
+                  "description": "Comma-separated degree levels",
+                  "disabled": true
+                },
+                {
+                  "key": "field",
+                  "value": "",
+                  "description": "Comma-separated fields of study",
+                  "disabled": true
+                },
+                {
+                  "key": "country",
+                  "value": "",
+                  "description": "Comma-separated preferred countries",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of recommendations (max 50)"
+                },
+                {
+                  "key": "includeReasons",
+                  "value": "true",
+                  "description": "Include match reasoning"
+                },
+                {
+                  "key": "lang",
+                  "value": "en",
+                  "description": "Language: en or es"
+                }
+              ]
+            },
+            "description": "Get AI-powered personalized university recommendations based on user's assessments and preferences"
+          }
+        },
+        {
+          "name": "Get Recommendation Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/universities/recommendations/stats?lang=en",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "universities", "recommendations", "stats"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "en",
+                  "description": "Language: en or es"
+                }
+              ]
+            },
+            "description": "Get aggregated statistics about user's university recommendations"
+          }
+        },
+        {
+          "name": "Toggle Favorite",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"save\"\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/universities/{{universityId}}/favorite",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "universities", "{{universityId}}", "favorite"]
+            },
+            "description": "Toggle favorite status for a university. Action: 'save' or 'unsave'"
+          }
+        },
+        {
+          "name": "Get Favorites",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/universities/favorites?page=1&limit=20&lang=en",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "universities", "favorites"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Items per page"
+                },
+                {
+                  "key": "lang",
+                  "value": "en",
+                  "description": "Language: en or es"
+                }
+              ]
+            },
+            "description": "Get list of user's favorited universities"
+          }
+        },
+        {
+          "name": "Compare Universities",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"universityIds\": [\n    \"{{universityId}}\",\n    \"{{universityId2}}\",\n    \"{{universityId3}}\"\n  ],\n  \"lang\": \"en\"\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/universities/compare",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "universities", "compare"]
+            },
+            "description": "Get side-by-side comparison of multiple universities (2-5 universities)"
+          }
+        },
+        {
+          "name": "Get Available Filters",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/universities/filters",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "universities", "filters"]
+            },
+            "description": "Get available filter options with counts"
+          }
+        },
+        {
+          "name": "Get User Preferences",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/universities/preferences",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "universities", "preferences"]
+            },
+            "description": "Get user preferences for university recommendations"
+          }
+        },
+        {
+          "name": "Update User Preferences",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"targetCareers\": [\"Software Engineer\", \"Data Scientist\"],\n  \"preferredFields\": [\"Technology\", \"Engineering\"],\n  \"preferredCountries\": [\"US\", \"CA\"],\n  \"preferredDegreeLevels\": [\"Bachelor\", \"Master\"],\n  \"budgetMin\": 0,\n  \"budgetMax\": 50000,\n  \"budgetCurrency\": \"USD\",\n  \"preferredCampusSizes\": [\"medium\", \"large\"],\n  \"preferredSettings\": [\"urban\", \"suburban\"],\n  \"preferHousing\": true,\n  \"preferAthletics\": false,\n  \"minRanking\": 100,\n  \"minAcceptanceRate\": 10,\n  \"preferredLanguages\": [\"English\"]\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/universities/preferences",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "universities", "preferences"]
+            },
+            "description": "Update user preferences for university recommendations"
+          }
+        },
+        {
+          "name": "Get All Universities (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login (Admin role required)"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/universities/admin?search=&isActive=&page=1&limit=20",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "universities", "admin"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search by name",
+                  "disabled": true
+                },
+                {
+                  "key": "isActive",
+                  "value": "",
+                  "description": "Filter by active status (true/false)",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Items per page"
+                }
+              ]
+            },
+            "description": "Get all universities with admin-level details (Admin only)"
+          }
+        },
+        {
+          "name": "Create University (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login (Admin role required)"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Stanford University\",\n  \"shortName\": \"Stanford\",\n  \"logo\": \"https://example.com/stanford-logo.png\",\n  \"type\": \"private\",\n  \"country\": \"US\",\n  \"state\": \"California\",\n  \"city\": \"Stanford\",\n  \"ranking\": {\n    \"global\": 3,\n    \"national\": 3,\n    \"source\": \"QS World Rankings\",\n    \"year\": 2024\n  },\n  \"acceptanceRate\": 3.68,\n  \"tuition\": {\n    \"international\": 56169,\n    \"currency\": \"USD\",\n    \"period\": \"year\"\n  },\n  \"description\": \"Stanford University is a private research university...\",\n  \"website\": \"https://www.stanford.edu\",\n  \"programs\": [\n    {\n      \"name\": \"Computer Science\",\n      \"degree\": \"Bachelor\",\n      \"field\": \"Technology\",\n      \"duration\": 4,\n      \"matchingPersonalityTraits\": [\"C\", \"D\"],\n      \"academicRigor\": \"high\"\n    }\n  ],\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/universities/admin",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "universities", "admin"]
+            },
+            "description": "Create a new university entry (Admin only)"
+          }
+        },
+        {
+          "name": "Update University (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login (Admin role required)"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ranking\": {\n    \"global\": 2,\n    \"national\": 2\n  },\n  \"acceptanceRate\": 3.5,\n  \"tuition\": {\n    \"international\": 58000,\n    \"currency\": \"USD\",\n    \"period\": \"year\"\n  }\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/universities/admin/{{universityId}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "universities", "admin", "{{universityId}}"]
+            },
+            "description": "Update an existing university (Admin only - partial update supported)"
+          }
+        },
+        {
+          "name": "Delete University (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login (Admin role required)"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/universities/admin/{{universityId}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "universities", "admin", "{{universityId}}"]
+            },
+            "description": "Soft delete a university (sets isActive to false) (Admin only)"
+          }
+        },
+        {
+          "name": "Toggle University Active Status (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login (Admin role required)"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/universities/admin/{{universityId}}/toggle-active",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "universities", "admin", "{{universityId}}", "toggle-active"]
+            },
+            "description": "Toggle the active status of a university (Admin only)"
+          }
+        }
+      ]
     }
   ],
   "variable": [
@@ -4651,6 +5386,21 @@
       "key": "bookingId",
       "value": "your-booking-id-here",
       "description": "Replace with actual booking ID for testing (returned from book session endpoint)"
+    },
+    {
+      "key": "universityId",
+      "value": "your-university-id-here",
+      "description": "Replace with actual university ID for testing"
+    },
+    {
+      "key": "universityId2",
+      "value": "your-university-id-2-here",
+      "description": "Second university ID for comparison testing"
+    },
+    {
+      "key": "universityId3",
+      "value": "your-university-id-3-here",
+      "description": "Third university ID for comparison testing"
     }
   ]
 }

@@ -62,6 +62,29 @@ The "Student Profile" link currently goes to a generic page. Coaches need a spec
 ### `GET /api/v1/coach/me/students`
 List of all students who have booked this coach.
 
+**Response:**
+```json
+{
+  "data": {
+    "data": [
+      {
+        "studentId": "687257c5bf061ca5844a460b",
+        "name": "Kanish Kumar",
+        "email": "hey@kanishkumar.in",
+        "image": null,
+        "totalSessions": 2,
+        "completedSessions": 0,
+        "lastSessionDate": "2026-08-06T14:00:00Z",
+        "averageRating": null
+      }
+    ],
+    "total": 3
+  },
+  "message": "Students retrieved successfully",
+  "success": true
+}
+```
+
 ### `GET /api/v1/coach/me/students/{studentId}`
 Detailed view of a student, including past sessions with *this* coach and shared notes.
 

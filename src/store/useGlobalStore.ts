@@ -111,6 +111,8 @@ interface GlobalState {
     email: string | null;
     name: string | null;
     role: string | null;
+    image?: string | null;
+    avatar?: string | null;
     contractEnd?: string | null;
     isAuthenticated: boolean;
   };
@@ -210,6 +212,8 @@ export const useGlobalStore = create<GlobalState>()(
           email: null,
           name: null,
           role: null,
+          image: null,
+          avatar: null,
           isAuthenticated: false,
         },
         setUser: (userData) =>
@@ -228,6 +232,8 @@ export const useGlobalStore = create<GlobalState>()(
               email: null,
               name: null,
               role: null,
+              image: null,
+              avatar: null,
               isAuthenticated: false,
             },
           });
@@ -256,6 +262,8 @@ export const useGlobalStore = create<GlobalState>()(
                   email: null,
                   name: null,
                   role: null,
+                  image: null,
+                  avatar: null,
                   isAuthenticated: false,
                 },
               });

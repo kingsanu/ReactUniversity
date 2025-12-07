@@ -4,13 +4,16 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Star, MapPin, Clock, Calendar, MessageSquare, Share2, Globe, Languages } from "lucide-react";
+import { Star, MapPin, Clock, Calendar, MessageSquare, Share2, Globe, Languages, Shield, Award, ChevronRight, ArrowLeft } from "lucide-react";
 import { BookingModal } from "@/components/coaching/BookingModal";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Coach } from "@/types/coach";
+import { motion } from "motion/react";
+import { cn } from "@/lib/utils";
 
 export default function CoachProfilePage() {
   const params = useParams();
+  const router = useRouter();
   const coachId = params.coachId as string;
   
   const [coach, setCoach] = useState<Coach | null>(null);
@@ -35,116 +38,218 @@ export default function CoachProfilePage() {
   }, [coachId]);
 
   if (isLoading) {
-    return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
+    return (
+      <div className="max-w-5xl mx-auto space-y-8 pb-12 animate-pulse">
+        <div className="h-64 bg-gray-200 rounded-3xl"></div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-8">
+                <div className="h-40 bg-gray-200 rounded-2xl"></div>
+                <div className="h-40 bg-gray-200 rounded-2xl"></div>
+            </div>
+            <div className="h-60 bg-gray-200 rounded-2xl"></div>
+        </div>
+      </div>
+    );
   }
 
   if (!coach) {
-    return <div className="flex justify-center items-center min-h-screen">Coach not found</div>;
+    return (
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                <Shield className="w-8 h-8 text-gray-400" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900">Coach not found</h2>
+            <p className="text-gray-500 mt-2">The coach profile you are looking for does not exist.</p>
+            <Button variant="outline" className="mt-6" onClick={() => router.back()}>
+                Go Back
+            </Button>
+        </div>
+    );
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 pb-12">
+    <div className="max-w-6xl mx-auto pb-12 px-4 sm:px-6">
+      {/* Navigation */}
+      <button 
+        onClick={() => router.back()}
+        className="group flex items-center text-sm text-gray-500 hover:text-gray-900 mb-6 transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" />
+        Back to Coaches
+      </button>
+
       {/* Profile Header */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="h-48 bg-gradient-to-r from-blue-600 to-indigo-700 relative">
-          <div className="absolute top-4 right-4 flex gap-2">
-            <Button variant="secondary" size="sm" className="bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm">
-              <Share2 className="h-4 w-4 mr-2" /> Share
-            </Button>
-          </div>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-8"
+      >
+        <div className="h-64 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 relative overflow-hidden">
+            <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10"></div>
+            <div className="absolute top-6 right-6 flex gap-3">
+                <Button variant="secondary" size="sm" className="bg-white/10 hover:bg-white/20 text-white border-0 backdrop-blur-md transition-all">
+                    <Share2 className="h-4 w-4 mr-2" /> Share Profile
+                </Button>
+            </div>
         </div>
-        <div className="px-8 pb-8">
-          <div className="relative -mt-16 mb-6 flex justify-between items-end">
-            <Avatar className="h-32 w-32 border-4 border-white shadow-lg">
-              <AvatarImage src={coach.image || ""} alt={coach.name} />
-              <AvatarFallback className="text-2xl">{coach.name.charAt(0)}</AvatarFallback>
-            </Avatar>
-            <div className="flex gap-3 mb-2">
-              <Button size="lg" onClick={() => setIsBookingModalOpen(true)}>
-                Book a Session
-              </Button>
+        
+        <div className="px-8 pb-8 relative">
+          <div className="flex flex-col md:flex-row gap-6 items-start">
+            <div className="-mt-20 relative">
+                <div className="p-1.5 bg-white rounded-2xl shadow-xl">
+                    <Avatar className="h-40 w-40 rounded-xl">
+                        <AvatarImage src={coach.image || ""} alt={coach.name} className="object-cover" />
+                        <AvatarFallback className="text-4xl bg-gray-50 text-gray-400 rounded-xl">
+                            {coach.name.charAt(0)}
+                        </AvatarFallback>
+                    </Avatar>
+                </div>
+                <div className="absolute -bottom-3 -right-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full border-4 border-white shadow-sm flex items-center gap-1">
+                    <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                    AVAILABLE
+                </div>
+            </div>
+            
+            <div className="flex-1 pt-4 md:pt-6">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900">{coach.name}</h1>
+                        <p className="text-lg text-blue-600 font-medium mt-1">{coach.title}</p>
+                    </div>
+                    <div className="flex gap-3">
+                        <Button size="lg" className="bg-gray-900 hover:bg-gray-800 text-white shadow-lg shadow-gray-900/20" onClick={() => setIsBookingModalOpen(true)}>
+                            Book Session
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="flex flex-wrap gap-6 mt-6 pt-6 border-t border-gray-100">
+                    <div className="flex items-center gap-2">
+                        <div className="p-2 bg-yellow-50 rounded-lg">
+                            <Star className="h-4 w-4 text-yellow-600 fill-yellow-600" />
+                        </div>
+                        <div>
+                            <p className="text-sm font-bold text-gray-900">{coach.rating || "New"}</p>
+                            <p className="text-xs text-gray-500">Rating</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className="p-2 bg-blue-50 rounded-lg">
+                            <MapPin className="h-4 w-4 text-blue-600" />
+                        </div>
+                        <div>
+                            <p className="text-sm font-bold text-gray-900">{coach.location}</p>
+                            <p className="text-xs text-gray-500">Location</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className="p-2 bg-purple-50 rounded-lg">
+                            <Globe className="h-4 w-4 text-purple-600" />
+                        </div>
+                        <div>
+                            <p className="text-sm font-bold text-gray-900">{coach.languages?.join(", ")}</p>
+                            <p className="text-xs text-gray-500">Languages</p>
+                        </div>
+                    </div>
+                </div>
             </div>
           </div>
-          
-          <div className="flex flex-col md:flex-row justify-between gap-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">{coach.name}</h1>
-              <p className="text-lg text-gray-600 font-medium mt-1">{coach.title}</p>
-              
-              <div className="flex flex-wrap gap-4 mt-4 text-sm text-gray-600">
-                <div className="flex items-center">
-                  <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 mr-1" />
-                  <span className="font-bold text-gray-900 mr-1">{coach.rating || "New"}</span>
-                  {coach.reviews && <span>({Array.isArray(coach.reviews) ? coach.reviews.length : coach.reviews} reviews)</span>}
-                </div>
-                <div className="flex items-center">
-                  <MapPin className="h-4 w-4 mr-1.5 text-gray-400" />
-                  {coach.location}
-                </div>
-                <div className="flex items-center">
-                  <Globe className="h-4 w-4 mr-1.5 text-gray-400" />
-                  {coach.languages?.join(", ")}
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
+      </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-8">
           {/* About */}
-          <section className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">About</h2>
-            <div className="prose prose-gray max-w-none text-gray-600">
+          <motion.section 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100"
+          >
+            <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 bg-blue-50 rounded-xl">
+                    <Shield className="w-5 h-5 text-blue-600" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">About Coach</h2>
+            </div>
+            <div className="prose prose-gray max-w-none text-gray-600 leading-relaxed">
               <p>{coach.bio}</p>
             </div>
-          </section>
+          </motion.section>
 
           {/* Specialization & Skills */}
-          <section className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Expertise</h2>
+          <motion.section 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100"
+          >
+            <div className="flex items-center gap-3 mb-8">
+                <div className="p-2 bg-purple-50 rounded-xl">
+                    <Award className="w-5 h-5 text-purple-600" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">Expertise & Skills</h2>
+            </div>
             
-            <div className="space-y-6">
+            <div className="space-y-8">
               <div>
-                <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3">Specialization</h3>
-                <Badge className="text-base py-1 px-3 bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-100">
-                  {coach.specialization}
-                </Badge>
+                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Core Specialization</h3>
+                <div className="flex flex-wrap gap-3">
+                    <Badge className="text-base py-2 px-4 bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-100 rounded-xl">
+                    {coach.specialization}
+                    </Badge>
+                </div>
               </div>
               
               <div>
-                <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3">Skills & Topics</h3>
+                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Topics & Skills</h3>
                 <div className="flex flex-wrap gap-2">
                   {coach.tags?.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="px-3 py-1">
+                    <Badge key={tag} variant="secondary" className="px-3 py-1.5 bg-gray-50 text-gray-600 hover:bg-gray-100 border-transparent rounded-lg">
                       {tag}
                     </Badge>
                   ))}
                 </div>
               </div>
             </div>
-          </section>
+          </motion.section>
         </div>
 
         {/* Sidebar */}
         <div className="space-y-6">
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 sticky top-6">
-            <h3 className="font-bold text-gray-900 mb-4">Availability</h3>
-            <div className="space-y-4">
-              <div className="flex items-start gap-3 text-sm text-gray-600">
-                <Clock className="h-5 w-5 text-gray-400 shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium text-gray-900">Next Available</p>
-                  <p>Check calendar for slots</p>
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 sticky top-6"
+          >
+            <h3 className="font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-gray-900" />
+                Availability
+            </h3>
+            
+            <div className="bg-gray-50 rounded-2xl p-4 mb-6">
+                <div className="flex items-start gap-3">
+                    <div className="p-2 bg-white rounded-xl shadow-sm">
+                        <Clock className="h-5 w-5 text-green-600" />
+                    </div>
+                    <div>
+                        <p className="font-bold text-gray-900">Next Available</p>
+                        <p className="text-sm text-gray-500 mt-0.5">Slots available today</p>
+                    </div>
                 </div>
-              </div>
-              <Button className="w-full" onClick={() => setIsBookingModalOpen(true)}>
-                Check Calendar
-              </Button>
             </div>
-          </div>
+
+            <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white h-12 rounded-xl shadow-lg shadow-blue-600/20 font-medium" onClick={() => setIsBookingModalOpen(true)}>
+              Check Calendar
+              <ChevronRight className="w-4 h-4 ml-2" />
+            </Button>
+            
+            <p className="text-xs text-center text-gray-400 mt-4">
+                Free cancellation up to 24h before
+            </p>
+          </motion.div>
         </div>
       </div>
 

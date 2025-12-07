@@ -11,6 +11,7 @@ import { useGlobalStore } from "@/store/useGlobalStore";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { DollarSign, Calendar, CreditCard, FileText } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { PricingSettingsTab } from "./_components/PricingSettingsTab";
 import { AvailabilitySettingsTab } from "./_components/AvailabilitySettingsTab";
 import { PaymentSettingsTab } from "./_components/PaymentSettingsTab";
@@ -56,76 +57,100 @@ export default function CoachSettingsPage() {
   }, []);
 
   return (
-    <div className="container max-w-4xl mx-auto py-8 px-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Settings</h1>
-        <p className="text-muted-foreground mt-2">
-          Manage your coaching profile, pricing, availability, and payments.
-        </p>
+    <div className="min-h-screen bg-[#F8FAFC] relative overflow-hidden">
+      {/* Background Decor */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-100/40 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-100/40 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2" />
       </div>
 
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="space-y-6"
-      >
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="pricing" className="flex items-center gap-2">
-            <DollarSign className="h-4 w-4" />
-            <span className="hidden sm:inline">Pricing</span>
-          </TabsTrigger>
-          <TabsTrigger value="availability" className="flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
-            <span className="hidden sm:inline">Availability</span>
-          </TabsTrigger>
-          <TabsTrigger value="payments" className="flex items-center gap-2">
-            <CreditCard className="h-4 w-4" />
-            <span className="hidden sm:inline">Payments</span>
-          </TabsTrigger>
-          <TabsTrigger value="billing" className="flex items-center gap-2">
-            <FileText className="h-4 w-4" />
-            <span className="hidden sm:inline">Billing</span>
-          </TabsTrigger>
-        </TabsList>
+      <div className="container max-w-5xl mx-auto py-12 px-4 sm:px-6 relative z-10">
+        <div className="mb-10">
+          <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-2">Settings</h1>
+          <p className="text-lg text-gray-500 font-medium">
+            Manage your coaching profile, pricing, availability, and payments.
+          </p>
+        </div>
 
-        <TabsContent value="pricing">
-          <PricingSettingsTab
-            coachDetails={coachDetails}
-            isLoading={isLoading}
-            onUpdated={(newData: any) =>
-              setCoachDetails((prev: any) => ({ ...prev, ...(newData || {}) }))
-            }
-          />
-        </TabsContent>
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-8"
+        >
+          <div className="bg-white/60 backdrop-blur-xl p-1.5 rounded-2xl shadow-sm border border-white/50 inline-flex">
+            <TabsList className="bg-transparent h-auto p-0 gap-1">
+              <TabsTrigger 
+                value="pricing" 
+                className="rounded-xl px-5 py-2.5 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm font-semibold text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2"
+              >
+                <DollarSign className="h-4 w-4" />
+                <span className="hidden sm:inline">Pricing</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="availability" 
+                className="rounded-xl px-5 py-2.5 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm font-semibold text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2"
+              >
+                <Calendar className="h-4 w-4" />
+                <span className="hidden sm:inline">Availability</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="payments" 
+                className="rounded-xl px-5 py-2.5 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm font-semibold text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2"
+              >
+                <CreditCard className="h-4 w-4" />
+                <span className="hidden sm:inline">Payments</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="billing" 
+                className="rounded-xl px-5 py-2.5 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm font-semibold text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2"
+              >
+                <FileText className="h-4 w-4" />
+                <span className="hidden sm:inline">Billing</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
-        <TabsContent value="availability">
-          <AvailabilitySettingsTab
-            availability={availability}
-            isLoading={isLoading}
-            onUpdated={(newData: any) =>
-              setAvailability((prev: any) => ({ ...prev, ...(newData || {}) }))
-            }
-          />
-        </TabsContent>
+          <div className="bg-white/70 backdrop-blur-2xl rounded-3xl border border-white/60 shadow-xl overflow-hidden min-h-[400px] p-1">
+            <TabsContent value="pricing" className="m-0 focus-visible:ring-0 focus-visible:outline-none">
+              <PricingSettingsTab
+                coachDetails={coachDetails}
+                isLoading={isLoading}
+                onUpdated={(newData: any) =>
+                  setCoachDetails((prev: any) => ({ ...prev, ...(newData || {}) }))
+                }
+              />
+            </TabsContent>
 
-        <TabsContent value="payments">
-          <PaymentSettingsTab
-            bankAccount={bankAccount}
-            payouts={payouts}
-            isLoading={isLoading}
-            onBankAccountUpdated={(bank: any) => setBankAccount(bank)}
-            onPayoutsUpdated={(p) => setPayouts(p)}
-          />
-        </TabsContent>
+            <TabsContent value="availability" className="m-0 focus-visible:ring-0 focus-visible:outline-none">
+              <AvailabilitySettingsTab
+                availability={availability}
+                isLoading={isLoading}
+                onUpdated={(newData: any) =>
+                  setAvailability((prev: any) => ({ ...prev, ...(newData || {}) }))
+                }
+              />
+            </TabsContent>
 
-        <TabsContent value="billing">
-          <BillingSettingsTab
-            billingCurrent={null}
-            billingHistory={null}
-            isLoading={isLoading}
-          />
-        </TabsContent>
-      </Tabs>
+            <TabsContent value="payments" className="m-0 focus-visible:ring-0 focus-visible:outline-none">
+              <PaymentSettingsTab
+                bankAccount={bankAccount}
+                payouts={payouts}
+                isLoading={isLoading}
+                onBankAccountUpdated={(bank: any) => setBankAccount(bank)}
+                onPayoutsUpdated={(p) => setPayouts(p)}
+              />
+            </TabsContent>
+
+            <TabsContent value="billing" className="m-0 focus-visible:ring-0 focus-visible:outline-none">
+              <BillingSettingsTab
+                billingCurrent={null}
+                billingHistory={null}
+                isLoading={isLoading}
+              />
+            </TabsContent>
+          </div>
+        </Tabs>
+      </div>
     </div>
   );
 }

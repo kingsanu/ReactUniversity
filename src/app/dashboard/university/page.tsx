@@ -8,6 +8,8 @@ import {
   useUniversityRecommendations,
   useUniversityStats,
   useUniversityFiltersOptions,
+  useUniversityFavoriteMutation,
+  useUniversityFavorites,
 } from "@/hooks/useUniversityQueries";
 import { University, UniversityFilters } from "@/types/university";
 import UniversityCard from "@/components/dashboard/University/UniversityCard";
@@ -48,6 +50,20 @@ export default function UniversityPage() {
   const recoQuery = useUniversityRecommendations(userId);
   const statsQuery = useUniversityStats(userId);
   const filterOptionsQuery = useUniversityFiltersOptions();
+  const favoritesQuery = useUniversityFavorites(userId);
+  const favoriteMutation = useUniversityFavoriteMutation();
+
+  const favoritesSet = new Set(
+    favoritesQuery.data?.map((f) => f.universityId) ?? []
+  );
+
+  const handleFavoriteToggle = (universityId: string) => {
+    const isFavorite = favoritesSet.has(universityId);
+    favoriteMutation.mutate({
+      universityId,
+      action: isFavorite ? "unsave" : "save",
+    });
+  };
 
   const t = (en: string, es: string) => (language === "spanish" ? es : en);
 
@@ -246,6 +262,8 @@ export default function UniversityPage() {
                               }
                               onViewDetails={setSelectedUniversity}
                               variant="featured"
+                              isFavorite={favoritesSet.has(u.id)}
+                              onFavoriteToggle={handleFavoriteToggle}
                             />
                           );
                         })}
@@ -298,6 +316,8 @@ export default function UniversityPage() {
                             key={u.id}
                             university={u}
                             onViewDetails={setSelectedUniversity}
+                            isFavorite={favoritesSet.has(u.id)}
+                            onFavoriteToggle={handleFavoriteToggle}
                           />
                         ))}
                       </div>

@@ -59,6 +59,7 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [topic, setTopic] = useState("");
+  const [notes, setNotes] = useState("");
   const [step, setStep] = useState<"date-time" | "details">("date-time");
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
 
@@ -140,7 +141,7 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
           end: endDate.toISOString()
         },
         topic,
-        notes: "" // Add notes field to state if needed
+        notes: notes // Pass the actual notes
       });
 
       toast.success(`Session booked with ${coach?.name} on ${format(date, "PPP")} at ${selectedTime}`);
@@ -400,6 +401,9 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
                   <div className="grid gap-2">
                     <Label htmlFor="notes" className="text-gray-700 font-medium">Additional Notes (Optional)</Label>
                     <textarea 
+                      id="notes"
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
                       className="flex min-h-[120px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
                       placeholder="Share anything that will help prepare for our meeting..."
                     />
