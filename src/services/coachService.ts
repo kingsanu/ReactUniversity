@@ -13,6 +13,7 @@ import {
   Payout,
   BankAccount,
   Notification,
+  CoachSlotsResponse,
 } from "../types/coach";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -69,19 +70,28 @@ export async function getCalendarAuthUrl(
 ): Promise<{ url: string }> {
   const query = new URLSearchParams();
   if (email) query.append("email", email);
-  const response = await fetch(
-    `${API_BASE_URL}/api/v1/auth/${provider}/url${
+  const requestUrl = `${API_BASE_URL}/api/v1/auth/${provider}/url${
       query.toString() ? `?${query.toString()}` : ""
-    }`,
+    }`;
+  
+  console.log(`[getCalendarAuthUrl] Requesting: ${requestUrl}`);
+
+  const response = await fetch(
+    requestUrl,
     {
       headers: getHeaders(),
     }
   );
+  
+  console.log(`[getCalendarAuthUrl] Response status: ${response.status}`);
+
   if (!response.ok) throw new Error(`Failed to get ${provider} auth URL`);
   const data = await response.json();
   // Handle both 'url' and 'callbackurl' response formats and nested response payloads
   // Some APIs return { data: { url: '...' } } while others return { url: '...' }
-  console.log(`API response for ${provider} calendar auth:`, data);
+
+  console.log(`[getCalendarAuthUrl] Response data:`, JSON.stringify(data, null, 2));
+  debugger
   const nested = data && typeof data === "object" ? data.data || data : data;
   const url =
     nested?.url || nested?.callbackurl || data?.url || data?.callbackurl;
@@ -91,6 +101,31 @@ export async function getCalendarAuthUrl(
     );
   }
   return { url };
+}
+
+export async function checkGoogleAuthStatus(email: string): Promise<{
+  isAuthenticated: boolean;
+  email: string;
+  userId: string;
+  authDetails: {
+    connected: boolean;
+    hasAccessToken: boolean;
+    hasRefreshToken: boolean;
+    isTokenValid: boolean;
+    isTokenExpired: boolean;
+    tokenStatus: string;
+  };
+}> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/auth/google/status?email=${email}`,
+    {
+      headers: getHeaders(),
+    }
+  );
+
+  if (!response.ok) throw new Error("Failed to check Google auth status");
+  const json = await response.json();
+  return json.data || json;
 }
 
 // --- User Side APIs ---
@@ -249,27 +284,36 @@ export async function getCoachDetails(coachId: string): Promise<Coach> {
   return json.data;
 }
 
-// Get coach availability for a specific date (optional - falls back to weekly schedule if not implemented)
+// Get coach availability for a specific date
 export async function getCoachAvailableSlots(
   coachId: string,
-  date: string
-): Promise<{ slots: string[] }> {
-  try {
-    const response = await fetch(
-      `${API_BASE_URL}/api/v1/coach/${coachId}/slots?date=${date}`
-    );
-    if (!response.ok) {
-      // If endpoint doesn't exist, return empty - component will fall back to weekly schedule
-      console.warn(
-        "Coach slots endpoint not available, using weekly schedule fallback"
-      );
-      return { slots: [] };
-    }
-    return response.json();
-  } catch (error) {
-    console.warn("Error fetching coach slots:", error);
-    return { slots: [] };
+  date: string,
+  timezone?: string
+): Promise<CoachSlotsResponse> {
+  const query = new URLSearchParams();
+  query.append("date", date);
+  if (timezone) query.append("timezone", timezone);
+
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/coach/${coachId}/slots?${query.toString()}`
+  );
+  
+  if (!response.ok) {
+    // If endpoint returns 404 or other error, return a safe empty object matching the interface
+    // so the UI can handle it gracefully (e.g. show "no availability")
+    console.warn("Coach slots endpoint not available or returned error");
+    return {
+      date,
+      timezone: timezone || "UTC",
+      coachId,
+      sessionDurationMinutes: 30, // Fallback default
+      price: { amount: 0, currency: "USD" },
+      slots: [],
+    };
   }
+  
+  const json = await response.json();
+  return json.data;
 }
 
 export async function bookSession(data: {

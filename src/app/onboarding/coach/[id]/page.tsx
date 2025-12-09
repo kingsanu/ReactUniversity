@@ -1,7 +1,7 @@
 "use client";
 
 import React, { use, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { OnboardingLayout } from "@/components/onboarding/OnboardingLayout";
 import { PersonalInfoStep } from "@/components/onboarding/PersonalInfoStep";
 import { PricingStep } from "@/components/onboarding/PricingStep";
@@ -44,6 +44,7 @@ export default function CoachOnboardingPage({
 }) {
   const { id } = use(params);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [currentStep, setCurrentStep] = useState(1);
   const [data, setData] = useState<CoachOnboardingData>(
     INITIAL_ONBOARDING_DATA
@@ -71,6 +72,47 @@ export default function CoachOnboardingPage({
     }
   }, [id]);
 
+  // Handle googleConnected query param
+  // Handle googleConnected query param
+  useEffect(() => {
+    const googleConnected = searchParams.get("googleConnected");
+    
+    if (googleConnected === "true" && email) {
+      const verifyConnection = async () => {
+        try {
+          setIsLoading(true);
+          const { checkGoogleAuthStatus } = await import("@/services/coachService");
+          const status = await checkGoogleAuthStatus(email);
+
+          if (status.isAuthenticated && status.authDetails?.connected) {
+            setData((prev) => ({
+              ...prev,
+              calendarIntegrations: {
+                ...prev.calendarIntegrations,
+                google: true,
+              },
+            }));
+            setCurrentStep(5);
+            toast.success("Google Calendar connected successfully!");
+          } else {
+            console.error("Google Calendar connection verification failed", status);
+            toast.error("Failed to verify Google Calendar connection. Please try again.");
+            setCurrentStep(4); // Ensure we are on the Calendar Sync step
+          }
+        } catch (error) {
+          console.error("Error verifying Google Calendar connection:", error);
+          toast.error("An error occurred while connecting Google Calendar.");
+          setCurrentStep(4);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      verifyConnection();
+    }
+  }, [searchParams, email]); // Added email dependency to ensure we have it before checking
+
+
   // Save data to localStorage whenever it changes
   useEffect(() => {
     if (data !== INITIAL_ONBOARDING_DATA) {
@@ -80,10 +122,9 @@ export default function CoachOnboardingPage({
 
   // Save current step to localStorage
   useEffect(() => {
+    // If we just jumped to 5 due to param, this will save 5.
     localStorage.setItem(`onboarding_step_${id}`, currentStep.toString());
   }, [currentStep, id]);
-
-
 
   useEffect(() => {
     const fetchStatus = async () => {

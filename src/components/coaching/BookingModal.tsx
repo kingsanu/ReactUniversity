@@ -19,13 +19,7 @@ interface BookingModalProps {
   onClose: () => void;
 }
 
-// Default fallback time slots (used when coach has no availability set)
-const DEFAULT_TIME_SLOTS = [
-  "09:00am", "09:30am", "10:00am", "10:30am",
-  "11:00am", "11:30am", "12:00pm", "12:30pm",
-  "01:00pm", "01:30pm", "02:00pm", "02:30pm",
-  "03:00pm", "03:30pm", "04:00pm", "04:30pm"
-];
+// Default fallback time slots removed
 
 // Day name mapping
 const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -55,6 +49,9 @@ function generateSlotsFromRange(start: string, end: string): string[] {
   return slots;
 }
 
+import { getCoachAvailableSlots, bookSession } from "@/services/coachService";
+import { CoachSlotsResponse } from "@/types/coach";
+
 export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
@@ -62,33 +59,55 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
   const [notes, setNotes] = useState("");
   const [step, setStep] = useState<"date-time" | "details">("date-time");
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+  
+  // API State
+  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
+  const [slotsData, setSlotsData] = useState<CoachSlotsResponse | null>(null);
+  const [timezone, setTimezone] = useState<string>(Intl.DateTimeFormat().resolvedOptions().timeZone);
 
-  // Get available slots based on coach availability and selected date
+  // Fetch slots from API
+  useEffect(() => {
+    const fetchSlots = async () => {
+      if (!date || !coach?.id) return;
+      
+      setIsLoadingSlots(true);
+      try {
+        const formattedDate = format(date, "yyyy-MM-dd");
+        const data = await getCoachAvailableSlots(coach.id, formattedDate, timezone);
+        setSlotsData(data);
+      } catch (error) {
+        console.error("Failed to fetch slots:", error);
+        toast.error("Could not load available times");
+      } finally {
+        setIsLoadingSlots(false);
+      }
+    };
+
+    if (isOpen) {
+      fetchSlots();
+    }
+  }, [date, coach?.id, timezone, isOpen]);
+
   const availableTimeSlots = useMemo(() => {
-    if (!date || !coach?.availability?.weeklySchedule) {
-      return DEFAULT_TIME_SLOTS;
-    }
-
-    const dayIndex = getDay(date); // 0 = Sunday, 1 = Monday, etc.
-    const dayName = DAY_NAMES[dayIndex];
+    if (!slotsData) return [];
     
-    const daySchedule = coach.availability.weeklySchedule.find(
-      (schedule: DaySchedule) => schedule.day === dayName && schedule.enabled
-    );
-
-    if (!daySchedule || !daySchedule.timeSlots || daySchedule.timeSlots.length === 0) {
-      return []; // No availability on this day
-    }
-
-    // Generate slots from all time ranges for the day
-    const allSlots: string[] = [];
-    daySchedule.timeSlots.forEach((slot: TimeSlot) => {
-      const slots = generateSlotsFromRange(slot.start, slot.end);
-      allSlots.push(...slots);
+    // API returns ISO strings or time strings. If ISO, we might need to format them.
+    // Based on the spec, it returns full ISO strings e.g., "2024-12-25T09:00:00+05:30".
+    // We want to display them as "09:00am".
+    
+    return slotsData.slots.map(slotIso => {
+      try {
+        // Build a date object from the ISO string
+        const d = new Date(slotIso);
+        // Format to local time string matching the modal's expected format "hh:mma"
+        return format(d, "hh:mma").toLowerCase();
+      } catch (e) {
+        // Fallback if it's already a simple time string like "09:00am" (though spec says ISO)
+        return slotIso;
+      }
     });
 
-    return allSlots;
-  }, [date, coach?.availability]);
+  }, [slotsData]);
 
   // Reset state when modal opens/closes
   useEffect(() => {
@@ -113,27 +132,29 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
     }
 
     try {
-      const { bookSession } = await import("@/services/coachService");
+      // Map the selected visible time back to the full ISO string if possible, 
+      // or construct it carefully. Since we mapped FROM ISO to display, we should find the matching ISO.
+      // However, if we just formatted it for display, we might have lost the exact original string if there were duplicates (unlikely in time slots).
       
-      // Construct start and end times
-      // This is a simplification. In a real app, parse time string properly.
-      // Assuming time is like "09:00am"
-      const timeParts = selectedTime.match(/(\d+):(\d+)(am|pm)/i);
-      if (!timeParts) return;
-      
-      let hours = parseInt(timeParts[1]);
-      const minutes = parseInt(timeParts[2]);
-      const meridian = timeParts[3].toLowerCase();
-      
-      if (meridian === 'pm' && hours < 12) hours += 12;
-      if (meridian === 'am' && hours === 12) hours = 0;
-      
-      const startDate = new Date(date);
-      startDate.setHours(hours, minutes, 0, 0);
-      
-      const endDate = new Date(startDate);
-      endDate.setMinutes(startDate.getMinutes() + 30); // 30 min duration
-      
+      // Better approach: Find the original slot ISO string from `slotsData.slots` that matches the selectedTime display.
+      const originalSlotIso = slotsData?.slots.find(slotIso => {
+         try {
+           return format(new Date(slotIso), "hh:mma").toLowerCase() === selectedTime;
+         } catch { return false; }
+      });
+
+      if (!originalSlotIso) {
+         // Fallback logic if we can't match (shouldn't happen with correct API)
+         // Construct date from 'date' + 'selectedTime'
+         toast.error("Invalid time slot. Please try refreshing.");
+         return;
+      }
+
+      // Calculate end time based on session duration
+      const startDate = new Date(originalSlotIso);
+      const durationMinutes = slotsData?.sessionDurationMinutes || 30;
+      const endDate = new Date(startDate.getTime() + durationMinutes * 60000);
+
       await bookSession({
         coachId: coach.id,
         slot: {
@@ -141,7 +162,7 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
           end: endDate.toISOString()
         },
         topic,
-        notes: notes // Pass the actual notes
+        notes: notes 
       });
 
       toast.success(`Session booked with ${coach?.name} on ${format(date, "PPP")} at ${selectedTime}`);
@@ -177,12 +198,19 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
               </Avatar>
               <p className="text-gray-500 text-sm font-medium mb-1">Coach</p>
               <h3 className="text-lg font-bold text-gray-900 mb-1">{coach.name}</h3>
-              <p className="text-gray-900 font-semibold text-xl mb-6">30 Min Meeting</p>
+              <h3 className="text-lg font-bold text-gray-900 mb-1">{coach.name}</h3>
+              <p className="text-gray-900 font-semibold text-xl mb-6">
+                 {slotsData?.price && slotsData.price.amount > 0 
+                  ? `${slotsData.price.currency} ${slotsData.price.amount}` 
+                  : "30 Min Meeting"}
+              </p>
               
               <div className="space-y-4 text-gray-600 text-sm">
                 <div className="flex items-center">
                   <Clock className="h-4 w-4 mr-3 text-gray-400" />
-                  <span className="font-medium">30 min</span>
+                  <span className="font-medium">
+                    {slotsData?.sessionDurationMinutes ? `${slotsData.sessionDurationMinutes} min` : "30 min"}
+                  </span>
                 </div>
                 <div className="flex items-center">
                   <Video className="h-4 w-4 mr-3 text-gray-400" />
@@ -282,12 +310,20 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
                   />
                   
                   {/* Coach Timezone Info */}
-                  {coach?.availability?.timezone && (
-                    <div className="mt-4 pt-4 border-t border-gray-100 text-sm text-gray-500 flex items-center gap-2">
+                  <div className="mt-4 pt-4 border-t border-gray-100 text-sm text-gray-500 flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
                       <Globe className="h-4 w-4" />
-                      <span>Times shown in {coach.availability.timezone}</span>
+                      <span>
+                        Times shown in {slotsData?.timezone || timezone}
+                      </span>
                     </div>
-                  )}
+                    {/* Timezone Helper Text */}
+                     {slotsData?.timezone && slotsData.timezone !== timezone && (
+                        <p className="text-xs text-blue-600">
+                          Converted to your local time ({timezone})
+                        </p>
+                     )}
+                  </div>
                 </div>
 
                 {/* Column 3: Time Slots */}
@@ -296,10 +332,17 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
                     <h4 className="text-base font-semibold text-gray-900">
                       {date ? format(date, "EEEE, MMM d") : "Select a date"}
                     </h4>
-                    {date && availableTimeSlots.length > 0 && (
-                      <p className="text-sm text-gray-500 mt-1">
-                        {availableTimeSlots.length} slots available
-                      </p>
+                    {isLoadingSlots ? (
+                       <div className="flex items-center text-sm text-gray-500 mt-1">
+                          <Loader2 className="h-3 w-3 animate-spin mr-2" />
+                          Checking availability...
+                       </div>
+                    ) : (
+                      date && availableTimeSlots.length > 0 && (
+                        <p className="text-sm text-gray-500 mt-1">
+                          {availableTimeSlots.length} slots available
+                        </p>
+                      )
                     )}
                   </div>
                   
@@ -309,54 +352,51 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
                         <CalendarDays className="h-12 w-12 mb-3 opacity-30" />
                         <p>Select a date to see available times</p>
                       </div>
+                    ) : isLoadingSlots ? (
+                       <div className="flex flex-col items-center justify-center h-full text-gray-400 text-sm">
+                          <Loader2 className="h-8 w-8 animate-spin text-blue-600 mb-3" />
+                         <p>Loading slots...</p>
+                       </div>
                     ) : availableTimeSlots.length === 0 ? (
                       <div className="flex flex-col items-center justify-center h-full text-gray-400 text-sm text-center px-4">
                         <Clock className="h-12 w-12 mb-3 opacity-30" />
                         <p className="font-medium text-gray-600">No availability</p>
-                        <p className="mt-1">Coach is not available on this day. Please select another date.</p>
+                        <p className="mt-1 mb-4">Coach is not available on this day.</p>
+                        
+                        {slotsData?.nextAvailableDate && (
+                           <Button 
+                             variant="outline" 
+                             size="sm"
+                             onClick={() => {
+                               if (slotsData.nextAvailableDate) {
+                                  const nextDate = new Date(slotsData.nextAvailableDate);
+                                  setDate(nextDate);
+                                  setCurrentMonth(nextDate);
+                               }
+                             }}
+                           >
+                             Jump to {format(new Date(slotsData.nextAvailableDate), "MMM d")}
+                           </Button>
+                        )}
                       </div>
                     ) : (
                       availableTimeSlots.map((time) => {
-                        const isPast = (() => {
-                          if (!date) return false;
-                          const today = new Date();
-                          const isToday = date.getDate() === today.getDate() &&
-                                        date.getMonth() === today.getMonth() &&
-                                        date.getFullYear() === today.getFullYear();
-                          
-                          if (!isToday) return false;
-
-                          const timeParts = time.match(/(\d+):(\d+)(am|pm)/i);
-                          if (!timeParts) return false;
-                          
-                          let hours = parseInt(timeParts[1]);
-                          const minutes = parseInt(timeParts[2]);
-                          const meridian = timeParts[3].toLowerCase();
-                          
-                          if (meridian === 'pm' && hours < 12) hours += 12;
-                          if (meridian === 'am' && hours === 12) hours = 0;
-                          
-                          const slotDate = new Date(date);
-                          slotDate.setHours(hours, minutes, 0, 0);
-                          
-                          return slotDate < new Date();
-                        })();
-
                         const isSelected = selectedTime === time;
 
                         return (
                           <Button
                             key={time}
+                             // Past check is handled by API mostly, but keeping UI check is fine
+                             // though confusing if we mix timezones. 
+                             // Since API returns valid future slots, we can rely on it primarily.
                             variant={isSelected ? "default" : "outline"}
-                            disabled={isPast}
                             className={cn(
                               "w-full justify-center font-medium h-11 transition-all rounded-lg",
                               isSelected 
                                 ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-700 shadow-md" 
-                                : "border-gray-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700",
-                              isPast && "opacity-40 cursor-not-allowed hover:bg-transparent hover:border-gray-200 hover:text-gray-400 text-gray-400"
+                                : "border-gray-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700"
                             )}
-                            onClick={() => !isPast && handleTimeSelect(time)}
+                            onClick={() => handleTimeSelect(time)}
                           >
                             {time}
                           </Button>

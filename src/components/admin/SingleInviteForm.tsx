@@ -12,26 +12,21 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Loader2, Mail } from "lucide-react";
-import { Calendar as CalendarIcon } from "lucide-react";
-import { DateInput } from "@/components/ui/datefield-rac";
+import { Loader2, Mail, Calendar as CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
 import {
-  DatePicker,
-  Group,
-  DateValue,
-  Button as AriaButton,
-  Popover as AriaPopover,
-  Dialog as AriaDialog,
-  Label as AriaLabel,
-  Calendar,
-} from "react-aria-components";
-import { getLocalTimeZone, today } from "@internationalized/date";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 export function SingleInviteForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [contractStart, setContractStart] = useState<DateValue | null>(null);
-  const [contractEnd, setContractEnd] = useState<DateValue | null>(null);
+  const [contractStart, setContractStart] = useState<Date>();
+  const [contractEnd, setContractEnd] = useState<Date>();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async () => {
@@ -46,15 +41,15 @@ export function SingleInviteForm() {
       await inviteCoach({
         email,
         name,
-        contractStart: contractStart ? contractStart.toString() : undefined,
-        contractEnd: contractEnd ? contractEnd.toString() : undefined,
+        contractStart: contractStart ? format(contractStart, "yyyy-MM-dd") : undefined,
+        contractEnd: contractEnd ? format(contractEnd, "yyyy-MM-dd") : undefined,
       });
 
       toast.success(`An invitation has been sent to ${name} (${email})`);
       setName("");
       setEmail("");
-      setContractStart(null);
-      setContractEnd(null);
+      setContractStart(undefined);
+      setContractEnd(undefined);
     } catch (error) {
       toast.error("Failed to send invitation. Please try again.");
     } finally {
@@ -74,7 +69,7 @@ export function SingleInviteForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Full Name</Label>
             <Input
@@ -98,61 +93,67 @@ export function SingleInviteForm() {
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <AriaLabel>Contract Start Date</AriaLabel>
-              <DatePicker
-                value={contractStart}
-                onChange={setContractStart}
-                minValue={today(getLocalTimeZone())}
-                className="group flex flex-col gap-1"
-              >
-                <div className="flex">
-                  <Group className="w-full">
-                    <DateInput className="pe-9" />
-                  </Group>
-                  <AriaButton className="-ms-9 -me-px z-10 flex w-9 items-center justify-center rounded-e-md text-muted-foreground/80 outline-none transition-[color,box-shadow] hover:text-foreground data-focus-visible:border-ring data-focus-visible:ring-[3px] data-focus-visible:ring-ring/50">
-                    <CalendarIcon size={16} />
-                  </AriaButton>
-                </div>
-                <AriaPopover
-                  className="data-[entering]:fade-in-0 data-[entering]:zoom-in-95 data-[exiting]:fade-out-0 data-[exiting]:zoom-out-95 data-[placement=bottom]:slide-in-from-top-2 data-[placement=left]:slide-in-from-right-2 data-[placement=right]:slide-in-from-left-2 data-[placement=top]:slide-in-from-bottom-2 z-50 rounded-lg border bg-background text-popover-foreground shadow-lg outline-hidden data-entering:animate-in data-exiting:animate-out"
-                  offset={4}
-                >
-                  <AriaDialog className="max-h-[inherit] overflow-auto p-2 outline-none">
-                    <Calendar />
-                  </AriaDialog>
-                </AriaPopover>
-              </DatePicker>
+            <div className="space-y-2 flex flex-col">
+              <Label>Contract Start Date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !contractStart && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {contractStart ? format(contractStart, "PPP") : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={contractStart}
+                    onSelect={setContractStart}
+                    disabled={(date) =>
+                      date < new Date(new Date().setHours(0, 0, 0, 0))
+                    }
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
-            <div className="space-y-2">
-              <AriaLabel>Contract End Date</AriaLabel>
-              <DatePicker
-                value={contractEnd}
-                onChange={setContractEnd}
-                minValue={contractStart ?? today(getLocalTimeZone())}
-                className="group flex flex-col gap-1"
-              >
-                <div className="flex">
-                  <Group className="w-full">
-                    <DateInput className="pe-9" />
-                  </Group>
-                  <AriaButton className="-ms-9 -me-px z-10 flex w-9 items-center justify-center rounded-e-md text-muted-foreground/80 outline-none transition-[color,box-shadow] hover:text-foreground data-focus-visible:border-ring data-focus-visible:ring-[3px] data-focus-visible:ring-ring/50">
-                    <CalendarIcon size={16} />
-                  </AriaButton>
-                </div>
-                <AriaPopover
-                  className="data-[entering]:fade-in-0 data-[entering]:zoom-in-95 data-[exiting]:fade-out-0 data-[exiting]:zoom-out-95 data-[placement=bottom]:slide-in-from-top-2 data-[placement=left]:slide-in-from-right-2 data-[placement=right]:slide-in-from-left-2 data-[placement=top]:slide-in-from-bottom-2 z-50 rounded-lg border bg-background text-popover-foreground shadow-lg outline-hidden data-entering:animate-in data-exiting:animate-out"
-                  offset={4}
-                >
-                  <AriaDialog className="max-h-[inherit] overflow-auto p-2 outline-none">
-                    <Calendar />
-                  </AriaDialog>
-                </AriaPopover>
-              </DatePicker>
+            <div className="space-y-2 flex flex-col">
+              <Label>Contract End Date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !contractEnd && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {contractEnd ? format(contractEnd, "PPP") : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={contractEnd}
+                    onSelect={setContractEnd}
+                    disabled={(date) => {
+                        const today = new Date();
+                        today.setHours(0,0,0,0);
+                        return date < (contractStart ?? today);
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
           <Button
-            onClick={handleSubmit}
+            type="submit"
             disabled={isLoading}
             className="w-full"
           >

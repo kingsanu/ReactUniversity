@@ -6,7 +6,12 @@ const nextConfig: NextConfig = {
    * This fixes runtime errors from `next/image` when loading external images.
    */
   images: {
-    domains: ["images.unsplash.com"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+    ],
   },
 };
 

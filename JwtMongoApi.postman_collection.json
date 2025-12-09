@@ -471,7 +471,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/auth/google/url?email={{email}}",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/auth/google/url?email={{email}}&invitationToken={{invitationToken}}",
                   "protocol": "https",
                   "host": [
                     "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
@@ -482,10 +482,16 @@
                       "key": "email",
                       "value": "{{email}}",
                       "description": "User email address (required)"
+                    },
+                    {
+                      "key": "invitationToken",
+                      "value": "{{invitationToken}}",
+                      "description": "Invitation token for coach onboarding (optional). If provided, callback will redirect back to invitation URL.",
+                      "disabled": true
                     }
                   ]
                 },
-                "description": "Get Google Calendar OAuth consent URL for calendar integration. No authentication required. Passes user email as query parameter to identify the user.\n\n**Query Parameters:**\n- email: User's email address (required)\n\n**Returns:**\n- OAuth URL that can be used to redirect user to Google consent screen\n- User ID is encoded in the state parameter for callback identification"
+                "description": "Get Google Calendar OAuth consent URL for calendar integration. No authentication required. Passes user email as query parameter to identify the user.\n\n**Query Parameters:**\n- email: User's email address (required)\n- invitationToken: Optional - Invitation token from coach invitation email. If provided, the OAuth callback will redirect back to the invitation URL instead of the default frontend path.\n\n**Returns:**\n- OAuth URL that can be used to redirect user to Google consent screen\n- User ID and invitationToken (if provided) are encoded in the state parameter for callback identification\n\n**Use Cases:**\n- During onboarding: Include invitationToken to redirect back to onboarding page after Google auth\n- Regular use: Omit invitationToken for default redirect behavior"
               }
             },
             {
@@ -508,6 +514,29 @@
                   "path": ["api", "v1", "auth", "outlook", "url"]
                 },
                 "description": "Get Outlook Calendar OAuth consent URL for calendar integration."
+              }
+            },
+            {
+              "name": "Check Google Auth Status",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/auth/google/status?email={{email}}",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "auth", "google", "status"],
+                  "query": [
+                    {
+                      "key": "email",
+                      "value": "{{email}}",
+                      "description": "User email address (required)"
+                    }
+                  ]
+                },
+                "description": "Check Google Calendar authentication status for a user by email. Returns true/false with detailed authentication information.\n\n**Query Parameters:**\n- email: Required - User's email address\n\n**Returns:**\n- isAuthenticated: Boolean indicating if user is authenticated\n- email: User's email\n- userId: User ID\n- coachId: Coach profile ID (if exists)\n- authDetails: Detailed authentication information including:\n  - connected: Whether Google Calendar is connected\n  - hasAccessToken: Whether access token exists\n  - hasRefreshToken: Whether refresh token exists\n  - isTokenValid: Whether token is valid (verified with Google API)\n  - isTokenExpired: Whether token is expired\n  - tokenExpiresAt: Token expiration timestamp\n  - tokenStatus: Token status (valid, expired, invalid, not_connected)\n- message: Status message\n\n**Features:**\n- Validates email format\n- Finds user and coach profile\n- Checks Google Calendar connection status\n- Verifies token validity with Google API\n- Provides detailed authentication status"
               }
             }
           ]
@@ -586,6 +615,34 @@
               }
             },
             {
+              "name": "Get Coach Booking Slots",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/{{coachId}}/slots?date=2024-12-25&timezone=Asia/Kolkata",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "coach", "{{coachId}}", "slots"],
+                  "query": [
+                    {
+                      "key": "date",
+                      "value": "2024-12-25",
+                      "description": "Date in YYYY-MM-DD format (required)"
+                    },
+                    {
+                      "key": "timezone",
+                      "value": "Asia/Kolkata",
+                      "description": "Timezone for slot display (optional, defaults to coach's timezone)"
+                    }
+                  ]
+                },
+                "description": "Get available booking slots for a coach on a specific date. Returns discrete time slots based on coach's availability, session duration, and existing bookings.\n\n**Query Parameters:**\n- date: Required - Date in YYYY-MM-DD format\n- timezone: Optional - Timezone for slot display (e.g., 'Asia/Kolkata', 'America/New_York')\n\n**Returns:**\n- Available time slots in ISO 8601 format\n- Session duration and pricing information\n- Next available date if no slots on requested date\n\n**Features:**\n- Filters out past time slots\n- Excludes slots overlapping with existing bookings\n- Handles timezone conversion\n- Generates slots based on session duration and interval"
+              }
+            },
+            {
               "name": "Book Session",
               "request": {
                 "method": "POST",
@@ -612,7 +669,36 @@
                   ],
                   "path": ["api", "v1", "bookings"]
                 },
-                "description": "Book a coaching session with a coach. Requires authentication."
+                "description": "Book a coaching session with a coach. Requires authentication. Creates a Google Calendar event with Google Meet link if coach has Google Calendar connected."
+              }
+            },
+            {
+              "name": "Get User Sessions",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/bookings/me?status=upcoming",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "bookings", "me"],
+                  "query": [
+                    {
+                      "key": "status",
+                      "value": "upcoming",
+                      "description": "Filter: 'upcoming', 'past', or 'all' (default: 'all')"
+                    }
+                  ]
+                },
+                "description": "Get user's own booking sessions (for students). Returns detailed session information including coach details, slot information, meeting links, and status.\n\n**Query Parameters:**\n- status: Optional - Filter by status ('upcoming', 'past', 'all')\n\n**Returns:**\n- List of user's bookings with coach details\n- Slot information (start/end times)\n- Meeting links\n- Session status and topic"
               }
             }
           ]
@@ -788,7 +874,7 @@
                   ],
                   "path": ["api", "v1", "bookings", "{{bookingId}}", "cancel"]
                 },
-                "description": "Cancel a booking. Can be triggered by coach or student."
+                "description": "Cancel a booking. Can be triggered by coach or student. Returns detailed cancellation information including reason, cancelled by, and timestamp.\n\n**Request Body:**\n- reason: Required - Reason for cancellation\n\n**Returns:**\n- Booking ID and status\n- Cancellation reason\n- Who cancelled (coach/student)\n- Cancellation timestamp\n\n**Validation:**\n- Cannot cancel completed sessions\n- User must be the coach or student of the booking"
               }
             },
             {
@@ -1175,6 +1261,58 @@
                   "path": ["api", "v1", "coach", "users-without-profile"]
                 },
                 "description": "Get list of users who have the COACH role but don't have a corresponding Coach entity/profile. This endpoint helps identify users who need to complete their coach profile setup.\n\n**Returns:**\n- List of users with COACH role who haven't created a Coach profile\n- Each user includes: userId, name, email, roleId, roleName, createdDate, updatedAt, isActive\n- Total count of users without profiles\n\n**Use Cases:**\n- Identify coaches who need to complete onboarding\n- Admin dashboard for tracking incomplete profiles\n- Data synchronization verification\n- Onboarding status monitoring"
+              }
+            },
+            {
+              "name": "Get Admin Settings",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/admin/settings",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "admin", "settings"]
+                },
+                "description": "Get current admin settings including platform fee percentage. Requires authentication.\n\n**Returns:**\n- platformFee: Platform fee percentage (0-100)\n\n**Note:** Currently uses in-memory storage. Should be migrated to database for production."
+              }
+            },
+            {
+              "name": "Update Admin Settings",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"platformFee\": 20\n}"
+                },
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/admin/settings",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "admin", "settings"]
+                },
+                "description": "Update admin settings. Currently supports platform fee percentage. Requires authentication.\n\n**Request Body:**\n- platformFee: Optional - Platform fee percentage (0-100)\n\n**Validation:**\n- Platform fee must be between 0 and 100\n\n**Returns:**\n- Updated settings object\n\n**Note:** Currently uses in-memory storage. Should be migrated to database for production."
               }
             }
           ]

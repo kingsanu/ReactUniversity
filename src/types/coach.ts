@@ -190,3 +190,21 @@ export interface StudentDetails extends StudentSummary {
   activity?: RecentActivityItem[];
   sessions?: Booking[];
 }
+
+export interface CoachSlotsParams {
+  date: string;
+  timezone?: string;
+}
+
+export interface CoachSlotsResponse {
+  date: string;
+  timezone: string;
+  coachId: string;
+  sessionDurationMinutes: number;
+  price: {
+    amount: number;
+    currency: string;
+  };
+  slots: string[];
+  nextAvailableDate?: string;
+}
