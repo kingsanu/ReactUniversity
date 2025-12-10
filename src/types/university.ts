@@ -216,6 +216,8 @@ export interface UniversityFilters {
   settings?: CampusSetting[];
   hasFinancialAid?: boolean;
   hasHousing?: boolean;
+  sort?: UniversitySortOption;
+  lang?: "en" | "es";
 }
 
 /**
