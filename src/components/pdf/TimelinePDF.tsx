@@ -1,25 +1,25 @@
-import React from 'react';
-import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import React from "react";
+import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 
 const styles = StyleSheet.create({
   page: {
-    flexDirection: 'column',
-    backgroundColor: '#ffffff',
+    flexDirection: "column",
+    backgroundColor: "#ffffff",
     padding: 30,
   },
   title: {
     fontSize: 24,
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   event: {
     marginBottom: 15,
     padding: 10,
-    borderBottom: '1 solid #cccccc',
+    borderBottom: "1 solid #cccccc",
   },
   eventTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 5,
   },
   eventDescription: {
@@ -28,17 +28,18 @@ const styles = StyleSheet.create({
   },
   eventMeta: {
     fontSize: 10,
-    color: '#666666',
+    color: "#666666",
   },
 });
 
 interface TimelinePDFProps {
   events: any[];
-  language: 'en' | 'sp';
+  language: "en" | "sp";
 }
 
 const TimelinePDF: React.FC<TimelinePDFProps> = ({ events, language }) => {
-  const title = language === 'sp' ? 'Cronograma de Evaluaciones' : 'Assessment Timeline';
+  const title =
+    language === "sp" ? "Cronograma de Evaluaciones" : "Assessment Timeline";
 
   return (
     <Document>
@@ -49,7 +50,8 @@ const TimelinePDF: React.FC<TimelinePDFProps> = ({ events, language }) => {
             <Text style={styles.eventTitle}>{event.title}</Text>
             <Text style={styles.eventDescription}>{event.description}</Text>
             <Text style={styles.eventMeta}>
-              {new Date(event.timestamp).toLocaleDateString()} - {event.type.toUpperCase()} - {event.status}
+              {new Date(event.timestamp).toLocaleDateString()} -{" "}
+              {event.type.toUpperCase()} - {event.status}
             </Text>
           </View>
         ))}

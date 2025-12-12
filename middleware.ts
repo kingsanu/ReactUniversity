@@ -1,52 +1,38 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// Define protected routes that require authentication
-const protectedRoutes = ['/dashboard'];
-
-// Define auth routes that should redirect to dashboard if user is already authenticated
-const authRoutes = ['/login', '/signup'];
-
-// Define public routes that don't require authentication
-const publicRoutes = ['/', '/about', '/contact'];
+// Define protected API routes that require authentication
+const protectedApiRoutes = [
+  '/api/admin',
+  '/api/v1/assessments/me/timeline',
+  '/api/v1/assessments/me/timeline/stats',
+  '/api/v1/assessments/me/timeline/export'
+];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Get token from cookies or check if it exists in the request
-  // Since we're using localStorage, we'll check for a custom header or cookie
-  const token = request.cookies.get('auth-token')?.value ||
-                request.headers.get('authorization')?.replace('Bearer ', '');
+  // Only check authentication for protected API routes
+  if (pathname.startsWith('/api/')) {
+    const isProtectedApiRoute = protectedApiRoutes.some(route =>
+      pathname.startsWith(route)
+    );
 
-  const isAuthenticated = !!token;
+    if (isProtectedApiRoute) {
+      // Get token from authorization header
+      const authHeader = request.headers.get('authorization');
 
-  // Check if the current path is a protected route
-  const isProtectedRoute = protectedRoutes.some(route =>
-    pathname.startsWith(route)
-  );
-
-  // Check if the current path is an auth route
-  const isAuthRoute = authRoutes.includes(pathname);
-
-  // Check if the current path is a public route
-  const isPublicRoute = publicRoutes.includes(pathname) ||
-                       pathname.startsWith('/api/') ||
-                       pathname.startsWith('/_next/') ||
-                       pathname.includes('.');
-
-  // If user is not authenticated and trying to access protected route
-  if (!isAuthenticated && isProtectedRoute) {
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('redirect', pathname);
-    return NextResponse.redirect(loginUrl);
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return NextResponse.json(
+          { error: 'Authentication required' },
+          { status: 401 }
+        );
+      }
+    }
   }
 
-  // If user is authenticated and trying to access auth routes, redirect to dashboard
-  if (isAuthenticated && isAuthRoute) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
-  }
-
-  // Allow access to public routes and continue
+  // Allow all other requests to pass through
+  // Page authentication redirects are handled client-side by AuthWrapper
   return NextResponse.next();
 }
 

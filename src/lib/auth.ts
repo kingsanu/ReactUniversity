@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 
 export interface JWTPayload {
   userId: string;
@@ -16,20 +16,20 @@ export function verifyJWT(token: string): JWTPayload {
     const decoded = jwt.decode(token) as JWTPayload;
 
     if (!decoded || !decoded.userId) {
-      throw new Error('Invalid token');
+      throw new Error("Invalid token");
     }
 
     return decoded;
   } catch (error) {
-    throw new Error('Invalid token');
+    throw new Error("Invalid token");
   }
 }
 
 export function getUserIdFromRequest(request: Request): string {
-  const authHeader = request.headers.get('authorization');
+  const authHeader = request.headers.get("authorization");
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    throw new Error('No authorization token provided');
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    throw new Error("No authorization token provided");
   }
 
   const token = authHeader.substring(7); // Remove 'Bearer '
