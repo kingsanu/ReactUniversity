@@ -1,30 +1,30 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 // Define protected API routes that require authentication
 const protectedApiRoutes = [
-  '/api/admin',
-  '/api/v1/assessments/me/timeline',
-  '/api/v1/assessments/me/timeline/stats',
-  '/api/v1/assessments/me/timeline/export'
+  "/api/admin",
+  "/api/v1/assessments/me/timeline",
+  "/api/v1/assessments/me/timeline/stats",
+  "/api/v1/assessments/me/timeline/export",
 ];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Only check authentication for protected API routes
-  if (pathname.startsWith('/api/')) {
-    const isProtectedApiRoute = protectedApiRoutes.some(route =>
+  if (pathname.startsWith("/api/")) {
+    const isProtectedApiRoute = protectedApiRoutes.some((route) =>
       pathname.startsWith(route)
     );
 
     if (isProtectedApiRoute) {
       // Get token from authorization header
-      const authHeader = request.headers.get('authorization');
+      const authHeader = request.headers.get("authorization");
 
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
         return NextResponse.json(
-          { error: 'Authentication required' },
+          { error: "Authentication required" },
           { status: 401 }
         );
       }
@@ -46,6 +46,6 @@ export const config = {
      * - favicon.ico (favicon file)
      * - public files (images, etc.)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.).*)',
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.).*)",
   ],
 };

@@ -51,6 +51,8 @@ function generateSlotsFromRange(start: string, end: string): string[] {
 
 import { getCoachAvailableSlots, bookSession } from "@/services/coachService";
 import { CoachSlotsResponse } from "@/types/coach";
+import { useGlobalStore } from "@/store/useGlobalStore";
+import { redirectToStripeCheckout } from "@/services/paymentService";
 
 export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -62,8 +64,10 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
   
   // API State
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
+  const [isBooking, setIsBooking] = useState(false);
   const [slotsData, setSlotsData] = useState<CoachSlotsResponse | null>(null);
   const [timezone, setTimezone] = useState<string>(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  const { user } = useGlobalStore();
 
   // Fetch slots from API
   useEffect(() => {
@@ -150,12 +154,16 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
          return;
       }
 
+      // Show loading
+      setIsBooking(true);
+
       // Calculate end time based on session duration
       const startDate = new Date(originalSlotIso);
       const durationMinutes = slotsData?.sessionDurationMinutes || 30;
       const endDate = new Date(startDate.getTime() + durationMinutes * 60000);
 
-      await bookSession({
+      // 1. Create Booking
+      const bookingResponse = await bookSession({
         coachId: coach.id,
         slot: {
           start: startDate.toISOString(),
@@ -165,11 +173,39 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
         notes: notes 
       });
 
-      toast.success(`Session booked with ${coach?.name} on ${format(date, "PPP")} at ${selectedTime}`);
-      onClose();
+      // 2. Check for Payment
+      if (slotsData?.price && slotsData.price.amount > 0) {
+        if (!user.id) {
+           toast.error("User not identified. Please log in.");
+           setIsBooking(false);
+           return;
+        }
+
+        const amountInCents = Math.round(slotsData.price.amount * 100);
+        
+        try {
+          toast.loading("Redirecting to payment...");
+          await redirectToStripeCheckout(
+            amountInCents,
+            `Coaching Session: ${topic}`,
+            user.id,
+            { bookingId: bookingResponse.id }
+          );
+          // Redirecting...
+        } catch (paymentError) {
+          console.error("Payment initialization failed:", paymentError);
+          toast.error("Booking created but payment failed to initialize.");
+          onClose();
+        }
+      } else {
+        toast.success(`Session booked with ${coach?.name} on ${format(date, "PPP")} at ${selectedTime}`);
+        onClose();
+      }
     } catch (error) {
       console.error("Booking failed:", error);
       toast.error("Failed to book session. Please try again.");
+    } finally {
+      setIsBooking(false);
     }
   };
 
@@ -460,8 +496,16 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
                     <Button 
                       className="h-11 px-8 bg-black text-white hover:bg-gray-800" 
                       onClick={handleBook}
+                      disabled={isBooking}
                     >
-                      Schedule Event
+                      {isBooking ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        slotsData?.price && slotsData.price.amount > 0 ? "Book & Pay" : "Schedule Event"
+                      )}
                     </Button>
                   </div>
                 </div>

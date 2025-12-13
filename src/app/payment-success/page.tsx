@@ -43,6 +43,16 @@ export default function PaymentSuccess() {
   }, [searchParams]);
 
   const handleContinue = () => {
+    // If it was a booking payment (we can guess by description or metadata if available, but for now generic check)
+    // Actually, we can check searchParams if we add more context, but simplest is:
+    // If successful, users likely want to see their sessions or subscriptions.
+    
+    // Better: Check description or amount to differentiate
+    if (paymentDetails?.description?.toLowerCase().includes("coaching session")) {
+        router.push("/dashboard/coaching?tab=sessions");
+        return;
+    }
+    
     router.push("/dashboard/subscriptions");
   };
 

@@ -8,6 +8,7 @@ export interface CreateCheckoutSessionRequest {
   productName: string;
   successUrl: string;
   cancelUrl: string;
+  metadata?: Record<string, string>;
 }
 
 export interface CheckoutSessionResponse {
@@ -75,11 +76,13 @@ export async function getUserPayments(userId: string): Promise<any[]> {
 export async function redirectToStripeCheckout(
   amount: number,
   productName: string,
-  userId: string
+  userId: string,
+  metadata?: Record<string, string>
 ): Promise<void> {
   try {
     // Ensure we have absolute URLs
     const baseUrl = window.location.origin;
+    // Success URL now includes metadata hooks if needed, but primarily we rely on webhook
     const successUrl = `${baseUrl}/payment-success?session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl = `${baseUrl}/payment-cancelled`;
 
@@ -92,6 +95,7 @@ export async function redirectToStripeCheckout(
       productName,
       successUrl,
       cancelUrl,
+      metadata,
     };
 
     const response = await createCheckoutSession(request);
