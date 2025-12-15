@@ -1,13 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { Sidebar } from "../_components/Sidebar";
-import { TopNav } from "../_components/TopNav";
+// Sidebar and TopNav are provided by the parent dashboard layout; removed local instances
 import { SubscriptionPlans } from "./_components/SubscriptionPlans";
 
 export default function SubscriptionsPage() {
   const searchParams = useSearchParams();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  // Sidebar state is handled by the parent dashboard layout
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   // Check for success/cancelled parameters from Stripe redirect
@@ -61,13 +60,8 @@ export default function SubscriptionsPage() {
   }, [searchParams]);
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-
-      <div className="flex-1 flex flex-col overflow-hidden lg:ml-0">
-        <TopNav onMenuClick={() => setSidebarOpen(true)} />
-
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">
+    <div className="bg-gray-50">
+      <main className="flex-1 overflow-y-auto p-4 md:p-6">
           {/* Success Message */}
           {showSuccessMessage && (
             <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
@@ -135,7 +129,6 @@ export default function SubscriptionsPage() {
           {/* Subscription Plans */}
           <SubscriptionPlans />
         </main>
-      </div>
     </div>
   );
 }
