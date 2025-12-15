@@ -39,7 +39,7 @@ export function PaymentSettingsTab({
     connected: boolean;
     accountId?: string;
     email?: string;
-    last4?: string;
+    last4?: string | null;
     payoutsEnabled?: boolean;
     onboardingLink?: string;
     requiresOnboarding?: boolean;

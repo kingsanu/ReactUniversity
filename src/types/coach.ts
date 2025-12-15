@@ -94,7 +94,12 @@ export interface Booking {
   startTime?: string; // Flattened for easier UI consumption if needed, or use slot
   endTime?: string;
   slot?: BookingSlot;
-  status: "confirmed" | "rescheduled" | "cancelled" | "completed" | "pending_payment";
+  status:
+    | "confirmed"
+    | "rescheduled"
+    | "cancelled"
+    | "completed"
+    | "pending_payment";
   meetingLink?: string;
 }
 
