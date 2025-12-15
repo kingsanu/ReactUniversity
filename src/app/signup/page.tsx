@@ -153,17 +153,17 @@ export default function SignupPage() {
       await signUpApi(
         `${data.firstName} ${data.lastName}`,
         data.email,
-        data.password,
-        userRoleId
+        data.password
+        // userRoleId
       );
 
       // on signup success, call login to get token
       const loginRes = await loginApi(data.email, data.password);
       localStorage.setItem("token", loginRes.token);
-      
+
       // Extract role name from login response
       const roleName = loginRes.user?.role?.name || null;
-      
+
       setUser({
         id: loginRes.user?.id || "",
         email: data.email,

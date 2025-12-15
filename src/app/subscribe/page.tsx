@@ -3,11 +3,13 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { SubscriptionPlans } from "@/app/dashboard/subscriptions/_components/SubscriptionPlans";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+
+import { motion, AnimatePresence } from "motion/react";
+import { CheckCircle2, X } from "lucide-react";
 
 export default function SubscribePage() {
   const searchParams = useSearchParams();
-  const router = useRouter();
+
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   // Check for success/cancelled parameters from Stripe redirect
@@ -61,67 +63,65 @@ export default function SubscribePage() {
   }, [searchParams]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto py-10 px-4">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Choose Your Plan</h1>
-          <Button variant="outline" onClick={() => router.push("/dashboard")}>
-            Back to Dashboard
-          </Button>
-        </div>
-        
-        {/* Success Message */}
-        {showSuccessMessage && (
-          <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
-            <div className="flex items-center space-x-3">
-              <div className="flex-shrink-0">
-                <svg
-                  className="w-6 h-6 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-green-800">
-                  Payment Successful!
-                </h3>
-                <p className="text-sm text-green-700 mt-1">
-                  Your subscription has been activated. You now have access to
-                  all premium features.
-                </p>
-              </div>
-              <button
-                onClick={() => setShowSuccessMessage(false)}
-                className="flex-shrink-0 text-green-400 hover:text-green-600"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
-          </div>
-        )}
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 relative overflow-hidden">
+      {/* Background Decor */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div className="absolute -top-[20%] -right-[10%] w-[50%] h-[50%] rounded-full bg-purple-200/20 blur-3xl animate-pulse" />
+        <div className="absolute top-[40%] -left-[10%] w-[40%] h-[40%] rounded-full bg-blue-200/20 blur-3xl animate-pulse delay-1000" />
+      </div>
 
-        <div className="bg-white rounded-xl shadow-sm border p-6">
-          <SubscriptionPlans />
+      <div className="relative z-10 container mx-auto py-8 px-4 md:py-12">
+
+        
+        {/* Success Message Float */}
+        <AnimatePresence>
+          {showSuccessMessage && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: -20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="fixed top-8 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md px-4"
+            >
+              <div className="bg-white/90 backdrop-blur-md shadow-2xl rounded-2xl p-4 border border-green-100 flex items-start gap-4 ring-1 ring-black/5">
+                <div className="flex-shrink-0">
+                   <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <CheckCircle2 className="w-6 h-6 text-green-600" />
+                   </div>
+                </div>
+                <div className="flex-1 pt-1">
+                  <h3 className="font-semibold text-gray-900">Payment Successful!</h3>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Your subscription is now active. Enjoy your premium features!
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowSuccessMessage(false)}
+                  className="flex-shrink-0 text-gray-400 hover:text-gray-600 p-1"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Content */}
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="mb-10 text-center"
+          >
+            <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 mb-4 tracking-tight">
+              Upgrade Your Experience
+            </h1>
+            <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              Choose the perfect plan to unlock exclusive features and take your journey to the next level.
+            </p>
+          </motion.div>
+
+          <SubscriptionPlans className="!mt-0" />
         </div>
       </div>
     </div>

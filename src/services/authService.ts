@@ -231,7 +231,7 @@ export async function login(
     // Try to parse error as JSON for better error messages
     try {
       const errorJson = JSON.parse(errorText);
-      
+
       // Handle different error response formats
       if (errorJson.message) {
         // Use the message field if available
@@ -343,7 +343,7 @@ export async function signUp(
     name: name,
     email: email,
     password: password,
-    roleId: roleId || "default-role-id", // You may need to get a default role ID
+    // roleId: roleId || "default-role-id", // You may need to get a default role ID
   };
 
   console.log("📤 Signup request body:", requestBody);
