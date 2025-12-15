@@ -115,7 +115,7 @@ export default function SessionsPage() {
 
             let date = "TBD";
             let time = "TBD";
-            let duration = "30 min";
+            let duration = "1 hour";
 
             if (startTime) {
               try {
@@ -233,7 +233,7 @@ export default function SessionsPage() {
       startObj.setHours(hours, minutes, 0, 0);
       
       const endObj = new Date(startObj);
-      endObj.setMinutes(startObj.getMinutes() + 30); // Default 30 min
+      endObj.setMinutes(startObj.getMinutes() + 60); // Default 60 min
       
       const start = startObj.toISOString();
       const end = endObj.toISOString();

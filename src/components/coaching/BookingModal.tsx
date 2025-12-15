@@ -17,6 +17,11 @@ interface BookingModalProps {
   coach: Coach | null;
   isOpen: boolean;
   onClose: () => void;
+  mode?: 'book' | 'reschedule';
+  bookingId?: string;
+  initialTopic?: string;
+  initialNotes?: string;
+  onRescheduleSuccess?: () => void;
 }
 
 // Default fallback time slots removed
@@ -54,7 +59,16 @@ import { CoachSlotsResponse } from "@/types/coach";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { redirectToStripeCheckout } from "@/services/paymentService";
 
-export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
+export function BookingModal({ 
+  coach, 
+  isOpen, 
+  onClose, 
+  mode = 'book',
+  bookingId,
+  initialTopic = '',
+  initialNotes = '',
+  onRescheduleSuccess
+}: BookingModalProps) {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [topic, setTopic] = useState("");
@@ -118,11 +132,12 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
     if (isOpen) {
       setStep("date-time");
       setSelectedTime(null);
-      setTopic("");
+      setTopic(initialTopic);
+      setNotes(initialNotes);
       setDate(new Date());
       setCurrentMonth(new Date());
     }
-  }, [isOpen]);
+  }, [isOpen, initialTopic, initialNotes]);
 
   const handleTimeSelect = (time: string) => {
     setSelectedTime(time);
@@ -159,22 +174,33 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
 
       // Calculate end time based on session duration
       const startDate = new Date(originalSlotIso);
-      const durationMinutes = slotsData?.sessionDurationMinutes || 30;
+      const durationMinutes = slotsData?.sessionDurationMinutes || 60;
       const endDate = new Date(startDate.getTime() + durationMinutes * 60000);
 
-      // 1. Create Booking
-      const bookingResponse = await bookSession({
-        coachId: coach.id,
-        slot: {
+      // 1. Create Booking or Reschedule
+      let response;
+      if (mode === 'reschedule' && bookingId) {
+        const { rescheduleSession } = await import("@/services/coachService");
+        response = await rescheduleSession(bookingId, {
           start: startDate.toISOString(),
           end: endDate.toISOString()
-        },
-        topic,
-        notes: notes 
-      });
+        });
+        toast.success("Session rescheduled successfully");
+        onRescheduleSuccess?.();
+      } else {
+        response = await bookSession({
+          coachId: coach.id,
+          slot: {
+            start: startDate.toISOString(),
+            end: endDate.toISOString()
+          },
+          topic,
+          notes: notes 
+        });
+      }
 
-      // 2. Check for Payment
-      if (slotsData?.price && slotsData.price.amount > 0) {
+      // 2. Check for Payment (only for new bookings)
+      if (mode === 'book' && slotsData?.price && slotsData.price.amount > 0) {
         if (!user.id) {
            toast.error("User not identified. Please log in.");
            setIsBooking(false);
@@ -189,7 +215,7 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
             amountInCents,
             `Coaching Session: ${topic}`,
             user.id,
-            { bookingId: bookingResponse.id }
+            { bookingId: response.id }
           );
           // Redirecting...
         } catch (paymentError) {
@@ -198,7 +224,9 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
           onClose();
         }
       } else {
-        toast.success(`Session booked with ${coach?.name} on ${format(date, "PPP")} at ${selectedTime}`);
+        if (mode === 'book') {
+          toast.success(`Session booked with ${coach?.name} on ${format(date, "PPP")} at ${selectedTime}`);
+        }
         onClose();
       }
     } catch (error) {
@@ -236,16 +264,18 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
               <h3 className="text-lg font-bold text-gray-900 mb-1">{coach.name}</h3>
               <h3 className="text-lg font-bold text-gray-900 mb-1">{coach.name}</h3>
               <p className="text-gray-900 font-semibold text-xl mb-6">
-                 {slotsData?.price && slotsData.price.amount > 0 
-                  ? `${slotsData.price.currency} ${slotsData.price.amount}` 
-                  : "30 Min Meeting"}
+                 {mode === 'reschedule' 
+                  ? "Reschedule Session"
+                  : slotsData?.price && slotsData.price.amount > 0 
+                    ? `${slotsData.price.currency} ${slotsData.price.amount}` 
+                    : "1 Hour Session"}
               </p>
               
               <div className="space-y-4 text-gray-600 text-sm">
                 <div className="flex items-center">
                   <Clock className="h-4 w-4 mr-3 text-gray-400" />
                   <span className="font-medium">
-                    {slotsData?.sessionDurationMinutes ? `${slotsData.sessionDurationMinutes} min` : "30 min"}
+                    {slotsData?.sessionDurationMinutes ? `${slotsData.sessionDurationMinutes} min` : "1 hour"}
                   </span>
                 </div>
                 <div className="flex items-center">
@@ -503,7 +533,7 @@ export function BookingModal({ coach, isOpen, onClose }: BookingModalProps) {
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Processing...
                         </>
-                      ) : (
+                      ) : mode === 'reschedule' ? "Reschedule Session" : (
                         slotsData?.price && slotsData.price.amount > 0 ? "Book & Pay" : "Schedule Event"
                       )}
                     </Button>

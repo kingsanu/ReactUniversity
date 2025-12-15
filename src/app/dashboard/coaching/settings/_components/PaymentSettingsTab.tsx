@@ -4,19 +4,21 @@ import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Loader2,
   CreditCard,
   CheckCircle,
-  XCircle,
   ExternalLink,
 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   getCoachBankAccount,
   getCoachPayouts,
@@ -47,18 +49,23 @@ export function PaymentSettingsTab({
     email?: string;
     last4?: string;
     payoutsEnabled?: boolean;
+    onboardingLink?: string;
+    requiresOnboarding?: boolean;
   } | null>(null);
+  const [payoutFrequency, setPayoutFrequency] = useState("monthly");
 
   useEffect(() => {
     if (parentBankAccount || parentPayouts) {
       setStripeAccount({
         connected: !!(
-          parentBankAccount && parentBankAccount.status === "connected"
+          parentBankAccount && (parentBankAccount.status === "connected" || parentBankAccount.isConnected)
         ),
         accountId: parentBankAccount?.id,
         email: parentBankAccount?.email,
         last4: parentBankAccount?.last4,
-        payoutsEnabled: parentBankAccount?.status === "connected",
+        payoutsEnabled: parentBankAccount?.status === "connected" || parentBankAccount?.isConnected,
+        onboardingLink: parentBankAccount?.onboardingLink,
+        requiresOnboarding: parentBankAccount?.requiresOnboarding,
       });
       setIsLoading(false);
     } else {
@@ -68,19 +75,19 @@ export function PaymentSettingsTab({
 
   const fetchStripeAccount = async () => {
     try {
-      // Call API to get Stripe/bank account details and payouts
       const bankData = await getCoachBankAccount();
       const payoutsData = await getCoachPayouts();
       const account = bankData?.data;
       const payouts = payoutsData?.data || [];
 
       const accountObj = {
-        connected: !!(account && account.status === "connected"),
+        connected: account?.isConnected || false,
         accountId: account?.id,
         email: account?.email,
-        last4:
-          payouts.length > 0 ? String(payouts[0].amount).slice(-4) : undefined,
-        payoutsEnabled: account?.status === "connected",
+        last4: account?.last4,
+        payoutsEnabled: account?.isConnected || false,
+        onboardingLink: account?.onboardingLink, // Store onboarding link
+        requiresOnboarding: account?.requiresOnboarding,
       };
       setStripeAccount(accountObj);
       if (onBankAccountUpdated) onBankAccountUpdated(accountObj);
@@ -95,15 +102,32 @@ export function PaymentSettingsTab({
   const handleConnectStripe = async () => {
     setIsConnecting(true);
     try {
-      // Call API to create a Stripe / bank account linking URL
-      const { onboardingUrl } = await linkCoachBankAccount();
-      if (onboardingUrl) {
-        window.location.href = onboardingUrl;
+      // Check if we already have an onboarding link from GET request
+      if (stripeAccount?.onboardingLink) {
+        // Redirect directly to the onboarding link
+        window.location.href = stripeAccount.onboardingLink;
         return;
       }
-      toast.info("Stripe Connect integration coming soon");
-    } catch (error) {
-      toast.error("Failed to connect Stripe account");
+      
+      // Otherwise, call POST endpoint to generate link
+      const response = await linkCoachBankAccount({
+        provider: "stripe",
+        accountType: "checking",
+        accountHolderName: "", // Will be filled during Stripe onboarding
+        bankName: "", // Will be filled during Stripe onboarding
+      });
+      
+      if (response.onboardingUrl) {
+        // Redirect to Stripe Connect onboarding
+        window.location.href = response.onboardingUrl;
+        return;
+      }
+      
+      toast.success(response.message || "Bank account linked successfully");
+      fetchStripeAccount(); // Refresh account status
+    } catch (error: any) {
+      console.error("Stripe connection error:", error);
+      toast.error(error.message || "Failed to connect Stripe account");
     } finally {
       setIsConnecting(false);
     }
@@ -114,14 +138,18 @@ export function PaymentSettingsTab({
       return;
 
     try {
-      // TODO: Call API to disconnect Stripe
-      // await disconnectStripe();
       setStripeAccount({ connected: false });
       if (onBankAccountUpdated) onBankAccountUpdated(null);
       toast.success("Stripe account disconnected");
     } catch (error) {
       toast.error("Failed to disconnect Stripe account");
     }
+  };
+
+  const handleFrequencyChange = async (value: string) => {
+    // In a real app, call API to update frequency here
+    setPayoutFrequency(value);
+    toast.success(`Payout frequency updated to ${value}`);
   };
 
   if (parentLoading || isLoading) {
@@ -228,6 +256,27 @@ export function PaymentSettingsTab({
              </div>
           </div>
 
+          <div className="bg-white border-gray-100 rounded-2xl p-6 border shadow-sm">
+             <h3 className="text-lg font-bold text-gray-900 mb-4">Payout Preferences</h3>
+             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+               <div>
+                  <p className="font-medium text-gray-900">Payout Frequency</p>
+                  <p className="text-sm text-gray-500">Choose how often you want to receive your earnings.</p>
+               </div>
+               <div className="w-full sm:w-[200px]">
+                 <Select value={payoutFrequency} onValueChange={handleFrequencyChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select frequency" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="biweekly">Bi-weekly (Every 2 weeks)</SelectItem>
+                      <SelectItem value="monthly">Monthly (1st of month)</SelectItem>
+                    </SelectContent>
+                 </Select>
+               </div>
+             </div>
+           </div>
+
           <div className="space-y-4">
              <h3 className="text-lg font-bold text-gray-900">Payout History</h3>
              {(!parentPayouts || parentPayouts.length === 0) ? (
@@ -236,7 +285,6 @@ export function PaymentSettingsTab({
                </div>
              ) : (
                 <div className="space-y-2">
-                  {/* Placeholder for list since we initially handle empty state */}
                    <div className="bg-gray-50 rounded-2xl p-8 text-center border border-gray-100 border-dashed">
                      <p className="text-gray-500 font-medium">No payout history available.</p>
                    </div>

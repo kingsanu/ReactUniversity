@@ -97,7 +97,7 @@ GET /api/v1/coach/12345/slots?date=2024-12-25&timezone=Asia/Kolkata
 Based on this API, the Booking Modal UI should be enhanced to display:
 
 1.  **Session Price**:
-    *   Display the price per session (e.g., "$50.00 / 30 min") prominently in the modal header or near the "Book" button.
+    *   Display the price per session (e.g., "$50.00 / 1 hour") prominently in the modal header or near the "Book" button.
     *   *Why*: Users need to know the cost before committing.
 
 2.  **Timezone Clarity**:
@@ -108,7 +108,7 @@ Based on this API, the Booking Modal UI should be enhanced to display:
     *   If the selected date has no slots (empty array), use the `nextAvailableDate` from the response to show a button: "Jump to next available date (Dec 26)".
 
 4.  **Session Duration**:
-    *   Display the duration (e.g., "30 Minutes") clearly.
+    *   Display the duration (e.g., "1 Hour") clearly.
 
 ---
 

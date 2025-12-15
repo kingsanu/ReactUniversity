@@ -133,7 +133,7 @@ export default function CoachDashboardPage() {
 
           let date = "TBD";
           let time = "TBD";
-          let duration = "30 min"; // Default
+          let duration = "1 hour"; // Default
 
           if (startTime) {
             try {
@@ -281,7 +281,7 @@ export default function CoachDashboardPage() {
       startObj.setHours(hours, minutes, 0, 0);
       
       const endObj = new Date(startObj);
-      endObj.setMinutes(startObj.getMinutes() + 30); // Default 30 min duration
+      endObj.setMinutes(startObj.getMinutes() + 60); // Default 60 min duration
       
       const start = startObj.toISOString();
       const end = endObj.toISOString();

@@ -480,7 +480,7 @@
                   ],
                   "path": ["api", "v1", "coach", "{{coachId}}", "onboarding"]
                 },
-                "description": "Submit coach onboarding data including profile, availability, calendar preferences, pricing information, and optional password.\n\n**Request Body Fields:**\n- `personalInfo`: Required - Personal information (name, title, bio, specialization, location, languages, tags, image)\n- `availability`: Required - Weekly schedule with timezone and time slots\n- `calendarIntegrations`: Optional - Google and Outlook calendar integration settings\n- `hourlyRate`: Optional (nullable) - Coach's hourly rate as a decimal number\n- `currency`: Optional (nullable) - Currency code (e.g., \"USD\", \"EUR\", \"GBP\") - max 10 characters\n- `password`: Optional - Password to set for the coach account (will be hashed before storage)"
+                "description": "Submit coach onboarding data including profile, availability, calendar preferences, pricing information, and optional password.\n\n**Request Body Fields:**\n- `personalInfo`: Required - Personal information (name, title, bio, specialization, location, languages, tags, image)\n- `availability`: Required - Weekly schedule with timezone and time slots\n- `calendarIntegrations`: Optional - Google and Outlook calendar integration settings\n- `hourlyRate`: **Required** - Coach's hourly rate as a decimal number (must be between 0.01 and 999999.99). This is required for coaches to accept bookings.\n- `currency`: **Required** - Currency code as a 3-letter ISO code (e.g., \"USD\", \"EUR\", \"GBP\"). Accepts both uppercase and lowercase (e.g., \"usd\" or \"USD\") - will be normalized to uppercase.\n- `password`: Optional - Password to set for the coach account (will be hashed before storage)\n\n**Note:** HourlyRate and Currency are required fields. Coaches cannot accept bookings without setting their hourly rate."
               }
             },
             {
@@ -957,6 +957,28 @@
               }
             },
             {
+              "name": "Get My Coach Profile",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/me",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "coach", "me"]
+                },
+                "description": "Get the authenticated coach's profile information including personal details, pricing (HourlyRate and Currency), availability, ratings, and reviews.\n\n**Response includes:**\n- Personal information (name, title, bio, specialization, location, languages, tags, image)\n- Pricing information (hourlyRate, currency)\n- Availability schedule\n- Ratings and reviews\n- Statistics"
+              }
+            },
+            {
               "name": "Update Coach Profile",
               "request": {
                 "method": "PUT",
@@ -973,7 +995,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"title\": \"Senior Career Coach\",\n  \"bio\": \"Updated bio with more experience...\",\n  \"specialization\": \"Tech Leadership\",\n  \"location\": \"New York, NY\",\n  \"languages\": [\"English\", \"French\"],\n  \"tags\": [\"Leadership\", \"Management\"]\n}"
+                  "raw": "{\n  \"title\": \"Senior Career Coach\",\n  \"bio\": \"Updated bio with more experience...\",\n  \"specialization\": \"Tech Leadership\",\n  \"location\": \"New York, NY\",\n  \"languages\": [\"English\", \"French\"],\n  \"tags\": [\"Leadership\", \"Management\"],\n  \"hourlyRate\": 85.50,\n  \"currency\": \"USD\"\n}"
                 },
                 "url": {
                   "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/me",
@@ -983,7 +1005,7 @@
                   ],
                   "path": ["api", "v1", "coach", "me"]
                 },
-                "description": "Update coach's personal information (bio, title, specialization, etc.). All fields are optional."
+                "description": "Update coach's personal information and pricing. All fields are optional.\n\n**Request Body Fields:**\n- `title`: Optional - Coach title\n- `bio`: Optional - Coach biography\n- `specialization`: Optional - Area of specialization\n- `location`: Optional - Coach location\n- `languages`: Optional - List of languages spoken\n- `tags`: Optional - List of tags\n- `hourlyRate`: Optional - Hourly rate (must be between 0.01 and 999999.99)\n- `currency`: Optional - Currency code (3-letter ISO code, e.g., \"USD\", \"EUR\", \"GBP\"). Accepts both uppercase and lowercase (e.g., \"usd\" or \"USD\") - will be normalized to uppercase.\n\n**Response includes:**\n- All updated profile fields including `hourlyRate` and `currency`\n\n**Note:** HourlyRate and Currency are required during onboarding but can be updated later using this endpoint."
               }
             },
             {
@@ -1331,6 +1353,114 @@
                 },
                 "description": "Link or update bank account for payouts. Supports both Stripe Connect (recommended) and manual entry.\n\n**Request Body:**\n- accountNumber: Bank account number (optional for Stripe)\n- routingNumber: Bank routing number (optional for Stripe)\n- accountHolderName: Name on account\n- bankName: Name of bank\n- accountType: 'checking' or 'savings'\n- provider: 'stripe' (default) or 'manual'\n\n**Note:** For Stripe Connect, an onboarding link will be generated. For manual entry, account will be marked as connected immediately."
               }
+            },
+            {
+              "name": "Get Earnings",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/me/earnings",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "coach", "me", "earnings"]
+                },
+                "description": "Get current earning statistics for the coach. Returns total earnings, pending payout amount, and last payout information.\n\n**Returns:**\n- totalEarnings: Total earnings from all completed sessions\n- pendingPayout: Sum of pending/processing payouts\n- lastPayoutAmount: Amount of last completed payout\n- lastPayoutDate: Date of last completed payout\n- currency: Currency code (e.g., USD)"
+              }
+            },
+            {
+              "name": "Get Earnings History",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/me/earnings/history?page=1&limit=50",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "coach", "me", "earnings", "history"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "description": "Page number (default: 1)"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "50",
+                      "description": "Items per page (default: 50, max: 100)"
+                    }
+                  ]
+                },
+                "description": "Get detailed earnings history with platform fee breakdown. Returns list of earning events (sessions) with gross amount, platform fee, and net amount.\n\n**Query Parameters:**\n- page: Page number (default: 1)\n- limit: Items per page (default: 50, max: 100)\n\n**Returns:**\n- List of earnings history items\n- Each item includes: date, description, amountGross, platformFee, amountNet, status, bookingId, currency\n- Total count of earnings events"
+              }
+            },
+            {
+              "name": "Get Payout Settings",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/me/payout-settings",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "coach", "me", "payout-settings"]
+                },
+                "description": "Get payout configuration settings for the coach. Returns payout frequency and payment method.\n\n**Returns:**\n- frequency: 'biweekly' or 'monthly'\n- method: 'stripe' or 'bank_transfer'\n- bankName: Name of bank (if bank_transfer)\n- accountHolderName: Account holder name (if bank_transfer)\n- last4: Last 4 digits of account (if bank_transfer)"
+              }
+            },
+            {
+              "name": "Update Payout Settings",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"frequency\": \"monthly\",\n  \"method\": \"stripe\",\n  \"bankAccountNumber\": \"1234567890\",\n  \"bankRoutingNumber\": \"110000000\",\n  \"bankName\": \"Example Bank\",\n  \"accountHolderName\": \"John Doe\"\n}"
+                },
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/me/payout-settings",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "coach", "me", "payout-settings"]
+                },
+                "description": "Update payout frequency and payment method. All fields are optional - only provided fields will be updated.\n\n**Request Body:**\n- frequency: Optional - 'biweekly' or 'monthly'\n- method: Optional - 'stripe' or 'bank_transfer'\n- bankAccountNumber: Optional - Bank account number (for bank_transfer)\n- bankRoutingNumber: Optional - Bank routing number (for bank_transfer)\n- bankName: Optional - Name of bank (for bank_transfer)\n- accountHolderName: Optional - Account holder name (for bank_transfer)\n\n**Validation:**\n- frequency must be 'biweekly' or 'monthly'\n- method must be 'stripe' or 'bank_transfer'"
+              }
             }
           ]
         },
@@ -1379,6 +1509,247 @@
                   "path": ["api", "v1", "notifications", "{{notificationId}}", "read"]
                 },
                 "description": "Mark a specific notification as read. Updates the notification's read status and records the read timestamp."
+              }
+            }
+          ]
+        },
+        {
+          "name": "User Profile",
+          "item": [
+            {
+              "name": "Get Profile",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/user/profile",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "user", "profile"]
+                },
+                "description": "Get current user's profile details including personal information, social links, skills, and statistics.\n\n**Returns:**\n- id, fullName, email, headline, bio, location, phone\n- avatarUrl, coverUrl\n- socialLinks: website, linkedin, twitter, github\n- skills: Array of skill strings\n- stats: coursesCompleted, applicationsSubmitted, mentorshipSessions"
+              }
+            },
+            {
+              "name": "Update Profile",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"fullName\": \"John Doe\",\n  \"headline\": \"Senior Software Engineer\",\n  \"bio\": \"Experienced developer with 10+ years in software engineering\",\n  \"location\": \"San Francisco, CA\",\n  \"phone\": \"+1234567890\",\n  \"socialLinks\": {\n    \"website\": \"https://johndoe.com\",\n    \"linkedin\": \"https://linkedin.com/in/johndoe\",\n    \"twitter\": \"https://twitter.com/johndoe\",\n    \"github\": \"https://github.com/johndoe\"\n  },\n  \"skills\": [\"JavaScript\", \"TypeScript\", \"React\", \"Node.js\"]\n}"
+                },
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/user/profile",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "user", "profile"]
+                },
+                "description": "Update user's personal information. All fields are optional - only provided fields will be updated.\n\n**Request Body:**\n- fullName: Optional - Full name\n- headline: Optional - Professional headline\n- bio: Optional - Biography\n- location: Optional - Location\n- phone: Optional - Phone number\n- socialLinks: Optional - Object with website, linkedin, twitter, github\n- skills: Optional - Array of skill strings"
+              }
+            },
+            {
+              "name": "Upload Avatar",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": []
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/user/profile/avatar",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "user", "profile", "avatar"]
+                },
+                "description": "Upload a new profile picture. Accepts image files (jpg, jpeg, png, gif, webp) up to 5MB.\n\n**Returns:**\n- url: URL of the uploaded avatar image"
+              }
+            },
+            {
+              "name": "Upload Cover Image",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": []
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/user/profile/cover",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "user", "profile", "cover"]
+                },
+                "description": "Upload a new cover background image. Accepts image files (jpg, jpeg, png, gif, webp) up to 10MB.\n\n**Returns:**\n- url: URL of the uploaded cover image"
+              }
+            },
+            {
+              "name": "Get Activity",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/user/activity?limit=50",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "user", "activity"],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "50",
+                      "description": "Maximum number of activities to return (default: 50)"
+                    }
+                  ]
+                },
+                "description": "Get recent user activities including course enrollments, bookings, profile updates, etc.\n\n**Query Parameters:**\n- limit: Optional - Maximum number of activities (default: 50)\n\n**Returns:**\n- List of activity items\n- Each item includes: id, type, title, description, relatedEntityId, relatedEntityType, activityDate\n- Total count"
+              }
+            },
+            {
+              "name": "Update Settings",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"emailNotifications\": true,\n  \"pushNotifications\": true,\n  \"bookingNotifications\": true,\n  \"courseNotifications\": true,\n  \"marketingEmails\": false,\n  \"theme\": \"dark\",\n  \"language\": \"en\",\n  \"profileVisible\": true,\n  \"showEmail\": false,\n  \"showPhone\": false\n}"
+                },
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/user/settings",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "user", "settings"]
+                },
+                "description": "Update user interaction preferences including notifications and theme settings. All fields are optional.\n\n**Request Body:**\n- emailNotifications: Optional - Enable email notifications\n- pushNotifications: Optional - Enable push notifications\n- bookingNotifications: Optional - Enable booking notifications\n- courseNotifications: Optional - Enable course notifications\n- marketingEmails: Optional - Enable marketing emails\n- theme: Optional - 'light', 'dark', or 'system'\n- language: Optional - Language code (e.g., 'en', 'es')\n- profileVisible: Optional - Make profile visible to others\n- showEmail: Optional - Show email on profile\n- showPhone: Optional - Show phone on profile"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Transactions",
+          "item": [
+            {
+              "name": "Get Transactions",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/transactions?page=1&limit=20",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "transactions"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "description": "Page number (default: 1)"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20",
+                      "description": "Items per page (default: 20, max: 100)"
+                    }
+                  ]
+                },
+                "description": "Get paginated list of transactions for the authenticated user.\n\n**Query Parameters:**\n- page: Page number (default: 1)\n- limit: Items per page (default: 20, max: 100)\n\n**Returns:**\n- List of transaction items\n- Each item includes: id, amount, currency, status, date, description, paymentMethodId, receiptUrl, bookingId\n- Total count, page, limit"
+              }
+            },
+            {
+              "name": "Get Transaction Details",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/transactions/{{transactionId}}",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "transactions", "{{transactionId}}"]
+                },
+                "description": "Get detailed information about a specific transaction.\n\n**Returns:**\n- id, paymentIntentId, amount, currency, status\n- createdDate, updatedAt\n- description, paymentMethodId, receiptUrl, bookingId\n- userId"
               }
             }
           ]
@@ -1452,6 +1823,121 @@
                   "path": ["api", "v1", "admin", "settings"]
                 },
                 "description": "Update admin settings. Currently supports platform fee percentage. Requires authentication.\n\n**Request Body:**\n- platformFee: Optional - Platform fee percentage (0-100)\n\n**Validation:**\n- Platform fee must be between 0 and 100\n\n**Returns:**\n- Updated settings object\n\n**Note:** Currently uses in-memory storage. Should be migrated to database for production."
+              }
+            },
+            {
+              "name": "Get Payouts",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/admin/payouts?status=pending",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "admin", "payouts"],
+                  "query": [
+                    {
+                      "key": "status",
+                      "value": "pending",
+                      "description": "Filter by status: pending, processing, completed, failed (default: pending)"
+                    }
+                  ]
+                },
+                "description": "Get list of payouts grouped by coach. Returns pending payouts by default, but can be filtered by status.\n\n**Query Parameters:**\n- status: Optional - Filter by status (pending, processing, completed, failed). Default: pending\n\n**Returns:**\n- List of payout items\n- Each item includes: payoutId, coachId, coachName, coachEmail, amount, platformFeeAmount, netAmount, currency, periodStart, periodEnd, requestedAt, status\n- Total count\n\n**Note:** Requires admin role (currently allows any authenticated user - TODO: add role check)"
+              }
+            },
+            {
+              "name": "Approve Payout",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/admin/payouts/{{payoutId}}/approve",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "admin", "payouts", "{{payoutId}}", "approve"]
+                },
+                "description": "Approve a payout for processing. Changes status from 'pending' to 'processing' and records approval information.\n\n**Returns:**\n- payoutId, status, approvedBy, approvedAt\n\n**Note:**\n- Only pending payouts can be approved\n- Requires admin role (currently allows any authenticated user - TODO: add role check)\n- TODO: Trigger actual payout processing (Stripe transfer, bank transfer, etc.)"
+              }
+            },
+            {
+              "name": "Reject Payout",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"Insufficient documentation provided\"\n}"
+                },
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/admin/payouts/{{payoutId}}/reject",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "admin", "payouts", "{{payoutId}}", "reject"]
+                },
+                "description": "Reject a payout with a reason. Changes status from 'pending' to 'failed' and records rejection information.\n\n**Request Body:**\n- reason: Required - Reason for rejection (max 500 characters)\n\n**Returns:**\n- payoutId, status, rejectedBy, rejectedAt, reason\n\n**Note:**\n- Only pending payouts can be rejected\n- Reason is required\n- Requires admin role (currently allows any authenticated user - TODO: add role check)"
+              }
+            },
+            {
+              "name": "Get Commission Stats",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/admin/commission-stats?startDate=2024-01-01&endDate=2024-12-31",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "admin", "commission-stats"],
+                  "query": [
+                    {
+                      "key": "startDate",
+                      "value": "2024-01-01",
+                      "description": "Start date for commission period (ISO 8601 format)"
+                    },
+                    {
+                      "key": "endDate",
+                      "value": "2024-12-31",
+                      "description": "End date for commission period (ISO 8601 format)"
+                    }
+                  ]
+                },
+                "description": "Get platform commission statistics over a time period. Returns total commission earned and breakdown by period.\n\n**Query Parameters:**\n- startDate: Optional - Start date (default: 1 month ago)\n- endDate: Optional - End date (default: now)\n\n**Returns:**\n- totalCommission: Total platform commission earned\n- totalPayouts: Total number of payouts\n- periodStart, periodEnd: Date range\n- currency: Currency code\n- byPeriod: Monthly breakdown with commission and payout count\n\n**Note:** Requires admin role (currently allows any authenticated user - TODO: add role check)"
               }
             }
           ]
@@ -5720,6 +6206,16 @@
       "key": "universityId3",
       "value": "your-university-id-3-here",
       "description": "Third university ID for comparison testing"
+    },
+    {
+      "key": "transactionId",
+      "value": "your-transaction-id-here",
+      "description": "Replace with actual transaction ID for testing (returned from transactions endpoint)"
+    },
+    {
+      "key": "payoutId",
+      "value": "your-payout-id-here",
+      "description": "Replace with actual payout ID for testing (returned from admin payouts endpoint)"
     }
   ]
 }

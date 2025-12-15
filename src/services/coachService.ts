@@ -244,14 +244,41 @@ export async function getCoachBankAccount(): Promise<{ data: BankAccount }> {
   return response.json();
 }
 
-export async function linkCoachBankAccount(): Promise<{
-  onboardingUrl: string;
+export async function linkCoachBankAccount(data?: {
+  accountNumber?: string;
+  routingNumber?: string;
+  accountHolderName?: string;
+  bankName?: string;
+  accountType?: "checking" | "savings";
+  provider?: "stripe" | "manual";
+}): Promise<{
+  onboardingUrl?: string;
+  success?: boolean;
+  message?: string;
+  accountId?: string;
+  status?: string;
 }> {
+  // Default to Stripe Connect with minimal required fields
+  const requestBody = {
+    provider: data?.provider || "stripe",
+    accountType: data?.accountType || "checking",
+    accountHolderName: data?.accountHolderName || "",
+    bankName: data?.bankName || "",
+    ...(data?.accountNumber && { accountNumber: data.accountNumber }),
+    ...(data?.routingNumber && { routingNumber: data.routingNumber }),
+  };
+
   const response = await fetch(`${API_BASE_URL}/api/v1/coach/me/bank-account`, {
     method: "POST",
     headers: getHeaders(),
+    body: JSON.stringify(requestBody),
   });
-  if (!response.ok) throw new Error("Failed to initiate bank account linking");
+  
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: "Failed to initiate bank account linking" }));
+    throw new Error(error.message || "Failed to initiate bank account linking");
+  }
+  
   return response.json();
 }
 
@@ -596,4 +623,69 @@ export async function getCoachStudentDetails(studentId: string): Promise<any> {
   if (!response.ok) throw new Error("Failed to fetch student details");
   const json = await response.json();
   return json.data;
+}
+
+// --- Earnings & Payout APIs ---
+
+export interface CoachEarningsStats {
+  totalEarnings: number;
+  pendingPayout: number;
+  lastPayoutAmount: number;
+  lastPayoutDate: string;
+}
+
+export interface EarningsHistoryItem {
+  date: string;
+  description: string;
+  amountGross: number;
+  platformFee: number;
+  amountNet: number;
+  status: 'completed' | 'pending' | 'cancelled';
+}
+
+export interface PayoutSettings {
+  frequency: 'biweekly' | 'monthly';
+  method: 'stripe' | 'bank_transfer';
+}
+
+export async function getCoachEarnings(): Promise<CoachEarningsStats> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/coach/me/earnings`, {
+    headers: getHeaders(),
+  });
+
+  if (!response.ok) throw new Error("Failed to fetch earnings");
+  const json = await response.json();
+  return json.data || json;
+}
+
+export async function getCoachEarningsHistory(): Promise<EarningsHistoryItem[]> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/coach/me/earnings/history`, {
+    headers: getHeaders(),
+  });
+
+  if (!response.ok) throw new Error("Failed to fetch earnings history");
+  const json = await response.json();
+  return json.data || json;
+}
+
+export async function getCoachPayoutSettings(): Promise<PayoutSettings> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/coach/me/payout-settings`, {
+    headers: getHeaders(),
+  });
+
+  if (!response.ok) throw new Error("Failed to fetch payout settings");
+  const json = await response.json();
+  return json.data || json;
+}
+
+export async function updateCoachPayoutSettings(settings: Partial<PayoutSettings>): Promise<PayoutSettings> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/coach/me/payout-settings`, {
+    method: "PUT",
+    headers: getHeaders(),
+    body: JSON.stringify(settings),
+  });
+
+  if (!response.ok) throw new Error("Failed to update payout settings");
+  const json = await response.json();
+  return json.data || json;
 }

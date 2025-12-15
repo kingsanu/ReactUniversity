@@ -1,7 +1,7 @@
 "use client";
 
-import { AdminLayout } from "./_components/AdminLayout";
-
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return <AdminLayout>{children}</AdminLayout>;
+  // The main DashboardLayout already handles the sidebar based on user role (Admin/Coach/Student).
+  // So we just render the children here to avoid double sidebars.
+  return <>{children}</>;
 }

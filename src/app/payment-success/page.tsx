@@ -49,7 +49,7 @@ export default function PaymentSuccess() {
     
     // Better: Check description or amount to differentiate
     if (paymentDetails?.description?.toLowerCase().includes("coaching session")) {
-        router.push("/dashboard/coaching?tab=sessions");
+        router.push("/dashboard/my-sessions");
         return;
     }
     
@@ -92,7 +92,9 @@ export default function PaymentSuccess() {
               Payment Successful! 🎉
             </h2>
             <p className="text-gray-600 mb-6">
-              Thank you for your payment. Your subscription is now active.
+              {paymentDetails?.description?.toLowerCase().includes("coaching session") 
+                ? "Thank you for your payment. Your coaching session has been booked."
+                : "Thank you for your payment. Your subscription is now active."}
             </p>
 
             {paymentDetails && (
@@ -124,7 +126,9 @@ export default function PaymentSuccess() {
               onClick={handleContinue}
               className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
             >
-              Continue to Dashboard
+              {paymentDetails?.description?.toLowerCase().includes("coaching session") 
+                ? "View My Sessions"
+                : "Continue to Dashboard"}
             </button>
           </div>
         )}
@@ -154,7 +158,9 @@ export default function PaymentSuccess() {
             </p>
             <div className="space-y-3">
               <Link
-                href="/dashboard/subscriptions"
+                href={paymentDetails?.description?.toLowerCase().includes("coaching session") 
+                  ? "/dashboard/my-sessions" 
+                  : "/dashboard/subscriptions"}
                 className="block w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-center"
               >
                 Try Again

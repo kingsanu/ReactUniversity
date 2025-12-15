@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAdminAccess } from "@/hooks/useAdminAccess";
@@ -12,17 +13,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, MoreHorizontal, UserCheck, UserX, Mail, Filter } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Search, Filter, Download, CreditCard, Receipt } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { getAdminUsers, AdminUser } from "@/services/adminService";
+import { getAdminTransactions, AdminTransaction } from "@/services/adminService";
 import { toast } from "sonner";
 import {
   Select,
@@ -32,14 +25,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export default function AdminUsersPage() {
+export default function AdminTransactionsPage() {
   const router = useRouter();
   const { isAdmin, loading: authLoading } = useAdminAccess();
 
-  const [users, setUsers] = useState<AdminUser[]>([]);
+  const [transactions, setTransactions] = useState<AdminTransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -52,36 +44,35 @@ export default function AdminUsersPage() {
         router.push("/dashboard");
         return;
       }
-      fetchUsers();
+      fetchTransactions();
     }
-  }, [isAdmin, authLoading, router, page, roleFilter, statusFilter]);
+  }, [isAdmin, authLoading, router, page, statusFilter]);
 
   // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!authLoading && isAdmin) {
         setPage(1); // Reset to page 1 on search
-        fetchUsers();
+        fetchTransactions();
       }
     }, 500);
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  const fetchUsers = async () => {
+  const fetchTransactions = async () => {
     setLoading(true);
     try {
-      const response = await getAdminUsers({
+      const response = await getAdminTransactions({
         page,
         limit: 20,
         search: searchTerm,
-        role: roleFilter,
         status: statusFilter,
       });
-      setUsers(response.items);
+      setTransactions(response.items);
       setTotalPages(Math.ceil(response.total / response.limit));
     } catch (error) {
-      console.error("Failed to fetch users:", error);
-      toast.error("Failed to load users");
+      console.error("Failed to fetch transactions:", error);
+      toast.error("Failed to load transactions");
     } finally {
       setLoading(false);
     }
@@ -104,9 +95,9 @@ export default function AdminUsersPage() {
     <div className="p-4 md:p-6">
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Users</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Transactions</h1>
           <p className="text-muted-foreground">
-            Manage user accounts and permissions
+            Monitor all system transactions and payments
           </p>
         </div>
 
@@ -115,48 +106,42 @@ export default function AdminUsersPage() {
             <div className="relative w-full md:w-72">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search users..."
+                placeholder="Search transactions..."
                 className="pl-8"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Select value={roleFilter} onValueChange={setRoleFilter}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Role" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Roles</SelectItem>
-                <SelectItem value="student">Student</SelectItem>
-                <SelectItem value="coach">Coach</SelectItem>
-                <SelectItem value="admin">Admin</SelectItem>
-              </SelectContent>
-            </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-[140px]">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="failed">Failed</SelectItem>
+                <SelectItem value="refunded">Refunded</SelectItem>
               </SelectContent>
             </Select>
           </div>
-          <Button>Add User</Button>
+          <Button variant="outline" className="gap-2">
+            <Download className="w-4 h-4" />
+            Export Report
+          </Button>
         </div>
 
         <div className="border rounded-lg bg-white">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Role</TableHead>
+                <TableHead>ID</TableHead>
+                <TableHead>User</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead>Amount</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Subscription</TableHead>
-                <TableHead>Joined</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Method</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -168,64 +153,50 @@ export default function AdminUsersPage() {
                     </div>
                   </TableCell>
                 </TableRow>
-              ) : users.length === 0 ? (
+              ) : transactions.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-10 text-gray-500">
-                    No users found matching your criteria.
+                    No transactions found.
                   </TableCell>
                 </TableRow>
               ) : (
-                users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell className="font-medium">{user.name}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell className="capitalize">{user.role}</TableCell>
+                transactions.map((trx) => (
+                  <TableRow key={trx.id}>
+                    <TableCell className="font-medium text-xs">{trx.id}</TableCell>
+                    <TableCell>
+                      <div className="flex flex-col">
+                        <span className="font-medium">{trx.userName}</span>
+                        <span className="text-xs text-gray-500">ID: {trx.userId}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>{trx.description}</TableCell>
+                    <TableCell className="font-bold">
+                      {trx.currency} {trx.amount.toFixed(2)}
+                    </TableCell>
                     <TableCell>
                       <Badge
-                        variant={user.status === "active" ? "default" : "secondary"}
-                        className={user.status === "active" ? "bg-green-100 text-green-800 hover:bg-green-200" : ""}
+                        variant={
+                          trx.status === "completed"
+                            ? "default"
+                            : trx.status === "pending"
+                            ? "secondary"
+                            : "destructive"
+                        }
+                        className={
+                          trx.status === "completed"
+                            ? "bg-green-100 text-green-800 hover:bg-green-200"
+                            : trx.status === "pending"
+                            ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+                            : ""
+                        }
                       >
-                        {user.status}
+                        {trx.status}
                       </Badge>
                     </TableCell>
-                    <TableCell>
-                      {user.subscriptionStatus ? (
-                        <Badge variant="outline" className="capitalize">
-                          {user.subscriptionStatus}
-                        </Badge>
-                      ) : (
-                        <span className="text-gray-400 text-sm">-</span>
-                      )}
-                    </TableCell>
-                    <TableCell>{new Date(user.joinedDate).toLocaleDateString()}</TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              navigator.clipboard.writeText(user.email);
-                              toast.success("Email copied to clipboard");
-                            }}
-                          >
-                            <Mail className="mr-2 h-4 w-4" />
-                            Copy Email
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem>View Profile</DropdownMenuItem>
-                          <DropdownMenuItem>Edit Details</DropdownMenuItem>
-                          <DropdownMenuItem className="text-red-600">
-                            <UserX className="mr-2 h-4 w-4" />
-                            Deactivate User
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                    <TableCell>{new Date(trx.date).toLocaleDateString()}</TableCell>
+                    <TableCell className="text-gray-500 flex items-center gap-2">
+                        {trx.method && (trx.method.includes("Visa") || trx.method.includes("Mastercard")) ? <CreditCard className="w-3 h-3" /> : <Receipt className="w-3 h-3" />}
+                        {trx.method || 'N/A'}
                     </TableCell>
                   </TableRow>
                 ))

@@ -114,6 +114,7 @@ interface GlobalState {
     image?: string | null;
     avatar?: string | null;
     contractEnd?: string | null;
+    subscriptionStatus?: "active" | "past_due" | "canceled" | "none" | null;
     isAuthenticated: boolean;
   };
   setUser: (user: Partial<GlobalState["user"]>) => void;

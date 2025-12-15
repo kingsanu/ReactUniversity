@@ -233,6 +233,12 @@ export const sidebarData = {
       ],
     },
     {
+      id: "transactions",
+      name: "Transactions",
+      icon: "transactions",
+      path: "/dashboard/transactions",
+    },
+    {
       id: "subscriptions",
       name: "dashboard.subscriptions",
       icon: "subscriptions",
@@ -255,16 +261,34 @@ export const coachSidebarData = {
       path: "/dashboard",
     },
     {
+      id: "coaching-dashboard",
+      name: "Coaching Dashboard",
+      icon: "dashboard",
+      path: "/dashboard/coaching/dashboard",
+    },
+    {
       id: "sessions",
       name: "Sessions",
       icon: "opportunities",
       path: "/dashboard/coaching/sessions",
     },
     {
+      id: "schedule",
+      name: "Schedule",
+      icon: "calendar",
+      path: "/dashboard/coaching/schedule",
+    },
+    {
       id: "analytics",
       name: "Analytics",
       icon: "analytics",
       path: "/dashboard/coaching/analytics",
+    },
+    {
+      id: "earnings",
+      name: "Earnings",
+      icon: "subscriptions",
+      path: "/dashboard/coaching/earnings",
     },
     {
       id: "settings",
@@ -277,6 +301,82 @@ export const coachSidebarData = {
       name: "Profile",
       icon: "career",
       path: "/dashboard/coaching/profile",
+    },
+  ],
+};
+
+export const adminSidebarData = {
+  logo: {
+    icon: "V",
+    text: "UNIV.365",
+  },
+
+  navigation: [
+    {
+      id: "dashboard",
+      name: "Dashboard",
+      icon: "dashboard",
+      path: "/dashboard/admin",
+    },
+    {
+      id: "analytics",
+      name: "Analytics",
+      icon: "analytics",
+      path: "/dashboard/admin/analytics",
+    },
+    {
+      id: "users",
+      name: "Users",
+      icon: "people",
+      path: "/dashboard/admin/users",
+    },
+    {
+      id: "coaches",
+      name: "Coaches",
+      icon: "opportunities",
+      path: "/dashboard/admin/coaches",
+    },
+    {
+      id: "courses",
+      name: "Courses",
+      icon: "learning",
+      path: "/dashboard/admin/courses",
+    },
+    {
+      id: "careers",
+      name: "Careers",
+      icon: "career",
+      path: "/dashboard/admin/careers",
+    },
+    {
+      id: "questions",
+      name: "Questions",
+      icon: "assessments",
+      path: "/dashboard/admin/questions",
+    },
+    {
+      id: "plans",
+      name: "Plans",
+      icon: "subscriptions",
+      path: "/dashboard/admin/plans",
+    },
+    {
+      id: "transactions",
+      name: "Transactions",
+      icon: "subscriptions",
+      path: "/dashboard/admin/transactions",
+    },
+    {
+      id: "payouts",
+      name: "Payouts",
+      icon: "subscriptions",
+      path: "/dashboard/admin/payouts",
+    },
+    {
+      id: "settings",
+      name: "Settings",
+      icon: "settings",
+      path: "/dashboard/admin/settings",
     },
   ],
 };

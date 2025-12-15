@@ -2,11 +2,42 @@
 import { decodeJWTToken, isAdminRole, isSuperAdminRole } from "./authService";
 import { getRoleById } from "./roleService";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+// Helper to get token
+const getToken = () => localStorage.getItem("token");
+
+// Helper for headers
+const getHeaders = () => ({
+  Authorization: `Bearer ${getToken()}`,
+  "Content-Type": "application/json",
+});
+
 interface AdminVerificationResponse {
   isAdmin: boolean;
   isSuperAdmin: boolean;
   role: string;
   permissions: string[];
+}
+
+export interface AdminPayoutItem {
+  payoutId: string;
+  coachId: string;
+  coachName: string;
+  amount: number;
+  periodStart: string;
+  periodEnd: string;
+  status: 'pending' | 'approved' | 'rejected' | 'paid';
+}
+
+export interface CommissionStats {
+  totalCommission: number;
+  periodStart: string;
+  periodEnd: string;
+  breakdown: {
+    monthly: number;
+    yearly: number;
+  };
 }
 
 export async function verifyAdminAccess(): Promise<AdminVerificationResponse> {
@@ -171,6 +202,259 @@ export function setTestAdminRole(role: "user" | "admin" | "super_admin") {
   console.log(`Test role set to: ${role}`);
   console.log(`Token updated to: ${adminToken}`);
   console.log(`User data: ${JSON.stringify(userData)}`);
+}
+
+// --- Admin Payout APIs ---
+
+export async function getAdminPayouts(status?: 'pending' | 'approved' | 'rejected' | 'paid'): Promise<AdminPayoutItem[]> {
+  const query = status ? `?status=${status}` : '';
+
+  const response = await fetch(`${API_BASE_URL}/api/v1/admin/payouts${query}`, {
+    headers: getHeaders(),
+  });
+
+  if (!response.ok) throw new Error("Failed to fetch payouts");
+  const json = await response.json();
+  return json.data || json;
+}
+
+export async function approvePayout(payoutId: string): Promise<{ success: boolean; message: string }> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/admin/payouts/${payoutId}/approve`, {
+    method: "POST",
+    headers: getHeaders(),
+  });
+
+  if (!response.ok) throw new Error("Failed to approve payout");
+  const json = await response.json();
+  return json.data || json;
+}
+
+export async function rejectPayout(payoutId: string, reason?: string): Promise<{ success: boolean; message: string }> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/admin/payouts/${payoutId}/reject`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify({ reason }),
+  });
+
+  if (!response.ok) throw new Error("Failed to reject payout");
+  const json = await response.json();
+  return json.data || json;
+}
+
+export async function getCommissionStats(): Promise<CommissionStats> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/admin/commission-stats`, {
+    headers: getHeaders(),
+  });
+
+  if (!response.ok) throw new Error("Failed to fetch commission stats");
+  const json = await response.json();
+  return json.data || json;
+}
+
+// --- User Management ---
+
+export interface AdminUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  status: 'active' | 'inactive';
+  joinedDate: string;
+  subscriptionStatus?: string;
+}
+
+export interface AdminUsersResponse {
+  items: AdminUser[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export async function getAdminUsers(params: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  role?: string;
+  status?: string;
+}): Promise<AdminUsersResponse> {
+  const queryParams = new URLSearchParams();
+  if (params.page) queryParams.append("page", params.page.toString());
+  if (params.limit) queryParams.append("limit", params.limit.toString());
+  if (params.search) queryParams.append("search", params.search);
+  if (params.role && params.role !== "all") queryParams.append("role", params.role);
+  if (params.status && params.status !== "all") queryParams.append("status", params.status);
+
+  const response = await fetch(`${API_BASE_URL}/api/admin/users?${queryParams}`, {
+    headers: getHeaders(),
+  });
+
+  if (!response.ok) throw new Error("Failed to fetch users");
+  const json = await response.json();
+  return json.data || json;
+}
+
+// --- Transaction Management ---
+
+export interface AdminTransaction {
+  id: string;
+  userId: string;
+  userName: string;
+  amount: number;
+  currency: string;
+  status: 'pending' | 'completed' | 'failed' | 'refunded';
+  date: string;
+  description: string;
+  method?: string;
+}
+
+export interface AdminTransactionsResponse {
+  items: AdminTransaction[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export async function getAdminTransactions(params: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: string;
+}): Promise<AdminTransactionsResponse> {
+  const queryParams = new URLSearchParams();
+  if (params.page) queryParams.append("page", params.page.toString());
+  if (params.limit) queryParams.append("limit", params.limit.toString());
+  if (params.search) queryParams.append("search", params.search);
+  if (params.status && params.status !== "all") queryParams.append("status", params.status);
+
+  const response = await fetch(`${API_BASE_URL}/api/admin/transactions?${queryParams}`, {
+    headers: getHeaders(),
+  });
+
+  if (!response.ok) throw new Error("Failed to fetch transactions");
+  const json = await response.json();
+  return json.data || json;
+}
+
+// --- Admin Analytics ---
+
+export interface PlatformStats {
+  totalUsers: number;
+  totalRevenue: number;
+  activeCourses: number;
+  growthRate: number;
+  monthlyGrowth: {
+    users: number;
+    revenue: number;
+    courses: number;
+  };
+}
+
+export interface RevenueData {
+  month: string;
+  revenue: number;
+  transactions: number;
+}
+
+export interface UserGrowthData {
+  month: string;
+  users: number;
+  newUsers: number;
+}
+
+export interface TopCoach {
+  id: string;
+  name: string;
+  earnings: number;
+  sessions: number;
+  rating: number;
+}
+
+export interface TopCourse {
+  id: string;
+  title: string;
+  enrollments: number;
+  revenue: number;
+  rating: number;
+}
+
+export interface AdminAnalytics {
+  stats: PlatformStats;
+  revenueData: RevenueData[];
+  userGrowthData: UserGrowthData[];
+  topCoaches: TopCoach[];
+  topCourses: TopCourse[];
+  recentActivity: {
+    type: 'user' | 'transaction' | 'course' | 'session';
+    message: string;
+    timestamp: string;
+  }[];
+}
+
+export async function getAdminAnalytics(period: 'week' | 'month' | 'year' = 'month'): Promise<AdminAnalytics> {
+  const response = await fetch(`${API_BASE_URL}/api/admin/analytics?period=${period}`, {
+    headers: getHeaders(),
+  });
+
+  if (!response.ok) {
+    // Return mock data if endpoint doesn't exist yet
+    return getMockAdminAnalytics();
+  }
+  
+  const json = await response.json();
+  return json.data || json;
+}
+
+function getMockAdminAnalytics(): AdminAnalytics {
+  return {
+    stats: {
+      totalUsers: 1234,
+      totalRevenue: 45231.89,
+      activeCourses: 12,
+      growthRate: 12.5,
+      monthlyGrowth: {
+        users: 20.1,
+        revenue: 15,
+        courses: 16.7,
+      },
+    },
+    revenueData: [
+      { month: 'Jan', revenue: 2400, transactions: 24 },
+      { month: 'Feb', revenue: 1398, transactions: 18 },
+      { month: 'Mar', revenue: 9800, transactions: 52 },
+      { month: 'Apr', revenue: 3908, transactions: 31 },
+      { month: 'May', revenue: 4800, transactions: 38 },
+      { month: 'Jun', revenue: 3800, transactions: 29 },
+    ],
+    userGrowthData: [
+      { month: 'Jan', users: 400, newUsers: 45 },
+      { month: 'Feb', users: 300, newUsers: 38 },
+      { month: 'Mar', users: 200, newUsers: 52 },
+      { month: 'Apr', users: 278, newUsers: 41 },
+      { month: 'May', users: 189, newUsers: 35 },
+      { month: 'Jun', users: 239, newUsers: 48 },
+    ],
+    topCoaches: [
+      { id: '1', name: 'Dr. Sarah Johnson', earnings: 12500, sessions: 48, rating: 4.9 },
+      { id: '2', name: 'Prof. Michael Chen', earnings: 10800, sessions: 42, rating: 4.8 },
+      { id: '3', name: 'Dr. Emily Rodriguez', earnings: 9600, sessions: 38, rating: 4.9 },
+      { id: '4', name: 'Prof. David Kim', earnings: 8400, sessions: 35, rating: 4.7 },
+      { id: '5', name: 'Dr. Lisa Anderson', earnings: 7800, sessions: 32, rating: 4.8 },
+    ],
+    topCourses: [
+      { id: '1', title: 'Advanced Web Development', enrollments: 245, revenue: 12250, rating: 4.8 },
+      { id: '2', title: 'Data Science Fundamentals', enrollments: 198, revenue: 9900, rating: 4.7 },
+      { id: '3', title: 'Machine Learning', enrollments: 156, revenue: 7800, rating: 4.9 },
+      { id: '4', title: 'Cloud Architecture', enrollments: 142, revenue: 7100, rating: 4.6 },
+      { id: '5', title: 'UX Design Principles', enrollments: 128, revenue: 6400, rating: 4.8 },
+    ],
+    recentActivity: [
+      { type: 'user', message: 'New user registered: John Doe', timestamp: new Date(Date.now() - 5 * 60000).toISOString() },
+      { type: 'transaction', message: 'Payment completed: $299.99', timestamp: new Date(Date.now() - 15 * 60000).toISOString() },
+      { type: 'course', message: 'New course published: React Mastery', timestamp: new Date(Date.now() - 30 * 60000).toISOString() },
+      { type: 'session', message: 'Coaching session completed', timestamp: new Date(Date.now() - 45 * 60000).toISOString() },
+      { type: 'user', message: 'User upgraded to premium', timestamp: new Date(Date.now() - 60 * 60000).toISOString() },
+    ],
+  };
 }
 
 // Debug function to check current admin status

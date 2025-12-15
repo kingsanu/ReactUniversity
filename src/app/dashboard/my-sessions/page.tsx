@@ -19,8 +19,7 @@ import {
   Users,
   ArrowRight,
   Star,
-  MoreHorizontal,
-  AlertCircle
+  MoreHorizontal
 } from "lucide-react";
 import { format } from "date-fns";
 import { motion, AnimatePresence } from "motion/react";
@@ -41,6 +40,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+import { BookingModal } from "@/components/coaching/BookingModal";
 import { useGlobalStore } from "@/store/useGlobalStore";
 
 interface Session {
@@ -70,13 +70,14 @@ export default function MySessionsPage() {
   // Dialog States
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [rescheduleDialogOpen, setRescheduleDialogOpen] = useState(false);
+  const [bookingModalOpen, setBookingModalOpen] = useState(false);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
+  const [rescheduleCoach, setRescheduleCoach] = useState<any>(null);
   
   // Form States
   const [cancelReason, setCancelReason] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [rescheduleDate, setRescheduleDate] = useState("");
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState("");
 
@@ -103,7 +104,7 @@ export default function MySessionsPage() {
 
         let date = "TBD";
         let time = "TBD";
-        let duration = "30 min";
+        let duration = "1 hour";
 
         if (startTime) {
           try {
@@ -150,10 +151,17 @@ export default function MySessionsPage() {
     setCancelDialogOpen(true);
   };
 
-  const handleRescheduleClick = (session: Session) => {
+  const handleRescheduleClick = async (session: Session) => {
     setSelectedSession(session);
-    setRescheduleDate("");
-    setRescheduleDialogOpen(true);
+    try {
+      const { getCoachDetails } = await import("@/services/coachService");
+      const coachData = await getCoachDetails(session.coachId);
+      setRescheduleCoach(coachData);
+      setBookingModalOpen(true);
+    } catch (error) {
+      console.error("Failed to fetch coach details:", error);
+      toast.error("Failed to load coach information");
+    }
   };
 
   const handleReviewClick = (session: Session) => {
@@ -189,38 +197,10 @@ export default function MySessionsPage() {
     }
   };
 
-  const confirmReschedule = async () => {
-    if (!selectedSession || !rescheduleDate) {
-      toast.error("Please select a new date and time");
-      return;
-    }
-
-    setIsProcessing(true);
-    try {
-      const { rescheduleSession } = await import("@/services/coachService");
-      
-      const start = new Date(rescheduleDate);
-      const end = new Date(start.getTime() + 60 * 60 * 1000); // Assume 1 hour for now
-
-      await rescheduleSession(selectedSession.id, {
-        start: start.toISOString(),
-        end: end.toISOString()
-      });
-
-      setSessions((prev) =>
-        prev.map((s) =>
-          s.id === selectedSession.id ? { ...s, status: "rescheduled", date: format(start, "EEE, MMM d, yyyy"), time: format(start, "h:mm a") } : s
-        )
-      );
-
-      toast.success("Reschedule request sent");
-      setRescheduleDialogOpen(false);
-    } catch (error) {
-      console.error("Reschedule error:", error);
-      toast.error("Failed to reschedule session");
-    } finally {
-      setIsProcessing(false);
-    }
+  const handleRescheduleSuccess = () => {
+    // Refresh sessions after reschedule
+    fetchSessions();
+    setBookingModalOpen(false);
   };
 
   const confirmReview = async () => {
@@ -512,38 +492,17 @@ export default function MySessionsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Reschedule Dialog */}
-      <Dialog open={rescheduleDialogOpen} onOpenChange={setRescheduleDialogOpen}>
-        <DialogContent className="sm:max-w-md rounded-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-xl">Reschedule Session</DialogTitle>
-            <DialogDescription className="text-gray-500">
-              Propose a new time for your session with <span className="font-medium text-gray-700">{selectedSession?.coachName}</span>.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4 space-y-4">
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700">New Date & Time</Label>
-              <Input 
-                type="datetime-local" 
-                value={rescheduleDate}
-                onChange={(e) => setRescheduleDate(e.target.value)}
-                className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
-              />
-              <p className="text-xs text-slate-500 flex items-center">
-                <AlertCircle className="h-3 w-3 mr-1" />
-                Subject to coach availability.
-              </p>
-            </div>
-          </div>
-          <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setRescheduleDialogOpen(false)} className="rounded-lg">Cancel</Button>
-            <Button onClick={confirmReschedule} disabled={isProcessing} className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg">
-              {isProcessing ? "Updating..." : "Confirm Reschedule"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Booking Modal for Rescheduling */}
+      <BookingModal
+        coach={rescheduleCoach}
+        isOpen={bookingModalOpen}
+        onClose={() => setBookingModalOpen(false)}
+        mode="reschedule"
+        bookingId={selectedSession?.id}
+        initialTopic={selectedSession?.topic || ''}
+        initialNotes={selectedSession?.notes || ''}
+        onRescheduleSuccess={handleRescheduleSuccess}
+      />
 
       {/* Review Dialog */}
       <Dialog open={reviewDialogOpen} onOpenChange={setReviewDialogOpen}>

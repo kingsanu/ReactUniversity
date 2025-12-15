@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { sidebarData, coachSidebarData } from "./data";
+import { sidebarData, coachSidebarData, adminSidebarData } from "./data";
 import { cn } from "@/lib/utils";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { useTranslation } from "react-i18next";
@@ -21,6 +21,7 @@ import {
   BookOpen,
   Target,
   Users,
+  Receipt,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -33,7 +34,9 @@ const IconMap: Record<string, any> = {
   learning: GraduationCap,
   assessments: FileText,
   subscriptions: CreditCard,
+  transactions: Receipt,
   sessions: Calendar,
+  calendar: Calendar,
   settings: Settings,
   people: Users,
   resources: BookOpen,
@@ -52,11 +55,17 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
   const pathname = usePathname();
   const { t } = useTranslation();
 
-  // Select sidebar data based on user role (case-insensitive)
-  const currentSidebarData =
-    user.role && user.role.toLowerCase() === "coach"
-      ? coachSidebarData
-      : sidebarData;
+  // Select sidebar data based on current path, then role
+  const role = user.role?.toLowerCase();
+  const isAdminRoute = pathname?.includes("/dashboard/admin");
+  
+  let currentSidebarData = sidebarData;
+  // Admin routes take priority - show admin sidebar only on /dashboard/admin/* pages
+  if (isAdminRoute) {
+    currentSidebarData = adminSidebarData;
+  } else if (role === "coach") {
+    currentSidebarData = coachSidebarData;
+  }
 
   const toggleExpanded = (itemId: string) => {
     setExpandedItems((prev) =>
