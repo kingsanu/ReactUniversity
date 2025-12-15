@@ -1,13 +1,18 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, Video, User, MoreHorizontal } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
@@ -23,34 +28,44 @@ export default function CoachSessionsPage() {
   const [rescheduleTime, setRescheduleTime] = useState("");
   const [cancelReason, setCancelReason] = useState("");
 
+  // Simple in-memory cache to avoid repeated parsing within same session
+  const SESSION_CACHE_KEY = "coach_sessions_all";
+  const CACHE_TTL = 1000 * 60 * 2; // 2 minutes
+
+  async function fetchWithRetry(fn: () => Promise<any>, retries = 2, delay = 300) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (retries <= 0) throw err;
+      await new Promise((r) => setTimeout(r, delay));
+      return fetchWithRetry(fn, retries - 1, delay * 2);
+    }
+  }
+
   const fetchSessions = async () => {
     try {
+      setIsLoading(true);
+
+      // Check cache
+      const cached = (globalThis as any).__sessionCache ??= new Map();
+      const entry = cached.get(SESSION_CACHE_KEY);
+      if (entry && Date.now() - entry.ts < CACHE_TTL) {
+        setSessions(entry.data);
+        return;
+      }
+
       const { getCoachSessions } = await import("@/services/coachService");
-      const rawResponse: any = await getCoachSessions("all");
-      const response: any = rawResponse;
-      // API may return { data: [] } or an array directly
-      // Handle multiple possible shapes:
-      // 1) { data: { data: [...] } }
-      // 2) { data: [...] }
-      // 3) [...] (array)
-      const sessionsData = Array.isArray(response?.data?.data)
-        ? response.data.data
-        : Array.isArray(response?.data)
-        ? response.data
-        : Array.isArray(response)
-        ? response
-        : [];
 
-      // Normalize items to ensure startTime is present
-      const normalized = sessionsData.map((s: any) => ({
-        ...s,
-        startTime: s.startTime || s.start || null,
-        endTime: s.endTime || s.end || null,
-      }));
+      const rawResponse: any = await fetchWithRetry(() => getCoachSessions("all"));
 
-      console.debug("🔍 Fetched sessions:", normalized);
+      const normalize = (await import("@/lib/normalizeSessions")).default;
+      const normalized = normalize(rawResponse);
+
+      console.debug("🔍 Fetched sessions (normalized):", normalized);
 
       setSessions(normalized);
+
+      cached.set(SESSION_CACHE_KEY, { ts: Date.now(), data: normalized });
     } catch (error) {
       console.error("Failed to fetch sessions:", error);
       toast.error("Failed to load sessions");
@@ -65,19 +80,15 @@ export default function CoachSessionsPage() {
 
   const now = Date.now();
 
-  // Upcoming: status is confirmed/rescheduled AND startTime is in future
-  const upcomingSessions = sessions.filter((s) => {
-    const isStatus = s.status === "confirmed" || s.status === "rescheduled";
-    const start = s.startTime ? new Date(s.startTime).getTime() : 0;
-    return isStatus && start > now;
-  });
+  const upcomingSessions = useMemo(() => {
+    const { isUpcoming } = require("@/lib/normalizeSessions");
+    return sessions.filter((s: any) => isUpcoming(s, now));
+  }, [sessions]);
 
-  // Past: completed or cancelled, OR confirmed/rescheduled with startTime in past
-  const pastSessions = sessions.filter((s) => {
-    if (s.status === "completed" || s.status === "cancelled") return true;
-    const start = s.startTime ? new Date(s.startTime).getTime() : Infinity;
-    return (s.status === "confirmed" || s.status === "rescheduled") && start <= now;
-  });
+  const pastSessions = useMemo(() => {
+    const { isPast } = require("@/lib/normalizeSessions");
+    return sessions.filter((s: any) => isPast(s, now));
+  }, [sessions]);
 
   const handleRescheduleClick = (session: any) => {
     setSelectedSession(session);
@@ -101,12 +112,16 @@ export default function CoachSessionsPage() {
     try {
       const { rescheduleSession } = await import("@/services/coachService");
       // Construct ISO string or required format
-      const start = new Date(`${rescheduleDate}T${rescheduleTime}`).toISOString();
+      const start = new Date(
+        `${rescheduleDate}T${rescheduleTime}`
+      ).toISOString();
       // Assuming 1 hour duration for now, or calculate based on original duration
-      const end = new Date(new Date(start).getTime() + 60 * 60 * 1000).toISOString();
+      const end = new Date(
+        new Date(start).getTime() + 60 * 60 * 1000
+      ).toISOString();
 
       await rescheduleSession(selectedSession.id, { start, end });
-      
+
       toast.success("Session rescheduled successfully");
       setIsRescheduleOpen(false);
       fetchSessions(); // Refresh list
@@ -121,8 +136,11 @@ export default function CoachSessionsPage() {
 
     try {
       const { cancelSession } = await import("@/services/coachService");
-      await cancelSession(selectedSession.id, cancelReason || "Cancelled by coach");
-      
+      await cancelSession(
+        selectedSession.id,
+        cancelReason || "Cancelled by coach"
+      );
+
       toast.success("Session cancelled successfully");
       setIsCancelOpen(false);
       fetchSessions(); // Refresh list
@@ -151,11 +169,20 @@ export default function CoachSessionsPage() {
               <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
                 <div className="flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
-                  <span>{session.date || new Date(session.startTime).toLocaleDateString()}</span>
+                  <span>
+                    {session.date ||
+                      new Date(session.startTime).toLocaleDateString()}
+                  </span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Clock className="h-4 w-4" />
-                  <span>{session.time || new Date(session.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                  <span>
+                    {session.time ||
+                      new Date(session.startTime).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                  </span>
                 </div>
               </div>
             </div>
@@ -192,7 +219,11 @@ export default function CoachSessionsPage() {
             )}
             {session.meetingLink && session.status === "confirmed" && (
               <Button size="sm" asChild>
-                <a href={session.meetingLink} target="_blank" rel="noopener noreferrer">
+                <a
+                  href={session.meetingLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <Video className="h-4 w-4 mr-2" />
                   Join
                 </a>
@@ -219,15 +250,21 @@ export default function CoachSessionsPage() {
             <TabsTrigger value="upcoming">
               Upcoming ({upcomingSessions.length})
             </TabsTrigger>
-            <TabsTrigger value="past">
-              Past ({pastSessions.length})
-            </TabsTrigger>
+            <TabsTrigger value="past">Past ({pastSessions.length})</TabsTrigger>
           </TabsList>
 
           <TabsContent value="upcoming" className="space-y-4 mt-6">
             {isLoading ? (
-              <div className="text-center py-12 text-gray-500">
-                Loading sessions...
+              <div className="grid gap-4">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <Card key={i} className="animate-pulse">
+                    <CardContent className="p-6">
+                      <div className="h-4 bg-gray-200 rounded w-1/3 mb-3"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             ) : upcomingSessions.length > 0 ? (
               upcomingSessions.map((session) => (
@@ -250,8 +287,16 @@ export default function CoachSessionsPage() {
 
           <TabsContent value="past" className="space-y-4 mt-6">
             {isLoading ? (
-              <div className="text-center py-12 text-gray-500">
-                Loading sessions...
+              <div className="grid gap-4">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <Card key={i} className="animate-pulse">
+                    <CardContent className="p-6">
+                      <div className="h-4 bg-gray-200 rounded w-1/3 mb-3"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             ) : pastSessions.length > 0 ? (
               pastSessions.map((session) => (
@@ -282,25 +327,22 @@ export default function CoachSessionsPage() {
             <div className="space-y-4 py-4">
               <div className="space-y-2">
                 <Label>New Date</Label>
-                <Input 
-                  type="date" 
+                <Input
+                  type="date"
                   value={rescheduleDate}
                   onChange={(e) => setRescheduleDate(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
                 <Label>New Time</Label>
-                <Input 
-                  type="time" 
+                <Input
+                  type="time"
                   value={rescheduleTime}
                   onChange={(e) => setRescheduleTime(e.target.value)}
                 />
               </div>
               <div className="flex gap-3 pt-4">
-                <Button
-                  onClick={confirmReschedule}
-                  className="flex-1"
-                >
+                <Button onClick={confirmReschedule} className="flex-1">
                   Confirm
                 </Button>
                 <Button
@@ -323,11 +365,12 @@ export default function CoachSessionsPage() {
             </DialogHeader>
             <div className="space-y-4 py-4">
               <p className="text-sm text-gray-500">
-                Are you sure you want to cancel this session? This action cannot be undone.
+                Are you sure you want to cancel this session? This action cannot
+                be undone.
               </p>
               <div className="space-y-2">
                 <Label>Reason (Optional)</Label>
-                <Input 
+                <Input
                   placeholder="e.g. Unexpected conflict"
                   value={cancelReason}
                   onChange={(e) => setCancelReason(e.target.value)}
