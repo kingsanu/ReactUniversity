@@ -161,12 +161,18 @@ export interface Payout {
 }
 
 export interface BankAccount {
-  id: string;
-  provider: string; // e.g., stripe
-  status: string; // connected, disconnected
+  id?: string;
+  provider?: string; // e.g., stripe
+  status?: string; // connected, disconnected
+  isConnected?: boolean; // Whether bank account is connected
+  requiresOnboarding?: boolean; // Whether Stripe onboarding is required
   onboardingUrl?: string; // if available
+  onboardingLink?: string; // Stripe Connect onboarding URL
   email?: string;
-  last4?: string;
+  last4?: string | null;
+  accountType?: string; // checking, savings
+  bankName?: string;
+  accountHolderName?: string;
 }
 
 export interface Notification {
