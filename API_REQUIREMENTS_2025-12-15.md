@@ -3,11 +3,13 @@
 This document outlines additional API endpoints required to fully support the Transaction Dashboard features (Statistics, Export, and Payment Method Management).
 
 ## 1. Transaction Statistics
-**Current Issue**: The frontend currently calculates "Total Spent" and "Invoice Count" based only on the *fetched* transactions (current page). This leads to inaccurate statistics if the user has more transactions than the page limit.
+
+**Current Issue**: The frontend currently calculates "Total Spent" and "Invoice Count" based only on the _fetched_ transactions (current page). This leads to inaccurate statistics if the user has more transactions than the page limit.
 
 **New Endpoint**: `GET /api/v1/transactions/stats`
 **Description**: Fetches aggregated statistics for the user's transaction history.
 **Response**:
+
 ```json
 {
   "totalSpent": 2404.99,
@@ -26,22 +28,26 @@ This document outlines additional API endpoints required to fully support the Tr
 ```
 
 ## 2. Transaction Export
-**Current Issue**: The "Export CSV" button currently generates a CSV from only the *loaded* data on the client side. This misses older transactions not currently in the view.
+
+**Current Issue**: The "Export CSV" button currently generates a CSV from only the _loaded_ data on the client side. This misses older transactions not currently in the view.
 
 **New Endpoint**: `GET /api/v1/transactions/export`
 **Description**: Generates and returns a downloadable export of the user's full transaction history.
 **Query Parameters**:
+
 - `format`: `csv` | `pdf` (default: `csv`)
 - `startDate`: ISO Date string (optional)
 - `endDate`: ISO Date string (optional)
-**Response**: Binary file stream (Content-Type: `text/csv` or `application/pdf`)
+  **Response**: Binary file stream (Content-Type: `text/csv` or `application/pdf`)
 
 ## 3. Payment Methods Management
+
 **Current Issue**: The "Manage Methods" button is a placeholder. Users need a way to view, add, and remove saved payment methods.
 
 **New Endpoint**: `GET /api/v1/user/payment-methods`
 **Description**: Lists all saved payment methods for the user.
 **Response**:
+
 ```json
 [
   {
@@ -59,6 +65,7 @@ This document outlines additional API endpoints required to fully support the Tr
 **New Endpoint**: `POST /api/v1/user/payment-methods`
 **Description**: Initiates the process to add a new payment method (e.g., returns a Stripe SetupIntent client secret).
 **Response**:
+
 ```json
 {
   "clientSecret": "seti_12345..."
@@ -72,15 +79,18 @@ This document outlines additional API endpoints required to fully support the Tr
 **Description**: Sets a specific payment method as the default for future charges.
 
 ## 4. Admin Management
+
 **New Endpoint**: `GET /api/admin/users`
 **Description**: Fetches a paginated list of all users with filtering capabilities.
 **Query Parameters**:
+
 - `page`: number
 - `limit`: number
 - `search`: string (name/email)
 - `role`: string (student/coach/admin)
 - `status`: string (active/inactive)
-**Response**:
+  **Response**:
+
 ```json
 {
   "items": [
@@ -103,14 +113,17 @@ This document outlines additional API endpoints required to fully support the Tr
 **New Endpoint**: `GET /api/admin/transactions`
 **Description**: Fetches a paginated list of all system transactions.
 **Query Parameters**:
+
 - `page`, `limit`, `search`
 - `status`: string
-**Response**: Similar to user transactions but includes `userId` and `userName`.
+  **Response**: Similar to user transactions but includes `userId` and `userName`.
 
 ## 5. Subscription Enforcement
+
 **New Endpoint**: `GET /api/v1/user/subscription/status`
 **Description**: Checks if the current user has an active subscription.
 **Response**:
+
 ```json
 {
   "hasActiveSubscription": boolean,
@@ -124,12 +137,15 @@ This document outlines additional API endpoints required to fully support the Tr
 **Description**: Creates a new subscription (integrates with Stripe).
 
 ## 6. Admin Analytics Dashboard
+
 **New Endpoint**: `GET /api/admin/analytics`
 **Description**: Fetches comprehensive platform analytics data for the admin dashboard. This endpoint provides aggregated statistics, trends, and insights across the entire platform.
 **Query Parameters**:
+
 - `period`: `week` | `month` | `year` (default: `month`) - The time period for analytics data
 
 **Response**:
+
 ```json
 {
   "stats": {
@@ -138,29 +154,29 @@ This document outlines additional API endpoints required to fully support the Tr
     "activeCourses": 12,
     "growthRate": 12.5,
     "monthlyGrowth": {
-      "users": 20.1,          // Percentage change from previous period
-      "revenue": 15.0,        // Percentage change from previous period
-      "courses": 16.7         // Percentage change from previous period
+      "users": 20.1, // Percentage change from previous period
+      "revenue": 15.0, // Percentage change from previous period
+      "courses": 16.7 // Percentage change from previous period
     }
   },
   "revenueData": [
     {
-      "month": "Jan",         // Or "Week 1", "Q1" depending on period
-      "revenue": 2400.00,
-      "transactions": 24      // Number of transactions in this period
+      "month": "Jan", // Or "Week 1", "Q1" depending on period
+      "revenue": 2400.0,
+      "transactions": 24 // Number of transactions in this period
     },
     {
       "month": "Feb",
-      "revenue": 1398.00,
+      "revenue": 1398.0,
       "transactions": 18
     }
     // ... more data points based on period
   ],
   "userGrowthData": [
     {
-      "month": "Jan",         // Or "Week 1", "Q1" depending on period
-      "users": 400,           // Total active users in this period
-      "newUsers": 45          // New user registrations in this period
+      "month": "Jan", // Or "Week 1", "Q1" depending on period
+      "users": 400, // Total active users in this period
+      "newUsers": 45 // New user registrations in this period
     },
     {
       "month": "Feb",
@@ -173,14 +189,14 @@ This document outlines additional API endpoints required to fully support the Tr
     {
       "id": "coach_123",
       "name": "Dr. Sarah Johnson",
-      "earnings": 12500.00,
-      "sessions": 48,         // Total completed sessions
-      "rating": 4.9           // Average rating from students
+      "earnings": 12500.0,
+      "sessions": 48, // Total completed sessions
+      "rating": 4.9 // Average rating from students
     },
     {
       "id": "coach_456",
       "name": "Prof. Michael Chen",
-      "earnings": 10800.00,
+      "earnings": 10800.0,
       "sessions": 42,
       "rating": 4.8
     }
@@ -190,22 +206,22 @@ This document outlines additional API endpoints required to fully support the Tr
     {
       "id": "course_123",
       "title": "Advanced Web Development",
-      "enrollments": 245,      // Total enrolled students
-      "revenue": 12250.00,     // Total revenue generated
-      "rating": 4.8            // Average course rating
+      "enrollments": 245, // Total enrolled students
+      "revenue": 12250.0, // Total revenue generated
+      "rating": 4.8 // Average course rating
     },
     {
       "id": "course_456",
       "title": "Data Science Fundamentals",
       "enrollments": 198,
-      "revenue": 9900.00,
+      "revenue": 9900.0,
       "rating": 4.7
     }
     // Top 5 courses by revenue
   ],
   "recentActivity": [
     {
-      "type": "user",                              // "user" | "transaction" | "course" | "session"
+      "type": "user", // "user" | "transaction" | "course" | "session"
       "message": "New user registered: John Doe",
       "timestamp": "2025-12-15T10:30:00Z"
     },
@@ -232,6 +248,7 @@ This document outlines additional API endpoints required to fully support the Tr
 **Data Details:**
 
 ### Stats Card Metrics:
+
 - **totalUsers**: Total number of registered users across all roles
 - **totalRevenue**: Sum of all completed transactions (in USD)
 - **activeCourses**: Number of published/active courses
@@ -239,28 +256,33 @@ This document outlines additional API endpoints required to fully support the Tr
 - **monthlyGrowth**: Percentage change compared to previous period for each metric
 
 ### Revenue Data Chart:
+
 - Monthly/weekly breakdown of revenue and transaction count
 - Used for bar chart visualization
 - Should include at least 6 data points for meaningful trends
 
 ### User Growth Chart:
+
 - Tracks total active users vs new registrations
 - Helps identify user retention and acquisition trends
 - Used for line chart visualization
 
 ### Top Performers:
+
 - **topCoaches**: Ranked by total earnings in selected period
 - Includes session count and average rating for performance context
 - **topCourses**: Ranked by total revenue generated
 - Includes enrollment count and rating for popularity context
 
 ### Recent Activity Feed:
+
 - Real-time platform events in chronological order
 - Shows last 10-20 activities
 - Types: user registration, transactions, course publications, session completions
 - Timestamps should be ISO 8601 format for proper time-ago calculation
 
 **Implementation Notes:**
+
 - All monetary values should be in the platform's base currency (USD)
 - Percentages should be rounded to 1 decimal place
 - Ratings should be rounded to 1 decimal place (out of 5.0)
@@ -269,16 +291,19 @@ This document outlines additional API endpoints required to fully support the Tr
 - Admin-only endpoint - requires admin role verification
 
 ## 7. Coach Stripe Connect Integration
+
 **Status**: ✅ **Already Implemented** in Postman collection
 
 These endpoints handle Stripe Connect onboarding for coaches to receive payouts.
 
 ### Get Coach Bank Account Status
+
 **Endpoint**: `GET /api/v1/coach/bank-account`
 **Description**: Returns the coach's bank account connection status and Stripe onboarding link if needed.
 **Authentication**: Required (Coach role)
 
 **Response**:
+
 ```json
 {
   "isConnected": true,
@@ -293,6 +318,7 @@ These endpoints handle Stripe Connect onboarding for coaches to receive payouts.
 ```
 
 **Response Fields:**
+
 - `isConnected`: Boolean - Whether bank account is linked to Stripe
 - `accountType`: String - Type of account ("checking" or "savings")
 - `last4`: String - Last 4 digits of account number
@@ -303,11 +329,13 @@ These endpoints handle Stripe Connect onboarding for coaches to receive payouts.
 - `status`: String - Connection status ("connected", "pending", "not_connected")
 
 ### Link Coach Bank Account (Generate Stripe Connect URL)
+
 **Endpoint**: `POST /api/v1/coach/bank-account`
 **Description**: Initiates Stripe Connect onboarding or links bank account manually. For Stripe Connect (recommended), returns an onboarding URL to redirect the coach to complete setup.
 **Authentication**: Required (Coach role)
 
 **Request Body**:
+
 ```json
 {
   "accountHolderName": "John Doe",
@@ -320,6 +348,7 @@ These endpoints handle Stripe Connect onboarding for coaches to receive payouts.
 ```
 
 **Request Fields:**
+
 - `provider`: String - Payment provider ("stripe" recommended, or "manual")
 - `accountHolderName`: String - Required - Name on the account
 - `bankName`: String - Required - Bank name
@@ -328,6 +357,7 @@ These endpoints handle Stripe Connect onboarding for coaches to receive payouts.
 - `routingNumber`: String - Optional for Stripe, required for manual
 
 **Response (Stripe Connect)**:
+
 ```json
 {
   "success": true,
@@ -338,6 +368,7 @@ These endpoints handle Stripe Connect onboarding for coaches to receive payouts.
 ```
 
 **Response (Manual Entry)**:
+
 ```json
 {
   "success": true,
@@ -348,13 +379,14 @@ These endpoints handle Stripe Connect onboarding for coaches to receive payouts.
 ```
 
 **Frontend Implementation Example**:
+
 ```typescript
 // Call the endpoint
 const response = await linkCoachBankAccount({
   provider: "stripe",
   accountHolderName: "John Doe",
   bankName: "Chase",
-  accountType: "checking"
+  accountType: "checking",
 });
 
 // Redirect to Stripe Connect onboarding
@@ -364,6 +396,7 @@ if (response.onboardingUrl) {
 ```
 
 **Stripe Connect Flow:**
+
 1. Coach clicks "Connect Stripe Account" button
 2. Frontend calls `POST /api/v1/coach/bank-account` with provider: "stripe"
 3. Backend creates Stripe Connect account and returns onboarding URL
@@ -374,15 +407,18 @@ if (response.onboardingUrl) {
 8. Coach can now receive payouts automatically
 
 **Return URLs:**
+
 - Success: `https://yourdomain.com/dashboard/coaching/settings?tab=payments&stripe=success`
 - Failure: `https://yourdomain.com/dashboard/coaching/settings?tab=payments&stripe=failed`
 
 **Webhook Events:**
+
 - `account.updated` - Stripe Connect account status changed
 - `payout.paid` - Payout successfully transferred to coach's bank account
 - `payout.failed` - Payout failed (insufficient funds, account closed, etc.)
 
 **Implementation Notes:**
+
 - Stripe Connect Express is recommended for simplicity
 - Backend must handle Stripe webhooks to update account status
 - Onboarding URL expires after 7 days
@@ -390,4 +426,3 @@ if (response.onboardingUrl) {
 - Minimum payout amount is typically $1.00 USD
 - Payout frequency can be set (daily, weekly, monthly)
 - Platform commission/fees deducted before payout
-

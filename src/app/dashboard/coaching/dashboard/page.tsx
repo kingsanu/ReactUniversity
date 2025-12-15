@@ -38,11 +38,15 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { useGlobalStore } from "@/store/useGlobalStore";
 
-import {
-
-} from "@/components/ui/select";
+import {} from "@/components/ui/select";
 import { format, isSameDay } from "date-fns";
-import { CalendarIcon, ChevronLeft, ChevronRight, Loader2, CalendarDays } from "lucide-react";
+import {
+  CalendarIcon,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+  CalendarDays,
+} from "lucide-react";
 import { getLocalTimeZone, today, parseDate } from "@internationalized/date";
 import { motion } from "motion/react";
 import { Calendar } from "@/components/ui/calendar";
@@ -87,7 +91,9 @@ export default function CoachDashboardPage() {
   const [isAvailabilityOpen, setIsAvailabilityOpen] = useState(false);
   const [isRescheduleOpen, setIsRescheduleOpen] = useState(false);
   const [selectedSession, setSelectedSession] = useState<any>(null);
-  const [rescheduleDate, setRescheduleDate] = useState<Date | undefined>(new Date());
+  const [rescheduleDate, setRescheduleDate] = useState<Date | undefined>(
+    new Date()
+  );
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
@@ -171,17 +177,17 @@ export default function CoachDashboardPage() {
 
         setUpcomingSessions(upcoming);
         setPastSessions(past);
-        
+
         // Handle student data parsing from nested structure { data: { data: [...], total: 3 } }
         const studentsResponse = studentsData as any;
-        const studentsList = Array.isArray(studentsResponse?.data?.data) 
-          ? studentsResponse.data.data 
+        const studentsList = Array.isArray(studentsResponse?.data?.data)
+          ? studentsResponse.data.data
           : Array.isArray(studentsResponse?.data)
           ? studentsResponse.data
           : [];
-          
+
         setStudents(studentsList);
-        
+
         setAvailability(
           (availabilityData as any)?.data ||
             availabilityData ||
@@ -227,23 +233,25 @@ export default function CoachDashboardPage() {
   // Fetch slots whenever rescheduleDate or selectedSession changes
   React.useEffect(() => {
     const fetchSlots = async () => {
-      if (!isRescheduleOpen || !selectedSession || !rescheduleDate || !user?.id) return;
+      if (!isRescheduleOpen || !selectedSession || !rescheduleDate || !user?.id)
+        return;
 
       setIsLoadingSlots(true);
       setAvailableSlots([]);
       setSelectedTime(null);
 
       try {
-        const { getCoachAvailableSlots } = await import("@/services/coachService");
+        const { getCoachAvailableSlots } = await import(
+          "@/services/coachService"
+        );
         const dateStr = format(rescheduleDate, "yyyy-MM-dd");
         // We need the coachId. Assuming 'user.id' is the coach's ID since this is the coach dashboard.
-        // However, fetching availability usually requires the coach's ID. 
+        // However, fetching availability usually requires the coach's ID.
         // If this is the coach viewing their own dashboard, they shouldn't need to fetch public slots...
-        // BUT the requirement says "fetch slots from backend". 
+        // BUT the requirement says "fetch slots from backend".
         // Let's assume we use the user.id as coachId.
         const response = await getCoachAvailableSlots(user.id, dateStr);
         setAvailableSlots(response.slots || []);
-        
       } catch (error) {
         console.error("Failed to fetch slots", error);
         toast.error("Failed to load available slots");
@@ -267,22 +275,22 @@ export default function CoachDashboardPage() {
       // Construct start/end time from date and time inputs
       const timeParts = selectedTime.match(/(\d+):(\d+)(am|pm)/i);
       if (!timeParts) return; // Should not happen given the UI
-      
+
       let hours = parseInt(timeParts[1]);
       const minutes = parseInt(timeParts[2]);
       const meridian = timeParts[3].toLowerCase();
-      
-      if (meridian === 'pm' && hours < 12) hours += 12;
-      if (meridian === 'am' && hours === 12) hours = 0;
-      
+
+      if (meridian === "pm" && hours < 12) hours += 12;
+      if (meridian === "am" && hours === 12) hours = 0;
+
       // Create date objects ensuring we keep local timezone correctness
-      // The API expects ISO strings. 
+      // The API expects ISO strings.
       const startObj = new Date(rescheduleDate);
       startObj.setHours(hours, minutes, 0, 0);
-      
+
       const endObj = new Date(startObj);
       endObj.setMinutes(startObj.getMinutes() + 60); // Default 60 min duration
-      
+
       const start = startObj.toISOString();
       const end = endObj.toISOString();
 
@@ -296,10 +304,7 @@ export default function CoachDashboardPage() {
             startTime: start,
             endTime: end,
             date: format(startObj, "EEE, MMM d, yyyy"),
-            time: `${format(startObj, "h:mm a")} - ${format(
-              endObj,
-              "h:mm a"
-            )}`,
+            time: `${format(startObj, "h:mm a")} - ${format(endObj, "h:mm a")}`,
             status: "rescheduled",
           };
         }
@@ -337,13 +342,16 @@ export default function CoachDashboardPage() {
             <span className="block sm:inline font-medium">{error}</span>
           </div>
         )}
-        
+
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
           <div className="flex items-center gap-5 sm:gap-6 w-full lg:w-auto">
             <div className="relative group">
               <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full blur opacity-30 group-hover:opacity-50 transition duration-500"></div>
               <Avatar className="h-16 w-16 sm:h-20 sm:w-20 border-4 border-white shadow-xl relative">
-                <AvatarImage src={`/api/users/${user.id}/avatar`} className="object-cover" />
+                <AvatarImage
+                  src={`/api/users/${user.id}/avatar`}
+                  className="object-cover"
+                />
                 <AvatarFallback className="bg-gradient-to-br from-gray-900 to-black text-white text-2xl">
                   {user.name?.charAt(0).toUpperCase() || "C"}
                 </AvatarFallback>
@@ -351,9 +359,15 @@ export default function CoachDashboardPage() {
             </div>
             <div className="flex-1">
               <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight mb-1.5">
-                Good {new Date().getHours() < 12 ? "Morning" : new Date().getHours() < 18 ? "Afternoon" : "Evening"}, {" "}
+                Good{" "}
+                {new Date().getHours() < 12
+                  ? "Morning"
+                  : new Date().getHours() < 18
+                  ? "Afternoon"
+                  : "Evening"}
+                ,{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-                  {user.name?.split(' ')[0] || "Coach"}
+                  {user.name?.split(" ")[0] || "Coach"}
                 </span>
               </h1>
               <p className="text-gray-500 font-medium text-base sm:text-lg flex items-center gap-2">
@@ -370,14 +384,20 @@ export default function CoachDashboardPage() {
             <DialogTrigger asChild>
               <Button className="w-full sm:w-auto bg-gray-900 text-white hover:bg-black h-12 sm:h-14 px-8 rounded-2xl shadow-lg shadow-gray-900/20 transition-all hover:shadow-xl hover:-translate-y-0.5 text-base font-semibold border border-gray-800">
                 <div className="flex items-center gap-2">
-                  <CalendarIcon className="w-5 h-5 text-gray-300" aria-label="Calendar Icon" /> {/* Changed Icon */}
+                  <CalendarIcon
+                    className="w-5 h-5 text-gray-300"
+                    aria-label="Calendar Icon"
+                  />{" "}
+                  {/* Changed Icon */}
                   <span>Manage Availability</span>
                 </div>
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-3xl h-[85vh] sm:h-[80vh] flex flex-col p-0 gap-0 rounded-3xl overflow-hidden border-0">
               <DialogHeader className="px-6 py-5 border-b bg-white input-border-color shrink-0">
-                <DialogTitle className="text-xl font-bold">Edit Availability</DialogTitle>
+                <DialogTitle className="text-xl font-bold">
+                  Edit Availability
+                </DialogTitle>
               </DialogHeader>
               <div className="flex-1 overflow-y-auto px-6 py-6 bg-gray-50/50">
                 <AvailabilityStep
@@ -414,7 +434,10 @@ export default function CoachDashboardPage() {
             {
               label: "Upcoming",
               value: upcomingSessions.length,
-              sub: upcomingSessions.length > 0 ? "next session soon" : "no sessions",
+              sub:
+                upcomingSessions.length > 0
+                  ? "next session soon"
+                  : "no sessions",
               icon: CalendarIcon,
               color: "text-purple-600",
               bg: "bg-purple-50/50",
@@ -437,10 +460,14 @@ export default function CoachDashboardPage() {
               transition={{ duration: 0.3, delay: i * 0.1 }}
             >
               <Card className="border-0 shadow-lg shadow-gray-100 bg-white/60 backdrop-blur-xl relative overflow-hidden group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full">
-                <div className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                <div
+                  className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
+                />
                 <CardContent className="p-6 sm:p-8 relative z-10">
                   <div className="flex justify-between items-start mb-6">
-                    <div className={`p-3.5 rounded-2xl ${stat.bg} ${stat.color} shadow-sm ring-1 ring-black/5`}>
+                    <div
+                      className={`p-3.5 rounded-2xl ${stat.bg} ${stat.color} shadow-sm ring-1 ring-black/5`}
+                    >
                       <stat.icon className="h-6 w-6" />
                     </div>
                     {i === 2 && upcomingSessions.length > 0 && (
@@ -481,7 +508,9 @@ export default function CoachDashboardPage() {
                 <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
                   Your Sessions
                 </h2>
-                <p className="text-gray-500 mt-1 font-medium">Manage your coaching schedule</p>
+                <p className="text-gray-500 mt-1 font-medium">
+                  Manage your coaching schedule
+                </p>
               </div>
               <TabsList className="bg-gray-100/80 p-1.5 rounded-2xl self-start sm:self-auto w-full sm:w-auto grid grid-cols-2 sm:flex h-auto">
                 <TabsTrigger
@@ -499,7 +528,10 @@ export default function CoachDashboardPage() {
               </TabsList>
             </div>
 
-            <TabsContent value="upcoming" className="space-y-4 mt-0 focus-visible:outline-none focus:outline-none">
+            <TabsContent
+              value="upcoming"
+              className="space-y-4 mt-0 focus-visible:outline-none focus:outline-none"
+            >
               {upcomingSessions.length > 0 ? (
                 upcomingSessions.map((session, index) => (
                   <motion.div
@@ -509,7 +541,7 @@ export default function CoachDashboardPage() {
                     transition={{ delay: index * 0.05 }}
                     className="group"
                   >
-                   <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6 p-6 sm:p-8 rounded-3xl border border-gray-100 bg-white hover:border-blue-100 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 relative overflow-hidden">
+                    <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6 p-6 sm:p-8 rounded-3xl border border-gray-100 bg-white hover:border-blue-100 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 relative overflow-hidden">
                       {/* Left Border Accent */}
                       <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-blue-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity" />
 
@@ -521,7 +553,10 @@ export default function CoachDashboardPage() {
                               {session.studentName?.charAt(0) || "S"}
                             </AvatarFallback>
                           </Avatar>
-                          <div className="absolute -bottom-1 -right-1 bg-green-500 h-5 w-5 sm:h-6 sm:w-6 rounded-full border-[3px] border-white ring-1 ring-black/5" title="Confirmed"></div>
+                          <div
+                            className="absolute -bottom-1 -right-1 bg-green-500 h-5 w-5 sm:h-6 sm:w-6 rounded-full border-[3px] border-white ring-1 ring-black/5"
+                            title="Confirmed"
+                          ></div>
                         </div>
                         <div className="flex-1 min-w-0">
                           <h3 className="font-bold text-gray-900 text-lg sm:text-xl mb-1.5 truncate">
@@ -540,15 +575,19 @@ export default function CoachDashboardPage() {
 
                       <div className="flex flex-col sm:flex-row lg:flex-row gap-4 sm:gap-6 w-full lg:w-auto justify-end items-stretch sm:items-center border-t lg:border-t-0 pt-6 lg:pt-0 border-gray-50">
                         <div className="flex flex-row sm:flex-col gap-2 sm:gap-1 text-right min-w-[120px] justify-between sm:justify-center bg-gray-50/50 lg:bg-transparent p-4 lg:p-0 rounded-2xl lg:rounded-none">
-                          <span className="text-sm font-medium text-gray-500">Date</span>
+                          <span className="text-sm font-medium text-gray-500">
+                            Date
+                          </span>
                           <span className="font-bold text-gray-900 flex items-center gap-2 sm:justify-end">
-                             <CalendarIcon className="w-4 h-4 text-blue-500 sm:hidden" />
-                             {session.date}
+                            <CalendarIcon className="w-4 h-4 text-blue-500 sm:hidden" />
+                            {session.date}
                           </span>
                         </div>
                         <div className="hidden sm:block w-px h-10 bg-gray-100"></div>
-                         <div className="flex flex-row sm:flex-col gap-2 sm:gap-1 text-right min-w-[100px] justify-between sm:justify-center bg-gray-50/50 lg:bg-transparent p-4 lg:p-0 rounded-2xl lg:rounded-none">
-                          <span className="text-sm font-medium text-gray-500">Time</span>
+                        <div className="flex flex-row sm:flex-col gap-2 sm:gap-1 text-right min-w-[100px] justify-between sm:justify-center bg-gray-50/50 lg:bg-transparent p-4 lg:p-0 rounded-2xl lg:rounded-none">
+                          <span className="text-sm font-medium text-gray-500">
+                            Time
+                          </span>
                           <span className="font-bold text-gray-900 flex items-center gap-2 sm:justify-end">
                             <Clock className="w-4 h-4 text-purple-500 sm:hidden" />
                             {session.duration || session.time}
@@ -577,26 +616,34 @@ export default function CoachDashboardPage() {
                           </a>
                         </Button>
                       </div>
-                   </div>
+                    </div>
                   </motion.div>
                 ))
               ) : (
                 <div className="text-center py-20 sm:py-32 bg-gray-50/50 rounded-3xl border-2 border-dashed border-gray-200/60 flex flex-col items-center justify-center">
                   <div className="h-24 w-24 bg-white rounded-3xl flex items-center justify-center mb-6 shadow-xl shadow-gray-100 p-6 transform rotate-3">
-                    <CalendarIcon className="h-full w-full text-blue-500/80" strokeWidth={1.5} />
+                    <CalendarIcon
+                      className="h-full w-full text-blue-500/80"
+                      strokeWidth={1.5}
+                    />
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-3">
                     No upcoming sessions
                   </h3>
                   <p className="text-gray-500 max-w-sm mx-auto text-lg leading-relaxed">
-                    You don't have any scheduled sessions yet. <br/>
-                    <span className="text-blue-600 font-medium">Time to take a break!</span>
+                    You don't have any scheduled sessions yet. <br />
+                    <span className="text-blue-600 font-medium">
+                      Time to take a break!
+                    </span>
                   </p>
                 </div>
               )}
             </TabsContent>
 
-            <TabsContent value="past" className="space-y-4 mt-0 focus-visible:outline-none focus:outline-none">
+            <TabsContent
+              value="past"
+              className="space-y-4 mt-0 focus-visible:outline-none focus:outline-none"
+            >
               {pastSessions.length > 0 ? (
                 pastSessions.map((session, index) => (
                   <motion.div
@@ -608,10 +655,10 @@ export default function CoachDashboardPage() {
                   >
                     <div className="flex items-center gap-5 flex-1 w-full">
                       <Avatar className="h-16 w-16 border-2 border-white grayscale opacity-75">
-                         <AvatarImage src={session.studentImage} />
-                          <AvatarFallback>
-                            {session.studentName?.charAt(0) || "S"}
-                          </AvatarFallback>
+                        <AvatarImage src={session.studentImage} />
+                        <AvatarFallback>
+                          {session.studentName?.charAt(0) || "S"}
+                        </AvatarFallback>
                       </Avatar>
                       <div>
                         <h3 className="font-bold text-gray-700 text-lg mb-1">
@@ -632,12 +679,12 @@ export default function CoachDashboardPage() {
                     </div>
 
                     <div className="flex flex-row md:flex-col lg:flex-row gap-4 md:gap-6 text-sm text-gray-500 w-full md:w-auto justify-between md:justify-end uppercase font-medium tracking-wide">
-                        <div className="flex items-center gap-2">
-                           {session.date}
-                        </div>
-                         <div className="flex items-center gap-2">
-                            {session.duration}
-                        </div>
+                      <div className="flex items-center gap-2">
+                        {session.date}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {session.duration}
+                      </div>
                     </div>
 
                     <div className="flex gap-3 w-full md:w-auto pt-2 md:pt-0">
@@ -656,7 +703,9 @@ export default function CoachDashboardPage() {
                   <h3 className="text-lg font-medium text-gray-900 mb-1">
                     No past sessions
                   </h3>
-                   <p className="text-gray-400">Your history will appear here.</p>
+                  <p className="text-gray-400">
+                    Your history will appear here.
+                  </p>
                 </div>
               )}
             </TabsContent>
@@ -667,171 +716,186 @@ export default function CoachDashboardPage() {
         {/* Reschedule Dialog */}
         <Dialog open={isRescheduleOpen} onOpenChange={setIsRescheduleOpen}>
           <DialogContent className="sm:max-w-[900px] w-full p-0 overflow-hidden gap-0 bg-white border-0 shadow-2xl rounded-3xl">
-             <div className="flex flex-col md:flex-row min-h-[500px] max-h-[85vh] overflow-y-auto md:overflow-hidden">
-                {/* Column 1: Calendar */}
-                <div className="flex-1 p-6 sm:p-8 border-r border-gray-100 flex flex-col bg-white">
-                  <div className="mb-6">
-                    <h2 className="text-xl font-bold text-gray-900 mb-1">Reschedule Session</h2>
-                    <p className="text-gray-500 text-sm">Select a new date and time for {selectedSession?.studentName}</p>
-                  </div>
-                  
-                  {/* Custom Calendar Header */}
-                  <div className="flex items-center justify-between mb-4 px-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 rounded-full hover:bg-gray-100"
-                      onClick={() => {
-                        const newMonth = new Date(currentMonth);
-                        newMonth.setMonth(newMonth.getMonth() - 1);
-                        setCurrentMonth(newMonth);
-                      }}
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <span className="text-base font-semibold text-gray-900 capitalize">
-                      {format(currentMonth, "MMMM yyyy")}
-                    </span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 rounded-full hover:bg-gray-100"
-                      onClick={() => {
-                        const newMonth = new Date(currentMonth);
-                        newMonth.setMonth(newMonth.getMonth() + 1);
-                        setCurrentMonth(newMonth);
-                      }}
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  
-                  <div className="flex justify-center">
-                    <Calendar
-                      mode="single"
-                      selected={rescheduleDate}
-                      onSelect={setRescheduleDate}
-                      month={currentMonth}
-                      onMonthChange={setCurrentMonth}
-                      className="p-0"
-                      showOutsideDays={false}
-                      classNames={{
-                        months: "flex flex-col",
-                        month: "space-y-4",
-                        caption: "hidden", 
-                        nav: "hidden", 
-                        month_grid: "w-full border-collapse",
-                        weekdays: "flex justify-between mb-2",
-                        weekday: "text-gray-400 font-medium text-xs uppercase w-9 text-center",
-                        week: "flex justify-between w-full mb-2",
-                        day: "h-9 w-9 text-center text-sm relative flex items-center justify-center p-0 hover:bg-transparent focus-within:relative focus-within:z-20",
-                        day_button: cn(
-                          "h-9 w-9 p-0 font-normal rounded-full transition-all duration-200 hover:bg-blue-50 hover:text-blue-600 focus:outline-none",
-                          "aria-selected:opacity-100"
-                        ),
-                        selected: "bg-blue-600 !text-white hover:!bg-blue-700 hover:!text-white shadow-md font-semibold",
-                        today: "bg-gray-100 text-gray-900 font-semibold",
-                        outside: "text-gray-300 opacity-50 pointer-events-none",
-                        disabled: "text-gray-300 opacity-50 cursor-not-allowed",
-                        hidden: "invisible",
-                      }}
-                      disabled={(date) => {
-                        const t = new Date();
-                        t.setHours(0, 0, 0, 0);
-                        return date < t;
-                      }}
-                    />
-                  </div>
+            <div className="flex flex-col md:flex-row min-h-[500px] max-h-[85vh] overflow-y-auto md:overflow-hidden">
+              {/* Column 1: Calendar */}
+              <div className="flex-1 p-6 sm:p-8 border-r border-gray-100 flex flex-col bg-white">
+                <div className="mb-6">
+                  <h2 className="text-xl font-bold text-gray-900 mb-1">
+                    Reschedule Session
+                  </h2>
+                  <p className="text-gray-500 text-sm">
+                    Select a new date and time for{" "}
+                    {selectedSession?.studentName}
+                  </p>
                 </div>
 
-                {/* Column 2: Time Slots */}
-                <div className="w-full md:w-[320px] bg-gray-50/50 flex flex-col border-t md:border-t-0">
-                  <div className="p-6 border-b border-gray-200/50">
-                     <div className="flex items-center gap-3">
-                        <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
-                          <AvatarImage src={selectedSession?.studentImage} />
-                          <AvatarFallback className="bg-gray-900 text-white text-xs">
-                            {selectedSession?.studentName?.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                           <p className="font-bold text-gray-900 text-sm truncate">{selectedSession?.studentName}</p>
-                           <p className="text-xs text-gray-500 truncate">{selectedSession?.topic?.replace(/-/g, " ").toUpperCase()}</p>
-                        </div>
-                     </div>
-                  </div>
+                {/* Custom Calendar Header */}
+                <div className="flex items-center justify-between mb-4 px-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 rounded-full hover:bg-gray-100"
+                    onClick={() => {
+                      const newMonth = new Date(currentMonth);
+                      newMonth.setMonth(newMonth.getMonth() - 1);
+                      setCurrentMonth(newMonth);
+                    }}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <span className="text-base font-semibold text-gray-900 capitalize">
+                    {format(currentMonth, "MMMM yyyy")}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 rounded-full hover:bg-gray-100"
+                    onClick={() => {
+                      const newMonth = new Date(currentMonth);
+                      newMonth.setMonth(newMonth.getMonth() + 1);
+                      setCurrentMonth(newMonth);
+                    }}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
 
-                  <div className="flex-1 p-6 flex flex-col min-h-[300px]">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                       <Clock className="w-4 h-4 text-blue-500" />
-                       Available Times
-                       {rescheduleDate && (
-                         <span className="text-gray-400 font-normal ml-auto text-xs">
-                           {format(rescheduleDate, "MMM d")}
-                         </span>
-                       )}
-                    </h4>
-                    
-                    <div className="flex-1 overflow-y-auto custom-scrollbar -mr-2 pr-2">
-                        {isLoadingSlots ? (
-                          <div className="h-full flex flex-col items-center justify-center text-gray-400 space-y-3">
-                            <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
-                            <p className="text-xs">Checking availability...</p>
-                          </div>
-                        ) : !rescheduleDate ? (
-                          <div className="h-full flex flex-col items-center justify-center text-gray-400 text-center p-4">
-                            <CalendarDays className="h-10 w-10 mb-3 opacity-20" />
-                            <p className="text-sm">Select a date to see times</p>
-                          </div>
-                        ) : availableSlots.length === 0 ? (
-                           <div className="h-full flex flex-col items-center justify-center text-gray-400 text-center p-4">
-                              <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
-                                 <Clock className="h-5 w-5 opacity-30" />
-                              </div>
-                              <p className="text-sm font-medium text-gray-600 mb-1">No slots available</p>
-                              <p className="text-xs">Try selecting another date</p>
-                           </div>
-                        ) : (
-                          <div className="grid grid-cols-2 gap-2">
-                             {availableSlots.map((time) => (
-                                <button
-                                  key={time}
-                                  onClick={() => setSelectedTime(time)}
-                                  className={cn(
-                                    "px-3 py-2 text-sm font-medium rounded-xl border transition-all text-center",
-                                    selectedTime === time 
-                                      ? "bg-blue-600 text-white border-blue-600 shadow-md transform scale-[1.02]" 
-                                      : "bg-white border-gray-200 text-gray-700 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50"
-                                  )}
-                                >
-                                  {time}
-                                </button>
-                             ))}
-                          </div>
-                        )}
+                <div className="flex justify-center">
+                  <Calendar
+                    mode="single"
+                    selected={rescheduleDate}
+                    onSelect={setRescheduleDate}
+                    month={currentMonth}
+                    onMonthChange={setCurrentMonth}
+                    className="p-0"
+                    showOutsideDays={false}
+                    classNames={{
+                      months: "flex flex-col",
+                      month: "space-y-4",
+                      caption: "hidden",
+                      nav: "hidden",
+                      month_grid: "w-full border-collapse",
+                      weekdays: "flex justify-between mb-2",
+                      weekday:
+                        "text-gray-400 font-medium text-xs uppercase w-9 text-center",
+                      week: "flex justify-between w-full mb-2",
+                      day: "h-9 w-9 text-center text-sm relative flex items-center justify-center p-0 hover:bg-transparent focus-within:relative focus-within:z-20",
+                      day_button: cn(
+                        "h-9 w-9 p-0 font-normal rounded-full transition-all duration-200 hover:bg-blue-50 hover:text-blue-600 focus:outline-none",
+                        "aria-selected:opacity-100"
+                      ),
+                      selected:
+                        "bg-blue-600 !text-white hover:!bg-blue-700 hover:!text-white shadow-md font-semibold",
+                      today: "bg-gray-100 text-gray-900 font-semibold",
+                      outside: "text-gray-300 opacity-50 pointer-events-none",
+                      disabled: "text-gray-300 opacity-50 cursor-not-allowed",
+                      hidden: "invisible",
+                    }}
+                    disabled={(date) => {
+                      const t = new Date();
+                      t.setHours(0, 0, 0, 0);
+                      return date < t;
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Column 2: Time Slots */}
+              <div className="w-full md:w-[320px] bg-gray-50/50 flex flex-col border-t md:border-t-0">
+                <div className="p-6 border-b border-gray-200/50">
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
+                      <AvatarImage src={selectedSession?.studentImage} />
+                      <AvatarFallback className="bg-gray-900 text-white text-xs">
+                        {selectedSession?.studentName?.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-gray-900 text-sm truncate">
+                        {selectedSession?.studentName}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {selectedSession?.topic
+                          ?.replace(/-/g, " ")
+                          .toUpperCase()}
+                      </p>
                     </div>
                   </div>
+                </div>
 
-                  <div className="p-6 border-t border-gray-200/50 bg-white md:bg-transparent">
-                     <div className="flex gap-3">
-                        <Button
-                          variant="outline"
-                          onClick={() => setIsRescheduleOpen(false)}
-                          className="flex-1 h-11 rounded-xl font-semibold border-gray-200 hover:bg-gray-50"
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          onClick={confirmReschedule}
-                          disabled={!selectedTime || isLoadingSlots}
-                          className="flex-1 bg-black text-white hover:bg-gray-800 h-11 rounded-xl font-semibold shadow-lg shadow-black/5 disabled:opacity-50"
-                        >
-                          Confirm
-                        </Button>
-                     </div>
+                <div className="flex-1 p-6 flex flex-col min-h-[300px]">
+                  <h4 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-blue-500" />
+                    Available Times
+                    {rescheduleDate && (
+                      <span className="text-gray-400 font-normal ml-auto text-xs">
+                        {format(rescheduleDate, "MMM d")}
+                      </span>
+                    )}
+                  </h4>
+
+                  <div className="flex-1 overflow-y-auto custom-scrollbar -mr-2 pr-2">
+                    {isLoadingSlots ? (
+                      <div className="h-full flex flex-col items-center justify-center text-gray-400 space-y-3">
+                        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                        <p className="text-xs">Checking availability...</p>
+                      </div>
+                    ) : !rescheduleDate ? (
+                      <div className="h-full flex flex-col items-center justify-center text-gray-400 text-center p-4">
+                        <CalendarDays className="h-10 w-10 mb-3 opacity-20" />
+                        <p className="text-sm">Select a date to see times</p>
+                      </div>
+                    ) : availableSlots.length === 0 ? (
+                      <div className="h-full flex flex-col items-center justify-center text-gray-400 text-center p-4">
+                        <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
+                          <Clock className="h-5 w-5 opacity-30" />
+                        </div>
+                        <p className="text-sm font-medium text-gray-600 mb-1">
+                          No slots available
+                        </p>
+                        <p className="text-xs">Try selecting another date</p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-2">
+                        {availableSlots.map((time) => (
+                          <button
+                            key={time}
+                            onClick={() => setSelectedTime(time)}
+                            className={cn(
+                              "px-3 py-2 text-sm font-medium rounded-xl border transition-all text-center",
+                              selectedTime === time
+                                ? "bg-blue-600 text-white border-blue-600 shadow-md transform scale-[1.02]"
+                                : "bg-white border-gray-200 text-gray-700 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50"
+                            )}
+                          >
+                            {time}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
-             </div>
+
+                <div className="p-6 border-t border-gray-200/50 bg-white md:bg-transparent">
+                  <div className="flex gap-3">
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsRescheduleOpen(false)}
+                      className="flex-1 h-11 rounded-xl font-semibold border-gray-200 hover:bg-gray-50"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={confirmReschedule}
+                      disabled={!selectedTime || isLoadingSlots}
+                      className="flex-1 bg-black text-white hover:bg-gray-800 h-11 rounded-xl font-semibold shadow-lg shadow-black/5 disabled:opacity-50"
+                    >
+                      Confirm
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </DialogContent>
         </Dialog>
       </div>

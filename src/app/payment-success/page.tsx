@@ -46,13 +46,15 @@ export default function PaymentSuccess() {
     // If it was a booking payment (we can guess by description or metadata if available, but for now generic check)
     // Actually, we can check searchParams if we add more context, but simplest is:
     // If successful, users likely want to see their sessions or subscriptions.
-    
+
     // Better: Check description or amount to differentiate
-    if (paymentDetails?.description?.toLowerCase().includes("coaching session")) {
-        router.push("/dashboard/my-sessions");
-        return;
+    if (
+      paymentDetails?.description?.toLowerCase().includes("coaching session")
+    ) {
+      router.push("/dashboard/my-sessions");
+      return;
     }
-    
+
     router.push("/dashboard/subscriptions");
   };
 
@@ -92,7 +94,9 @@ export default function PaymentSuccess() {
               Payment Successful! 🎉
             </h2>
             <p className="text-gray-600 mb-6">
-              {paymentDetails?.description?.toLowerCase().includes("coaching session") 
+              {paymentDetails?.description
+                ?.toLowerCase()
+                .includes("coaching session")
                 ? "Thank you for your payment. Your coaching session has been booked."
                 : "Thank you for your payment. Your subscription is now active."}
             </p>
@@ -126,7 +130,9 @@ export default function PaymentSuccess() {
               onClick={handleContinue}
               className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
             >
-              {paymentDetails?.description?.toLowerCase().includes("coaching session") 
+              {paymentDetails?.description
+                ?.toLowerCase()
+                .includes("coaching session")
                 ? "View My Sessions"
                 : "Continue to Dashboard"}
             </button>
@@ -158,9 +164,13 @@ export default function PaymentSuccess() {
             </p>
             <div className="space-y-3">
               <Link
-                href={paymentDetails?.description?.toLowerCase().includes("coaching session") 
-                  ? "/dashboard/my-sessions" 
-                  : "/dashboard/subscriptions"}
+                href={
+                  paymentDetails?.description
+                    ?.toLowerCase()
+                    .includes("coaching session")
+                    ? "/dashboard/my-sessions"
+                    : "/dashboard/subscriptions"
+                }
                 className="block w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-center"
               >
                 Try Again

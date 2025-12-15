@@ -58,7 +58,7 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
   // Select sidebar data based on current path, then role
   const role = user.role?.toLowerCase();
   const isAdminRoute = pathname?.includes("/dashboard/admin");
-  
+
   let currentSidebarData = sidebarData;
   // Admin routes take priority - show admin sidebar only on /dashboard/admin/* pages
   if (isAdminRoute) {

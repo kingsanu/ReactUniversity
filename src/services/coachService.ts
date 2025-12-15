@@ -45,8 +45,6 @@ export async function getOnboardingStatus(
   return json.data;
 }
 
-
-
 export async function submitOnboardingData(
   coachId: string,
   data: OnboardingData
@@ -71,18 +69,15 @@ export async function getCalendarAuthUrl(
   const query = new URLSearchParams();
   if (email) query.append("email", email);
   const requestUrl = `${API_BASE_URL}/api/v1/auth/${provider}/url${
-      query.toString() ? `?${query.toString()}` : ""
-    }`;
-  
+    query.toString() ? `?${query.toString()}` : ""
+  }`;
+
   console.log(`[getCalendarAuthUrl] Requesting: ${requestUrl}`);
 
-  const response = await fetch(
-    requestUrl,
-    {
-      headers: getHeaders(),
-    }
-  );
-  
+  const response = await fetch(requestUrl, {
+    headers: getHeaders(),
+  });
+
   console.log(`[getCalendarAuthUrl] Response status: ${response.status}`);
 
   if (!response.ok) throw new Error(`Failed to get ${provider} auth URL`);
@@ -90,8 +85,11 @@ export async function getCalendarAuthUrl(
   // Handle both 'url' and 'callbackurl' response formats and nested response payloads
   // Some APIs return { data: { url: '...' } } while others return { url: '...' }
 
-  console.log(`[getCalendarAuthUrl] Response data:`, JSON.stringify(data, null, 2));
-  debugger
+  console.log(
+    `[getCalendarAuthUrl] Response data:`,
+    JSON.stringify(data, null, 2)
+  );
+  debugger;
   const nested = data && typeof data === "object" ? data.data || data : data;
   const url =
     nested?.url || nested?.callbackurl || data?.url || data?.callbackurl;
@@ -213,8 +211,6 @@ export async function updateBookingNotes(
   return response.json();
 }
 
-
-
 export async function getCoachStudentById(
   studentId: string
 ): Promise<{ data: StudentDetails }> {
@@ -273,12 +269,14 @@ export async function linkCoachBankAccount(data?: {
     headers: getHeaders(),
     body: JSON.stringify(requestBody),
   });
-  
+
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: "Failed to initiate bank account linking" }));
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Failed to initiate bank account linking" }));
     throw new Error(error.message || "Failed to initiate bank account linking");
   }
-  
+
   return response.json();
 }
 
@@ -324,7 +322,7 @@ export async function getCoachAvailableSlots(
   const response = await fetch(
     `${API_BASE_URL}/api/v1/coach/${coachId}/slots?${query.toString()}`
   );
-  
+
   if (!response.ok) {
     // If endpoint returns 404 or other error, return a safe empty object matching the interface
     // so the UI can handle it gracefully (e.g. show "no availability")
@@ -338,7 +336,7 @@ export async function getCoachAvailableSlots(
       slots: [],
     };
   }
-  
+
   const json = await response.json();
   return json.data;
 }
@@ -640,12 +638,12 @@ export interface EarningsHistoryItem {
   amountGross: number;
   platformFee: number;
   amountNet: number;
-  status: 'completed' | 'pending' | 'cancelled';
+  status: "completed" | "pending" | "cancelled";
 }
 
 export interface PayoutSettings {
-  frequency: 'biweekly' | 'monthly';
-  method: 'stripe' | 'bank_transfer';
+  frequency: "biweekly" | "monthly";
+  method: "stripe" | "bank_transfer";
 }
 
 export async function getCoachEarnings(): Promise<CoachEarningsStats> {
@@ -658,10 +656,15 @@ export async function getCoachEarnings(): Promise<CoachEarningsStats> {
   return json.data || json;
 }
 
-export async function getCoachEarningsHistory(): Promise<EarningsHistoryItem[]> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/coach/me/earnings/history`, {
-    headers: getHeaders(),
-  });
+export async function getCoachEarningsHistory(): Promise<
+  EarningsHistoryItem[]
+> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/coach/me/earnings/history`,
+    {
+      headers: getHeaders(),
+    }
+  );
 
   if (!response.ok) throw new Error("Failed to fetch earnings history");
   const json = await response.json();
@@ -669,21 +672,29 @@ export async function getCoachEarningsHistory(): Promise<EarningsHistoryItem[]> 
 }
 
 export async function getCoachPayoutSettings(): Promise<PayoutSettings> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/coach/me/payout-settings`, {
-    headers: getHeaders(),
-  });
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/coach/me/payout-settings`,
+    {
+      headers: getHeaders(),
+    }
+  );
 
   if (!response.ok) throw new Error("Failed to fetch payout settings");
   const json = await response.json();
   return json.data || json;
 }
 
-export async function updateCoachPayoutSettings(settings: Partial<PayoutSettings>): Promise<PayoutSettings> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/coach/me/payout-settings`, {
-    method: "PUT",
-    headers: getHeaders(),
-    body: JSON.stringify(settings),
-  });
+export async function updateCoachPayoutSettings(
+  settings: Partial<PayoutSettings>
+): Promise<PayoutSettings> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/coach/me/payout-settings`,
+    {
+      method: "PUT",
+      headers: getHeaders(),
+      body: JSON.stringify(settings),
+    }
+  );
 
   if (!response.ok) throw new Error("Failed to update payout settings");
   const json = await response.json();

@@ -2,7 +2,7 @@ export interface Transaction {
   id: string;
   amount: number;
   currency: string;
-  status: 'pending' | 'completed' | 'failed' | 'refunded';
+  status: "pending" | "completed" | "failed" | "refunded";
   date: string;
   description: string;
   method?: string;
@@ -51,7 +51,9 @@ export async function getUserTransactions(params?: {
   return json.data || json;
 }
 
-export async function getTransactionById(transactionId: string): Promise<Transaction> {
+export async function getTransactionById(
+  transactionId: string
+): Promise<Transaction> {
   const response = await fetch(
     `${API_BASE_URL}/api/v1/transactions/${transactionId}`,
     {

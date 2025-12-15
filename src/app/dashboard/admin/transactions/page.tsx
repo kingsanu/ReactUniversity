@@ -15,7 +15,10 @@ import {
 } from "@/components/ui/table";
 import { Search, Filter, Download, CreditCard, Receipt } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { getAdminTransactions, AdminTransaction } from "@/services/adminService";
+import {
+  getAdminTransactions,
+  AdminTransaction,
+} from "@/services/adminService";
 import { toast } from "sonner";
 import {
   Select,
@@ -155,18 +158,25 @@ export default function AdminTransactionsPage() {
                 </TableRow>
               ) : transactions.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-10 text-gray-500">
+                  <TableCell
+                    colSpan={7}
+                    className="text-center py-10 text-gray-500"
+                  >
                     No transactions found.
                   </TableCell>
                 </TableRow>
               ) : (
                 transactions.map((trx) => (
                   <TableRow key={trx.id}>
-                    <TableCell className="font-medium text-xs">{trx.id}</TableCell>
+                    <TableCell className="font-medium text-xs">
+                      {trx.id}
+                    </TableCell>
                     <TableCell>
                       <div className="flex flex-col">
                         <span className="font-medium">{trx.userName}</span>
-                        <span className="text-xs text-gray-500">ID: {trx.userId}</span>
+                        <span className="text-xs text-gray-500">
+                          ID: {trx.userId}
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell>{trx.description}</TableCell>
@@ -193,10 +203,18 @@ export default function AdminTransactionsPage() {
                         {trx.status}
                       </Badge>
                     </TableCell>
-                    <TableCell>{new Date(trx.date).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      {new Date(trx.date).toLocaleDateString()}
+                    </TableCell>
                     <TableCell className="text-gray-500 flex items-center gap-2">
-                        {trx.method && (trx.method.includes("Visa") || trx.method.includes("Mastercard")) ? <CreditCard className="w-3 h-3" /> : <Receipt className="w-3 h-3" />}
-                        {trx.method || 'N/A'}
+                      {trx.method &&
+                      (trx.method.includes("Visa") ||
+                        trx.method.includes("Mastercard")) ? (
+                        <CreditCard className="w-3 h-3" />
+                      ) : (
+                        <Receipt className="w-3 h-3" />
+                      )}
+                      {trx.method || "N/A"}
                     </TableCell>
                   </TableRow>
                 ))
@@ -204,7 +222,7 @@ export default function AdminTransactionsPage() {
             </TableBody>
           </Table>
         </div>
-        
+
         {/* Pagination */}
         <div className="flex items-center justify-end space-x-2 py-4">
           <Button

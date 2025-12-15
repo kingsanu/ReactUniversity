@@ -19,7 +19,7 @@ import {
   Users,
   ArrowRight,
   Star,
-  MoreHorizontal
+  MoreHorizontal,
 } from "lucide-react";
 import { format } from "date-fns";
 import { motion, AnimatePresence } from "motion/react";
@@ -66,7 +66,7 @@ export default function MySessionsPage() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("upcoming");
-  
+
   // Dialog States
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [rescheduleDialogOpen, setRescheduleDialogOpen] = useState(false);
@@ -74,7 +74,7 @@ export default function MySessionsPage() {
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
   const [rescheduleCoach, setRescheduleCoach] = useState<any>(null);
-  
+
   // Form States
   const [cancelReason, setCancelReason] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -114,7 +114,8 @@ export default function MySessionsPage() {
 
             if (endTime) {
               const endDate = new Date(endTime);
-              const diff = (endDate.getTime() - startDate.getTime()) / (1000 * 60);
+              const diff =
+                (endDate.getTime() - startDate.getTime()) / (1000 * 60);
               duration = `${Math.round(diff)} min`;
               time = `${time} - ${format(endDate, "h:mm a")}`;
             }
@@ -212,7 +213,7 @@ export default function MySessionsPage() {
       await submitReview(selectedSession.coachId, {
         bookingId: selectedSession.id,
         rating: reviewRating,
-        comment: reviewComment
+        comment: reviewComment,
       });
 
       toast.success("Review submitted successfully");
@@ -230,26 +231,50 @@ export default function MySessionsPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "confirmed":
-        return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-0"><CheckCircle2 className="h-3 w-3 mr-1" />Confirmed</Badge>;
+        return (
+          <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-0">
+            <CheckCircle2 className="h-3 w-3 mr-1" />
+            Confirmed
+          </Badge>
+        );
       case "completed":
-        return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-0"><CheckCircle2 className="h-3 w-3 mr-1" />Completed</Badge>;
+        return (
+          <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-0">
+            <CheckCircle2 className="h-3 w-3 mr-1" />
+            Completed
+          </Badge>
+        );
       case "cancelled":
-        return <Badge className="bg-red-100 text-red-700 hover:bg-red-100 border-0"><XCircle className="h-3 w-3 mr-1" />Cancelled</Badge>;
+        return (
+          <Badge className="bg-red-100 text-red-700 hover:bg-red-100 border-0">
+            <XCircle className="h-3 w-3 mr-1" />
+            Cancelled
+          </Badge>
+        );
       case "rescheduled":
-        return <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 border-0"><Clock className="h-3 w-3 mr-1" />Rescheduled</Badge>;
+        return (
+          <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 border-0">
+            <Clock className="h-3 w-3 mr-1" />
+            Rescheduled
+          </Badge>
+        );
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
   };
 
-  const upcomingSessions = sessions.filter(s => ["confirmed", "rescheduled"].includes(s.status));
-  const pastSessions = sessions.filter(s => ["completed", "cancelled"].includes(s.status));
-  const filteredSessions = activeTab === "upcoming" ? upcomingSessions : pastSessions;
+  const upcomingSessions = sessions.filter((s) =>
+    ["confirmed", "rescheduled"].includes(s.status)
+  );
+  const pastSessions = sessions.filter((s) =>
+    ["completed", "cancelled"].includes(s.status)
+  );
+  const filteredSessions =
+    activeTab === "upcoming" ? upcomingSessions : pastSessions;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 space-y-8">
-        
         {/* Header Section */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
           <div className="flex items-center gap-5">
@@ -263,12 +288,19 @@ export default function MySessionsPage() {
               </Avatar>
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 tracking-tight">My Coaching Sessions</h1>
-              <p className="text-gray-500 mt-1">Track and manage all your coaching appointments</p>
+              <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+                My Coaching Sessions
+              </h1>
+              <p className="text-gray-500 mt-1">
+                Track and manage all your coaching appointments
+              </p>
             </div>
           </div>
 
-          <Button asChild className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-500/25 h-11 px-6 rounded-xl">
+          <Button
+            asChild
+            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-500/25 h-11 px-6 rounded-xl"
+          >
             <Link href="/dashboard/book-coach">
               <Users className="h-4 w-4 mr-2" />
               Book New Session
@@ -279,10 +311,34 @@ export default function MySessionsPage() {
         {/* Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: "Total Sessions", value: sessions.length, icon: CalendarDays, color: "text-slate-600", bg: "from-slate-100 to-slate-200" },
-            { label: "Upcoming", value: upcomingSessions.length, icon: Clock, color: "text-emerald-600", bg: "from-emerald-100 to-emerald-200" },
-            { label: "Completed", value: sessions.filter(s => s.status === "completed").length, icon: CheckCircle2, color: "text-blue-600", bg: "from-blue-100 to-blue-200" },
-            { label: "Cancelled", value: sessions.filter(s => s.status === "cancelled").length, icon: XCircle, color: "text-red-500", bg: "from-red-100 to-red-200" },
+            {
+              label: "Total Sessions",
+              value: sessions.length,
+              icon: CalendarDays,
+              color: "text-slate-600",
+              bg: "from-slate-100 to-slate-200",
+            },
+            {
+              label: "Upcoming",
+              value: upcomingSessions.length,
+              icon: Clock,
+              color: "text-emerald-600",
+              bg: "from-emerald-100 to-emerald-200",
+            },
+            {
+              label: "Completed",
+              value: sessions.filter((s) => s.status === "completed").length,
+              icon: CheckCircle2,
+              color: "text-blue-600",
+              bg: "from-blue-100 to-blue-200",
+            },
+            {
+              label: "Cancelled",
+              value: sessions.filter((s) => s.status === "cancelled").length,
+              icon: XCircle,
+              color: "text-red-500",
+              bg: "from-red-100 to-red-200",
+            },
           ].map((stat, i) => (
             <motion.div
               key={i}
@@ -293,12 +349,18 @@ export default function MySessionsPage() {
               <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                 <CardContent className="p-5">
                   <div className="flex items-center gap-3">
-                    <div className={`p-2.5 bg-gradient-to-br ${stat.bg} rounded-xl`}>
+                    <div
+                      className={`p-2.5 bg-gradient-to-br ${stat.bg} rounded-xl`}
+                    >
                       <stat.icon className={`h-5 w-5 ${stat.color}`} />
                     </div>
                     <div>
-                      <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                      <p className="text-xs text-gray-500 font-medium">{stat.label}</p>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {stat.value}
+                      </p>
+                      <p className="text-xs text-gray-500 font-medium">
+                        {stat.label}
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -311,13 +373,25 @@ export default function MySessionsPage() {
         <Card className="border-0 shadow-xl bg-white/90 backdrop-blur-sm rounded-2xl overflow-hidden">
           <CardHeader className="border-b bg-gradient-to-r from-slate-50 to-white px-6 py-5">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <CardTitle className="text-xl font-bold text-gray-900">Your Sessions</CardTitle>
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full sm:w-auto">
+              <CardTitle className="text-xl font-bold text-gray-900">
+                Your Sessions
+              </CardTitle>
+              <Tabs
+                value={activeTab}
+                onValueChange={setActiveTab}
+                className="w-full sm:w-auto"
+              >
                 <TabsList className="bg-gray-100/80 p-1 rounded-xl">
-                  <TabsTrigger value="upcoming" className="rounded-lg px-4 py-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all">
+                  <TabsTrigger
+                    value="upcoming"
+                    className="rounded-lg px-4 py-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
+                  >
                     Upcoming ({upcomingSessions.length})
                   </TabsTrigger>
-                  <TabsTrigger value="past" className="rounded-lg px-4 py-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all">
+                  <TabsTrigger
+                    value="past"
+                    className="rounded-lg px-4 py-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
+                  >
                     Past ({pastSessions.length})
                   </TabsTrigger>
                 </TabsList>
@@ -352,17 +426,26 @@ export default function MySessionsPage() {
                                 {session.coachName?.charAt(0) || "C"}
                               </AvatarFallback>
                             </Avatar>
-                            {["confirmed", "rescheduled"].includes(session.status) && (
+                            {["confirmed", "rescheduled"].includes(
+                              session.status
+                            ) && (
                               <div className="absolute -bottom-0.5 -right-0.5 h-4 w-4 bg-emerald-500 rounded-full border-2 border-white"></div>
                             )}
                           </div>
                           <div className="min-w-0">
-                            <h3 className="font-semibold text-gray-900 text-lg truncate">{session.coachName}</h3>
+                            <h3 className="font-semibold text-gray-900 text-lg truncate">
+                              {session.coachName}
+                            </h3>
                             {session.coachTitle && (
-                              <p className="text-sm text-gray-500 truncate">{session.coachTitle}</p>
+                              <p className="text-sm text-gray-500 truncate">
+                                {session.coachTitle}
+                              </p>
                             )}
                             <div className="flex items-center gap-2 mt-1.5">
-                              <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100 font-medium text-xs">
+                              <Badge
+                                variant="secondary"
+                                className="bg-blue-50 text-blue-700 hover:bg-blue-100 font-medium text-xs"
+                              >
                                 {session.topic}
                               </Badge>
                               {getStatusBadge(session.status)}
@@ -374,37 +457,66 @@ export default function MySessionsPage() {
                         <div className="flex flex-wrap items-center gap-3 text-sm">
                           <div className="flex items-center gap-2 bg-slate-100 px-3 py-2 rounded-lg">
                             <Calendar className="h-4 w-4 text-slate-500" />
-                            <span className="font-medium text-slate-700">{session.date}</span>
+                            <span className="font-medium text-slate-700">
+                              {session.date}
+                            </span>
                           </div>
                           <div className="flex items-center gap-2 bg-slate-100 px-3 py-2 rounded-lg">
                             <Clock className="h-4 w-4 text-slate-500" />
-                            <span className="font-medium text-slate-700">{session.time}</span>
+                            <span className="font-medium text-slate-700">
+                              {session.time}
+                            </span>
                           </div>
                         </div>
 
                         {/* Actions */}
                         <div className="flex items-center gap-2 flex-shrink-0">
-                          {["confirmed", "rescheduled"].includes(session.status) ? (
+                          {["confirmed", "rescheduled"].includes(
+                            session.status
+                          ) ? (
                             <>
                               {session.meetingLink && (
-                                <Button size="sm" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md h-9 px-4 rounded-lg" asChild>
-                                  <a href={session.meetingLink} target="_blank" rel="noopener noreferrer">
+                                <Button
+                                  size="sm"
+                                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md h-9 px-4 rounded-lg"
+                                  asChild
+                                >
+                                  <a
+                                    href={session.meetingLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
                                     <Video className="h-4 w-4 mr-1.5" />
                                     Join Call
                                   </a>
                                 </Button>
                               )}
-                              <Button variant="outline" size="sm" onClick={() => handleRescheduleClick(session)} className="h-9 px-4 rounded-lg border-slate-200 hover:bg-slate-50">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleRescheduleClick(session)}
+                                className="h-9 px-4 rounded-lg border-slate-200 hover:bg-slate-50"
+                              >
                                 Reschedule
                               </Button>
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg hover:bg-slate-100">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-9 w-9 rounded-lg hover:bg-slate-100"
+                                  >
                                     <MoreHorizontal className="h-4 w-4 text-slate-500" />
                                   </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="rounded-xl shadow-lg border-slate-100 p-1">
-                                  <DropdownMenuItem className="text-red-600 focus:text-red-700 focus:bg-red-50 rounded-lg cursor-pointer" onClick={() => handleCancelClick(session)}>
+                                <DropdownMenuContent
+                                  align="end"
+                                  className="rounded-xl shadow-lg border-slate-100 p-1"
+                                >
+                                  <DropdownMenuItem
+                                    className="text-red-600 focus:text-red-700 focus:bg-red-50 rounded-lg cursor-pointer"
+                                    onClick={() => handleCancelClick(session)}
+                                  >
                                     <X className="h-4 w-4 mr-2" />
                                     Cancel Session
                                   </DropdownMenuItem>
@@ -412,25 +524,39 @@ export default function MySessionsPage() {
                               </DropdownMenu>
                             </>
                           ) : session.status === "completed" ? (
-                            <Button size="sm" variant="outline" className="h-9 px-4 rounded-lg border-slate-200 hover:bg-slate-50" onClick={() => handleReviewClick(session)}>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-9 px-4 rounded-lg border-slate-200 hover:bg-slate-50"
+                              onClick={() => handleReviewClick(session)}
+                            >
                               <Star className="h-4 w-4 mr-1.5 text-yellow-500" />
                               Review
                             </Button>
                           ) : null}
-                          
-                          <Button size="sm" variant="ghost" className="h-9 w-9 p-0 rounded-lg hover:bg-slate-100" asChild>
-                            <Link href={`/dashboard/book-coach/${session.coachId}`}>
+
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-9 w-9 p-0 rounded-lg hover:bg-slate-100"
+                            asChild
+                          >
+                            <Link
+                              href={`/dashboard/book-coach/${session.coachId}`}
+                            >
                               <ArrowRight className="h-4 w-4 text-slate-400" />
                             </Link>
                           </Button>
                         </div>
                       </div>
-                      
+
                       {/* Notes Section */}
                       {session.notes && (
                         <div className="mt-4 ml-[4.5rem] pl-4 border-l-2 border-blue-100">
                           <p className="text-sm text-gray-600">
-                            <span className="font-medium text-gray-700">Notes: </span>
+                            <span className="font-medium text-gray-700">
+                              Notes:{" "}
+                            </span>
                             {session.notes}
                           </p>
                         </div>
@@ -444,14 +570,19 @@ export default function MySessionsPage() {
                 <div className="h-20 w-20 bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl flex items-center justify-center mb-5">
                   <Calendar className="h-10 w-10 text-slate-400" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No {activeTab} sessions</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  No {activeTab} sessions
+                </h3>
                 <p className="text-gray-500 text-center max-w-sm mb-5">
-                  {activeTab === "upcoming" 
-                    ? "You don't have any upcoming coaching sessions. Book a session with an expert coach to accelerate your career!" 
+                  {activeTab === "upcoming"
+                    ? "You don't have any upcoming coaching sessions. Book a session with an expert coach to accelerate your career!"
                     : "You haven't completed any coaching sessions yet."}
                 </p>
                 {activeTab === "upcoming" && (
-                  <Button asChild className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg h-11 px-6 rounded-xl">
+                  <Button
+                    asChild
+                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg h-11 px-6 rounded-xl"
+                  >
                     <Link href="/dashboard/book-coach">
                       <Users className="h-4 w-4 mr-2" />
                       Find a Coach
@@ -470,22 +601,39 @@ export default function MySessionsPage() {
           <DialogHeader>
             <DialogTitle className="text-xl">Cancel Session</DialogTitle>
             <DialogDescription className="text-gray-500">
-              Are you sure you want to cancel this session with <span className="font-medium text-gray-700">{selectedSession?.coachName}</span>?
+              Are you sure you want to cancel this session with{" "}
+              <span className="font-medium text-gray-700">
+                {selectedSession?.coachName}
+              </span>
+              ?
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
-            <label className="text-sm font-medium text-gray-700 mb-2 block">Reason for cancellation</label>
-            <Textarea 
+            <label className="text-sm font-medium text-gray-700 mb-2 block">
+              Reason for cancellation
+            </label>
+            <Textarea
               placeholder="Please let us know why you're cancelling..."
-              value={cancelReason} 
+              value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
               rows={3}
               className="resize-none rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
             />
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setCancelDialogOpen(false)} className="rounded-lg">Keep Session</Button>
-            <Button variant="destructive" onClick={confirmCancel} disabled={isProcessing} className="rounded-lg">
+            <Button
+              variant="outline"
+              onClick={() => setCancelDialogOpen(false)}
+              className="rounded-lg"
+            >
+              Keep Session
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmCancel}
+              disabled={isProcessing}
+              className="rounded-lg"
+            >
               {isProcessing ? "Cancelling..." : "Cancel Session"}
             </Button>
           </DialogFooter>
@@ -499,8 +647,8 @@ export default function MySessionsPage() {
         onClose={() => setBookingModalOpen(false)}
         mode="reschedule"
         bookingId={selectedSession?.id}
-        initialTopic={selectedSession?.topic || ''}
-        initialNotes={selectedSession?.notes || ''}
+        initialTopic={selectedSession?.topic || ""}
+        initialNotes={selectedSession?.notes || ""}
         onRescheduleSuccess={handleRescheduleSuccess}
       />
 
@@ -510,7 +658,11 @@ export default function MySessionsPage() {
           <DialogHeader>
             <DialogTitle className="text-xl">Leave a Review</DialogTitle>
             <DialogDescription className="text-gray-500">
-              How was your session with <span className="font-medium text-gray-700">{selectedSession?.coachName}</span>?
+              How was your session with{" "}
+              <span className="font-medium text-gray-700">
+                {selectedSession?.coachName}
+              </span>
+              ?
             </DialogDescription>
           </DialogHeader>
           <div className="py-4 space-y-6">
@@ -521,15 +673,21 @@ export default function MySessionsPage() {
                   onClick={() => setReviewRating(star)}
                   className="focus:outline-none transition-all hover:scale-110 active:scale-95"
                 >
-                  <Star 
-                    className={`h-10 w-10 ${star <= reviewRating ? "fill-yellow-400 text-yellow-400 drop-shadow-sm" : "text-slate-200"}`} 
+                  <Star
+                    className={`h-10 w-10 ${
+                      star <= reviewRating
+                        ? "fill-yellow-400 text-yellow-400 drop-shadow-sm"
+                        : "text-slate-200"
+                    }`}
                   />
                 </button>
               ))}
             </div>
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700">Comment</Label>
-              <Textarea 
+              <Label className="text-sm font-medium text-gray-700">
+                Comment
+              </Label>
+              <Textarea
                 value={reviewComment}
                 onChange={(e) => setReviewComment(e.target.value)}
                 placeholder="Share your experience..."
@@ -539,8 +697,18 @@ export default function MySessionsPage() {
             </div>
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setReviewDialogOpen(false)} className="rounded-lg">Cancel</Button>
-            <Button onClick={confirmReview} disabled={isProcessing} className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg">
+            <Button
+              variant="outline"
+              onClick={() => setReviewDialogOpen(false)}
+              className="rounded-lg"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={confirmReview}
+              disabled={isProcessing}
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg"
+            >
               {isProcessing ? "Submitting..." : "Submit Review"}
             </Button>
           </DialogFooter>

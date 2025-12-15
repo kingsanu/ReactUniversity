@@ -12,7 +12,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, MoreHorizontal, UserCheck, UserX, Mail, Filter } from "lucide-react";
+import {
+  Search,
+  MoreHorizontal,
+  UserCheck,
+  UserX,
+  Mail,
+  Filter,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -170,7 +177,10 @@ export default function AdminUsersPage() {
                 </TableRow>
               ) : users.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-10 text-gray-500">
+                  <TableCell
+                    colSpan={7}
+                    className="text-center py-10 text-gray-500"
+                  >
                     No users found matching your criteria.
                   </TableCell>
                 </TableRow>
@@ -182,8 +192,14 @@ export default function AdminUsersPage() {
                     <TableCell className="capitalize">{user.role}</TableCell>
                     <TableCell>
                       <Badge
-                        variant={user.status === "active" ? "default" : "secondary"}
-                        className={user.status === "active" ? "bg-green-100 text-green-800 hover:bg-green-200" : ""}
+                        variant={
+                          user.status === "active" ? "default" : "secondary"
+                        }
+                        className={
+                          user.status === "active"
+                            ? "bg-green-100 text-green-800 hover:bg-green-200"
+                            : ""
+                        }
                       >
                         {user.status}
                       </Badge>
@@ -197,7 +213,9 @@ export default function AdminUsersPage() {
                         <span className="text-gray-400 text-sm">-</span>
                       )}
                     </TableCell>
-                    <TableCell>{new Date(user.joinedDate).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      {new Date(user.joinedDate).toLocaleDateString()}
+                    </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -233,7 +251,7 @@ export default function AdminUsersPage() {
             </TableBody>
           </Table>
         </div>
-        
+
         {/* Pagination */}
         <div className="flex items-center justify-end space-x-2 py-4">
           <Button

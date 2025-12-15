@@ -27,7 +27,7 @@ export interface AdminPayoutItem {
   amount: number;
   periodStart: string;
   periodEnd: string;
-  status: 'pending' | 'approved' | 'rejected' | 'paid';
+  status: "pending" | "approved" | "rejected" | "paid";
 }
 
 export interface CommissionStats {
@@ -206,8 +206,10 @@ export function setTestAdminRole(role: "user" | "admin" | "super_admin") {
 
 // --- Admin Payout APIs ---
 
-export async function getAdminPayouts(status?: 'pending' | 'approved' | 'rejected' | 'paid'): Promise<AdminPayoutItem[]> {
-  const query = status ? `?status=${status}` : '';
+export async function getAdminPayouts(
+  status?: "pending" | "approved" | "rejected" | "paid"
+): Promise<AdminPayoutItem[]> {
+  const query = status ? `?status=${status}` : "";
 
   const response = await fetch(`${API_BASE_URL}/api/v1/admin/payouts${query}`, {
     headers: getHeaders(),
@@ -218,23 +220,34 @@ export async function getAdminPayouts(status?: 'pending' | 'approved' | 'rejecte
   return json.data || json;
 }
 
-export async function approvePayout(payoutId: string): Promise<{ success: boolean; message: string }> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/admin/payouts/${payoutId}/approve`, {
-    method: "POST",
-    headers: getHeaders(),
-  });
+export async function approvePayout(
+  payoutId: string
+): Promise<{ success: boolean; message: string }> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/admin/payouts/${payoutId}/approve`,
+    {
+      method: "POST",
+      headers: getHeaders(),
+    }
+  );
 
   if (!response.ok) throw new Error("Failed to approve payout");
   const json = await response.json();
   return json.data || json;
 }
 
-export async function rejectPayout(payoutId: string, reason?: string): Promise<{ success: boolean; message: string }> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/admin/payouts/${payoutId}/reject`, {
-    method: "POST",
-    headers: getHeaders(),
-    body: JSON.stringify({ reason }),
-  });
+export async function rejectPayout(
+  payoutId: string,
+  reason?: string
+): Promise<{ success: boolean; message: string }> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/admin/payouts/${payoutId}/reject`,
+    {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify({ reason }),
+    }
+  );
 
   if (!response.ok) throw new Error("Failed to reject payout");
   const json = await response.json();
@@ -242,9 +255,12 @@ export async function rejectPayout(payoutId: string, reason?: string): Promise<{
 }
 
 export async function getCommissionStats(): Promise<CommissionStats> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/admin/commission-stats`, {
-    headers: getHeaders(),
-  });
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/admin/commission-stats`,
+    {
+      headers: getHeaders(),
+    }
+  );
 
   if (!response.ok) throw new Error("Failed to fetch commission stats");
   const json = await response.json();
@@ -258,7 +274,7 @@ export interface AdminUser {
   name: string;
   email: string;
   role: string;
-  status: 'active' | 'inactive';
+  status: "active" | "inactive";
   joinedDate: string;
   subscriptionStatus?: string;
 }
@@ -281,12 +297,17 @@ export async function getAdminUsers(params: {
   if (params.page) queryParams.append("page", params.page.toString());
   if (params.limit) queryParams.append("limit", params.limit.toString());
   if (params.search) queryParams.append("search", params.search);
-  if (params.role && params.role !== "all") queryParams.append("role", params.role);
-  if (params.status && params.status !== "all") queryParams.append("status", params.status);
+  if (params.role && params.role !== "all")
+    queryParams.append("role", params.role);
+  if (params.status && params.status !== "all")
+    queryParams.append("status", params.status);
 
-  const response = await fetch(`${API_BASE_URL}/api/admin/users?${queryParams}`, {
-    headers: getHeaders(),
-  });
+  const response = await fetch(
+    `${API_BASE_URL}/api/admin/users?${queryParams}`,
+    {
+      headers: getHeaders(),
+    }
+  );
 
   if (!response.ok) throw new Error("Failed to fetch users");
   const json = await response.json();
@@ -301,7 +322,7 @@ export interface AdminTransaction {
   userName: string;
   amount: number;
   currency: string;
-  status: 'pending' | 'completed' | 'failed' | 'refunded';
+  status: "pending" | "completed" | "failed" | "refunded";
   date: string;
   description: string;
   method?: string;
@@ -324,11 +345,15 @@ export async function getAdminTransactions(params: {
   if (params.page) queryParams.append("page", params.page.toString());
   if (params.limit) queryParams.append("limit", params.limit.toString());
   if (params.search) queryParams.append("search", params.search);
-  if (params.status && params.status !== "all") queryParams.append("status", params.status);
+  if (params.status && params.status !== "all")
+    queryParams.append("status", params.status);
 
-  const response = await fetch(`${API_BASE_URL}/api/admin/transactions?${queryParams}`, {
-    headers: getHeaders(),
-  });
+  const response = await fetch(
+    `${API_BASE_URL}/api/admin/transactions?${queryParams}`,
+    {
+      headers: getHeaders(),
+    }
+  );
 
   if (!response.ok) throw new Error("Failed to fetch transactions");
   const json = await response.json();
@@ -384,22 +409,27 @@ export interface AdminAnalytics {
   topCoaches: TopCoach[];
   topCourses: TopCourse[];
   recentActivity: {
-    type: 'user' | 'transaction' | 'course' | 'session';
+    type: "user" | "transaction" | "course" | "session";
     message: string;
     timestamp: string;
   }[];
 }
 
-export async function getAdminAnalytics(period: 'week' | 'month' | 'year' = 'month'): Promise<AdminAnalytics> {
-  const response = await fetch(`${API_BASE_URL}/api/admin/analytics?period=${period}`, {
-    headers: getHeaders(),
-  });
+export async function getAdminAnalytics(
+  period: "week" | "month" | "year" = "month"
+): Promise<AdminAnalytics> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/admin/analytics?period=${period}`,
+    {
+      headers: getHeaders(),
+    }
+  );
 
   if (!response.ok) {
     // Return mock data if endpoint doesn't exist yet
     return getMockAdminAnalytics();
   }
-  
+
   const json = await response.json();
   return json.data || json;
 }
@@ -418,41 +448,121 @@ function getMockAdminAnalytics(): AdminAnalytics {
       },
     },
     revenueData: [
-      { month: 'Jan', revenue: 2400, transactions: 24 },
-      { month: 'Feb', revenue: 1398, transactions: 18 },
-      { month: 'Mar', revenue: 9800, transactions: 52 },
-      { month: 'Apr', revenue: 3908, transactions: 31 },
-      { month: 'May', revenue: 4800, transactions: 38 },
-      { month: 'Jun', revenue: 3800, transactions: 29 },
+      { month: "Jan", revenue: 2400, transactions: 24 },
+      { month: "Feb", revenue: 1398, transactions: 18 },
+      { month: "Mar", revenue: 9800, transactions: 52 },
+      { month: "Apr", revenue: 3908, transactions: 31 },
+      { month: "May", revenue: 4800, transactions: 38 },
+      { month: "Jun", revenue: 3800, transactions: 29 },
     ],
     userGrowthData: [
-      { month: 'Jan', users: 400, newUsers: 45 },
-      { month: 'Feb', users: 300, newUsers: 38 },
-      { month: 'Mar', users: 200, newUsers: 52 },
-      { month: 'Apr', users: 278, newUsers: 41 },
-      { month: 'May', users: 189, newUsers: 35 },
-      { month: 'Jun', users: 239, newUsers: 48 },
+      { month: "Jan", users: 400, newUsers: 45 },
+      { month: "Feb", users: 300, newUsers: 38 },
+      { month: "Mar", users: 200, newUsers: 52 },
+      { month: "Apr", users: 278, newUsers: 41 },
+      { month: "May", users: 189, newUsers: 35 },
+      { month: "Jun", users: 239, newUsers: 48 },
     ],
     topCoaches: [
-      { id: '1', name: 'Dr. Sarah Johnson', earnings: 12500, sessions: 48, rating: 4.9 },
-      { id: '2', name: 'Prof. Michael Chen', earnings: 10800, sessions: 42, rating: 4.8 },
-      { id: '3', name: 'Dr. Emily Rodriguez', earnings: 9600, sessions: 38, rating: 4.9 },
-      { id: '4', name: 'Prof. David Kim', earnings: 8400, sessions: 35, rating: 4.7 },
-      { id: '5', name: 'Dr. Lisa Anderson', earnings: 7800, sessions: 32, rating: 4.8 },
+      {
+        id: "1",
+        name: "Dr. Sarah Johnson",
+        earnings: 12500,
+        sessions: 48,
+        rating: 4.9,
+      },
+      {
+        id: "2",
+        name: "Prof. Michael Chen",
+        earnings: 10800,
+        sessions: 42,
+        rating: 4.8,
+      },
+      {
+        id: "3",
+        name: "Dr. Emily Rodriguez",
+        earnings: 9600,
+        sessions: 38,
+        rating: 4.9,
+      },
+      {
+        id: "4",
+        name: "Prof. David Kim",
+        earnings: 8400,
+        sessions: 35,
+        rating: 4.7,
+      },
+      {
+        id: "5",
+        name: "Dr. Lisa Anderson",
+        earnings: 7800,
+        sessions: 32,
+        rating: 4.8,
+      },
     ],
     topCourses: [
-      { id: '1', title: 'Advanced Web Development', enrollments: 245, revenue: 12250, rating: 4.8 },
-      { id: '2', title: 'Data Science Fundamentals', enrollments: 198, revenue: 9900, rating: 4.7 },
-      { id: '3', title: 'Machine Learning', enrollments: 156, revenue: 7800, rating: 4.9 },
-      { id: '4', title: 'Cloud Architecture', enrollments: 142, revenue: 7100, rating: 4.6 },
-      { id: '5', title: 'UX Design Principles', enrollments: 128, revenue: 6400, rating: 4.8 },
+      {
+        id: "1",
+        title: "Advanced Web Development",
+        enrollments: 245,
+        revenue: 12250,
+        rating: 4.8,
+      },
+      {
+        id: "2",
+        title: "Data Science Fundamentals",
+        enrollments: 198,
+        revenue: 9900,
+        rating: 4.7,
+      },
+      {
+        id: "3",
+        title: "Machine Learning",
+        enrollments: 156,
+        revenue: 7800,
+        rating: 4.9,
+      },
+      {
+        id: "4",
+        title: "Cloud Architecture",
+        enrollments: 142,
+        revenue: 7100,
+        rating: 4.6,
+      },
+      {
+        id: "5",
+        title: "UX Design Principles",
+        enrollments: 128,
+        revenue: 6400,
+        rating: 4.8,
+      },
     ],
     recentActivity: [
-      { type: 'user', message: 'New user registered: John Doe', timestamp: new Date(Date.now() - 5 * 60000).toISOString() },
-      { type: 'transaction', message: 'Payment completed: $299.99', timestamp: new Date(Date.now() - 15 * 60000).toISOString() },
-      { type: 'course', message: 'New course published: React Mastery', timestamp: new Date(Date.now() - 30 * 60000).toISOString() },
-      { type: 'session', message: 'Coaching session completed', timestamp: new Date(Date.now() - 45 * 60000).toISOString() },
-      { type: 'user', message: 'User upgraded to premium', timestamp: new Date(Date.now() - 60 * 60000).toISOString() },
+      {
+        type: "user",
+        message: "New user registered: John Doe",
+        timestamp: new Date(Date.now() - 5 * 60000).toISOString(),
+      },
+      {
+        type: "transaction",
+        message: "Payment completed: $299.99",
+        timestamp: new Date(Date.now() - 15 * 60000).toISOString(),
+      },
+      {
+        type: "course",
+        message: "New course published: React Mastery",
+        timestamp: new Date(Date.now() - 30 * 60000).toISOString(),
+      },
+      {
+        type: "session",
+        message: "Coaching session completed",
+        timestamp: new Date(Date.now() - 45 * 60000).toISOString(),
+      },
+      {
+        type: "user",
+        message: "User upgraded to premium",
+        timestamp: new Date(Date.now() - 60 * 60000).toISOString(),
+      },
     ],
   };
 }

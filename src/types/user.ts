@@ -36,10 +36,10 @@ export interface UserSettings {
     push: boolean;
     sms: boolean;
   };
-  theme: 'light' | 'dark' | 'system';
+  theme: "light" | "dark" | "system";
   language: string;
   privacy: {
-    profileVisibility: 'public' | 'private' | 'connections';
+    profileVisibility: "public" | "private" | "connections";
     showActivity: boolean;
   };
 }

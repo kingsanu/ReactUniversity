@@ -27,7 +27,9 @@ export async function getUserProfile(): Promise<UserProfile> {
   return json.data || json;
 }
 
-export async function updateUserProfile(profileData: Partial<UserProfile>): Promise<UserProfile> {
+export async function updateUserProfile(
+  profileData: Partial<UserProfile>
+): Promise<UserProfile> {
   const response = await fetch(`${API_BASE_URL}/api/v1/user/profile`, {
     method: "PUT",
     headers: getHeaders(),
@@ -39,7 +41,9 @@ export async function updateUserProfile(profileData: Partial<UserProfile>): Prom
   return json.data || json;
 }
 
-export async function uploadProfileAvatar(file: File): Promise<{ avatarUrl: string }> {
+export async function uploadProfileAvatar(
+  file: File
+): Promise<{ avatarUrl: string }> {
   const formData = new FormData();
   formData.append("avatar", file);
 
@@ -56,7 +60,9 @@ export async function uploadProfileAvatar(file: File): Promise<{ avatarUrl: stri
   return json.data || json;
 }
 
-export async function uploadProfileCover(file: File): Promise<{ coverUrl: string }> {
+export async function uploadProfileCover(
+  file: File
+): Promise<{ coverUrl: string }> {
   const formData = new FormData();
   formData.append("cover", file);
 
@@ -83,7 +89,9 @@ export async function getUserActivity(): Promise<UserActivity[]> {
   return json.data || json;
 }
 
-export async function updateUserSettings(settings: Partial<UserSettings>): Promise<UserSettings> {
+export async function updateUserSettings(
+  settings: Partial<UserSettings>
+): Promise<UserSettings> {
   const response = await fetch(`${API_BASE_URL}/api/v1/user/settings`, {
     method: "PATCH",
     headers: getHeaders(),

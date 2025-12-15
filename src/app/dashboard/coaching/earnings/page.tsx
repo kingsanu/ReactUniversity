@@ -26,13 +26,22 @@ import {
   Download,
   Filter,
 } from "lucide-react";
-import { getCoachEarnings, getCoachEarningsHistory, CoachEarningsStats, EarningsHistoryItem } from "@/services/coachService";
+import {
+  getCoachEarnings,
+  getCoachEarningsHistory,
+  CoachEarningsStats,
+  EarningsHistoryItem,
+} from "@/services/coachService";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
 export default function EarningsPage() {
-  const [earningsStats, setEarningsStats] = useState<CoachEarningsStats | null>(null);
-  const [earningsHistory, setEarningsHistory] = useState<EarningsHistoryItem[]>([]);
+  const [earningsStats, setEarningsStats] = useState<CoachEarningsStats | null>(
+    null
+  );
+  const [earningsHistory, setEarningsHistory] = useState<EarningsHistoryItem[]>(
+    []
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState("all");
@@ -45,14 +54,15 @@ export default function EarningsPage() {
     try {
       const [statsResponse, historyResponse] = await Promise.all([
         getCoachEarnings(),
-        getCoachEarningsHistory()
+        getCoachEarningsHistory(),
       ]);
       setEarningsStats(statsResponse);
       setEarningsHistory(historyResponse);
       setError(null);
     } catch (error) {
       console.error("Failed to fetch earnings data:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to load earnings data";
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to load earnings data";
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -89,12 +99,11 @@ export default function EarningsPage() {
     return (
       <div className="p-6 sm:p-10 space-y-8 max-w-7xl mx-auto">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900">Error loading earnings data</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Error loading earnings data
+          </h1>
           <p className="text-gray-500 mt-2">{error}</p>
-          <Button 
-            onClick={() => window.location.reload()} 
-            className="mt-4"
-          >
+          <Button onClick={() => window.location.reload()} className="mt-4">
             Try Again
           </Button>
         </div>
@@ -106,7 +115,9 @@ export default function EarningsPage() {
     return (
       <div className="p-6 sm:p-10 space-y-8 max-w-7xl mx-auto">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900">Unable to load earnings data</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Unable to load earnings data
+          </h1>
           <p className="text-gray-500 mt-2">Please try again later</p>
         </div>
       </div>
@@ -141,7 +152,7 @@ export default function EarningsPage() {
           <CardContent>
             <div className="flex items-baseline gap-2">
               <span className="text-4xl font-bold">
-                ${earningsStats?.totalEarnings?.toLocaleString() || '0'}
+                ${earningsStats?.totalEarnings?.toLocaleString() || "0"}
               </span>
             </div>
             <p className="text-blue-100 text-sm mt-1 flex items-center gap-1">
@@ -160,7 +171,7 @@ export default function EarningsPage() {
           <CardContent>
             <div className="flex items-baseline gap-2">
               <span className="text-4xl font-bold text-gray-900">
-                ${earningsStats?.pendingPayout?.toLocaleString() || '0'}
+                ${earningsStats?.pendingPayout?.toLocaleString() || "0"}
               </span>
             </div>
             <p className="text-gray-500 text-sm mt-1 flex items-center gap-1">
@@ -179,11 +190,11 @@ export default function EarningsPage() {
           <CardContent>
             <div className="flex items-baseline gap-2">
               <span className="text-4xl font-bold text-gray-900">
-                ${earningsStats?.lastPayoutAmount?.toLocaleString() || '0'}
+                ${earningsStats?.lastPayoutAmount?.toLocaleString() || "0"}
               </span>
             </div>
             <p className="text-green-600 text-sm mt-1 flex items-center gap-1">
-              Paid on {earningsStats?.lastPayoutDate || 'N/A'}
+              Paid on {earningsStats?.lastPayoutDate || "N/A"}
             </p>
           </CardContent>
         </Card>
@@ -236,7 +247,7 @@ export default function EarningsPage() {
                     {item.description}
                   </TableCell>
                   <TableCell className="text-right font-medium">
-                    ${item.amountGross?.toFixed(2) || '0.00'}
+                    ${item.amountGross?.toFixed(2) || "0.00"}
                   </TableCell>
                   <TableCell className="text-right text-red-500">
                     -${calculateFee(item.amountGross || 0).toFixed(2)}
@@ -255,7 +266,11 @@ export default function EarningsPage() {
                           : "bg-red-50 text-red-700"
                       }
                     >
-                      {item.status === "completed" ? "Paid" : item.status === "pending" ? "Pending" : "Cancelled"}
+                      {item.status === "completed"
+                        ? "Paid"
+                        : item.status === "pending"
+                        ? "Pending"
+                        : "Cancelled"}
                     </Badge>
                   </TableCell>
                 </TableRow>

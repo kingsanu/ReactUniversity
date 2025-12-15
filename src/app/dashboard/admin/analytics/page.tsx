@@ -25,11 +25,11 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { 
-  Users, 
-  DollarSign, 
-  BookOpen, 
-  TrendingUp, 
+import {
+  Users,
+  DollarSign,
+  BookOpen,
+  TrendingUp,
   TrendingDown,
   Activity,
   Award,
@@ -40,20 +40,20 @@ import {
 import { getAdminAnalytics, AdminAnalytics } from "@/services/adminService";
 import { useQuery } from "@tanstack/react-query";
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8"];
 
 export default function AnalyticsPage() {
-  const [period, setPeriod] = useState<'week' | 'month' | 'year'>('month');
+  const [period, setPeriod] = useState<"week" | "month" | "year">("month");
 
   const { data: analytics, isLoading } = useQuery<AdminAnalytics>({
-    queryKey: ['admin-analytics', period],
+    queryKey: ["admin-analytics", period],
     queryFn: () => getAdminAnalytics(period),
   });
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
       minimumFractionDigits: 0,
     }).format(value);
   };
@@ -62,7 +62,7 @@ export default function AnalyticsPage() {
     const diff = Date.now() - new Date(timestamp).getTime();
     const minutes = Math.floor(diff / 60000);
     const hours = Math.floor(diff / 3600000);
-    
+
     if (minutes < 60) return `${minutes}m ago`;
     if (hours < 24) return `${hours}h ago`;
     return `${Math.floor(hours / 24)}d ago`;
@@ -74,7 +74,9 @@ export default function AnalyticsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Analytics</h1>
-            <p className="text-muted-foreground">Loading platform analytics...</p>
+            <p className="text-muted-foreground">
+              Loading platform analytics...
+            </p>
           </div>
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -126,12 +128,20 @@ export default function AnalyticsPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{analytics.stats.totalUsers.toLocaleString()}</div>
+            <div className="text-2xl font-bold">
+              {analytics.stats.totalUsers.toLocaleString()}
+            </div>
             <p className="text-xs text-muted-foreground flex items-center gap-1">
               {analytics.stats.monthlyGrowth.users >= 0 ? (
-                <><ArrowUpRight className="h-3 w-3 text-green-600" /> +{analytics.stats.monthlyGrowth.users}%</>
+                <>
+                  <ArrowUpRight className="h-3 w-3 text-green-600" /> +
+                  {analytics.stats.monthlyGrowth.users}%
+                </>
               ) : (
-                <><ArrowDownRight className="h-3 w-3 text-red-600" /> {analytics.stats.monthlyGrowth.users}%</>
+                <>
+                  <ArrowDownRight className="h-3 w-3 text-red-600" />{" "}
+                  {analytics.stats.monthlyGrowth.users}%
+                </>
               )}
               <span className="text-muted-foreground">from last period</span>
             </p>
@@ -143,12 +153,20 @@ export default function AnalyticsPage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(analytics.stats.totalRevenue)}</div>
+            <div className="text-2xl font-bold">
+              {formatCurrency(analytics.stats.totalRevenue)}
+            </div>
             <p className="text-xs text-muted-foreground flex items-center gap-1">
               {analytics.stats.monthlyGrowth.revenue >= 0 ? (
-                <><ArrowUpRight className="h-3 w-3 text-green-600" /> +{analytics.stats.monthlyGrowth.revenue}%</>
+                <>
+                  <ArrowUpRight className="h-3 w-3 text-green-600" /> +
+                  {analytics.stats.monthlyGrowth.revenue}%
+                </>
               ) : (
-                <><ArrowDownRight className="h-3 w-3 text-red-600" /> {analytics.stats.monthlyGrowth.revenue}%</>
+                <>
+                  <ArrowDownRight className="h-3 w-3 text-red-600" />{" "}
+                  {analytics.stats.monthlyGrowth.revenue}%
+                </>
               )}
               <span className="text-muted-foreground">from last period</span>
             </p>
@@ -156,16 +174,26 @@ export default function AnalyticsPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Courses</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Active Courses
+            </CardTitle>
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{analytics.stats.activeCourses}</div>
+            <div className="text-2xl font-bold">
+              {analytics.stats.activeCourses}
+            </div>
             <p className="text-xs text-muted-foreground flex items-center gap-1">
               {analytics.stats.monthlyGrowth.courses >= 0 ? (
-                <><ArrowUpRight className="h-3 w-3 text-green-600" /> +{analytics.stats.monthlyGrowth.courses}%</>
+                <>
+                  <ArrowUpRight className="h-3 w-3 text-green-600" /> +
+                  {analytics.stats.monthlyGrowth.courses}%
+                </>
               ) : (
-                <><ArrowDownRight className="h-3 w-3 text-red-600" /> {analytics.stats.monthlyGrowth.courses}%</>
+                <>
+                  <ArrowDownRight className="h-3 w-3 text-red-600" />{" "}
+                  {analytics.stats.monthlyGrowth.courses}%
+                </>
               )}
               <span className="text-muted-foreground">from last period</span>
             </p>
@@ -177,7 +205,9 @@ export default function AnalyticsPage() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+{analytics.stats.growthRate}%</div>
+            <div className="text-2xl font-bold">
+              +{analytics.stats.growthRate}%
+            </div>
             <p className="text-xs text-muted-foreground">
               Overall platform growth
             </p>
@@ -211,7 +241,11 @@ export default function AnalyticsPage() {
                 />
                 <Tooltip formatter={(value: number) => formatCurrency(value)} />
                 <Bar dataKey="revenue" fill="#adfa1d" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="transactions" fill="#60a5fa" radius={[4, 4, 0, 0]} />
+                <Bar
+                  dataKey="transactions"
+                  fill="#60a5fa"
+                  radius={[4, 4, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -271,7 +305,10 @@ export default function AnalyticsPage() {
           <CardContent>
             <div className="space-y-4">
               {analytics.topCoaches.map((coach, index) => (
-                <div key={coach.id} className="flex items-center justify-between">
+                <div
+                  key={coach.id}
+                  className="flex items-center justify-between"
+                >
                   <div className="flex items-center gap-3">
                     <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold">
                       {index + 1}
@@ -284,7 +321,9 @@ export default function AnalyticsPage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold">{formatCurrency(coach.earnings)}</p>
+                    <p className="font-semibold">
+                      {formatCurrency(coach.earnings)}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -305,12 +344,16 @@ export default function AnalyticsPage() {
               {analytics.topCourses.map((course, index) => (
                 <div key={course.id} className="space-y-1">
                   <div className="flex items-center justify-between">
-                    <p className="font-medium text-sm truncate flex-1">{course.title}</p>
+                    <p className="font-medium text-sm truncate flex-1">
+                      {course.title}
+                    </p>
                     <Badge variant="secondary">{course.enrollments}</Badge>
                   </div>
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>⭐ {course.rating}</span>
-                    <span className="font-semibold">{formatCurrency(course.revenue)}</span>
+                    <span className="font-semibold">
+                      {formatCurrency(course.revenue)}
+                    </span>
                   </div>
                 </div>
               ))}
@@ -330,20 +373,35 @@ export default function AnalyticsPage() {
             <div className="space-y-4">
               {analytics.recentActivity.map((activity, index) => (
                 <div key={index} className="flex items-start gap-3">
-                  <div className={`mt-0.5 rounded-full p-1.5 ${
-                    activity.type === 'user' ? 'bg-blue-500/10' :
-                    activity.type === 'transaction' ? 'bg-green-500/10' :
-                    activity.type === 'course' ? 'bg-purple-500/10' :
-                    'bg-orange-500/10'
-                  }`}>
-                    {activity.type === 'user' && <Users className="h-3 w-3 text-blue-500" />}
-                    {activity.type === 'transaction' && <DollarSign className="h-3 w-3 text-green-500" />}
-                    {activity.type === 'course' && <BookOpen className="h-3 w-3 text-purple-500" />}
-                    {activity.type === 'session' && <Clock className="h-3 w-3 text-orange-500" />}
+                  <div
+                    className={`mt-0.5 rounded-full p-1.5 ${
+                      activity.type === "user"
+                        ? "bg-blue-500/10"
+                        : activity.type === "transaction"
+                        ? "bg-green-500/10"
+                        : activity.type === "course"
+                        ? "bg-purple-500/10"
+                        : "bg-orange-500/10"
+                    }`}
+                  >
+                    {activity.type === "user" && (
+                      <Users className="h-3 w-3 text-blue-500" />
+                    )}
+                    {activity.type === "transaction" && (
+                      <DollarSign className="h-3 w-3 text-green-500" />
+                    )}
+                    {activity.type === "course" && (
+                      <BookOpen className="h-3 w-3 text-purple-500" />
+                    )}
+                    {activity.type === "session" && (
+                      <Clock className="h-3 w-3 text-orange-500" />
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm truncate">{activity.message}</p>
-                    <p className="text-xs text-muted-foreground">{formatTimeAgo(activity.timestamp)}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatTimeAgo(activity.timestamp)}
+                    </p>
                   </div>
                 </div>
               ))}

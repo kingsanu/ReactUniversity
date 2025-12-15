@@ -4,12 +4,26 @@ import { useState, useEffect, useMemo } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Coach, DaySchedule, TimeSlot } from "@/types/coach";
 import { toast } from "sonner";
 import { format, getDay } from "date-fns";
-import { Clock, Video, Globe, ChevronLeft, ChevronRight, Loader2, CalendarDays } from "lucide-react";
+import {
+  Clock,
+  Video,
+  Globe,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+  CalendarDays,
+} from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
@@ -17,7 +31,7 @@ interface BookingModalProps {
   coach: Coach | null;
   isOpen: boolean;
   onClose: () => void;
-  mode?: 'book' | 'reschedule';
+  mode?: "book" | "reschedule";
   bookingId?: string;
   initialTopic?: string;
   initialNotes?: string;
@@ -27,30 +41,43 @@ interface BookingModalProps {
 // Default fallback time slots removed
 
 // Day name mapping
-const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const DAY_NAMES = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
 
 // Generate 30-min slots from a time range
 function generateSlotsFromRange(start: string, end: string): string[] {
   const slots: string[] = [];
   const [startHour, startMin] = start.split(":").map(Number);
   const [endHour, endMin] = end.split(":").map(Number);
-  
+
   let currentHour = startHour;
   let currentMin = startMin;
-  
-  while (currentHour < endHour || (currentHour === endHour && currentMin < endMin)) {
+
+  while (
+    currentHour < endHour ||
+    (currentHour === endHour && currentMin < endMin)
+  ) {
     const hour12 = currentHour % 12 || 12;
     const meridian = currentHour < 12 ? "am" : "pm";
-    const timeStr = `${hour12.toString().padStart(2, '0')}:${currentMin.toString().padStart(2, '0')}${meridian}`;
+    const timeStr = `${hour12.toString().padStart(2, "0")}:${currentMin
+      .toString()
+      .padStart(2, "0")}${meridian}`;
     slots.push(timeStr);
-    
+
     currentMin += 30;
     if (currentMin >= 60) {
       currentMin = 0;
       currentHour++;
     }
   }
-  
+
   return slots;
 }
 
@@ -59,15 +86,15 @@ import { CoachSlotsResponse } from "@/types/coach";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { redirectToStripeCheckout } from "@/services/paymentService";
 
-export function BookingModal({ 
-  coach, 
-  isOpen, 
-  onClose, 
-  mode = 'book',
+export function BookingModal({
+  coach,
+  isOpen,
+  onClose,
+  mode = "book",
   bookingId,
-  initialTopic = '',
-  initialNotes = '',
-  onRescheduleSuccess
+  initialTopic = "",
+  initialNotes = "",
+  onRescheduleSuccess,
 }: BookingModalProps) {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
@@ -75,23 +102,29 @@ export function BookingModal({
   const [notes, setNotes] = useState("");
   const [step, setStep] = useState<"date-time" | "details">("date-time");
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
-  
+
   // API State
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [isBooking, setIsBooking] = useState(false);
   const [slotsData, setSlotsData] = useState<CoachSlotsResponse | null>(null);
-  const [timezone, setTimezone] = useState<string>(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  const [timezone, setTimezone] = useState<string>(
+    Intl.DateTimeFormat().resolvedOptions().timeZone
+  );
   const { user } = useGlobalStore();
 
   // Fetch slots from API
   useEffect(() => {
     const fetchSlots = async () => {
       if (!date || !coach?.id) return;
-      
+
       setIsLoadingSlots(true);
       try {
         const formattedDate = format(date, "yyyy-MM-dd");
-        const data = await getCoachAvailableSlots(coach.id, formattedDate, timezone);
+        const data = await getCoachAvailableSlots(
+          coach.id,
+          formattedDate,
+          timezone
+        );
         setSlotsData(data);
       } catch (error) {
         console.error("Failed to fetch slots:", error);
@@ -108,12 +141,12 @@ export function BookingModal({
 
   const availableTimeSlots = useMemo(() => {
     if (!slotsData) return [];
-    
+
     // API returns ISO strings or time strings. If ISO, we might need to format them.
     // Based on the spec, it returns full ISO strings e.g., "2024-12-25T09:00:00+05:30".
     // We want to display them as "09:00am".
-    
-    return slotsData.slots.map(slotIso => {
+
+    return slotsData.slots.map((slotIso) => {
       try {
         // Build a date object from the ISO string
         const d = new Date(slotIso);
@@ -124,7 +157,6 @@ export function BookingModal({
         return slotIso;
       }
     });
-
   }, [slotsData]);
 
   // Reset state when modal opens/closes
@@ -151,22 +183,26 @@ export function BookingModal({
     }
 
     try {
-      // Map the selected visible time back to the full ISO string if possible, 
+      // Map the selected visible time back to the full ISO string if possible,
       // or construct it carefully. Since we mapped FROM ISO to display, we should find the matching ISO.
       // However, if we just formatted it for display, we might have lost the exact original string if there were duplicates (unlikely in time slots).
-      
+
       // Better approach: Find the original slot ISO string from `slotsData.slots` that matches the selectedTime display.
-      const originalSlotIso = slotsData?.slots.find(slotIso => {
-         try {
-           return format(new Date(slotIso), "hh:mma").toLowerCase() === selectedTime;
-         } catch { return false; }
+      const originalSlotIso = slotsData?.slots.find((slotIso) => {
+        try {
+          return (
+            format(new Date(slotIso), "hh:mma").toLowerCase() === selectedTime
+          );
+        } catch {
+          return false;
+        }
       });
 
       if (!originalSlotIso) {
-         // Fallback logic if we can't match (shouldn't happen with correct API)
-         // Construct date from 'date' + 'selectedTime'
-         toast.error("Invalid time slot. Please try refreshing.");
-         return;
+        // Fallback logic if we can't match (shouldn't happen with correct API)
+        // Construct date from 'date' + 'selectedTime'
+        toast.error("Invalid time slot. Please try refreshing.");
+        return;
       }
 
       // Show loading
@@ -179,11 +215,11 @@ export function BookingModal({
 
       // 1. Create Booking or Reschedule
       let response;
-      if (mode === 'reschedule' && bookingId) {
+      if (mode === "reschedule" && bookingId) {
         const { rescheduleSession } = await import("@/services/coachService");
         response = await rescheduleSession(bookingId, {
           start: startDate.toISOString(),
-          end: endDate.toISOString()
+          end: endDate.toISOString(),
         });
         toast.success("Session rescheduled successfully");
         onRescheduleSuccess?.();
@@ -192,23 +228,23 @@ export function BookingModal({
           coachId: coach.id,
           slot: {
             start: startDate.toISOString(),
-            end: endDate.toISOString()
+            end: endDate.toISOString(),
           },
           topic,
-          notes: notes 
+          notes: notes,
         });
       }
 
       // 2. Check for Payment (only for new bookings)
-      if (mode === 'book' && slotsData?.price && slotsData.price.amount > 0) {
+      if (mode === "book" && slotsData?.price && slotsData.price.amount > 0) {
         if (!user.id) {
-           toast.error("User not identified. Please log in.");
-           setIsBooking(false);
-           return;
+          toast.error("User not identified. Please log in.");
+          setIsBooking(false);
+          return;
         }
 
         const amountInCents = Math.round(slotsData.price.amount * 100);
-        
+
         try {
           toast.loading("Redirecting to payment...");
           await redirectToStripeCheckout(
@@ -224,8 +260,13 @@ export function BookingModal({
           onClose();
         }
       } else {
-        if (mode === 'book') {
-          toast.success(`Session booked with ${coach?.name} on ${format(date, "PPP")} at ${selectedTime}`);
+        if (mode === "book") {
+          toast.success(
+            `Session booked with ${coach?.name} on ${format(
+              date,
+              "PPP"
+            )} at ${selectedTime}`
+          );
         }
         onClose();
       }
@@ -247,9 +288,9 @@ export function BookingModal({
           <div className="w-full md:w-[280px] p-6 border-r border-gray-100 flex flex-col bg-white">
             <div className="mb-8">
               {step === "details" && (
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={() => setStep("date-time")}
                   className="mb-4 -ml-2 text-gray-500 hover:text-gray-900"
                 >
@@ -261,21 +302,27 @@ export function BookingModal({
                 <AvatarFallback>{coach.name.charAt(0)}</AvatarFallback>
               </Avatar>
               <p className="text-gray-500 text-sm font-medium mb-1">Coach</p>
-              <h3 className="text-lg font-bold text-gray-900 mb-1">{coach.name}</h3>
-              <h3 className="text-lg font-bold text-gray-900 mb-1">{coach.name}</h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-1">
+                {coach.name}
+              </h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-1">
+                {coach.name}
+              </h3>
               <p className="text-gray-900 font-semibold text-xl mb-6">
-                 {mode === 'reschedule' 
+                {mode === "reschedule"
                   ? "Reschedule Session"
-                  : slotsData?.price && slotsData.price.amount > 0 
-                    ? `${slotsData.price.currency} ${slotsData.price.amount}` 
-                    : "1 Hour Session"}
+                  : slotsData?.price && slotsData.price.amount > 0
+                  ? `${slotsData.price.currency} ${slotsData.price.amount}`
+                  : "1 Hour Session"}
               </p>
-              
+
               <div className="space-y-4 text-gray-600 text-sm">
                 <div className="flex items-center">
                   <Clock className="h-4 w-4 mr-3 text-gray-400" />
                   <span className="font-medium">
-                    {slotsData?.sessionDurationMinutes ? `${slotsData.sessionDurationMinutes} min` : "1 hour"}
+                    {slotsData?.sessionDurationMinutes
+                      ? `${slotsData.sessionDurationMinutes} min`
+                      : "1 hour"}
                   </span>
                 </div>
                 <div className="flex items-center">
@@ -296,8 +343,10 @@ export function BookingModal({
               <>
                 {/* Column 2: Calendar */}
                 <div className="flex-1 p-6 border-r border-gray-100 flex flex-col">
-                  <h2 className="text-lg font-semibold mb-4 text-gray-900">Select a Date & Time</h2>
-                  
+                  <h2 className="text-lg font-semibold mb-4 text-gray-900">
+                    Select a Date & Time
+                  </h2>
+
                   {/* Custom Calendar Header */}
                   <div className="flex items-center justify-between mb-4 px-2">
                     <Button
@@ -328,7 +377,7 @@ export function BookingModal({
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                   </div>
-                  
+
                   <Calendar
                     mode="single"
                     selected={date}
@@ -347,7 +396,8 @@ export function BookingModal({
                       nav: "hidden", // Hide default nav
                       month_grid: "w-full border-collapse",
                       weekdays: "flex justify-around mb-2",
-                      weekday: "text-gray-400 font-medium text-xs uppercase w-10 text-center",
+                      weekday:
+                        "text-gray-400 font-medium text-xs uppercase w-10 text-center",
                       week: "flex justify-around w-full",
                       day: cn(
                         "h-10 w-10 text-center text-sm relative flex items-center justify-center",
@@ -374,7 +424,7 @@ export function BookingModal({
                       return date < today;
                     }}
                   />
-                  
+
                   {/* Coach Timezone Info */}
                   <div className="mt-4 pt-4 border-t border-gray-100 text-sm text-gray-500 flex flex-col gap-2">
                     <div className="flex items-center gap-2">
@@ -384,11 +434,11 @@ export function BookingModal({
                       </span>
                     </div>
                     {/* Timezone Helper Text */}
-                     {slotsData?.timezone && slotsData.timezone !== timezone && (
-                        <p className="text-xs text-blue-600">
-                          Converted to your local time ({timezone})
-                        </p>
-                     )}
+                    {slotsData?.timezone && slotsData.timezone !== timezone && (
+                      <p className="text-xs text-blue-600">
+                        Converted to your local time ({timezone})
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -399,19 +449,20 @@ export function BookingModal({
                       {date ? format(date, "EEEE, MMM d") : "Select a date"}
                     </h4>
                     {isLoadingSlots ? (
-                       <div className="flex items-center text-sm text-gray-500 mt-1">
-                          <Loader2 className="h-3 w-3 animate-spin mr-2" />
-                          Checking availability...
-                       </div>
+                      <div className="flex items-center text-sm text-gray-500 mt-1">
+                        <Loader2 className="h-3 w-3 animate-spin mr-2" />
+                        Checking availability...
+                      </div>
                     ) : (
-                      date && availableTimeSlots.length > 0 && (
+                      date &&
+                      availableTimeSlots.length > 0 && (
                         <p className="text-sm text-gray-500 mt-1">
                           {availableTimeSlots.length} slots available
                         </p>
                       )
                     )}
                   </div>
-                  
+
                   <div className="flex-1 overflow-y-auto pr-1 space-y-2 custom-scrollbar">
                     {!date ? (
                       <div className="flex flex-col items-center justify-center h-full text-gray-400 text-sm">
@@ -419,30 +470,40 @@ export function BookingModal({
                         <p>Select a date to see available times</p>
                       </div>
                     ) : isLoadingSlots ? (
-                       <div className="flex flex-col items-center justify-center h-full text-gray-400 text-sm">
-                          <Loader2 className="h-8 w-8 animate-spin text-blue-600 mb-3" />
-                         <p>Loading slots...</p>
-                       </div>
+                      <div className="flex flex-col items-center justify-center h-full text-gray-400 text-sm">
+                        <Loader2 className="h-8 w-8 animate-spin text-blue-600 mb-3" />
+                        <p>Loading slots...</p>
+                      </div>
                     ) : availableTimeSlots.length === 0 ? (
                       <div className="flex flex-col items-center justify-center h-full text-gray-400 text-sm text-center px-4">
                         <Clock className="h-12 w-12 mb-3 opacity-30" />
-                        <p className="font-medium text-gray-600">No availability</p>
-                        <p className="mt-1 mb-4">Coach is not available on this day.</p>
-                        
+                        <p className="font-medium text-gray-600">
+                          No availability
+                        </p>
+                        <p className="mt-1 mb-4">
+                          Coach is not available on this day.
+                        </p>
+
                         {slotsData?.nextAvailableDate && (
-                           <Button 
-                             variant="outline" 
-                             size="sm"
-                             onClick={() => {
-                               if (slotsData.nextAvailableDate) {
-                                  const nextDate = new Date(slotsData.nextAvailableDate);
-                                  setDate(nextDate);
-                                  setCurrentMonth(nextDate);
-                               }
-                             }}
-                           >
-                             Jump to {format(new Date(slotsData.nextAvailableDate), "MMM d")}
-                           </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              if (slotsData.nextAvailableDate) {
+                                const nextDate = new Date(
+                                  slotsData.nextAvailableDate
+                                );
+                                setDate(nextDate);
+                                setCurrentMonth(nextDate);
+                              }
+                            }}
+                          >
+                            Jump to{" "}
+                            {format(
+                              new Date(slotsData.nextAvailableDate),
+                              "MMM d"
+                            )}
+                          </Button>
                         )}
                       </div>
                     ) : (
@@ -452,14 +513,14 @@ export function BookingModal({
                         return (
                           <Button
                             key={time}
-                             // Past check is handled by API mostly, but keeping UI check is fine
-                             // though confusing if we mix timezones. 
-                             // Since API returns valid future slots, we can rely on it primarily.
+                            // Past check is handled by API mostly, but keeping UI check is fine
+                            // though confusing if we mix timezones.
+                            // Since API returns valid future slots, we can rely on it primarily.
                             variant={isSelected ? "default" : "outline"}
                             className={cn(
                               "w-full justify-center font-medium h-11 transition-all rounded-lg",
-                              isSelected 
-                                ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-700 shadow-md" 
+                              isSelected
+                                ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-700 shadow-md"
                                 : "border-gray-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700"
                             )}
                             onClick={() => handleTimeSelect(time)}
@@ -470,11 +531,11 @@ export function BookingModal({
                       })
                     )}
                   </div>
-                  
+
                   {/* Continue Button */}
                   {selectedTime && (
                     <div className="mt-4 pt-4 border-t border-gray-200">
-                      <Button 
+                      <Button
                         className="w-full bg-blue-600 hover:bg-blue-700 text-white h-11 font-medium"
                         onClick={() => setStep("details")}
                       >
@@ -487,26 +548,46 @@ export function BookingModal({
             ) : (
               // Details Step
               <div className="flex-1 p-10 animate-in fade-in slide-in-from-right-4 duration-300">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">Enter Details</h2>
+                <h2 className="text-xl font-bold text-gray-900 mb-6">
+                  Enter Details
+                </h2>
                 <div className="max-w-md space-y-6">
                   <div className="grid gap-2">
-                    <Label htmlFor="topic" className="text-gray-700 font-medium">What would you like to discuss?</Label>
+                    <Label
+                      htmlFor="topic"
+                      className="text-gray-700 font-medium"
+                    >
+                      What would you like to discuss?
+                    </Label>
                     <Select onValueChange={setTopic} value={topic}>
                       <SelectTrigger className="h-11 border-gray-300 focus:ring-black focus:ring-offset-0">
                         <SelectValue placeholder="Select a topic" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="career-guidance">Career Guidance</SelectItem>
-                        <SelectItem value="interview-prep">Interview Prep</SelectItem>
-                        <SelectItem value="resume-review">Resume Review</SelectItem>
-                        <SelectItem value="skill-development">Skill Development</SelectItem>
+                        <SelectItem value="career-guidance">
+                          Career Guidance
+                        </SelectItem>
+                        <SelectItem value="interview-prep">
+                          Interview Prep
+                        </SelectItem>
+                        <SelectItem value="resume-review">
+                          Resume Review
+                        </SelectItem>
+                        <SelectItem value="skill-development">
+                          Skill Development
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
                   <div className="grid gap-2">
-                    <Label htmlFor="notes" className="text-gray-700 font-medium">Additional Notes (Optional)</Label>
-                    <textarea 
+                    <Label
+                      htmlFor="notes"
+                      className="text-gray-700 font-medium"
+                    >
+                      Additional Notes (Optional)
+                    </Label>
+                    <textarea
                       id="notes"
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
@@ -516,15 +597,15 @@ export function BookingModal({
                   </div>
 
                   <div className="pt-4 flex gap-3">
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       onClick={() => setStep("date-time")}
                       className="h-11 px-6 border-gray-300 text-gray-700 hover:bg-gray-50"
                     >
                       Cancel
                     </Button>
-                    <Button 
-                      className="h-11 px-8 bg-black text-white hover:bg-gray-800" 
+                    <Button
+                      className="h-11 px-8 bg-black text-white hover:bg-gray-800"
                       onClick={handleBook}
                       disabled={isBooking}
                     >
@@ -533,8 +614,12 @@ export function BookingModal({
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Processing...
                         </>
-                      ) : mode === 'reschedule' ? "Reschedule Session" : (
-                        slotsData?.price && slotsData.price.amount > 0 ? "Book & Pay" : "Schedule Event"
+                      ) : mode === "reschedule" ? (
+                        "Reschedule Session"
+                      ) : slotsData?.price && slotsData.price.amount > 0 ? (
+                        "Book & Pay"
+                      ) : (
+                        "Schedule Event"
                       )}
                     </Button>
                   </div>
