@@ -26,9 +26,31 @@ export default function CoachSessionsPage() {
   const fetchSessions = async () => {
     try {
       const { getCoachSessions } = await import("@/services/coachService");
-      const response = await getCoachSessions("all");
-      const sessionsData = Array.isArray(response?.data) ? response.data : [];
-      setSessions(sessionsData);
+      const rawResponse: any = await getCoachSessions("all");
+      const response: any = rawResponse;
+      // API may return { data: [] } or an array directly
+      // Handle multiple possible shapes:
+      // 1) { data: { data: [...] } }
+      // 2) { data: [...] }
+      // 3) [...] (array)
+      const sessionsData = Array.isArray(response?.data?.data)
+        ? response.data.data
+        : Array.isArray(response?.data)
+        ? response.data
+        : Array.isArray(response)
+        ? response
+        : [];
+
+      // Normalize items to ensure startTime is present
+      const normalized = sessionsData.map((s: any) => ({
+        ...s,
+        startTime: s.startTime || s.start || null,
+        endTime: s.endTime || s.end || null,
+      }));
+
+      console.debug("🔍 Fetched sessions:", normalized);
+
+      setSessions(normalized);
     } catch (error) {
       console.error("Failed to fetch sessions:", error);
       toast.error("Failed to load sessions");
@@ -41,12 +63,21 @@ export default function CoachSessionsPage() {
     fetchSessions();
   }, []);
 
-  const upcomingSessions = sessions.filter(
-    (s) => s.status === "confirmed" || s.status === "rescheduled"
-  );
-  const pastSessions = sessions.filter(
-    (s) => s.status === "completed" || s.status === "cancelled"
-  );
+  const now = Date.now();
+
+  // Upcoming: status is confirmed/rescheduled AND startTime is in future
+  const upcomingSessions = sessions.filter((s) => {
+    const isStatus = s.status === "confirmed" || s.status === "rescheduled";
+    const start = s.startTime ? new Date(s.startTime).getTime() : 0;
+    return isStatus && start > now;
+  });
+
+  // Past: completed or cancelled, OR confirmed/rescheduled with startTime in past
+  const pastSessions = sessions.filter((s) => {
+    if (s.status === "completed" || s.status === "cancelled") return true;
+    const start = s.startTime ? new Date(s.startTime).getTime() : Infinity;
+    return (s.status === "confirmed" || s.status === "rescheduled") && start <= now;
+  });
 
   const handleRescheduleClick = (session: any) => {
     setSelectedSession(session);
