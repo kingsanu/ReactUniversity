@@ -83,7 +83,7 @@ export function middleware(request: NextRequest) {
 
               if (isStudent && !hasActiveSub) {
                 const url = request.nextUrl.clone();
-                url.pathname = "/dashboard/subscriptions";
+                url.pathname = "/subscribe";
                 return NextResponse.redirect(url);
               }
 

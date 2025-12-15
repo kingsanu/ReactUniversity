@@ -8,7 +8,7 @@ interface AuthWrapperProps {
   children: React.ReactNode;
 }
 
-const protectedRoutes = ["/dashboard"];
+const protectedRoutes = ["/dashboard", "/subscribe"];
 const authRoutes = ["/login", "/signup"];
 
 export function AuthWrapper({ children }: AuthWrapperProps) {
@@ -52,7 +52,8 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
       pathname.startsWith("/dashboard/subscriptions") ||
       pathname.startsWith("/dashboard/admin/plans") ||
       pathname.startsWith("/payment-success") ||
-      pathname.startsWith("/payment-cancelled");
+      pathname.startsWith("/payment-cancelled") ||
+      pathname.startsWith("/subscribe");
 
     const isOnboardingPage = pathname.startsWith("/onboarding");
 
@@ -86,7 +87,7 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
           pathname,
         }
       );
-      router.push("/dashboard/subscriptions");
+      router.push("/subscribe");
       return;
     }
 
