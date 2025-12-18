@@ -22,10 +22,11 @@ export function SubscriptionPlans({ className }: SubscriptionPlansProps) {
   const { user } = useGlobalStore();
   const [subscriptionData, setSubscriptionData] =
     useState<SubscriptionData | null>(null);
-  
+
   // Use the new hook for subscription status
-  const { data: subscriptionStatus, isLoading: statusLoading } = useSubscriptionStatus();
-  
+  const { data: subscriptionStatus, isLoading: statusLoading } =
+    useSubscriptionStatus();
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [processingPayment, setProcessingPayment] = useState<string | null>(
@@ -98,7 +99,7 @@ export function SubscriptionPlans({ className }: SubscriptionPlansProps) {
   const { subscription, billingOptions, features } = subscriptionData;
 
   const hasActiveSubscription = subscriptionStatus?.hasActiveSubscription;
-  
+
   const currentPlan =
     hasActiveSubscription && subscriptionStatus?.planId
       ? subscriptionService.findSubscriptionPlanById(
@@ -129,7 +130,9 @@ export function SubscriptionPlans({ className }: SubscriptionPlansProps) {
                     <span>
                       {" "}
                       - Expires{" "}
-                      {new Date(subscriptionStatus.expiryDate).toLocaleDateString()}
+                      {new Date(
+                        subscriptionStatus.expiryDate
+                      ).toLocaleDateString()}
                     </span>
                   )}
                 </p>

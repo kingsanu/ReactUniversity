@@ -45,8 +45,9 @@ export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  
-  const { mutate: exportTransactions, isPending: isExporting } = useExportTransactions();
+
+  const { mutate: exportTransactions, isPending: isExporting } =
+    useExportTransactions();
 
   useEffect(() => {
     fetchTransactions();
@@ -75,10 +76,15 @@ export default function TransactionsPage() {
       { format: "csv" },
       {
         onSuccess: () => {
-          toast.success(t("transactions.exportSuccess") || "Transactions exported successfully");
+          toast.success(
+            t("transactions.exportSuccess") ||
+              "Transactions exported successfully"
+          );
         },
         onError: () => {
-          toast.error(t("transactions.exportFailed") || "Failed to export transactions");
+          toast.error(
+            t("transactions.exportFailed") || "Failed to export transactions"
+          );
         },
       }
     );

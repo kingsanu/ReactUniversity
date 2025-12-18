@@ -51,10 +51,10 @@ export default function AdminUsersPage() {
   const [page, setPage] = useState(1);
 
   // Use the new hook for data fetching
-  const { 
-    data, 
-    isLoading: usersLoading, 
-    error 
+  const {
+    data,
+    isLoading: usersLoading,
+    error,
   } = useAdminUsers({
     page,
     limit: 20,
@@ -81,7 +81,7 @@ export default function AdminUsersPage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!authLoading && isAdmin) {
-        setPage(1); 
+        setPage(1);
       }
     }, 500);
     return () => clearTimeout(timer);

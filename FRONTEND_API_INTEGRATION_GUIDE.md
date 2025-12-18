@@ -31,7 +31,10 @@ Located in `src/hooks/`:
 ### 1. Transaction Dashboard Component
 
 ```tsx
-import { useTransactionStats, useExportTransactions } from "@/hooks/useTransactionDashboard";
+import {
+  useTransactionStats,
+  useExportTransactions,
+} from "@/hooks/useTransactionDashboard";
 
 export function TransactionDashboard() {
   const { data: stats, isLoading, error } = useTransactionStats();
@@ -57,8 +60,15 @@ export function TransactionDashboard() {
         </div>
         <div className="stat-card">
           <h3>Spending Trend</h3>
-          <p className={stats?.spendingTrend.direction === "up" ? "text-green" : "text-red"}>
-            {stats?.spendingTrend.direction === "up" ? "↑" : "↓"} {stats?.spendingTrend.percentage}%
+          <p
+            className={
+              stats?.spendingTrend.direction === "up"
+                ? "text-green"
+                : "text-red"
+            }
+          >
+            {stats?.spendingTrend.direction === "up" ? "↑" : "↓"}{" "}
+            {stats?.spendingTrend.percentage}%
           </p>
         </div>
       </div>
@@ -92,8 +102,12 @@ export function PaymentMethods() {
       {methods?.map((method) => (
         <div key={method.id} className="payment-card">
           <div>
-            <p>{method.brand.toUpperCase()} ending in {method.last4}</p>
-            <p>Expires: {method.expiryMonth}/{method.expiryYear}</p>
+            <p>
+              {method.brand.toUpperCase()} ending in {method.last4}
+            </p>
+            <p>
+              Expires: {method.expiryMonth}/{method.expiryYear}
+            </p>
             {method.isDefault && <span className="badge">Default</span>}
           </div>
           <div className="actions">
@@ -118,7 +132,10 @@ export function PaymentMethods() {
 ### 3. Subscription Component
 
 ```tsx
-import { useSubscriptionStatus, useCreateSubscription } from "@/hooks/useSubscription";
+import {
+  useSubscriptionStatus,
+  useCreateSubscription,
+} from "@/hooks/useSubscription";
 
 export function SubscriptionManager() {
   const { data: subscription, isLoading } = useSubscriptionStatus();
@@ -223,7 +240,10 @@ export function AdminUsersList() {
       </table>
 
       <div className="pagination">
-        <button onClick={() => setPage(Math.max(1, page - 1))} disabled={page === 1}>
+        <button
+          onClick={() => setPage(Math.max(1, page - 1))}
+          disabled={page === 1}
+        >
           Previous
         </button>
         <span>Page {page}</span>
@@ -305,7 +325,10 @@ export function AdminTransactionsList() {
       </table>
 
       <div className="pagination">
-        <button onClick={() => setPage(Math.max(1, page - 1))} disabled={page === 1}>
+        <button
+          onClick={() => setPage(Math.max(1, page - 1))}
+          disabled={page === 1}
+        >
           Previous
         </button>
         <span>Page {page}</span>
@@ -439,18 +462,25 @@ export function AdminAnalyticsDashboard() {
 ## Quick Reference
 
 ### Using Transaction Stats
+
 ```tsx
 const { data: stats } = useTransactionStats();
 // stats.totalSpent, stats.invoiceCount, stats.lastPaymentMethod, stats.spendingTrend
 ```
 
 ### Exporting Transactions
+
 ```tsx
 const { mutate: exportTransactions } = useExportTransactions();
-exportTransactions({ format: "csv", startDate: "2025-01-01", endDate: "2025-12-31" });
+exportTransactions({
+  format: "csv",
+  startDate: "2025-01-01",
+  endDate: "2025-12-31",
+});
 ```
 
 ### Payment Methods
+
 ```tsx
 const { data: methods } = usePaymentMethods();
 const { mutate: deleteMethod } = useDeletePaymentMethod();
@@ -458,12 +488,14 @@ const { mutate: setDefault } = useSetDefaultPaymentMethod();
 ```
 
 ### Subscription
+
 ```tsx
 const { data: subscription } = useSubscriptionStatus();
 const { mutate: createSubscription } = useCreateSubscription();
 ```
 
 ### Admin Operations
+
 ```tsx
 const { data: users } = useAdminUsers({ page: 1, limit: 20 });
 const { data: transactions } = useAdminTransactions({ page: 1 });
@@ -494,7 +526,7 @@ React Query automatically handles caching and refreshing:
 ```tsx
 // Refetch data manually
 const { refetch } = useTransactionStats();
-<button onClick={() => refetch()}>Refresh</button>
+<button onClick={() => refetch()}>Refresh</button>;
 
 // Or trigger refresh on certain events
 useEffect(() => {

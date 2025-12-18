@@ -33,7 +33,9 @@ export async function createPaymentMethod(): Promise<{ clientSecret: string }> {
 /**
  * Delete a payment method by ID
  */
-export async function deletePaymentMethod(paymentMethodId: string): Promise<void> {
+export async function deletePaymentMethod(
+  paymentMethodId: string
+): Promise<void> {
   await apiRequest(`/api/v1/user/payment-methods/${paymentMethodId}`, {
     method: "DELETE",
   });
@@ -42,7 +44,9 @@ export async function deletePaymentMethod(paymentMethodId: string): Promise<void
 /**
  * Set a payment method as the default for future charges
  */
-export async function setDefaultPaymentMethod(paymentMethodId: string): Promise<PaymentMethod> {
+export async function setDefaultPaymentMethod(
+  paymentMethodId: string
+): Promise<PaymentMethod> {
   const response = await apiRequest(
     `/api/v1/user/payment-methods/${paymentMethodId}/default`,
     {

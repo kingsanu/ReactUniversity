@@ -15,11 +15,13 @@ All 7 API groups have been implemented with mock data and proper error handling.
 ## API Implementation Details
 
 ### 1. Transaction Statistics API
+
 **Endpoint:** `GET /api/v1/transactions/stats`  
 **Location:** `src/app/api/v1/transactions/stats/route.ts`  
 **Authentication:** Required (JWT Bearer token)
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -41,11 +43,13 @@ All 7 API groups have been implemented with mock data and proper error handling.
 ```
 
 **Status Codes:**
+
 - `200`: Successfully retrieved statistics
 - `401`: Unauthorized (invalid or missing token)
 - `500`: Server error
 
 **Production Implementation Notes:**
+
 - Query the transactions collection for the user
 - Calculate aggregated totals across all transactions
 - Get last payment method from user profile or most recent transaction
@@ -54,20 +58,24 @@ All 7 API groups have been implemented with mock data and proper error handling.
 ---
 
 ### 2. Transaction Export API
+
 **Endpoint:** `GET /api/v1/transactions/export`  
 **Location:** `src/app/api/v1/transactions/export/route.ts`  
 **Authentication:** Required (JWT Bearer token)
 
 **Query Parameters:**
+
 - `format` (optional): `csv` or `pdf` (default: `csv`)
 - `startDate` (optional): ISO date string (e.g., "2025-01-01")
 - `endDate` (optional): ISO date string (e.g., "2025-12-31")
 
 **Response:** Binary file stream
+
 - Content-Type: `text/csv` or `application/pdf`
 - Content-Disposition: `attachment; filename=transactions.{csv|pdf}`
 
 **Status Codes:**
+
 - `200`: Successfully exported file
 - `400`: Invalid format parameter
 - `401`: Unauthorized
@@ -75,6 +83,7 @@ All 7 API groups have been implemented with mock data and proper error handling.
 - `500`: Server error
 
 **Production Implementation Notes:**
+
 - Implement CSV generation for all user transactions
 - Add optional PDF export using a PDF library (e.g., `pdfkit`, `html2pdf`)
 - Filter transactions by date range if parameters provided
@@ -85,11 +94,13 @@ All 7 API groups have been implemented with mock data and proper error handling.
 ### 3. Payment Methods Management APIs
 
 #### 3a. List Payment Methods
+
 **Endpoint:** `GET /api/v1/user/payment-methods`  
 **Location:** `src/app/api/v1/user/payment-methods/route.ts`  
 **Authentication:** Required
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -108,11 +119,13 @@ All 7 API groups have been implemented with mock data and proper error handling.
 ```
 
 #### 3b. Create Payment Method
+
 **Endpoint:** `POST /api/v1/user/payment-methods`  
 **Location:** `src/app/api/v1/user/payment-methods/route.ts`  
 **Authentication:** Required
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -123,11 +136,13 @@ All 7 API groups have been implemented with mock data and proper error handling.
 ```
 
 #### 3c. Delete Payment Method
+
 **Endpoint:** `DELETE /api/v1/user/payment-methods/:id`  
 **Location:** `src/app/api/v1/user/payment-methods/[id]/route.ts`  
 **Authentication:** Required
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -136,11 +151,13 @@ All 7 API groups have been implemented with mock data and proper error handling.
 ```
 
 #### 3d. Set Default Payment Method
+
 **Endpoint:** `PATCH /api/v1/user/payment-methods/:id/default`  
 **Location:** `src/app/api/v1/user/payment-methods/[id]/default/route.ts`  
 **Authentication:** Required
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -153,6 +170,7 @@ All 7 API groups have been implemented with mock data and proper error handling.
 ```
 
 **Production Implementation Notes:**
+
 - Integrate with Stripe API for payment method management
 - Validate payment method belongs to user before operations
 - Store payment methods in database with Stripe IDs
@@ -164,11 +182,13 @@ All 7 API groups have been implemented with mock data and proper error handling.
 ### 4. Subscription Status & Creation APIs
 
 #### 4a. Get Subscription Status
+
 **Endpoint:** `GET /api/v1/user/subscription/status`  
 **Location:** `src/app/api/v1/user/subscription/status/route.ts`  
 **Authentication:** Required
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -182,11 +202,13 @@ All 7 API groups have been implemented with mock data and proper error handling.
 ```
 
 #### 4b. Create Subscription
+
 **Endpoint:** `POST /api/v1/subscriptions`  
 **Location:** `src/app/api/v1/subscriptions/route.ts`  
 **Authentication:** Required
 
 **Request Body:**
+
 ```json
 {
   "planId": "plan_premium_monthly",
@@ -195,6 +217,7 @@ All 7 API groups have been implemented with mock data and proper error handling.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -209,12 +232,14 @@ All 7 API groups have been implemented with mock data and proper error handling.
 ```
 
 **Status Codes:**
+
 - `201`: Subscription created successfully
 - `400`: Invalid plan ID or request parameters
 - `401`: Unauthorized
 - `500`: Server error
 
 **Production Implementation Notes:**
+
 - Validate plan exists in subscription_plans collection
 - Integrate with Stripe for subscription creation
 - Store subscription in user_subscriptions collection
@@ -225,11 +250,13 @@ All 7 API groups have been implemented with mock data and proper error handling.
 ---
 
 ### 5. Admin Users Management API
+
 **Endpoint:** `GET /api/v1/admin/users`  
 **Location:** `src/app/api/v1/admin/users/route.ts`  
 **Authentication:** Required (Admin role)
 
 **Query Parameters:**
+
 - `page` (optional): Page number (default: 1)
 - `limit` (optional): Items per page (default: 20, max: 100)
 - `search` (optional): Search by name or email
@@ -237,6 +264,7 @@ All 7 API groups have been implemented with mock data and proper error handling.
 - `status` (optional): Filter by status (active, inactive)
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -260,6 +288,7 @@ All 7 API groups have been implemented with mock data and proper error handling.
 ```
 
 **Status Codes:**
+
 - `200`: Successfully retrieved users
 - `400`: Invalid pagination parameters
 - `401`: Unauthorized
@@ -267,6 +296,7 @@ All 7 API groups have been implemented with mock data and proper error handling.
 - `500`: Server error
 
 **Production Implementation Notes:**
+
 - Add role-based access control (admin only)
 - Query users collection with filters
 - Implement efficient pagination
@@ -276,17 +306,20 @@ All 7 API groups have been implemented with mock data and proper error handling.
 ---
 
 ### 6. Admin Transactions Management API
+
 **Endpoint:** `GET /api/v1/admin/transactions`  
 **Location:** `src/app/api/v1/admin/transactions/route.ts`  
 **Authentication:** Required (Admin role)
 
 **Query Parameters:**
+
 - `page` (optional): Page number (default: 1)
 - `limit` (optional): Items per page (default: 20, max: 100)
 - `search` (optional): Search by user email or name
 - `status` (optional): Filter by payment status
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -314,6 +347,7 @@ All 7 API groups have been implemented with mock data and proper error handling.
 ```
 
 **Production Implementation Notes:**
+
 - Implement admin-only access control
 - Query transactions collection with user details
 - Include all transaction fields for complete visibility
@@ -324,14 +358,17 @@ All 7 API groups have been implemented with mock data and proper error handling.
 ---
 
 ### 7. Admin Analytics Dashboard API
+
 **Endpoint:** `GET /api/v1/admin/analytics`  
 **Location:** `src/app/api/v1/admin/analytics/route.ts`  
 **Authentication:** Required (Admin role)
 
 **Query Parameters:**
+
 - `period` (optional): Time period - `week`, `month`, or `year` (default: `month`)
 
 **Response:** (Comprehensive analytics data)
+
 ```json
 {
   "success": true,
@@ -391,6 +428,7 @@ All 7 API groups have been implemented with mock data and proper error handling.
 ```
 
 **Production Implementation Notes:**
+
 - Aggregate data from users, transactions, coaches, courses, and bookings collections
 - Calculate growth percentages based on period
 - Implement caching (5-10 minutes) to reduce database load
@@ -405,30 +443,35 @@ All 7 API groups have been implemented with mock data and proper error handling.
 ## Implementation Roadmap
 
 ### Phase 1: Database Integration (Week 1)
+
 - [ ] Add database queries for transaction statistics
 - [ ] Implement aggregation pipelines for analytics
 - [ ] Add proper indexes for performance
 - [ ] Implement database filters and pagination
 
 ### Phase 2: Third-Party Integration (Week 1-2)
+
 - [ ] Integrate Stripe API for payment methods
 - [ ] Implement Stripe webhook handlers
 - [ ] Add subscription management with Stripe
 - [ ] Set up transaction recording from Stripe events
 
 ### Phase 3: Admin Role Verification (Week 2)
+
 - [ ] Add role-based access control middleware
 - [ ] Verify admin role on all admin endpoints
 - [ ] Log admin activities for audit trail
 - [ ] Add rate limiting for admin endpoints
 
 ### Phase 4: Advanced Features (Week 2-3)
+
 - [ ] Add PDF export functionality
 - [ ] Implement caching for analytics
 - [ ] Add date range filtering to transactions
 - [ ] Add more sorting options
 
 ### Phase 5: Testing & Optimization (Week 3)
+
 - [ ] Write comprehensive test cases
 - [ ] Performance testing and optimization
 - [ ] Error handling and edge cases
@@ -439,6 +482,7 @@ All 7 API groups have been implemented with mock data and proper error handling.
 ## Testing with Postman
 
 All endpoints are documented in `JwtMongoApi.postman_collection.json`. Use the following variables:
+
 - `jwtToken`: Your JWT token from login
 - `userId`: Your user ID
 
@@ -483,6 +527,7 @@ All endpoints follow a consistent error format:
 ```
 
 ### Common Error Codes:
+
 - `UNAUTHORIZED`: Missing or invalid JWT token (401)
 - `FORBIDDEN`: User lacks required permissions (403)
 - `INVALID_REQUEST`: Invalid request parameters (400)

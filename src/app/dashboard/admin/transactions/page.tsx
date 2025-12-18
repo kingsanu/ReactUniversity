@@ -36,10 +36,10 @@ export default function AdminTransactionsPage() {
   const [page, setPage] = useState(1);
 
   // Use the new hook for data fetching
-  const { 
-    data, 
-    isLoading: transactionsLoading, 
-    error 
+  const {
+    data,
+    isLoading: transactionsLoading,
+    error,
   } = useAdminTransactions({
     page,
     limit: 20,
@@ -213,14 +213,8 @@ export default function AdminTransactionsPage() {
                       {new Date(trx.date).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="text-gray-500 flex items-center gap-2">
-                      {trx.method &&
-                      (trx.method.includes("Visa") ||
-                        trx.method.includes("Mastercard")) ? (
-                        <CreditCard className="w-3 h-3" />
-                      ) : (
-                        <Receipt className="w-3 h-3" />
-                      )}
-                      {trx.method || "N/A"}
+                      <CreditCard className="w-3 h-3" />
+                      {trx.paymentMethodId || "N/A"}
                     </TableCell>
                   </TableRow>
                 ))

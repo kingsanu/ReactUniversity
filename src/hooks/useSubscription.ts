@@ -24,7 +24,11 @@ export function useSubscriptionStatus() {
 export function useCreateSubscription() {
   const queryClient = useQueryClient();
 
-  return useMutation<CreateSubscriptionResponse, Error, CreateSubscriptionRequest>({
+  return useMutation<
+    CreateSubscriptionResponse,
+    Error,
+    CreateSubscriptionRequest
+  >({
     mutationFn: createSubscription,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["subscriptionStatus"] });

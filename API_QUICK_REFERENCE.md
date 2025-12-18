@@ -5,6 +5,7 @@ All endpoints follow the format: `{{baseUrl}}/api/v1/...` or `{{baseUrl}}/api/v1
 ## Transaction Management
 
 ### 1. Get Transaction Statistics
+
 ```
 GET /api/v1/transactions/stats
 Authorization: Bearer {{jwtToken}}
@@ -14,6 +15,7 @@ Status: 200/401/500
 ```
 
 ### 2. Export Transactions
+
 ```
 GET /api/v1/transactions/export?format=csv&startDate=2025-01-01&endDate=2025-12-31
 Authorization: Bearer {{jwtToken}}
@@ -25,6 +27,7 @@ Status: 200/400/401/501/500
 ## Payment Methods
 
 ### 3. List Payment Methods
+
 ```
 GET /api/v1/user/payment-methods
 Authorization: Bearer {{jwtToken}}
@@ -34,6 +37,7 @@ Status: 200/401/500
 ```
 
 ### 4. Create Payment Method
+
 ```
 POST /api/v1/user/payment-methods
 Authorization: Bearer {{jwtToken}}
@@ -43,6 +47,7 @@ Status: 201/401/500
 ```
 
 ### 5. Delete Payment Method
+
 ```
 DELETE /api/v1/user/payment-methods/:id
 Authorization: Bearer {{jwtToken}}
@@ -52,6 +57,7 @@ Status: 200/401/500
 ```
 
 ### 6. Set Default Payment Method
+
 ```
 PATCH /api/v1/user/payment-methods/:id/default
 Authorization: Bearer {{jwtToken}}
@@ -63,6 +69,7 @@ Status: 200/401/500
 ## Subscriptions
 
 ### 7. Get Subscription Status
+
 ```
 GET /api/v1/user/subscription/status
 Authorization: Bearer {{jwtToken}}
@@ -72,6 +79,7 @@ Status: 200/401/500
 ```
 
 ### 8. Create Subscription
+
 ```
 POST /api/v1/subscriptions
 Authorization: Bearer {{jwtToken}}
@@ -84,6 +92,7 @@ Status: 201/400/401/500
 ## Admin - User Management
 
 ### 9. List All Users
+
 ```
 GET /api/v1/admin/users?page=1&limit=20&search=&role=&status=
 Authorization: Bearer {{jwtToken}}
@@ -102,6 +111,7 @@ Status: 200/400/401/403/500
 ## Admin - Transaction Management
 
 ### 10. List All Transactions
+
 ```
 GET /api/v1/admin/transactions?page=1&limit=20&search=&status=
 Authorization: Bearer {{jwtToken}}
@@ -119,6 +129,7 @@ Status: 200/400/401/403/500
 ## Admin - Analytics
 
 ### 11. Get Platform Analytics
+
 ```
 GET /api/v1/admin/analytics?period=month
 Authorization: Bearer {{jwtToken}}
@@ -140,6 +151,7 @@ Status: 200/400/401/403/500
 ## Error Response Format
 
 All endpoints return errors in this format:
+
 ```json
 {
   "success": false,
@@ -152,18 +164,18 @@ All endpoints return errors in this format:
 
 ## Common Error Codes
 
-| Code | Meaning | Status |
-|------|---------|--------|
-| UNAUTHORIZED | Missing/invalid JWT | 401 |
-| FORBIDDEN | User lacks permission | 403 |
-| INVALID_REQUEST | Bad parameters | 400 |
-| NOT_FOUND | Resource not found | 404 |
-| INTERNAL_ERROR | Server error | 500 |
-| INVALID_FORMAT | Invalid format parameter | 400 |
-| INVALID_PAGE | Invalid page number | 400 |
-| INVALID_LIMIT | Invalid limit value | 400 |
-| NOT_IMPLEMENTED | Feature not yet implemented | 501 |
-| INVALID_PERIOD | Invalid period parameter | 400 |
+| Code            | Meaning                     | Status |
+| --------------- | --------------------------- | ------ |
+| UNAUTHORIZED    | Missing/invalid JWT         | 401    |
+| FORBIDDEN       | User lacks permission       | 403    |
+| INVALID_REQUEST | Bad parameters              | 400    |
+| NOT_FOUND       | Resource not found          | 404    |
+| INTERNAL_ERROR  | Server error                | 500    |
+| INVALID_FORMAT  | Invalid format parameter    | 400    |
+| INVALID_PAGE    | Invalid page number         | 400    |
+| INVALID_LIMIT   | Invalid limit value         | 400    |
+| NOT_IMPLEMENTED | Feature not yet implemented | 501    |
+| INVALID_PERIOD  | Invalid period parameter    | 400    |
 
 ## Testing with curl
 
@@ -211,18 +223,18 @@ curl -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \
 
 ## Implementation Files
 
-| Endpoint | File |
-|----------|------|
-| Transaction Stats | `src/app/api/v1/transactions/stats/route.ts` |
-| Transaction Export | `src/app/api/v1/transactions/export/route.ts` |
-| Payment Methods (GET/POST) | `src/app/api/v1/user/payment-methods/route.ts` |
-| Payment Methods (DELETE) | `src/app/api/v1/user/payment-methods/[id]/route.ts` |
-| Set Default Payment | `src/app/api/v1/user/payment-methods/[id]/default/route.ts` |
-| Subscription Status | `src/app/api/v1/user/subscription/status/route.ts` |
-| Create Subscription | `src/app/api/v1/subscriptions/route.ts` |
-| Admin Users | `src/app/api/v1/admin/users/route.ts` |
-| Admin Transactions | `src/app/api/v1/admin/transactions/route.ts` |
-| Admin Analytics | `src/app/api/v1/admin/analytics/route.ts` |
+| Endpoint                   | File                                                        |
+| -------------------------- | ----------------------------------------------------------- |
+| Transaction Stats          | `src/app/api/v1/transactions/stats/route.ts`                |
+| Transaction Export         | `src/app/api/v1/transactions/export/route.ts`               |
+| Payment Methods (GET/POST) | `src/app/api/v1/user/payment-methods/route.ts`              |
+| Payment Methods (DELETE)   | `src/app/api/v1/user/payment-methods/[id]/route.ts`         |
+| Set Default Payment        | `src/app/api/v1/user/payment-methods/[id]/default/route.ts` |
+| Subscription Status        | `src/app/api/v1/user/subscription/status/route.ts`          |
+| Create Subscription        | `src/app/api/v1/subscriptions/route.ts`                     |
+| Admin Users                | `src/app/api/v1/admin/users/route.ts`                       |
+| Admin Transactions         | `src/app/api/v1/admin/transactions/route.ts`                |
+| Admin Analytics            | `src/app/api/v1/admin/analytics/route.ts`                   |
 
 ## Documentation Files
 
