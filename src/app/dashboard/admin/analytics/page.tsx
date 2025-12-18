@@ -37,18 +37,16 @@ import {
   ArrowUpRight,
   ArrowDownRight,
 } from "lucide-react";
-import { getAdminAnalytics, AdminAnalytics } from "@/services/adminService";
-import { useQuery } from "@tanstack/react-query";
+import { useAdminAnalytics } from "@/hooks/useAdminAnalytics";
+import { useTranslation } from "react-i18next";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8"];
 
 export default function AnalyticsPage() {
+  const { t } = useTranslation();
   const [period, setPeriod] = useState<"week" | "month" | "year">("month");
 
-  const { data: analytics, isLoading } = useQuery<AdminAnalytics>({
-    queryKey: ["admin-analytics", period],
-    queryFn: () => getAdminAnalytics(period),
-  });
+  const { data: analytics, isLoading } = useAdminAnalytics(period);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -73,9 +71,11 @@ export default function AnalyticsPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Analytics</h1>
+            <h1 className="text-3xl font-bold tracking-tight">
+              {t("admin.analytics.title")}
+            </h1>
             <p className="text-muted-foreground">
-              Loading platform analytics...
+              {t("admin.analytics.loading")}
             </p>
           </div>
         </div>
@@ -103,9 +103,11 @@ export default function AnalyticsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Analytics</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {t("admin.analytics.title")}
+          </h1>
           <p className="text-muted-foreground">
-            Comprehensive overview of your platform's performance
+            {t("admin.analytics.subtitle")}
           </p>
         </div>
         <Select value={period} onValueChange={(v: any) => setPeriod(v)}>
@@ -113,9 +115,15 @@ export default function AnalyticsPage() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="week">Last Week</SelectItem>
-            <SelectItem value="month">Last Month</SelectItem>
-            <SelectItem value="year">Last Year</SelectItem>
+            <SelectItem value="week">
+              {t("admin.analytics.period.week")}
+            </SelectItem>
+            <SelectItem value="month">
+              {t("admin.analytics.period.month")}
+            </SelectItem>
+            <SelectItem value="year">
+              {t("admin.analytics.period.year")}
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -124,7 +132,9 @@ export default function AnalyticsPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {t("admin.analytics.totalUsers")}
+            </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -143,13 +153,17 @@ export default function AnalyticsPage() {
                   {analytics.stats.monthlyGrowth.users}%
                 </>
               )}
-              <span className="text-muted-foreground">from last period</span>
+              <span className="text-muted-foreground">
+                {t("admin.analytics.fromLastPeriod")}
+              </span>
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {t("admin.analytics.totalRevenue")}
+            </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -168,14 +182,16 @@ export default function AnalyticsPage() {
                   {analytics.stats.monthlyGrowth.revenue}%
                 </>
               )}
-              <span className="text-muted-foreground">from last period</span>
+              <span className="text-muted-foreground">
+                {t("admin.analytics.fromLastPeriod")}
+              </span>
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Active Courses
+              {t("admin.analytics.activeCourses")}
             </CardTitle>
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -195,13 +211,17 @@ export default function AnalyticsPage() {
                   {analytics.stats.monthlyGrowth.courses}%
                 </>
               )}
-              <span className="text-muted-foreground">from last period</span>
+              <span className="text-muted-foreground">
+                {t("admin.analytics.fromLastPeriod")}
+              </span>
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Growth Rate</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {t("admin.analytics.growthRate")}
+            </CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -209,7 +229,7 @@ export default function AnalyticsPage() {
               +{analytics.stats.growthRate}%
             </div>
             <p className="text-xs text-muted-foreground">
-              Overall platform growth
+              {t("admin.analytics.overallPlatformGrowth")}
             </p>
           </CardContent>
         </Card>
@@ -219,7 +239,9 @@ export default function AnalyticsPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4">
           <CardHeader>
-            <CardTitle>Revenue & Transactions</CardTitle>
+            <CardTitle>
+              {t("admin.analytics.cards.revenueTransactions")}
+            </CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
             <ResponsiveContainer width="100%" height={350}>
@@ -252,7 +274,7 @@ export default function AnalyticsPage() {
         </Card>
         <Card className="col-span-3">
           <CardHeader>
-            <CardTitle>User Growth Trend</CardTitle>
+            <CardTitle>{t("admin.analytics.charts.userGrowthTrend")}</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={350}>
@@ -277,14 +299,14 @@ export default function AnalyticsPage() {
                   dataKey="users"
                   stroke="#8884d8"
                   strokeWidth={2}
-                  name="Total Users"
+                  name={t("admin.analytics.chartNames.totalUsers")}
                 />
                 <Line
                   type="monotone"
                   dataKey="newUsers"
                   stroke="#82ca9d"
                   strokeWidth={2}
-                  name="New Users"
+                  name={t("admin.analytics.chartNames.newUsers")}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -299,7 +321,7 @@ export default function AnalyticsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Award className="h-5 w-5 text-yellow-500" />
-              Top Performing Coaches
+              {t("admin.analytics.cards.topCoaches")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -336,7 +358,7 @@ export default function AnalyticsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5 text-blue-500" />
-              Top Courses
+              {t("admin.analytics.cards.topCourses")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -366,7 +388,7 @@ export default function AnalyticsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Activity className="h-5 w-5 text-green-500" />
-              Recent Activity
+              {t("admin.analytics.cards.recentActivity")}
             </CardTitle>
           </CardHeader>
           <CardContent>

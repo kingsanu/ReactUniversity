@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button";
 
 import { motion, AnimatePresence } from "motion/react";
 import { CheckCircle2, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function SubscribePage() {
+  const { t } = useTranslation();
   const searchParams = useSearchParams();
 
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -57,7 +59,7 @@ export default function SubscribePage() {
 
       // Show cancelled message briefly
       setTimeout(() => {
-        alert("Payment was cancelled. You can try again anytime.");
+        alert(t("payments.cancelledText"));
       }, 500);
     }
   }, [searchParams]);
@@ -71,8 +73,6 @@ export default function SubscribePage() {
       </div>
 
       <div className="relative z-10 container mx-auto py-8 px-4 md:py-12">
-
-        
         {/* Success Message Float */}
         <AnimatePresence>
           {showSuccessMessage && (
@@ -84,14 +84,16 @@ export default function SubscribePage() {
             >
               <div className="bg-white/90 backdrop-blur-md shadow-2xl rounded-2xl p-4 border border-green-100 flex items-start gap-4 ring-1 ring-black/5">
                 <div className="flex-shrink-0">
-                   <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
                     <CheckCircle2 className="w-6 h-6 text-green-600" />
-                   </div>
+                  </div>
                 </div>
                 <div className="flex-1 pt-1">
-                  <h3 className="font-semibold text-gray-900">Payment Successful!</h3>
+                  <h3 className="font-semibold text-gray-900">
+                    {t("subscribe.paymentSuccessful")}
+                  </h3>
                   <p className="text-sm text-gray-600 mt-1">
-                    Your subscription is now active. Enjoy your premium features!
+                    {t("subscribe.subscriptionActive")}
                   </p>
                 </div>
                 <button
@@ -114,10 +116,10 @@ export default function SubscribePage() {
             className="mb-10 text-center"
           >
             <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 mb-4 tracking-tight">
-              Upgrade Your Experience
+              {t("subscribe.upgradeTitle")}
             </h1>
             <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Choose the perfect plan to unlock exclusive features and take your journey to the next level.
+              {t("subscribe.upgradeSubtitle")}
             </p>
           </motion.div>
 

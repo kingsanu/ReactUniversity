@@ -14,8 +14,10 @@ import { Input } from "@/components/ui/input";
 import { Search, MapPin, Star, Filter } from "lucide-react";
 import Link from "next/link";
 import { CoachesResponse } from "@/types/coach";
+import { useTranslation } from "react-i18next";
 
 export default function BookCoachPage() {
+  const { t } = useTranslation();
   const [coaches, setCoaches] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -61,16 +63,16 @@ export default function BookCoachPage() {
     <div className="container mx-auto py-8 px-4 space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Find a Coach</h1>
-          <p className="text-gray-500 mt-1">
-            Book 1:1 sessions with industry experts to accelerate your career
-          </p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            {t("coaching.find.title")}
+          </h1>
+          <p className="text-gray-500 mt-1">{t("coaching.find.subtitle")}</p>
         </div>
         <div className="flex gap-2 w-full md:w-auto">
           <div className="relative flex-1 md:w-80">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
-              placeholder="Search by name, role, or company..."
+              placeholder={t("coaching.find.searchPlaceholder")}
               className="pl-9"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -114,16 +116,15 @@ export default function BookCoachPage() {
                   </div>
                   <div className="flex items-center bg-yellow-50 px-2 py-1 rounded text-xs font-medium text-yellow-700">
                     <Star className="h-3 w-3 fill-yellow-500 text-yellow-500 mr-1" />
-                    {coach.rating || "New"}
+                    {coach.rating || t("coaching.find.new")}
                   </div>
                 </div>
 
                 <div className="space-y-3 mt-4">
                   <div className="flex items-center text-sm text-gray-500">
                     <MapPin className="h-4 w-4 mr-2" />
-                    {coach.location || "Remote"}
+                    {coach.location || t("coaching.find.remote")}
                   </div>
-
                   <div className="flex flex-wrap gap-2">
                     {coach.specialization && (
                       <Badge
@@ -144,7 +145,7 @@ export default function BookCoachPage() {
               <CardFooter className="border-t bg-gray-50/50 p-4">
                 <Button className="w-full" asChild>
                   <Link href={`/dashboard/book-coach/${coach.id}`}>
-                    View Profile & Book
+                    {t("coaching.find.viewProfileBook")}
                   </Link>
                 </Button>
               </CardFooter>
@@ -154,9 +155,9 @@ export default function BookCoachPage() {
       ) : (
         <div className="text-center py-12 bg-white rounded-lg border border-dashed">
           <h3 className="text-lg font-medium text-gray-900">
-            No coaches found
+            {t("coaching.find.noCoachesFound")}
           </h3>
-          <p className="text-gray-500">Try adjusting your search terms</p>
+          <p className="text-gray-500">{t("coaching.find.tryAdjusting")}</p>
         </div>
       )}
     </div>

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,6 +34,7 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
 
@@ -60,10 +62,10 @@ export default function LoginPage() {
 
       if (!response.token) throw new Error("No token received from server");
       localStorage.setItem("token", response.token);
-      
+
       // Extract role name from response
       const roleName = response.user?.role?.name || null;
-      
+
       setUser({
         id: response.user?.id || "",
         email: data.email,
@@ -195,11 +197,9 @@ export default function LoginPage() {
 
               <div className="text-center mb-8">
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                  Welcome back
+                  {t("auth.login.title")}
                 </h1>
-                <p className="text-gray-600">
-                  Sign in to continue your journey
-                </p>
+                <p className="text-gray-600">{t("auth.login.subtitle")}</p>
               </div>
 
               <Form {...form}>
@@ -214,13 +214,13 @@ export default function LoginPage() {
                           htmlFor="email"
                           className="text-sm font-medium text-gray-700"
                         >
-                          Email address
+                          {t("auth.login.emailLabel")}
                         </FormLabel>
                         <FormControl>
                           <Input
                             id="email"
                             type="email"
-                            placeholder="john@example.com"
+                            placeholder={t("auth.login.emailPlaceholder")}
                             {...field}
                             className={cn(
                               "h-12 text-base bg-white/50 backdrop-blur-sm border-gray-200/50 focus:border-indigo-500 focus:ring-indigo-500/20",
@@ -245,7 +245,7 @@ export default function LoginPage() {
                             htmlFor="password"
                             className="text-sm font-medium text-gray-700"
                           >
-                            Password
+                            {t("auth.login.passwordLabel")}
                           </FormLabel>
                           <Link
                             href="/forgot-password"
@@ -259,7 +259,7 @@ export default function LoginPage() {
                             <Input
                               id="password"
                               type={showPassword ? "text" : "password"}
-                              placeholder="Enter your password"
+                              placeholder={t("auth.login.passwordPlaceholder")}
                               {...field}
                               className={cn(
                                 "h-12 text-base bg-white/50 backdrop-blur-sm border-gray-200/50 focus:border-indigo-500 focus:ring-indigo-500/20 pr-12",
@@ -323,14 +323,12 @@ export default function LoginPage() {
                       className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
                     />
                     <Label htmlFor="remember" className="text-sm text-gray-700">
-                      Remember me for 30 days
+                      {t("auth.login.remember")}
                     </Label>
                   </div>
 
                   {/* API Error */}
-                  {apiError && (
-                    <AuthErrorMessage message={apiError} />
-                  )}
+                  {apiError && <AuthErrorMessage message={apiError} />}
 
                   <Button
                     type="submit"
@@ -340,22 +338,22 @@ export default function LoginPage() {
                     {isSubmitting ? (
                       <div className="flex items-center space-x-2">
                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        <span>Signing in...</span>
+                        <span>{t("auth.login.submitting")}</span>
                       </div>
                     ) : (
-                      "Sign in"
+                      t("auth.login.submit")
                     )}
                   </Button>
                 </form>
               </Form>
 
               <p className="mt-8 text-center text-sm text-gray-600">
-                Don't have an account?{" "}
+                {t("auth.login.noAccountText")}{" "}
                 <Link
                   href="/signup"
                   className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors"
                 >
-                  Sign up for free
+                  {t("auth.login.signUp")}
                 </Link>
               </p>
             </div>

@@ -37,6 +37,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { useGlobalStore } from "@/store/useGlobalStore";
+import { useTranslation } from "react-i18next";
 
 import {} from "@/components/ui/select";
 import { format, isSameDay } from "date-fns";
@@ -86,6 +87,7 @@ const INITIAL_AVAILABILITY = {
 };
 
 export default function CoachDashboardPage() {
+  const { t } = useTranslation();
   const { user } = useGlobalStore();
   const [activeTab, setActiveTab] = useState("upcoming");
   const [isAvailabilityOpen, setIsAvailabilityOpen] = useState(false);
@@ -201,7 +203,7 @@ export default function CoachDashboardPage() {
         });
       } catch (error: any) {
         console.error("❌ Failed to fetch coach dashboard data:", error);
-        setError(error.message || "Failed to load dashboard data");
+        setError(t("coaching.dashboard.failedToLoad"));
       } finally {
         setIsLoading(false);
       }
@@ -215,10 +217,10 @@ export default function CoachDashboardPage() {
       const { updateAvailability } = await import("@/services/coachService");
       await updateAvailability(data);
       setAvailability(data);
-      toast.success("Availability updated successfully");
+      toast.success(t("coaching.dashboard.availabilityUpdated"));
       setIsAvailabilityOpen(false);
     } catch (error) {
-      toast.error("Failed to update availability");
+      toast.error(t("coaching.dashboard.failedToUpdateAvailability"));
     }
   };
 
@@ -254,7 +256,7 @@ export default function CoachDashboardPage() {
         setAvailableSlots(response.slots || []);
       } catch (error) {
         console.error("Failed to fetch slots", error);
-        toast.error("Failed to load available slots");
+        toast.error(t("coaching.dashboard.failedToLoadSlots"));
       } finally {
         setIsLoadingSlots(false);
       }
@@ -265,7 +267,7 @@ export default function CoachDashboardPage() {
 
   const confirmReschedule = async () => {
     if (!rescheduleDate || !selectedTime) {
-      toast.error("Please select a date and time");
+      toast.error(t("coaching.dashboard.selectDateTime"));
       return;
     }
 
@@ -313,13 +315,13 @@ export default function CoachDashboardPage() {
 
       setUpcomingSessions(updatedSessions);
 
-      toast.success("Session rescheduled successfully");
+      toast.success(t("coaching.dashboard.rescheduleSuccess"));
       setIsRescheduleOpen(false);
       setSelectedSession(null);
       setRescheduleDate(undefined);
       setSelectedTime(null);
     } catch (error) {
-      toast.error("Failed to reschedule session");
+      toast.error(t("coaching.dashboard.rescheduleFailed"));
     }
   };
 

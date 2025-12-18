@@ -26,6 +26,7 @@
     "edit": "Editar",
     "view": "Ver",
     "back": "Atrás",
+    "start": "Iniciar",
     "next": "Siguiente",
     "previous": "Anterior",
     "logout": "Cerrar Sesión",
@@ -43,7 +44,7 @@
     "careerMatches": "Coincidencias Profesionales",
     "opportunities": "Oportunidades",
     "activityChart": "Gráfico de Actividad",
-    "benchmarks": "Referencias",
+    "benchmarksLabel": "Referencias",
     "milestones": "Hitos",
     "learningTools": "Aprendizaje y Herramientas",
     "courseCatalog": "Catálogo de Cursos",
@@ -126,7 +127,6 @@
       "location": "Ubicación"
     },
 
-    "assessments": "Evaluaciones",
     "professionalAssessments": "Evaluaciones Profesionales",
     "assessmentsDescription": "Complete sus evaluaciones profesionales para desbloquear conocimientos personalizados sobre sus competencias, habilidades cognitivas y camino profesional ideal. Cada evaluación proporciona datos valiosos para su desarrollo profesional.",
     "pcaUserInfoIncomplete": "La información del usuario está incompleta. Por favor complete su perfil primero.",
@@ -280,16 +280,417 @@
     "startTest": "Comenzar Prueba",
     "nextExample": "Siguiente Ejemplo"
   },
+  "home": {
+    "title": "TimsCare",
+    "tagline": "Tu plataforma de desarrollo profesional",
+    "cta": {
+      "dashboard": "Panel",
+      "signIn": "Iniciar sesión",
+      "signUp": "Regístrate"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Bienvenido de vuelta",
+      "subtitle": "Inicia sesión para continuar tu camino",
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "juan@ejemplo.com",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "Ingresa tu contraseña",
+      "remember": "Recordarme durante 30 días",
+      "submit": "Iniciar sesión",
+      "submitting": "Iniciando sesión...",
+      "noAccountText": "¿No tienes una cuenta?",
+      "signUp": "Regístrate gratis"
+    },
+    "signup": {
+      "title": "Crear cuenta",
+      "subtitle": "Comienza tu camino hacia el éxito profesional",
+      "submit": "Crear cuenta",
+      "creating": "Creando cuenta..."
+    }
+  },
+  "payments": {
+    "verifying": "Verificando pago...",
+    "pleaseWait": "Por favor espera mientras confirmamos tu pago.",
+    "successTitle": "¡Pago exitoso! 🎉",
+    "successSubscription": "Gracias por tu pago. Tu suscripción está activa.",
+    "successSession": "Gracias por tu pago. Tu sesión de coaching ha sido reservada.",
+    "details": "Detalles del pago",
+    "amount": "Monto:",
+    "description": "Descripción:",
+    "date": "Fecha:",
+    "continueToDashboard": "Continuar al panel",
+    "viewMySessions": "Ver mis sesiones",
+    "failedTitle": "Pago fallido",
+    "failedText": "Hubo un problema con tu pago. Por favor inténtalo de nuevo.",
+    "tryAgain": "Intentar de nuevo",
+    "backToDashboard": "Volver al panel",
+    "cancelledTitle": "Pago cancelado",
+    "cancelledText": "Tu pago fue cancelado. No se realizaron cargos a tu cuenta. Puedes intentarlo de nuevo en cualquier momento.",
+    "errorTitle": "Error de verificación",
+    "errorText": "No se pudo verificar el estado del pago. Por favor contacta soporte si fuiste cobrado."
+  },
+  "transactions": {
+    "fetchFailed": "Error al cargar las transacciones",
+    "noExport": "No hay transacciones para exportar",
+    "paymentMethodsComingSoon": "¡Gestión de métodos de pago próximamente!",
+    "title": "Transacciones",
+    "subtitle": "Gestiona tus pagos, facturas e historial de facturación.",
+    "exportCSV": "Exportar CSV",
+    "manageMethods": "Gestionar Métodos",
+    "totalSpent": "Total Gastado",
+    "lifetime": "De por vida",
+    "total": "total",
+    "invoices": "Facturas",
+    "availableForDownload": "Disponible para descargar",
+    "lastUsedMethod": "Último método usado",
+    "fromRecentTransaction": "De transacción reciente",
+    "searchPlaceholder": "Buscar transacciones...",
+    "filter": "Filtrar",
+    "date": "Fecha",
+    "table": {
+      "id": "ID de Transacción",
+      "description": "Descripción",
+      "date": "Fecha",
+      "method": "Método",
+      "status": "Estado",
+      "amount": "Monto"
+    }
+  },
+  "admin": {
+    "redirecting": "Redirigiendo al Panel de Administración...",
+    "accessRequired": "Se requiere acceso de administrador",
+    "accessDenied": "Acceso denegado. Esta área es solo para administradores.",
+    "verifying": "Verificando acceso de administrador...",
+    "title": "Panel de Administración",
+    "subtitle": "Resumen del rendimiento de tu plataforma",
+    "lastUpdated": "Última actualización: {{when}}",
+    "quickActionsTitle": "Acciones rápidas",
+    "quickActions": {
+      "manageCoaches": {
+        "title": "Gestionar Coaches",
+        "description": "Invitar, aprobar y gestionar perfiles de coaches."
+      },
+      "courseManagement": {
+        "title": "Gestión de Cursos",
+        "description": "Crear y actualizar cursos de aprendizaje."
+      },
+      "questions": {
+        "title": "Preguntas 360°",
+        "description": "Configurar preguntas de retroalimentación."
+      },
+      "settings": {
+        "title": "Configuración del sistema",
+        "description": "Configuración global de la plataforma."
+      }
+    },
+    "analytics": {
+      "title": "Analítica",
+      "loading": "Cargando analítica de la plataforma...",
+      "subtitle": "Visión integral del rendimiento de tu plataforma",
+      "period": {
+        "week": "Última semana",
+        "month": "Último mes",
+        "year": "Último año"
+      },
+      "totalUsers": "Usuarios totales",
+      "totalRevenue": "Ingresos totales",
+      "activeCourses": "Cursos activos",
+      "growthRate": "Tasa de crecimiento",
+      "fromLastPeriod": "del periodo anterior",
+      "revenueTransactions": "Ingresos y Transacciones",
+      "cards": {
+        "topCoaches": "Coaches con mejor desempeño",
+        "topCourses": "Cursos principales",
+        "recentActivity": "Actividad reciente"
+      },
+      "charts": {
+        "userGrowthTrend": "Tendencia de crecimiento de usuarios"
+      },
+      "chartNames": {
+        "totalUsers": "Usuarios totales",
+        "newUsers": "Usuarios nuevos"
+      },
+      "overallPlatformGrowth": "Crecimiento general de la plataforma"
+    },
+    "layout": {
+      "panelTitle": "Panel de Administración",
+      "headerTitle": "Panel de Administración",
+      "userDashboard": "Panel de Usuario",
+      "logout": "Cerrar sesión",
+      "nav": {
+        "dashboard": "Panel",
+        "plans": "Planes de Suscripción",
+        "users": "Usuarios",
+        "coaches": "Coaches",
+        "courses": "Cursos",
+        "careers": "Carreras",
+        "questions": "Preguntas 360°",
+        "analytics": "Analítica",
+        "settings": "Configuración"
+      }
+    },
+    "payouts": {
+      "title": "Gestión de Pagos",
+      "subtitle": "Revisa y aprueba pagos a coaches del ciclo actual.",
+      "totalPending": "Total pendiente",
+      "requestsAwaiting": "{{count}} solicitudes en espera",
+      "processedThisMonth": "Procesado (este mes)",
+      "allSettlementsCleared": "Todos los asentamientos liquidados",
+      "searchPlaceholder": "Buscar coach o ID de pago...",
+      "filterStatus": "Filtrar estado",
+      "table": {
+        "payoutId": "ID de pago",
+        "coach": "Coach",
+        "period": "Periodo",
+        "amount": "Monto",
+        "status": "Estado",
+        "actions": "Acciones"
+      },
+      "actions": {
+        "reject": "Rechazar",
+        "approve": "Aprobar"
+      },
+      "noPending": "No se encontraron pagos pendientes."
+    },
+    "coaches": {
+      "title": "Coaches",
+      "subtitle": "Gestiona tu equipo de coaches e invitaciones",
+      "inviteButton": "Invitar Coach",
+      "inviteTitle": "Invitar nuevo coach",
+      "inviteDescription": "Agrega un nuevo coach a tu plataforma. Puedes invitar individualmente o subir en lote.",
+      "singleInvite": "Invitación individual",
+      "bulkUpload": "Carga masiva",
+      "totalCoaches": "Coaches totales",
+      "activeNow": "Activos ahora",
+      "pendingInvites": "Invitaciones pendientes",
+      "expiringContracts": "Contratos por expirar"
+    },
+    "users": {
+      "title": "Usuarios",
+      "subtitle": "Gestiona cuentas de usuario y permisos",
+      "failedToLoad": "Error al cargar usuarios",
+      "searchPlaceholder": "Buscar usuarios...",
+      "rolePlaceholder": "Rol",
+      "statusPlaceholder": "Estado",
+      "roles": {
+        "all": "Todos los roles",
+        "student": "Estudiante",
+        "coach": "Coach",
+        "admin": "Admin"
+      },
+      "status": {
+        "all": "Todos",
+        "active": "Activo",
+        "inactive": "Inactivo"
+      },
+      "addUser": "Agregar usuario",
+      "table": {
+        "name": "Nombre",
+        "email": "Correo",
+        "role": "Rol",
+        "status": "Estado",
+        "subscription": "Suscripción",
+        "joined": "Registrado",
+        "actions": "Acciones"
+      },
+      "loadingText": "Cargando usuarios...",
+      "noUsersFound": "No se encontraron usuarios que coincidan con tus criterios.",
+      "emailCopied": "Correo copiado al portapapeles",
+      "dropdown": {
+        "actions": "Acciones",
+        "copyEmail": "Copiar correo",
+        "viewProfile": "Ver perfil",
+        "editDetails": "Editar detalles",
+        "deactivateUser": "Desactivar usuario"
+      }
+    },
+    "careers": {
+      "loading": "Cargando...",
+      "accessDenied": "Acceso denegado"
+    },
+    "transactions": {
+      "table": {
+        "id": "ID de Transacción",
+        "user": "Usuario",
+        "description": "Descripción",
+        "amount": "Monto",
+        "status": "Estado",
+        "date": "Fecha",
+        "method": "Método"
+      },
+      "userId": "ID: {{id}}"
+    },
+    "questions": {
+      "title": "Banco de preguntas",
+      "subtitle": "Gestiona preguntas y categorías para evaluaciones",
+      "header": "Preguntas de Evaluación 360°",
+      "loading": "Cargando preguntas 360°...",
+      "manageSummary": "Estás administrando {{count}} preguntas de evaluación 360°",
+      "add": "Agregar pregunta",
+      "addNew": "Agregar nueva pregunta",
+      "searchPlaceholder": "Buscar preguntas...",
+      "tabs": {
+        "all": "Todas las preguntas",
+        "categories": "Categorías",
+        "archived": "Archivadas"
+      },
+      "cardTitle": "Pregunta #{{i}}",
+      "sampleQuestion": "¿Cuál es el propósito principal de los hooks de React?",
+      "tags": {
+        "frontend": "Frontend",
+        "react": "React"
+      },
+      "questionsInCategory": "Preguntas en esta categoría",
+      "filters": {
+        "title": "Filtros",
+        "relationType": "Tipo de relación",
+        "category": "Categoría",
+        "status": "Estado",
+        "allTypes": "Todos los tipos",
+        "allCategories": "Todas las categorías",
+        "allStatus": "Todos los estados",
+        "active": "Activo",
+        "inactive": "Inactivo",
+        "none": "Ninguno",
+        "clear": "Limpiar filtros"
+      },
+      "form": {
+        "relationTypeLabel": "Tipo de relación",
+        "categoryLabel": "Categoría",
+        "questionLabel": "Texto de pregunta en español",
+        "questionNumberLabel": "Número de pregunta"
+      }
+    },
+    "transactions": {
+      "title": "Transacciones",
+      "subtitle": "Monitorea todas las transacciones y pagos del sistema",
+      "searchPlaceholder": "Buscar transacciones...",
+      "statusPlaceholder": "Estado",
+      "status": {
+        "all": "Todos",
+        "completed": "Completado",
+        "pending": "Pendiente",
+        "failed": "Fallido",
+        "refunded": "Reembolsado"
+      },
+      "exportReport": "Exportar informe",
+      "noTransactions": "No se encontraron transacciones.",
+      "table": {
+        "id": "ID de Transacción",
+        "user": "Usuario",
+        "date": "Fecha",
+        "method": "Método",
+        "status": "Estado",
+        "amount": "Monto"
+      }
+    },
+    "courses": {
+      "title": "Cursos",
+      "subtitle": "Gestiona tus cursos y plan de estudios",
+      "addCourse": "Agregar curso",
+      "createTitle": "Crear nuevo curso",
+      "create": "Crear curso",
+      "field": {
+        "title": "Título",
+        "description": "Descripción",
+        "instructor": "Instructor"
+      },
+      "searchPlaceholder": "Buscar cursos...",
+      "courseCreated": "Curso creado con éxito",
+      "courseDeleted": "Curso eliminado con éxito",
+      "table": {
+        "title": "Título",
+        "instructor": "Instructor",
+        "students": "Estudiantes",
+        "status": "Estado",
+        "lastUpdated": "Última actualización",
+        "actions": "Acciones",
+        "course": "Curso",
+        "provider": "Proveedor",
+        "category": "Categoría",
+        "difficulty": "Dificultad",
+        "enrollments": "Inscripciones"
+      },
+      "status": {
+        "active": "Activo",
+        "inactive": "Inactivo"
+      },
+      "form": {
+        "titleCreate": "Crear nuevo curso",
+        "titleEdit": "Editar curso",
+        "labels": {
+          "basicInformation": "Información Básica",
+          "title": "Título del curso",
+          "provider": "Proveedor",
+          "difficulty": "Dificultad",
+          "duration": "Duración (semanas)",
+          "hoursPerWeek": "Horas por Semana",
+          "category": "Categoría",
+          "instructor": "Instructor",
+          "description": "Descripción",
+          "shortDescription": "Descripción corta",
+          "fullDescription": "Descripción completa",
+          "media": "Medios",
+          "thumbnailUrl": "URL de miniatura",
+          "videoUrl": "URL de video",
+          "locationLanguage": "Ubicación e idioma",
+          "language": "Idioma",
+          "country": "País",
+          "region": "Región"
+        },
+        "save": "Guardar cambios",
+        "cancel": "Cancelar"
+      },
+      "confirmDelete": "¿Estás seguro de que deseas eliminar este curso?"
+    },
+    "careers": {
+      "title": "Carreras",
+      "header": {
+        "title": "Administrador de Carreras"
+      },
+      "confirmDelete": "¿Estás seguro de que deseas eliminar esta carrera?",
+      "createTitle": "Crear Carrera",
+      "editTitle": "Editar Carrera",
+      "form": {
+        "title": "Título (Inglés)",
+        "shortDescription": "Descripción corta (Inglés)"
+      }
+    }
+  },
+  "subscribe": {
+    "upgradeTitle": "Mejora tu experiencia",
+    "upgradeSubtitle": "Elige el plan perfecto para desbloquear funciones exclusivas y llevar tu trayectoria al siguiente nivel.",
+    "paymentSuccessful": "¡Pago exitoso!",
+    "subscriptionActive": "Tu suscripción está activa. ¡Disfruta de tus funciones premium!"
+  },
   "career": {
     "match": "Coincidencia",
     "favorite": "Favorito",
     "favorited": "Guardado",
-    "compare": "Comparar",
+    "compareLabel": "Comparar",
     "salaryRange": "Rango Salarial",
     "laborDemand": "Demanda Laboral",
     "whyRecommended": "Por qué se recomienda",
     "showAll": "Mostrar todas las recomendaciones",
-    "noResults": "No se encontraron carreras"
+    "noResults": "No se encontraron carreras",
+    "compare": {
+      "title": "Comparar carreras",
+      "description": "Selecciona hasta 3 carreras para comparar atributos lado a lado.",
+      "noSelected": "No hay carreras seleccionadas. Elige hasta 3 para comparar.",
+      "table": {
+        "attribute": "Atributo",
+        "match": "Coincidencia",
+        "education": "Educación",
+        "salary": "Salario",
+        "skills": "Habilidades"
+      }
+    }
+  },
+  "careers": {
+    "title": "Carreras",
+    "subtitle": "Explora rutas profesionales e información sobre roles"
   },
   "compare": {
     "selectedCount": "{{count}} seleccionadas",
@@ -366,43 +767,7 @@
     "success": "Trabajo de importación iniciado. Verifica el estado en breve.",
     "failure": "No se pudo iniciar la importación. Intenta de nuevo."
   },
-  "admin": {
-    "courses": {
-      "header": {
-        "addCourse": "Agregar curso"
-      },
-      "table": {
-        "course": "Curso",
-        "provider": "Proveedor",
-        "category": "Categoría",
-        "difficulty": "Dificultad",
-        "status": "Estado",
-        "enrollments": "Inscripciones",
-        "actions": "Acciones"
-      },
-      "status": {
-        "active": "Activo",
-        "inactive": "Inactivo"
-      },
-      "form": {
-        "titleCreate": "Crear nuevo curso",
-        "titleEdit": "Editar curso",
-        "save": "Guardar cambios",
-        "cancel": "Cancelar"
-      },
-      "confirmDelete": "¿Estás seguro de que deseas eliminar este curso?"
-    },
-    "careers": {
-      "header": { "title": "Administrador de Carreras" },
-      "confirmDelete": "¿Estás seguro de que deseas eliminar esta carrera?",
-      "createTitle": "Crear Carrera",
-      "editTitle": "Editar Carrera",
-      "form": {
-        "title": "Título (Inglés)",
-        "shortDescription": "Descripción corta (Inglés)"
-      }
-    }
-  },
+
   "evaluation": {
     "toast": {
       "emailSent": "¡Correo de invitación enviado con éxito!",
@@ -422,7 +787,31 @@
     "spanish": "Español",
     "switchLanguage": "Cambiar Idioma"
   },
+  "testPCA": {
+    "title": "Pruebas de la API PCA",
+    "testing": "Probando...",
+    "testStructure": "Probar estructura de la API",
+    "testWithUser": "Probar con el usuario actual ({{id}})",
+    "notLoggedIn": "No ha iniciado sesión",
+    "currentUser": "Usuario actual",
+    "clickToRun": "Haz clic en un botón arriba para ejecutar las pruebas...",
+    "endpointsTitle": "Endpoints de la API que se prueban"
+  },
   "timeline": {
+    "benchmarks": {
+      "marketDemand": "Demanda del mercado",
+      "high": "Alta",
+      "topGrowth": "Top 10% tasa de crecimiento",
+      "talentSupply": "Oferta de talento",
+      "moderate": "Moderada",
+      "balancedCompetition": "Competencia equilibrada",
+      "employability": "Empleabilidad",
+      "basedOnProfile": "Basado en tu perfil",
+      "salaryBenchmarks": "Referencias salariales",
+      "topSkills": "Habilidades principales",
+      "workMode": "Modo de trabajo"
+    },
+
     "title": "Línea de Tiempo de Progreso",
     "subtitle": "Rastrea todas tus evaluaciones y progreso en un solo lugar",
     "breadcrumb": "Línea de Tiempo",
@@ -452,7 +841,7 @@
     "tryAgain": "Intentar de Nuevo",
     "backToDashboard": "Volver al Panel",
     "overallProgress": "Progreso General",
-    "assessments": "evaluaciones",
+
     "lastActivity": "Última Actividad",
     "thisWeek": "Esta Semana",
     "thisMonth": "Este Mes",
@@ -560,10 +949,211 @@
       "socialSciences": "Ciencias Sociales"
     }
   },
+  "sessions": {
+    "title": "Mis sesiones de coaching",
+    "subtitle": "Rastrea y gestiona todas tus citas de coaching",
+    "bookNew": "Reservar nueva sesión",
+    "stats": {
+      "total": "Sesiones Totales",
+      "upcoming": "Próximas",
+      "completed": "Completadas",
+      "cancelled": "Canceladas"
+    },
+    "yourSessions": "Tus sesiones",
+    "tabs": {
+      "upcoming": "Próximas",
+      "past": "Pasadas"
+    },
+    "messages": {
+      "failedToLoad": "Error al cargar tus sesiones",
+      "cancelReasonRequired": "Por favor proporciona una razón para la cancelación",
+      "cancelSuccess": "Sesión cancelada con éxito",
+      "failedToCancel": "Error al cancelar la sesión",
+      "reviewSubmitted": "Reseña enviada con éxito",
+      "failedToSubmitReview": "Error al enviar la reseña"
+    },
+    "status": {
+      "confirmed": "Confirmada",
+      "completed": "Completada",
+      "cancelled": "Cancelada",
+      "rescheduled": "Reprogramada"
+    }
+  },
+  "subscriptions": {
+    "title": "Suscripciones",
+    "subtitle": "Elige el plan perfecto para tu trayectoria profesional",
+    "paymentSuccessfulTitle": "¡Pago exitoso!",
+    "paymentSuccessfulBody": "Tu suscripción ha sido activada. Ahora tienes acceso a todas las funciones premium."
+  },
   "coaching": {
     "featuredCoaches": "Coaches Destacados",
     "featuredDescription": "Conecta con coaches expertos para acelerar tu crecimiento profesional",
     "viewAllCoaches": "Ver Todos los Coaches",
-    "bookSession": "Reservar Sesión"
+    "bookSession": "Reservar Sesión",
+    "find": {
+      "title": "Encontrar un coach",
+      "subtitle": "Reserva sesiones 1:1 con expertos de la industria para acelerar tu carrera",
+      "searchPlaceholder": "Buscar por nombre, rol o empresa...",
+      "viewProfileBook": "Ver perfil y reservar",
+      "noCoachesFound": "No se encontraron coaches",
+      "tryAdjusting": "Intenta ajustar tus términos de búsqueda",
+      "remote": "Remoto",
+      "new": "Nuevo"
+    },
+    "earnings": {
+      "title": "Ganancias y Pagos",
+      "subtitle": "Rastrea tus ingresos, tarifas de plataforma y pagos.",
+      "unableToLoad": "No se pueden cargar los datos de ganancias",
+      "tryAgain": "Por favor intenta de nuevo más tarde",
+      "errorTitle": "Error al cargar los datos de ganancias"
+    },
+    "profile": {
+      "notFoundTitle": "Coach no encontrado",
+      "notFoundText": "El perfil del coach que buscas no existe.",
+      "goBack": "Volver",
+      "backToCoaches": "Volver a coaches",
+      "available": "DISPONIBLE",
+      "bookSession": "Reservar sesión",
+      "rating": "Calificación",
+      "location": "Ubicación",
+      "languages": "Idiomas",
+      "about": "Sobre el coach",
+      "expertise": "Experiencia y habilidades",
+      "coreSpecialization": "Especialización principal",
+      "topicsSkills": "Temas y habilidades",
+      "availability": "Disponibilidad",
+      "nextAvailable": "Siguiente disponible",
+      "slotsToday": "Turnos disponibles hoy",
+      "checkCalendar": "Ver calendario",
+      "freeCancellation": "Cancelación gratuita hasta 24h antes",
+      "updated": "Perfil actualizado con éxito",
+      "failedToUpdate": "Error al actualizar el perfil",
+      "uploading": "Subiendo imagen...",
+      "uploadSuccess": "Imagen de perfil actualizada con éxito",
+      "uploadFailed": "Error al subir la imagen",
+      "failedToLoad": "Error al cargar los datos del perfil"
+    },
+    "settings": {
+      "profileTitle": "Información del perfil",
+      "profileDescription": "Actualiza tu perfil público de coaching visible para los estudiantes.",
+      "fullName": "Nombre completo",
+      "professionalTitle": "Título profesional",
+      "bioPlaceholder": "Cuéntale a los estudiantes sobre tu experiencia de coaching...",
+      "uploadImage": "Subir imagen"
+    },
+    "dashboard": {
+      "availabilityUpdated": "Disponibilidad actualizada con éxito",
+      "failedToUpdateAvailability": "Error al actualizar la disponibilidad",
+      "failedToLoad": "Error al cargar datos del panel",
+      "noSlotsAvailable": "No hay turnos disponibles",
+      "failedToLoadSlots": "Error al cargar los turnos disponibles",
+      "selectDateTime": "Por favor selecciona una fecha y hora",
+      "rescheduleSuccess": "Sesión reprogramada con éxito",
+      "rescheduleFailed": "Error al reprogramar la sesión",
+      "sessionCancelled": "Sesión cancelada",
+      "cancelFailed": "Error al cancelar la sesión",
+      "reportDownloaded": "Informe descargado con éxito",
+      "reportDownloadFailed": "Error al descargar el informe",
+      "activityLogComingSoon": "Registro de actividad completo disponible próximamente",
+      "studentProfileNotFound": "Perfil del estudiante no encontrado",
+      "benchmarks": {
+        "overview": {
+          "salaryTitle": "Referencias salariales",
+          "details": "Detalles",
+          "topSkills": "Habilidades principales",
+          "workMode": "Modo de trabajo",
+          "costOfLiving": "Costo de vida",
+          "certifications": "Certificaciones",
+          "viewAll": "Ver todo",
+          "marketPulse": "Pulso del mercado",
+          "marketPulseDesc": "Métricas de la industria en tiempo real",
+          "liveUpdates": "Actualizaciones en vivo"
+        },
+        "compensation": {
+          "avgAnnualSalary": "Salario anual promedio",
+          "sinceLastYear": "desde el año pasado",
+          "purchasePowerIndex": "Índice de poder adquisitivo",
+          "relativeToNYC": "Relativo a Nueva York (100)",
+          "estimatedTakeHome": "Estimación de ingreso neto",
+          "afterEstimatedTaxes": "Después de impuestos estimados (~28%)",
+          "detailedSalaryTitle": "Desglose detallado de salario",
+          "cardDescription": "Rangos de compensación para roles de {{career}} en {{country}} a través de niveles de experiencia.",
+          "keyObservation": "Observación clave",
+          "keyObservationDesc": "Las bandas salariales para {{career}} en {{country}} se están ampliando. Los roles de nivel senior están experimentando un crecimiento más rápido debido a la escasez de talento especializado, mientras que la compensación de nivel de entrada se mantiene estable."
+        },
+        "skills": {
+          "title": "Habilidades y Crecimiento",
+          "subtitle": "Referencias de competencias y oportunidades de aprendizaje.",
+          "mostInDemand": "Habilidades más demandadas",
+          "cardDescription": "Frecuencia de habilidades solicitadas en descripciones de trabajo para {{career}}.",
+          "emergingTechWatch": "Vigilancia de tecnologías emergentes",
+          "emergingDesc": "Tecnologías que están ganando tracción rápidamente en los últimos 6 meses.",
+          "topCertifications": "Principales certificaciones",
+          "certificationsDesc": "Credenciales que impactan significativamente la probabilidad de contratación.",
+          "recommendedLearningPaths": "Rutas de aprendizaje recomendadas"
+        },
+        "market": {
+          "title": "Dinámica del mercado",
+          "subtitle": "Tendencias macroeconómicas y análisis de estabilidad laboral.",
+          "employabilityScore": "Puntuación de empleabilidad",
+          "employabilityDesc": "Tendencia histórica del éxito de colocación de roles en los últimos 5 años.",
+          "analysisLabel": "Análisis:",
+          "analysis": "Tendencia ascendiente consistente indica un mercado maduro para profesionales de {{career}}.",
+          "youthEmploymentRate": "Tasa de empleo juvenil",
+          "marketForecast": "Pronóstico del mercado",
+          "positiveOutlook": "Perspectiva positiva",
+          "positiveOutlookDesc": "Se proyecta que startups y sectores empresariales aumenten la contratación en un 15% en el tercer trimestre.",
+          "projectedHotspots": "Puntos calientes proyectados",
+          "recruiterSentiment": "Sentimiento de reclutadores",
+          "hiringSpeed": "Velocidad de contratación",
+          "interviewTech": "Técnica de entrevistas",
+          "contractRoles": "Roles por contrato",
+          "badgeFast": "Rápido",
+          "badgeRemote": "Remoto",
+          "badgeIncreasing": "En aumento"
+        },
+        "tabs": {
+          "overview": "Resumen",
+          "compensation": "Compensación",
+          "market": "Análisis de Mercado",
+          "skills": "Habilidades y Aprendizaje",
+          "demographics": "Demografía"
+        },
+        "header": {
+          "title": "Inteligencia Profesional",
+          "description": "Análisis profundo de tendencias de mercado globales, referencias salariales y requisitos de habilidades para tu trayectoria.",
+          "selectCountryPlaceholder": "Selecciona País",
+          "selectCareerPlaceholder": "Selecciona Profesión",
+          "shareReport": "Compartir Informe"
+        },
+        "demographics": {
+          "title": "Fuerza Laboral y Cultura",
+          "subtitle": "Desglose demográfico y tendencias del entorno laboral.",
+          "workModeTitle": "Distribución del modo de trabajo",
+          "workModeDesc": "Prevalencia de roles remotos, híbridos y presenciales.",
+          "remote": "Remoto",
+          "hybrid": "Híbrido",
+          "onsite": "Presencial",
+          "genderDiversityTitle": "Diversidad de Género",
+          "genderDiversityDesc": "Distribución de género en roles de {{career}}.",
+          "inclusivityTitle": "Puntuación de Inclusividad",
+          "inclusivityDesc": "Calificación promedio de la industria para políticas y beneficios laborales inclusivos.",
+          "enterpriseTrendTitle": "Tendencia Empresarial",
+          "enterpriseTrendDesc": "Las empresas Fortune 500 están trasladando un 20% más de roles a 'Remoto-First' en 2025.",
+          "readReport": "Leer Informe",
+          "badges": {
+            "parentalLeave": "Licencia parental",
+            "flexHours": "Horario flexible",
+            "wellness": "Programas de bienestar"
+          }
+        },
+        "common": {
+          "title": "Referencias",
+          "today": "Hoy",
+          "comparedToYesterday": "Comparado con ${{amount}} ayer",
+          "lastWeekIncome": "Ingresos de la semana pasada"
+        }
+      }
+    }
   }
 }

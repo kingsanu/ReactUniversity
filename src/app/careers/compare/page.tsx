@@ -5,8 +5,10 @@ import { useCareersStore } from "@/store/useCareersStore";
 import { useCareerList } from "@/hooks/useCareerQueries";
 import { Sidebar } from "@/app/dashboard/_components/Sidebar";
 import { TopNav } from "@/app/dashboard/_components/TopNav";
+import { useTranslation } from "react-i18next";
 
 export default function ComparePage() {
+  const { t } = useTranslation();
   const { compareList } = useCareersStore();
   const { data: careersData } = useCareerList();
   const selected = (careersData?.careers || []).filter((c) =>
@@ -19,14 +21,14 @@ export default function ComparePage() {
         <TopNav onMenuClick={() => {}} />
         <main className="flex-1 overflow-y-auto p-6">
           <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <h2 className="text-xl font-bold">Compare Careers</h2>
+            <h2 className="text-xl font-bold">{t("career.compare.title")}</h2>
             <p className="text-sm text-gray-500 mt-2">
-              Select up to 3 careers to compare attributes side-by-side.
+              {t("career.compare.description")}
             </p>
             <div className="mt-6">
               {selected.length === 0 && (
                 <div className="text-sm text-gray-500">
-                  No careers selected. Choose up to 3 to compare.
+                  {t("career.compare.noSelected")}
                 </div>
               )}
               {selected.length > 0 && (
@@ -34,7 +36,9 @@ export default function ComparePage() {
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr>
-                        <th className="p-2">Attribute</th>
+                        <th className="p-2">
+                          {t("career.compare.table.attribute")}
+                        </th>
                         {selected.map((s) => (
                           <th key={s.id} className="p-2">
                             {s.title.en}
@@ -44,7 +48,9 @@ export default function ComparePage() {
                     </thead>
                     <tbody>
                       <tr>
-                        <td className="p-2 font-semibold">Match</td>
+                        <td className="p-2 font-semibold">
+                          {t("career.compare.table.match")}
+                        </td>
                         {selected.map((s) => (
                           <td key={s.id} className="p-2">
                             {s.matchScore}%
@@ -52,7 +58,9 @@ export default function ComparePage() {
                         ))}
                       </tr>
                       <tr>
-                        <td className="p-2 font-semibold">Education</td>
+                        <td className="p-2 font-semibold">
+                          {t("career.compare.table.education")}
+                        </td>
                         {selected.map((s) => (
                           <td key={s.id} className="p-2">
                             {s.educationLevel}
@@ -60,7 +68,9 @@ export default function ComparePage() {
                         ))}
                       </tr>
                       <tr>
-                        <td className="p-2 font-semibold">Salary</td>
+                        <td className="p-2 font-semibold">
+                          {t("career.compare.table.salary")}
+                        </td>
                         {selected.map((s) => (
                           <td key={s.id} className="p-2">
                             {s.salaryRange?.median
@@ -70,7 +80,9 @@ export default function ComparePage() {
                         ))}
                       </tr>
                       <tr>
-                        <td className="p-2 font-semibold">Skills</td>
+                        <td className="p-2 font-semibold">
+                          {t("career.compare.table.skills")}
+                        </td>
                         {selected.map((s) => (
                           <td key={s.id} className="p-2">
                             {(s.skills || [])

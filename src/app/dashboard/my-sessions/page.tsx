@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -62,6 +63,7 @@ interface Session {
 }
 
 export default function MySessionsPage() {
+  const { t } = useTranslation();
   const { user } = useGlobalStore();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -138,7 +140,7 @@ export default function MySessionsPage() {
       setSessions(formattedSessions);
     } catch (error) {
       console.error("Failed to fetch sessions:", error);
-      toast.error("Failed to load your sessions");
+      toast.error(t("sessions.messages.failedToLoad"));
     } finally {
       setIsLoading(false);
     }
@@ -174,7 +176,7 @@ export default function MySessionsPage() {
 
   const confirmCancel = async () => {
     if (!selectedSession || !cancelReason.trim()) {
-      toast.error("Please provide a reason for cancellation");
+      toast.error(t("sessions.messages.cancelReasonRequired"));
       return;
     }
 
@@ -189,10 +191,10 @@ export default function MySessionsPage() {
         )
       );
 
-      toast.success("Session cancelled successfully");
+      toast.success(t("sessions.messages.cancelSuccess"));
       setCancelDialogOpen(false);
     } catch (error) {
-      toast.error("Failed to cancel session");
+      toast.error(t("sessions.messages.failedToCancel"));
     } finally {
       setIsProcessing(false);
     }
@@ -216,11 +218,11 @@ export default function MySessionsPage() {
         comment: reviewComment,
       });
 
-      toast.success("Review submitted successfully");
+      toast.success(t("sessions.messages.reviewSubmitted"));
       setReviewDialogOpen(false);
     } catch (error) {
       console.error("Review error:", error);
-      toast.error("Failed to submit review");
+      toast.error(t("sessions.messages.failedToSubmitReview"));
     } finally {
       setIsProcessing(false);
     }
@@ -234,28 +236,28 @@ export default function MySessionsPage() {
         return (
           <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-0">
             <CheckCircle2 className="h-3 w-3 mr-1" />
-            Confirmed
+            {t("sessions.status.confirmed")}
           </Badge>
         );
       case "completed":
         return (
           <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-0">
             <CheckCircle2 className="h-3 w-3 mr-1" />
-            Completed
+            {t("sessions.status.completed")}
           </Badge>
         );
       case "cancelled":
         return (
           <Badge className="bg-red-100 text-red-700 hover:bg-red-100 border-0">
             <XCircle className="h-3 w-3 mr-1" />
-            Cancelled
+            {t("sessions.status.cancelled")}
           </Badge>
         );
       case "rescheduled":
         return (
           <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 border-0">
             <Clock className="h-3 w-3 mr-1" />
-            Rescheduled
+            {t("sessions.status.rescheduled")}
           </Badge>
         );
       default:
@@ -289,11 +291,9 @@ export default function MySessionsPage() {
             </div>
             <div>
               <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-                My Coaching Sessions
+                {t("sessions.title")}
               </h1>
-              <p className="text-gray-500 mt-1">
-                Track and manage all your coaching appointments
-              </p>
+              <p className="text-gray-500 mt-1">{t("sessions.subtitle")}</p>
             </div>
           </div>
 
@@ -303,7 +303,7 @@ export default function MySessionsPage() {
           >
             <Link href="/dashboard/book-coach">
               <Users className="h-4 w-4 mr-2" />
-              Book New Session
+              {t("sessions.bookNew")}
             </Link>
           </Button>
         </div>
@@ -374,7 +374,7 @@ export default function MySessionsPage() {
           <CardHeader className="border-b bg-gradient-to-r from-slate-50 to-white px-6 py-5">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <CardTitle className="text-xl font-bold text-gray-900">
-                Your Sessions
+                {t("sessions.yourSessions")}
               </CardTitle>
               <Tabs
                 value={activeTab}
@@ -386,13 +386,13 @@ export default function MySessionsPage() {
                     value="upcoming"
                     className="rounded-lg px-4 py-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
                   >
-                    Upcoming ({upcomingSessions.length})
+                    {t("sessions.tabs.upcoming")} ({upcomingSessions.length})
                   </TabsTrigger>
                   <TabsTrigger
                     value="past"
                     className="rounded-lg px-4 py-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
                   >
-                    Past ({pastSessions.length})
+                    {t("sessions.tabs.past")} ({pastSessions.length})
                   </TabsTrigger>
                 </TabsList>
               </Tabs>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { format, isSameDay } from "date-fns";
 import {
   Calendar as CalendarIcon,
@@ -58,6 +59,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { StudentDetailsSheet } from "./_components/StudentDetailsSheet";
 
 export default function SessionsPage() {
+  const { t } = useTranslation();
   const { user } = useGlobalStore();
   const router = useRouter();
   const [sessions, setSessions] = useState<any[]>([]);
@@ -174,7 +176,7 @@ export default function SessionsPage() {
         setSessions(formattedSessions);
       } catch (error) {
         console.error("Failed to fetch sessions:", error);
-        toast.error("Failed to load sessions");
+        toast.error(t("coaching.dashboard.failedToLoad"));
       } finally {
         setIsLoading(false);
       }
@@ -216,7 +218,7 @@ export default function SessionsPage() {
         setAvailableSlots(response.slots || []);
       } catch (error) {
         console.error("Failed to fetch slots", error);
-        toast.error("Failed to load available slots");
+        toast.error(t("coaching.dashboard.failedToLoadSlots"));
       } finally {
         setIsLoadingSlots(false);
       }
@@ -227,7 +229,7 @@ export default function SessionsPage() {
 
   const confirmReschedule = async () => {
     if (!rescheduleDate || !selectedTime || !selectedSession) {
-      toast.error("Please select a date and time");
+      toast.error(t("coaching.dashboard.selectDateTime"));
       return;
     }
 
@@ -274,14 +276,14 @@ export default function SessionsPage() {
 
       setSessions(updatedSessions);
 
-      toast.success("Session rescheduled successfully");
+      toast.success(t("coaching.dashboard.rescheduleSuccess"));
       setIsRescheduleOpen(false);
       setSelectedSession(null);
       setRescheduleDate(undefined);
       setSelectedTime(null);
     } catch (error) {
       console.error("Reschedule failed:", error);
-      toast.error("Failed to reschedule session");
+      toast.error(t("coaching.dashboard.rescheduleFailed"));
     }
   };
 
@@ -387,7 +389,7 @@ export default function SessionsPage() {
       setSelectedStudentId(studentId);
       setIsStudentSheetOpen(true);
     } else {
-      toast.error("Student profile not found");
+      toast.error(t("coaching.dashboard.studentProfileNotFound"));
     }
   };
 
@@ -874,7 +876,7 @@ export default function SessionsPage() {
                       );
                       setSessions(updatedSessions);
 
-                      toast.success("Session cancelled");
+                      toast.success(t("coaching.dashboard.sessionCancelled"));
                       setIsConfirmCancelOpen(false);
 
                       // 2. API Call
@@ -887,7 +889,7 @@ export default function SessionsPage() {
                       );
                     } catch (error) {
                       console.error("Failed to cancel session:", error);
-                      toast.error("Failed to cancel session");
+                      toast.error(t("coaching.dashboard.cancelFailed"));
                       // Revert optimistic update if needed, but for now we keep it simple
                       // as a failure toast is shown.Ideally we'd refetch or revert.
                     }

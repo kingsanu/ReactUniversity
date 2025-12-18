@@ -21,6 +21,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, Search, Edit, Trash2, BookOpen } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 // Mock data for courses
@@ -55,6 +56,7 @@ const MOCK_COURSES = [
 ];
 
 export default function CoursesPage() {
+  const { t } = useTranslation();
   const [courses, setCourses] = useState(MOCK_COURSES);
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -75,12 +77,12 @@ export default function CoursesPage() {
     setCourses([...courses, course]);
     setIsAddDialogOpen(false);
     setNewCourse({ title: "", description: "", instructor: "" });
-    toast.success("Course created successfully");
+    toast.success(t("admin.courses.courseCreated"));
   };
 
   const handleDeleteCourse = (id: string) => {
     setCourses(courses.filter((c) => c.id !== id));
-    toast.success("Course deleted successfully");
+    toast.success(t("admin.courses.courseDeleted"));
   };
 
   const filteredCourses = courses.filter((course) =>
@@ -91,24 +93,24 @@ export default function CoursesPage() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Courses</h1>
-          <p className="text-muted-foreground">
-            Manage your courses and curriculum
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {t("admin.courses.title")}
+          </h1>
+          <p className="text-muted-foreground">{t("admin.courses.subtitle")}</p>
         </div>
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
             <Button>
-              <Plus className="mr-2 h-4 w-4" /> Add Course
+              <Plus className="mr-2 h-4 w-4" /> {t("admin.courses.addCourse")}
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Create New Course</DialogTitle>
+              <DialogTitle>{t("admin.courses.createTitle")}</DialogTitle>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="title">Title</Label>
+                <Label htmlFor="title">{t("admin.courses.field.title")}</Label>
                 <Input
                   id="title"
                   value={newCourse.title}
@@ -118,7 +120,9 @@ export default function CoursesPage() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">
+                  {t("admin.courses.field.description")}
+                </Label>
                 <Textarea
                   id="description"
                   value={newCourse.description}
@@ -128,7 +132,9 @@ export default function CoursesPage() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="instructor">Instructor</Label>
+                <Label htmlFor="instructor">
+                  {t("admin.courses.field.instructor")}
+                </Label>
                 <Input
                   id="instructor"
                   value={newCourse.instructor}
@@ -143,9 +149,11 @@ export default function CoursesPage() {
                 variant="outline"
                 onClick={() => setIsAddDialogOpen(false)}
               >
-                Cancel
+                {t("common.cancel")}
               </Button>
-              <Button onClick={handleAddCourse}>Create Course</Button>
+              <Button onClick={handleAddCourse}>
+                {t("admin.courses.create")}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -155,7 +163,7 @@ export default function CoursesPage() {
         <div className="relative w-72">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search courses..."
+            placeholder={t("admin.courses.searchPlaceholder")}
             className="pl-8"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -167,12 +175,14 @@ export default function CoursesPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead>Instructor</TableHead>
-              <TableHead>Students</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Last Updated</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>{t("admin.courses.table.title")}</TableHead>
+              <TableHead>{t("admin.courses.table.instructor")}</TableHead>
+              <TableHead>{t("admin.courses.table.students")}</TableHead>
+              <TableHead>{t("admin.courses.table.status")}</TableHead>
+              <TableHead>{t("admin.courses.table.lastUpdated")}</TableHead>
+              <TableHead className="text-right">
+                {t("admin.courses.table.actions")}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

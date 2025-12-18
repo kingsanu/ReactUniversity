@@ -2,7 +2,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAdminAccess } from "@/hooks/useAdminAccess";
+import { useAdminUsers } from "@/hooks/useAdminUsers";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -29,7 +31,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { getAdminUsers, AdminUser } from "@/services/adminService";
 import { toast } from "sonner";
 import {
   Select,
@@ -42,57 +43,49 @@ import {
 export default function AdminUsersPage() {
   const router = useRouter();
   const { isAdmin, loading: authLoading } = useAdminAccess();
+  const { t } = useTranslation();
 
-  const [users, setUsers] = useState<AdminUser[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+
+  // Use the new hook for data fetching
+  const { 
+    data, 
+    isLoading: usersLoading, 
+    error 
+  } = useAdminUsers({
+    page,
+    limit: 20,
+    search: searchTerm,
+    role: roleFilter,
+    status: statusFilter,
+  });
+
+  const users = data?.items || [];
+  const totalPages = data ? Math.ceil(data.total / data.limit) : 1;
+  const loading = usersLoading;
 
   // Handle admin access check
   useEffect(() => {
     if (!authLoading) {
       if (!isAdmin) {
-        toast.error("Access denied. This area is for administrators only.");
+        toast.error(t("admin.accessDenied"));
         router.push("/dashboard");
-        return;
       }
-      fetchUsers();
     }
-  }, [isAdmin, authLoading, router, page, roleFilter, statusFilter]);
+  }, [isAdmin, authLoading, router]);
 
-  // Debounce search
+  // Debounce search - reset page when search changes
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!authLoading && isAdmin) {
-        setPage(1); // Reset to page 1 on search
-        fetchUsers();
+        setPage(1); 
       }
     }, 500);
     return () => clearTimeout(timer);
   }, [searchTerm]);
-
-  const fetchUsers = async () => {
-    setLoading(true);
-    try {
-      const response = await getAdminUsers({
-        page,
-        limit: 20,
-        search: searchTerm,
-        role: roleFilter,
-        status: statusFilter,
-      });
-      setUsers(response.items);
-      setTotalPages(Math.ceil(response.total / response.limit));
-    } catch (error) {
-      console.error("Failed to fetch users:", error);
-      toast.error("Failed to load users");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (authLoading) {
     return (
@@ -100,7 +93,7 @@ export default function AdminUsersPage() {
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-600">Verifying admin access...</p>
+            <p className="text-gray-600">{t("admin.verifying")}</p>
           </div>
         </div>
       </div>
@@ -111,10 +104,10 @@ export default function AdminUsersPage() {
     <div className="p-4 md:p-6">
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Users</h1>
-          <p className="text-muted-foreground">
-            Manage user accounts and permissions
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {t("admin.users.title")}
+          </h1>
+          <p className="text-muted-foreground">{t("admin.users.subtitle")}</p>
         </div>
 
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -122,7 +115,7 @@ export default function AdminUsersPage() {
             <div className="relative w-full md:w-72">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search users..."
+                placeholder={t("admin.users.searchPlaceholder")}
                 className="pl-8"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -130,40 +123,56 @@ export default function AdminUsersPage() {
             </div>
             <Select value={roleFilter} onValueChange={setRoleFilter}>
               <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Role" />
+                <SelectValue placeholder={t("admin.users.rolePlaceholder")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Roles</SelectItem>
-                <SelectItem value="student">Student</SelectItem>
-                <SelectItem value="coach">Coach</SelectItem>
-                <SelectItem value="admin">Admin</SelectItem>
+                <SelectItem value="all">
+                  {t("admin.users.roles.all")}
+                </SelectItem>
+                <SelectItem value="student">
+                  {t("admin.users.roles.student")}
+                </SelectItem>
+                <SelectItem value="coach">
+                  {t("admin.users.roles.coach")}
+                </SelectItem>
+                <SelectItem value="admin">
+                  {t("admin.users.roles.admin")}
+                </SelectItem>
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Status" />
+                <SelectValue placeholder={t("admin.users.statusPlaceholder")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
+                <SelectItem value="all">
+                  {t("admin.users.status.all")}
+                </SelectItem>
+                <SelectItem value="active">
+                  {t("admin.users.status.active")}
+                </SelectItem>
+                <SelectItem value="inactive">
+                  {t("admin.users.status.inactive")}
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
-          <Button>Add User</Button>
+          <Button>{t("admin.users.addUser")}</Button>
         </div>
 
         <div className="border rounded-lg bg-white">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Subscription</TableHead>
-                <TableHead>Joined</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>{t("admin.users.table.name")}</TableHead>
+                <TableHead>{t("admin.users.table.email")}</TableHead>
+                <TableHead>{t("admin.users.table.role")}</TableHead>
+                <TableHead>{t("admin.users.table.status")}</TableHead>
+                <TableHead>{t("admin.users.table.subscription")}</TableHead>
+                <TableHead>{t("admin.users.table.joined")}</TableHead>
+                <TableHead className="text-right">
+                  {t("admin.users.table.actions")}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -181,7 +190,7 @@ export default function AdminUsersPage() {
                     colSpan={7}
                     className="text-center py-10 text-gray-500"
                   >
-                    No users found matching your criteria.
+                    {t("admin.users.noUsersFound")}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -225,22 +234,28 @@ export default function AdminUsersPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuLabel>
+                            {t("admin.users.dropdown.actions")}
+                          </DropdownMenuLabel>
                           <DropdownMenuItem
                             onClick={() => {
                               navigator.clipboard.writeText(user.email);
-                              toast.success("Email copied to clipboard");
+                              toast.success(t("admin.users.emailCopied"));
                             }}
                           >
                             <Mail className="mr-2 h-4 w-4" />
-                            Copy Email
+                            {t("admin.users.dropdown.copyEmail")}
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem>View Profile</DropdownMenuItem>
-                          <DropdownMenuItem>Edit Details</DropdownMenuItem>
+                          <DropdownMenuItem>
+                            {t("admin.users.dropdown.viewProfile")}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            {t("admin.users.dropdown.editDetails")}
+                          </DropdownMenuItem>
                           <DropdownMenuItem className="text-red-600">
                             <UserX className="mr-2 h-4 w-4" />
-                            Deactivate User
+                            {t("admin.users.dropdown.deactivateUser")}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -260,7 +275,7 @@ export default function AdminUsersPage() {
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1 || loading}
           >
-            Previous
+            {t("common.previous")}
           </Button>
           <div className="text-sm text-gray-500">
             Page {page} of {totalPages || 1}
@@ -271,7 +286,7 @@ export default function AdminUsersPage() {
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages || loading}
           >
-            Next
+            {t("common.next")}
           </Button>
         </div>
       </div>

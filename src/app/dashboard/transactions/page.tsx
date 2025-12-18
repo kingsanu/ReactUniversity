@@ -36,12 +36,17 @@ import {
   getUserTransactions,
   Transaction,
 } from "@/services/transactionService";
+import { useExportTransactions } from "@/hooks/useTransactionDashboard";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 export default function TransactionsPage() {
+  const { t } = useTranslation();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  
+  const { mutate: exportTransactions, isPending: isExporting } = useExportTransactions();
 
   useEffect(() => {
     fetchTransactions();
@@ -53,7 +58,7 @@ export default function TransactionsPage() {
       setTransactions(response.items);
     } catch (error) {
       console.error("Failed to fetch transactions:", error);
-      toast.error("Failed to load transactions");
+      toast.error(t("transactions.fetchFailed"));
     } finally {
       setIsLoading(false);
     }
@@ -66,39 +71,21 @@ export default function TransactionsPage() {
   );
 
   const handleExportCSV = () => {
-    if (transactions.length === 0) {
-      toast.error("No transactions to export");
-      return;
-    }
-
-    const headers = ["ID", "Date", "Description", "Amount", "Status", "Method"];
-    const csvContent = [
-      headers.join(","),
-      ...transactions.map((trx) =>
-        [
-          trx.id,
-          new Date(trx.date).toLocaleDateString(),
-          `"${trx.description}"`,
-          trx.amount,
-          trx.status,
-          trx.method || "N/A",
-        ].join(",")
-      ),
-    ].join("\n");
-
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", "transactions.csv");
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    exportTransactions(
+      { format: "csv" },
+      {
+        onSuccess: () => {
+          toast.success(t("transactions.exportSuccess") || "Transactions exported successfully");
+        },
+        onError: () => {
+          toast.error(t("transactions.exportFailed") || "Failed to export transactions");
+        },
+      }
+    );
   };
 
   const handleManageMethods = () => {
-    toast.info("Payment methods management coming soon!");
+    toast.info(t("transactions.paymentMethodsComingSoon"));
   };
 
   // Calculate stats
@@ -119,10 +106,10 @@ export default function TransactionsPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-            Transactions
+            {t("transactions.title")}
           </h1>
           <p className="text-gray-500 mt-2 text-lg">
-            Manage your payments, invoices, and billing history.
+            {t("transactions.subtitle")}
           </p>
         </div>
         <div className="flex gap-3">
@@ -132,14 +119,14 @@ export default function TransactionsPage() {
             onClick={handleExportCSV}
           >
             <Download className="w-4 h-4" />
-            Export CSV
+            {t("transactions.exportCSV")}
           </Button>
           <Button
             className="h-10 gap-2 rounded-xl bg-gray-900 text-white hover:bg-gray-800 shadow-lg shadow-gray-900/20"
             onClick={handleManageMethods}
           >
             <CreditCard className="w-4 h-4" />
-            Manage Methods
+            {t("transactions.manageMethods")}
           </Button>
         </div>
       </div>
@@ -150,7 +137,9 @@ export default function TransactionsPage() {
           <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
             <ArrowUpRight className="w-24 h-24" />
           </div>
-          <p className="text-sm font-medium text-gray-500 mb-1">Total Spent</p>
+          <p className="text-sm font-medium text-gray-500 mb-1">
+            {t("transactions.totalSpent")}
+          </p>
           <h3 className="text-3xl font-bold text-gray-900">
             $
             {totalSpent.toLocaleString(undefined, {
@@ -160,19 +149,21 @@ export default function TransactionsPage() {
           </h3>
           <p className="text-xs text-green-600 font-medium mt-2 flex items-center gap-1">
             <span className="bg-green-100 px-1.5 py-0.5 rounded-md">
-              Lifetime
+              {t("transactions.lifetime")}
             </span>{" "}
-            total
+            {t("transactions.total")}
           </p>
         </div>
         <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
             <Receipt className="w-24 h-24" />
           </div>
-          <p className="text-sm font-medium text-gray-500 mb-1">Invoices</p>
+          <p className="text-sm font-medium text-gray-500 mb-1">
+            {t("transactions.invoices")}
+          </p>
           <h3 className="text-3xl font-bold text-gray-900">{invoiceCount}</h3>
           <p className="text-xs text-gray-500 font-medium mt-2">
-            Available for download
+            {t("transactions.availableForDownload")}
           </p>
         </div>
         <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden group">
@@ -180,13 +171,13 @@ export default function TransactionsPage() {
             <CreditCard className="w-24 h-24" />
           </div>
           <p className="text-sm font-medium text-gray-500 mb-1">
-            Last Used Method
+            {t("transactions.lastUsedMethod")}
           </p>
           <h3 className="text-xl font-bold text-gray-900 truncate">
             {activeMethod || "N/A"}
           </h3>
           <p className="text-xs text-gray-500 font-medium mt-2">
-            From recent transaction
+            {t("transactions.fromRecentTransaction")}
           </p>
         </div>
       </div>
@@ -198,7 +189,7 @@ export default function TransactionsPage() {
           <div className="relative w-full sm:max-w-xs">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
-              placeholder="Search transactions..."
+              placeholder={t("transactions.searchPlaceholder")}
               className="pl-9 bg-white border-gray-200 rounded-xl focus-visible:ring-gray-900"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -211,7 +202,7 @@ export default function TransactionsPage() {
               className="h-9 gap-2 rounded-lg border-gray-200 text-gray-600"
             >
               <Filter className="w-3.5 h-3.5" />
-              Filter
+              {t("transactions.filter")}
             </Button>
             <Button
               variant="outline"
@@ -219,7 +210,7 @@ export default function TransactionsPage() {
               className="h-9 gap-2 rounded-lg border-gray-200 text-gray-600"
             >
               <Calendar className="w-3.5 h-3.5" />
-              Date
+              {t("transactions.date")}
             </Button>
           </div>
         </div>

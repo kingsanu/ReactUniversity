@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useGlobalStore } from "@/store/useGlobalStore";
+import { useTranslation } from "react-i18next";
 import { ActionCards } from "./_components/ActionCards";
 import { CompetencyChart } from "./_components/CompetencyChart";
 import { OpportunitiesTable } from "./_components/OpportunitiesTable";
@@ -15,6 +16,7 @@ import "@/utils/milTestUtils";
 import "@/utils/debugUserRole";
 
 export default function DashboardPage() {
+  const { t } = useTranslation();
   const { user } = useGlobalStore();
 
   // Check if user is a coach (case-insensitive)
@@ -36,6 +38,7 @@ export default function DashboardPage() {
   // Otherwise, render the student dashboard content
   return (
     <div className="p-4 md:p-8 space-y-8 bg-gradient-to-br from-slate-50 via-white to-blue-50/30 min-h-full">
+      <h1 className="sr-only">{t("dashboard.title")}</h1>
       {/* Action Cards */}
       <ActionCards />
 

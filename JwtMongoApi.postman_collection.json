@@ -44,7 +44,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"Password123\",\n  \"roleId\": \"{{roleId}}\"\n}"
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"Password123\"\n}"
             },
             "url": {
               "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/authapi/signup",
@@ -53,7 +53,8 @@
                 "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["authapi", "signup"]
-            }
+            },
+            "description": "Register a new user. **roleId is optional** - if not provided, user will be assigned the \"Student\" role by default. To assign a different role, include \"roleId\" in the request body."
           }
         },
         {
@@ -1751,6 +1752,67 @@
                 },
                 "description": "Get detailed information about a specific transaction.\n\n**Returns:**\n- id, paymentIntentId, amount, currency, status\n- createdDate, updatedAt\n- description, paymentMethodId, receiptUrl, bookingId\n- userId"
               }
+            },
+            {
+              "name": "Get Transaction Statistics",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/transactions/stats",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "transactions", "stats"]
+                },
+                "description": "Get transaction statistics for the authenticated user.\n\n**Returns:**\n- totalSpent: Total amount spent (in dollars)\n- currency: Currency code\n- invoiceCount: Total number of successful transactions\n- lastPaymentMethod: Details of the last payment method used (type, brand, last4, expiryMonth, expiryYear)\n- spendingTrend: Spending trend comparison (percentage change and direction: up/down)\n\n**Note:**\n- Only includes successful (succeeded) transactions\n- Spending trend compares last 30 days with previous 30 days"
+              }
+            },
+            {
+              "name": "Export Transactions",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/transactions/export?format=csv&startDate=2024-01-01&endDate=2024-12-31",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "transactions", "export"],
+                  "query": [
+                    {
+                      "key": "format",
+                      "value": "csv",
+                      "description": "Export format: csv or pdf (default: csv)"
+                    },
+                    {
+                      "key": "startDate",
+                      "value": "2024-01-01",
+                      "description": "Optional: Start date filter (ISO 8601 format)"
+                    },
+                    {
+                      "key": "endDate",
+                      "value": "2024-12-31",
+                      "description": "Optional: End date filter (ISO 8601 format)"
+                    }
+                  ]
+                },
+                "description": "Export transactions in CSV or PDF format. Returns a downloadable file.\n\n**Query Parameters:**\n- format: Export format - 'csv' or 'pdf' (default: csv)\n- startDate: Optional - Filter transactions from this date\n- endDate: Optional - Filter transactions until this date\n\n**Returns:**\n- CSV file with columns: Date, Amount, Currency, Status, Description, Payment Method ID, Receipt URL\n- File name format: transactions_YYYY-MM-DD.csv\n\n**Note:**\n- PDF export is not yet implemented\n- Requires authentication\n- Only exports transactions for the authenticated user"
+              }
             }
           ]
         },
@@ -1938,6 +2000,128 @@
                   ]
                 },
                 "description": "Get platform commission statistics over a time period. Returns total commission earned and breakdown by period.\n\n**Query Parameters:**\n- startDate: Optional - Start date (default: 1 month ago)\n- endDate: Optional - End date (default: now)\n\n**Returns:**\n- totalCommission: Total platform commission earned\n- totalPayouts: Total number of payouts\n- periodStart, periodEnd: Date range\n- currency: Currency code\n- byPeriod: Monthly breakdown with commission and payout count\n\n**Note:** Requires admin role (currently allows any authenticated user - TODO: add role check)"
+              }
+            },
+            {
+              "name": "Get Users",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/admin/users?page=1&limit=20&search=&role=&status=",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "admin", "users"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "description": "Page number (default: 1)"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20",
+                      "description": "Items per page (default: 20)"
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "description": "Optional: Search by name or email"
+                    },
+                    {
+                      "key": "role",
+                      "value": "",
+                      "description": "Optional: Filter by role name"
+                    },
+                    {
+                      "key": "status",
+                      "value": "",
+                      "description": "Optional: Filter by status (active, inactive)"
+                    }
+                  ]
+                },
+                "description": "Get paginated list of all users with filtering options.\n\n**Query Parameters:**\n- page: Page number (default: 1)\n- limit: Items per page (default: 20)\n- search: Optional - Search by name or email\n- role: Optional - Filter by role name\n- status: Optional - Filter by status (active, inactive)\n\n**Returns:**\n- List of user items\n- Each item includes: id, name, email, role, status, joinedDate, subscriptionStatus\n- Total count, page, limit\n\n**Note:** Requires admin role (currently allows any authenticated user - TODO: add role check)"
+              }
+            },
+            {
+              "name": "Get Admin Transactions",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/admin/transactions?page=1&limit=20&search=&status=",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "admin", "transactions"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "description": "Page number (default: 1)"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20",
+                      "description": "Items per page (default: 20)"
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "description": "Optional: Search by user email or name"
+                    },
+                    {
+                      "key": "status",
+                      "value": "",
+                      "description": "Optional: Filter by payment status"
+                    }
+                  ]
+                },
+                "description": "Get paginated list of all system transactions with filtering options.\n\n**Query Parameters:**\n- page: Page number (default: 1)\n- limit: Items per page (default: 20)\n- search: Optional - Search by user email or name\n- status: Optional - Filter by payment status\n\n**Returns:**\n- List of transaction items\n- Each item includes: id, userId, userName, userEmail, amount, currency, status, date, description, paymentMethodId, bookingId\n- Total count, page, limit\n\n**Note:** Requires admin role (currently allows any authenticated user - TODO: add role check)"
+              }
+            },
+            {
+              "name": "Get Analytics",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/admin/analytics?period=month",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "admin", "analytics"],
+                  "query": [
+                    {
+                      "key": "period",
+                      "value": "month",
+                      "description": "Time period: week, month, or year (default: month)"
+                    }
+                  ]
+                },
+                "description": "Get comprehensive platform analytics for admin dashboard.\n\n**Query Parameters:**\n- period: Time period - 'week', 'month', or 'year' (default: month)\n\n**Returns:**\n- stats: Overall statistics (totalUsers, totalRevenue, activeCourses, growthRate, monthlyGrowth)\n- revenueData: Revenue breakdown by period\n- userGrowthData: User growth data by period\n- topCoaches: Top 5 coaches by earnings (id, name, earnings, sessions, rating)\n- topCourses: Top 5 courses by enrollments (id, title, enrollments, revenue, rating)\n- recentActivity: Recent activity feed (last 20 items)\n\n**Note:** Requires admin role (currently allows any authenticated user - TODO: add role check)"
               }
             }
           ]

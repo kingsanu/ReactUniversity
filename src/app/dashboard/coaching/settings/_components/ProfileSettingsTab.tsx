@@ -1,16 +1,24 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Upload, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 export function ProfileSettingsTab() {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [profile, setProfile] = useState({
@@ -38,7 +46,7 @@ export function ProfileSettingsTab() {
       // setProfile(data);
       setIsLoading(false);
     } catch (error) {
-      toast.error("Failed to load profile");
+      toast.error(t("coaching.profile.failedToLoad"));
       setIsLoading(false);
     }
   };
@@ -48,9 +56,9 @@ export function ProfileSettingsTab() {
     try {
       const { updateCoachProfile } = await import("@/services/coachService");
       await updateCoachProfile(profile);
-      toast.success("Profile updated successfully");
+      toast.success(t("coaching.profile.updated"));
     } catch (error) {
-      toast.error("Failed to update profile");
+      toast.error(t("coaching.profile.failedToUpdate"));
     } finally {
       setIsSaving(false);
     }
@@ -58,13 +66,19 @@ export function ProfileSettingsTab() {
 
   const addLanguage = () => {
     if (newLanguage && !profile.languages.includes(newLanguage)) {
-      setProfile({ ...profile, languages: [...profile.languages, newLanguage] });
+      setProfile({
+        ...profile,
+        languages: [...profile.languages, newLanguage],
+      });
       setNewLanguage("");
     }
   };
 
   const removeLanguage = (lang: string) => {
-    setProfile({ ...profile, languages: profile.languages.filter((l) => l !== lang) });
+    setProfile({
+      ...profile,
+      languages: profile.languages.filter((l) => l !== lang),
+    });
   };
 
   const addTag = () => {
@@ -162,7 +176,9 @@ export function ProfileSettingsTab() {
           <Input
             id="specialization"
             value={profile.specialization}
-            onChange={(e) => setProfile({ ...profile, specialization: e.target.value })}
+            onChange={(e) =>
+              setProfile({ ...profile, specialization: e.target.value })
+            }
             placeholder="Tech Leadership"
           />
         </div>
@@ -173,7 +189,9 @@ export function ProfileSettingsTab() {
           <Input
             id="location"
             value={profile.location}
-            onChange={(e) => setProfile({ ...profile, location: e.target.value })}
+            onChange={(e) =>
+              setProfile({ ...profile, location: e.target.value })
+            }
             placeholder="San Francisco, CA"
           />
         </div>

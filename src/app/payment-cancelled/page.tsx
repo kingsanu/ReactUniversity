@@ -1,8 +1,10 @@
 "use client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 
 export default function PaymentCancelled() {
+  const { t } = useTranslation();
   const router = useRouter();
 
   return (
@@ -25,25 +27,22 @@ export default function PaymentCancelled() {
         </div>
 
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Payment Cancelled
+          {t("payments.cancelledTitle")}
         </h2>
-        <p className="text-gray-600 mb-6">
-          Your payment was cancelled. No charges were made to your account. You
-          can try again anytime.
-        </p>
+        <p className="text-gray-600 mb-6">{t("payments.cancelledText")}</p>
 
         <div className="space-y-3">
           <Link
             href="/subscribe"
             className="block w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
           >
-            Try Again
+            {t("payments.tryAgain")}
           </Link>
           <button
             onClick={() => router.push("/dashboard")}
             className="w-full border border-gray-300 text-gray-700 py-3 px-4 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
           >
-            Back to Dashboard
+            {t("payments.backToDashboard")}
           </button>
         </div>
       </div>

@@ -26,6 +26,7 @@
     "edit": "Edit",
     "view": "View",
     "back": "Back",
+    "start": "Start",
     "next": "Next",
     "previous": "Previous",
     "logout": "Logout",
@@ -43,7 +44,7 @@
     "careerMatches": "Career Matches",
     "opportunities": "Opportunities",
     "activityChart": "Activity Chart",
-    "benchmarks": "Benchmarks",
+    "benchmarksLabel": "Benchmarks",
     "milestones": "Milestones",
     "learningTools": "Learning & Tools",
     "courseCatalog": "Course Catalog",
@@ -126,7 +127,6 @@
       "location": "Location"
     },
 
-    "assessments": "Assessments",
     "professionalAssessments": "Professional Assessments",
     "assessmentsDescription": "Complete your professional assessments to unlock personalized insights about your competencies, cognitive abilities, and ideal career path. Each assessment provides valuable data for your professional development.",
     "pcaUserInfoIncomplete": "User information is incomplete. Please complete your profile first.",
@@ -280,16 +280,417 @@
     "startTest": "Start Test",
     "nextExample": "Next Example"
   },
+  "home": {
+    "title": "TimsCare",
+    "tagline": "Your career development platform",
+    "cta": {
+      "dashboard": "Dashboard",
+      "signIn": "Sign In",
+      "signUp": "Sign Up"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to continue your journey",
+      "emailLabel": "Email address",
+      "emailPlaceholder": "john@example.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "remember": "Remember me for 30 days",
+      "submit": "Sign in",
+      "submitting": "Signing in...",
+      "noAccountText": "Don't have an account?",
+      "signUp": "Sign up for free"
+    },
+    "signup": {
+      "title": "Create account",
+      "subtitle": "Start your journey to career success",
+      "submit": "Create account",
+      "creating": "Creating account..."
+    }
+  },
+  "payments": {
+    "verifying": "Verifying Payment...",
+    "pleaseWait": "Please wait while we confirm your payment.",
+    "successTitle": "Payment Successful! 🎉",
+    "successSubscription": "Thank you for your payment. Your subscription is now active.",
+    "successSession": "Thank you for your payment. Your coaching session has been booked.",
+    "details": "Payment Details",
+    "amount": "Amount:",
+    "description": "Description:",
+    "date": "Date:",
+    "continueToDashboard": "Continue to Dashboard",
+    "viewMySessions": "View My Sessions",
+    "failedTitle": "Payment Failed",
+    "failedText": "There was an issue with your payment. Please try again.",
+    "tryAgain": "Try Again",
+    "backToDashboard": "Back to Dashboard",
+    "cancelledTitle": "Payment Cancelled",
+    "cancelledText": "Your payment was cancelled. No charges were made to your account. You can try again anytime.",
+    "errorTitle": "Verification Error",
+    "errorText": "Unable to verify payment status. Please contact support if you were charged."
+  },
+  "transactions": {
+    "fetchFailed": "Failed to load transactions",
+    "noExport": "No transactions to export",
+    "paymentMethodsComingSoon": "Payment methods management coming soon!",
+    "title": "Transactions",
+    "subtitle": "Manage your payments, invoices, and billing history.",
+    "exportCSV": "Export CSV",
+    "manageMethods": "Manage Methods",
+    "totalSpent": "Total Spent",
+    "lifetime": "Lifetime",
+    "total": "total",
+    "invoices": "Invoices",
+    "availableForDownload": "Available for download",
+    "lastUsedMethod": "Last Used Method",
+    "fromRecentTransaction": "From recent transaction",
+    "searchPlaceholder": "Search transactions...",
+    "filter": "Filter",
+    "date": "Date",
+    "table": {
+      "id": "Transaction ID",
+      "description": "Description",
+      "date": "Date",
+      "method": "Method",
+      "status": "Status",
+      "amount": "Amount"
+    }
+  },
+  "admin": {
+    "redirecting": "Redirecting to Admin Panel...",
+    "accessRequired": "Administrator access required",
+    "accessDenied": "Access denied. This area is for administrators only.",
+    "verifying": "Verifying admin access...",
+    "title": "Admin Dashboard",
+    "subtitle": "Overview of your platform's performance",
+    "lastUpdated": "Last updated: {{when}}",
+    "quickActionsTitle": "Quick Actions",
+    "quickActions": {
+      "manageCoaches": {
+        "title": "Manage Coaches",
+        "description": "Invite, approve, and manage coach profiles."
+      },
+      "courseManagement": {
+        "title": "Course Management",
+        "description": "Create and update learning courses."
+      },
+      "questions": {
+        "title": "360° Questions",
+        "description": "Configure feedback questions."
+      },
+      "settings": {
+        "title": "System Settings",
+        "description": "Global platform configuration."
+      }
+    },
+    "analytics": {
+      "title": "Analytics",
+      "loading": "Loading platform analytics...",
+      "subtitle": "Comprehensive overview of your platform's performance",
+      "period": {
+        "week": "Last Week",
+        "month": "Last Month",
+        "year": "Last Year"
+      },
+      "totalUsers": "Total Users",
+      "totalRevenue": "Total Revenue",
+      "activeCourses": "Active Courses",
+      "growthRate": "Growth Rate",
+      "fromLastPeriod": "from last period",
+      "revenueTransactions": "Revenue & Transactions",
+      "cards": {
+        "topCoaches": "Top Performing Coaches",
+        "topCourses": "Top Courses",
+        "recentActivity": "Recent Activity"
+      },
+      "charts": {
+        "userGrowthTrend": "User Growth Trend"
+      },
+      "chartNames": {
+        "totalUsers": "Total Users",
+        "newUsers": "New Users"
+      },
+      "overallPlatformGrowth": "Overall platform growth"
+    },
+    "payouts": {
+      "title": "Payout Management",
+      "subtitle": "Review and approve coach payouts for the current cycle.",
+      "totalPending": "Total Pending",
+      "requestsAwaiting": "{{count}} requests awaiting action",
+      "processedThisMonth": "Processed (This Month)",
+      "allSettlementsCleared": "All settlements cleared",
+      "searchPlaceholder": "Search coach or payout ID...",
+      "filterStatus": "Filter Status",
+      "table": {
+        "payoutId": "Payout ID",
+        "coach": "Coach",
+        "period": "Period",
+        "amount": "Amount",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "actions": {
+        "reject": "Reject",
+        "approve": "Approve"
+      },
+      "noPending": "No pending payouts found."
+    },
+    "users": {
+      "title": "Users",
+      "subtitle": "Manage user accounts and permissions",
+      "failedToLoad": "Failed to load users",
+      "searchPlaceholder": "Search users...",
+      "rolePlaceholder": "Role",
+      "statusPlaceholder": "Status",
+      "roles": {
+        "all": "All Roles",
+        "student": "Student",
+        "coach": "Coach",
+        "admin": "Admin"
+      },
+      "status": {
+        "all": "All Status",
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "addUser": "Add User",
+      "table": {
+        "name": "Name",
+        "email": "Email",
+        "role": "Role",
+        "status": "Status",
+        "subscription": "Subscription",
+        "joined": "Joined",
+        "actions": "Actions"
+      },
+      "loadingText": "Loading users...",
+      "noUsersFound": "No users found matching your criteria.",
+      "emailCopied": "Email copied to clipboard",
+      "dropdown": {
+        "actions": "Actions",
+        "copyEmail": "Copy Email",
+        "viewProfile": "View Profile",
+        "editDetails": "Edit Details",
+        "deactivateUser": "Deactivate User"
+      }
+    },
+    "transactions": {
+      "table": {
+        "id": "Transaction ID",
+        "user": "User",
+        "description": "Description",
+        "amount": "Amount",
+        "status": "Status",
+        "date": "Date",
+        "method": "Method"
+      },
+      "userId": "ID: {{id}}"
+    },
+    "questions": {
+      "title": "Questions Bank",
+      "subtitle": "Manage questions and categories for assessments",
+      "header": "360° Evaluation Questions",
+      "loading": "Loading 360° questions...",
+      "manageSummary": "You are managing {{count}} 360° evaluation questions",
+      "add": "Add Question",
+      "addNew": "Add New Question",
+      "searchPlaceholder": "Search questions...",
+      "tabs": {
+        "all": "All Questions",
+        "categories": "Categories",
+        "archived": "Archived"
+      },
+      "cardTitle": "Question #{{i}}",
+      "sampleQuestion": "What is the primary purpose of React hooks?",
+      "tags": {
+        "frontend": "Frontend",
+        "react": "React"
+      },
+      "questionsInCategory": "Questions in this category",
+      "filters": {
+        "title": "Filters",
+        "relationType": "Relation Type",
+        "category": "Category",
+        "status": "Status",
+        "allTypes": "All Types",
+        "allCategories": "All Categories",
+        "allStatus": "All Status",
+        "active": "Active",
+        "inactive": "Inactive",
+        "none": "None",
+        "clear": "Clear Filters"
+      },
+      "form": {
+        "relationTypeLabel": "Relation Type",
+        "categoryLabel": "Category",
+        "questionLabel": "Spanish Question Text",
+        "questionNumberLabel": "Question Number"
+      }
+    },
+    "layout": {
+      "panelTitle": "Admin Panel",
+      "headerTitle": "Administrator Dashboard",
+      "userDashboard": "User Dashboard",
+      "logout": "Logout",
+      "nav": {
+        "dashboard": "Dashboard",
+        "plans": "Subscription Plans",
+        "users": "Users",
+        "coaches": "Coaches",
+        "courses": "Courses",
+        "careers": "Careers",
+        "questions": "360° Questions",
+        "analytics": "Analytics",
+        "settings": "Settings"
+      }
+    },
+    "coaches": {
+      "title": "Coaches",
+      "subtitle": "Manage your coaching team and invitations",
+      "inviteButton": "Invite Coach",
+      "inviteTitle": "Invite New Coach",
+      "inviteDescription": "Add a new coach to your platform. You can invite individually or bulk upload.",
+      "singleInvite": "Single Invite",
+      "bulkUpload": "Bulk Upload",
+      "totalCoaches": "Total Coaches",
+      "activeNow": "Active Now",
+      "pendingInvites": "Pending Invites",
+      "expiringContracts": "Expiring Contracts"
+    },
+    "careers": {
+      "loading": "Loading...",
+      "accessDenied": "Access denied"
+    },
+    "transactions": {
+      "title": "Transactions",
+      "subtitle": "Monitor all system transactions and payments",
+      "searchPlaceholder": "Search transactions...",
+      "statusPlaceholder": "Status",
+      "status": {
+        "all": "All Status",
+        "completed": "Completed",
+        "pending": "Pending",
+        "failed": "Failed",
+        "refunded": "Refunded"
+      },
+      "exportReport": "Export Report",
+      "noTransactions": "No transactions found.",
+      "table": {
+        "id": "Transaction ID",
+        "user": "User",
+        "date": "Date",
+        "method": "Method",
+        "status": "Status",
+        "amount": "Amount"
+      }
+    },
+    "courses": {
+      "title": "Courses",
+      "subtitle": "Manage your courses and curriculum",
+      "addCourse": "Add Course",
+      "createTitle": "Create New Course",
+      "create": "Create Course",
+      "field": {
+        "title": "Title",
+        "description": "Description",
+        "instructor": "Instructor"
+      },
+      "searchPlaceholder": "Search courses...",
+      "courseCreated": "Course created successfully",
+      "courseDeleted": "Course deleted successfully",
+      "table": {
+        "title": "Title",
+        "instructor": "Instructor",
+        "students": "Students",
+        "status": "Status",
+        "lastUpdated": "Last Updated",
+        "actions": "Actions",
+        "course": "Course",
+        "provider": "Provider",
+        "category": "Category",
+        "difficulty": "Difficulty",
+        "enrollments": "Enrollments"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "form": {
+        "titleCreate": "Create New Course",
+        "titleEdit": "Edit Course",
+        "labels": {
+          "basicInformation": "Basic Information",
+          "title": "Course Title",
+          "provider": "Provider",
+          "difficulty": "Difficulty",
+          "duration": "Duration (weeks)",
+          "hoursPerWeek": "Hours per Week",
+          "category": "Category",
+          "instructor": "Instructor",
+          "description": "Description",
+          "shortDescription": "Short Description",
+          "fullDescription": "Full Description",
+          "media": "Media",
+          "thumbnailUrl": "Thumbnail URL",
+          "videoUrl": "Video URL",
+          "locationLanguage": "Location & Language",
+          "language": "Language",
+          "country": "Country",
+          "region": "Region"
+        },
+        "save": "Save Changes",
+        "cancel": "Cancel"
+      },
+      "confirmDelete": "Are you sure you want to delete this course?"
+    },
+    "careers": {
+      "title": "Careers",
+      "header": {
+        "title": "Career Manager"
+      },
+      "confirmDelete": "Are you sure you want to delete this career?",
+      "createTitle": "Create Career",
+      "editTitle": "Edit Career",
+      "form": {
+        "title": "Title (English)",
+        "shortDescription": "Short description (English)"
+      }
+    }
+  },
+  "subscribe": {
+    "upgradeTitle": "Upgrade Your Experience",
+    "upgradeSubtitle": "Choose the perfect plan to unlock exclusive features and take your journey to the next level.",
+    "paymentSuccessful": "Payment Successful!",
+    "subscriptionActive": "Your subscription is now active. Enjoy your premium features!"
+  },
   "career": {
     "match": "Match",
     "favorite": "Favorite",
     "favorited": "Favorited",
-    "compare": "Compare",
+    "compareLabel": "Compare",
     "salaryRange": "Salary Range",
     "laborDemand": "Labor Demand",
     "whyRecommended": "Why recommended",
     "showAll": "Show all recommendations",
-    "noResults": "No careers found"
+    "noResults": "No careers found",
+    "compare": {
+      "title": "Compare Careers",
+      "description": "Select up to 3 careers to compare attributes side-by-side.",
+      "noSelected": "No careers selected. Choose up to 3 to compare.",
+      "table": {
+        "attribute": "Attribute",
+        "match": "Match",
+        "education": "Education",
+        "salary": "Salary",
+        "skills": "Skills"
+      }
+    }
+  },
+  "careers": {
+    "title": "Careers",
+    "subtitle": "Explore career paths and role information"
   },
   "compare": {
     "selectedCount": "{{count}} selected",
@@ -367,43 +768,7 @@
     "started": "Import job started ({{jobId}}). Check status in a moment.",
     "failure": "Failed to start import. Please try again."
   },
-  "admin": {
-    "courses": {
-      "header": {
-        "addCourse": "Add Course"
-      },
-      "table": {
-        "course": "Course",
-        "provider": "Provider",
-        "category": "Category",
-        "difficulty": "Difficulty",
-        "status": "Status",
-        "enrollments": "Enrollments",
-        "actions": "Actions"
-      },
-      "status": {
-        "active": "Active",
-        "inactive": "Inactive"
-      },
-      "form": {
-        "titleCreate": "Create New Course",
-        "titleEdit": "Edit Course",
-        "save": "Save Changes",
-        "cancel": "Cancel"
-      },
-      "confirmDelete": "Are you sure you want to delete this course?"
-    },
-    "careers": {
-      "header": { "title": "Career Manager" },
-      "confirmDelete": "Are you sure you want to delete this career?",
-      "createTitle": "Create Career",
-      "editTitle": "Edit Career",
-      "form": {
-        "title": "Title (English)",
-        "shortDescription": "Short description (English)"
-      }
-    }
-  },
+
   "evaluation": {
     "toast": {
       "emailSent": "Email invitation sent successfully!",
@@ -423,7 +788,31 @@
     "spanish": "Spanish",
     "switchLanguage": "Switch Language"
   },
+  "testPCA": {
+    "title": "PCA API Testing",
+    "testing": "Testing...",
+    "testStructure": "Test API Structure",
+    "testWithUser": "Test with Current User ({{id}})",
+    "notLoggedIn": "Not logged in",
+    "currentUser": "Current User",
+    "clickToRun": "Click a button above to run tests...",
+    "endpointsTitle": "API Endpoints Being Tested"
+  },
   "timeline": {
+    "benchmarks": {
+      "marketDemand": "Market Demand",
+      "high": "High",
+      "topGrowth": "Top 10% growth rate",
+      "talentSupply": "Talent Supply",
+      "moderate": "Moderate",
+      "balancedCompetition": "Balanced competition",
+      "employability": "Employability",
+      "basedOnProfile": "Based on your profile",
+      "salaryBenchmarks": "Salary Benchmarks",
+      "topSkills": "Top Skills",
+      "workMode": "Work Mode"
+    },
+
     "title": "Progress Timeline",
     "subtitle": "Track all your assessments and progress in one place",
     "breadcrumb": "Timeline",
@@ -453,7 +842,7 @@
     "tryAgain": "Try Again",
     "backToDashboard": "Back to Dashboard",
     "overallProgress": "Overall Progress",
-    "assessments": "assessments",
+
     "lastActivity": "Last Activity",
     "thisWeek": "This Week",
     "thisMonth": "This Month",
@@ -561,10 +950,212 @@
       "socialSciences": "Social Sciences"
     }
   },
+  "sessions": {
+    "title": "My Coaching Sessions",
+    "subtitle": "Track and manage all your coaching appointments",
+    "bookNew": "Book New Session",
+    "stats": {
+      "total": "Total Sessions",
+      "upcoming": "Upcoming",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "yourSessions": "Your Sessions",
+    "tabs": {
+      "upcoming": "Upcoming",
+      "past": "Past"
+    },
+    "messages": {
+      "failedToLoad": "Failed to load your sessions",
+      "cancelReasonRequired": "Please provide a reason for cancellation",
+      "cancelSuccess": "Session cancelled successfully",
+      "failedToCancel": "Failed to cancel session",
+      "reviewSubmitted": "Review submitted successfully",
+      "failedToSubmitReview": "Failed to submit review"
+    },
+    "status": {
+      "confirmed": "Confirmed",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "rescheduled": "Rescheduled"
+    }
+  },
+  "subscriptions": {
+    "title": "Subscriptions",
+    "subtitle": "Choose the perfect plan for your career journey",
+    "paymentSuccessfulTitle": "Payment Successful!",
+    "paymentSuccessfulBody": "Your subscription has been activated. You now have access to all premium features."
+  },
   "coaching": {
     "featuredCoaches": "Featured Coaches",
     "featuredDescription": "Connect with expert coaches to accelerate your career growth",
     "viewAllCoaches": "View All Coaches",
-    "bookSession": "Book Session"
+    "bookSession": "Book Session",
+    "find": {
+      "title": "Find a Coach",
+      "subtitle": "Book 1:1 sessions with industry experts to accelerate your career",
+      "searchPlaceholder": "Search by name, role, or company...",
+      "viewProfileBook": "View Profile & Book",
+      "noCoachesFound": "No coaches found",
+      "tryAdjusting": "Try adjusting your search terms",
+      "remote": "Remote",
+      "new": "New"
+    },
+    "earnings": {
+      "title": "Earnings & Payouts",
+      "subtitle": "Track your revenue, platform fees, and payouts.",
+      "unableToLoad": "Unable to load earnings data",
+      "tryAgain": "Please try again later",
+      "errorTitle": "Error loading earnings data"
+    },
+    "profile": {
+      "notFoundTitle": "Coach not found",
+      "notFoundText": "The coach profile you are looking for does not exist.",
+      "goBack": "Go Back",
+      "backToCoaches": "Back to Coaches",
+      "available": "AVAILABLE",
+      "bookSession": "Book Session",
+      "rating": "Rating",
+      "location": "Location",
+      "languages": "Languages",
+      "about": "About Coach",
+      "expertise": "Expertise & Skills",
+      "coreSpecialization": "Core Specialization",
+      "topicsSkills": "Topics & Skills",
+      "availability": "Availability",
+      "nextAvailable": "Next Available",
+      "slotsToday": "Slots available today",
+      "checkCalendar": "Check Calendar",
+      "freeCancellation": "Free cancellation up to 24h before",
+      "updated": "Profile updated successfully",
+      "failedToUpdate": "Failed to update profile",
+      "uploading": "Uploading image...",
+      "uploadSuccess": "Profile image updated successfully",
+      "uploadFailed": "Failed to upload image",
+      "failedToLoad": "Failed to load profile data"
+    },
+
+    "settings": {
+      "profileTitle": "Profile Information",
+      "profileDescription": "Update your public coaching profile visible to students.",
+      "fullName": "Full Name",
+      "professionalTitle": "Professional Title",
+      "bioPlaceholder": "Tell students about your coaching experience...",
+      "uploadImage": "Upload Image"
+    },
+    "dashboard": {
+      "availabilityUpdated": "Availability updated successfully",
+      "failedToUpdateAvailability": "Failed to update availability",
+      "failedToLoad": "Failed to load dashboard data",
+      "noSlotsAvailable": "No slots available",
+      "failedToLoadSlots": "Failed to load available slots",
+      "selectDateTime": "Please select a date and time",
+      "rescheduleSuccess": "Session rescheduled successfully",
+      "rescheduleFailed": "Failed to reschedule session",
+      "sessionCancelled": "Session cancelled",
+      "cancelFailed": "Failed to cancel session",
+      "reportDownloaded": "Report downloaded successfully",
+      "reportDownloadFailed": "Failed to download report",
+      "activityLogComingSoon": "Open full activity log coming soon",
+      "studentProfileNotFound": "Student profile not found",
+      "benchmarks": {
+        "overview": {
+          "salaryTitle": "Salary Benchmarks",
+          "details": "Details",
+          "topSkills": "Top Skills",
+          "workMode": "Work Mode",
+          "costOfLiving": "Cost of Living",
+          "certifications": "Certifications",
+          "viewAll": "View All",
+          "marketPulse": "Market Pulse",
+          "marketPulseDesc": "Real-time industry metrics",
+          "liveUpdates": "Live Updates"
+        },
+        "compensation": {
+          "avgAnnualSalary": "Avg. Annual Salary",
+          "sinceLastYear": "since last year",
+          "purchasePowerIndex": "Purchase Power Index",
+          "relativeToNYC": "Relative to New York City (100)",
+          "estimatedTakeHome": "Est. Take Home",
+          "afterEstimatedTaxes": "After estimated taxes (~28%)",
+          "detailedSalaryTitle": "Detailed Salary Breakdown",
+          "cardDescription": "Compensation ranges for {{career}} roles in {{country}} across experience levels.",
+          "keyObservation": "Key Observation",
+          "keyObservationDesc": "Salary bands for {{career}} in {{country}} are widening. Senior-level roles are seeing faster growth due to a shortage of specialized talent, while entry-level compensation remains stable."
+        },
+        "skills": {
+          "title": "Skills & Growth",
+          "subtitle": "Competency benchmarks and learning opportunities.",
+          "mostInDemand": "Most In-Demand Skills",
+          "cardDescription": "Frequency of skills requested in job descriptions for {{career}}.",
+          "emergingTechWatch": "Emerging Tech Watch",
+          "emergingDesc": "Technologies gaining rapid traction in the last 6 months.",
+          "topCertifications": "Top Certifications",
+          "certificationsDesc": "Credentials that significantly impact hiring probability.",
+          "recommendedLearningPaths": "Recommended Learning Paths"
+        },
+        "market": {
+          "title": "Market Dynamics",
+          "subtitle": "Macro-economic trends and employment stability analysis.",
+          "employabilityScore": "Employability Score",
+          "employabilityDesc": "Historical trend of role placement success over the last 5 years.",
+          "analysisLabel": "Analysis:",
+          "analysis": "Consistent upward trend indicates a maturing market for {{career}} professionals.",
+          "youthEmploymentRate": "Youth Employment Rate",
+          "marketForecast": "Market Forecast",
+          "positiveOutlook": "Positive Outlook",
+          "positiveOutlookDesc": "Startups and enterprise sectors are projected to increase hiring by 15% in Q3.",
+          "projectedHotspots": "Projected Hotspots",
+          "recruiterSentiment": "Recruiter Sentiment",
+          "hiringSpeed": "Hiring Speed",
+          "interviewTech": "Interview Tech",
+          "contractRoles": "Contract Roles",
+          "badgeFast": "Fast",
+          "badgeRemote": "Remote",
+          "badgeIncreasing": "Increasing"
+        },
+        "tabs": {
+          "overview": "Overview",
+          "compensation": "Compensation",
+          "market": "Market Analysis",
+          "skills": "Skills & Learning",
+          "demographics": "Demographics"
+        },
+        "header": {
+          "title": "Career Intelligence",
+          "description": "Deep-dive into global market trends, salary benchmarks, and skill requirements for your path.",
+          "selectCountryPlaceholder": "Select Country",
+          "selectCareerPlaceholder": "Select Career",
+          "shareReport": "Share Report"
+        },
+        "demographics": {
+          "title": "Workforce & Culture",
+          "subtitle": "Demographic breakdown and work environment trends.",
+          "workModeTitle": "Work Mode Distribution",
+          "workModeDesc": "Prevalence of Remote vs Hybrid vs Onsite roles.",
+          "remote": "Remote",
+          "hybrid": "Hybrid",
+          "onsite": "Onsite",
+          "genderDiversityTitle": "Gender Diversity",
+          "genderDiversityDesc": "Gender distribution in {{career}} roles.",
+          "inclusivityTitle": "Inclusivity Score",
+          "inclusivityDesc": "Industry average rating for inclusive workplace policies and benefits.",
+          "enterpriseTrendTitle": "Enterprise Trend",
+          "enterpriseTrendDesc": "Fortune 500 companies are shifting 20% more roles to \"Remote-First\" in 2025.",
+          "readReport": "Read Report",
+          "badges": {
+            "parentalLeave": "Parental Leave",
+            "flexHours": "Flex Hours",
+            "wellness": "Wellness Programs"
+          }
+        },
+        "common": {
+          "title": "Benchmarks",
+          "today": "Today",
+          "comparedToYesterday": "Compared to ${{amount}} yesterday",
+          "lastWeekIncome": "Last week income"
+        }
+      }
+    }
   }
 }

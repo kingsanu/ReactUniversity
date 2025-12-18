@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import {
   Question360,
@@ -46,6 +47,7 @@ const RELATION_TYPE_OPTIONS = getRelationTypeOptions();
 const CATEGORY_OPTIONS = getCommonCategories();
 
 export function Question360Manager() {
+  const { t } = useTranslation();
   const [questions, setQuestions] = useState<Question360[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -311,13 +313,15 @@ export function Question360Manager() {
     fetchQuestions();
   }, []);
 
+  const { t } = useTranslation();
+
   // Loading state
   if (loading) {
     return (
       <div className="flex justify-center items-center py-12">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-red-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading 360° questions...</p>
+          <p className="text-gray-600">{t("admin.questions.loading")}</p>
         </div>
       </div>
     );
@@ -329,31 +333,34 @@ export function Question360Manager() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-xl font-semibold text-gray-900">
-            360° Evaluation Questions
+            {t("admin.questions.header")}
           </h2>
           <p className="text-sm text-gray-600 mt-1">
-            Manage questions for all relation types (
-            {Array.isArray(questions) ? questions.length : 0} total)
+            {t("admin.questions.manageSummary", {
+              count: Array.isArray(questions) ? questions.length : 0,
+            })}
           </p>
         </div>
         <Button
           onClick={() => setShowCreateModal(true)}
           className="bg-red-600 hover:bg-red-700"
         >
-          ➕ Add New Question
+          {t("admin.questions.add")}
         </Button>
       </div>
 
       {/* Filters */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-        <h3 className="text-sm font-medium text-gray-900 mb-3">Filters</h3>
+        <h3 className="text-sm font-medium text-gray-900 mb-3">
+          {t("admin.questions.filters.title")}
+        </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label
               htmlFor="relation-type-filter"
               className="text-xs font-medium text-gray-700"
             >
-              Relation Type
+              {t("admin.questions.filters.relationType")}
             </Label>
             <Select
               value={filters.relationType}
@@ -362,10 +369,14 @@ export function Question360Manager() {
               }
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="All Types" />
+                <SelectValue
+                  placeholder={t("admin.questions.filters.allTypes")}
+                />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="all">
+                  {t("admin.questions.filters.allTypes")}
+                </SelectItem>
                 {RELATION_TYPE_OPTIONS.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
@@ -405,7 +416,7 @@ export function Question360Manager() {
               htmlFor="status-filter"
               className="text-xs font-medium text-gray-700"
             >
-              Status
+              {t("admin.questions.filters.status")}
             </Label>
             <Select
               value={filters.isActive}
@@ -414,12 +425,20 @@ export function Question360Manager() {
               }
             >
               <SelectTrigger className="w-full">
-                <SelectValue />
+                <SelectValue
+                  placeholder={t("admin.questions.filters.allStatus")}
+                />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="true">Active</SelectItem>
-                <SelectItem value="false">Inactive</SelectItem>
+                <SelectItem value="all">
+                  {t("admin.questions.filters.allStatus")}
+                </SelectItem>
+                <SelectItem value="true">
+                  {t("admin.questions.filters.active")}
+                </SelectItem>
+                <SelectItem value="false">
+                  {t("admin.questions.filters.inactive")}
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -440,7 +459,7 @@ export function Question360Manager() {
               }
               className="text-red-600 hover:text-red-700 h-auto p-0"
             >
-              Clear Filters
+              {t("admin.questions.filters.clear")}
             </Button>
             <span className="text-xs text-gray-500">
               Showing {filteredQuestions.length} of{" "}

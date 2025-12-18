@@ -7,11 +7,11 @@ import { LoadingState } from "./LoadingState";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import StripeCheckout from "@/components/StripeCheckout";
 import * as subscriptionService from "@/services/subscriptionService";
+import { useSubscriptionStatus } from "@/hooks/useSubscription";
 import type {
   SubscriptionPlan,
   FeatureComparison,
   SubscriptionData,
-  UserSubscription,
 } from "@/services/subscriptionService";
 
 interface SubscriptionPlansProps {
@@ -22,8 +22,10 @@ export function SubscriptionPlans({ className }: SubscriptionPlansProps) {
   const { user } = useGlobalStore();
   const [subscriptionData, setSubscriptionData] =
     useState<SubscriptionData | null>(null);
-  const [userSubscription, setUserSubscription] =
-    useState<UserSubscription | null>(null);
+  
+  // Use the new hook for subscription status
+  const { data: subscriptionStatus, isLoading: statusLoading } = useSubscriptionStatus();
+  
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [processingPayment, setProcessingPayment] = useState<string | null>(
@@ -33,17 +35,13 @@ export function SubscriptionPlans({ className }: SubscriptionPlansProps) {
   // Get user ID from global store, fallback to mock for development
   const userId = user.id || "user-123";
 
-  // Load subscription data and user's current subscription
+  // Load subscription plans
   useEffect(() => {
     const loadData = async () => {
       try {
         setLoading(true);
-        const [plans, userSub] = await Promise.all([
-          subscriptionService.fetchSubscriptionPlans(),
-          subscriptionService.getUserSubscription(userId),
-        ]);
+        const plans = await subscriptionService.fetchSubscriptionPlans();
         setSubscriptionData(plans);
-        setUserSubscription(userSub);
       } catch (err) {
         console.error("Failed to load subscription data:", err);
         setError(
@@ -57,10 +55,10 @@ export function SubscriptionPlans({ className }: SubscriptionPlansProps) {
     };
 
     loadData();
-  }, [userId]);
+  }, []);
 
   // Show loading state
-  if (loading) {
+  if (loading || statusLoading) {
     return <LoadingState />;
   }
 
@@ -99,12 +97,12 @@ export function SubscriptionPlans({ className }: SubscriptionPlansProps) {
 
   const { subscription, billingOptions, features } = subscriptionData;
 
-  const hasActiveSubscription =
-    subscriptionService.hasActiveSubscription(userSubscription);
+  const hasActiveSubscription = subscriptionStatus?.hasActiveSubscription;
+  
   const currentPlan =
-    userSubscription && hasActiveSubscription
+    hasActiveSubscription && subscriptionStatus?.planId
       ? subscriptionService.findSubscriptionPlanById(
-          userSubscription.planId,
+          subscriptionStatus.planId,
           billingOptions
         )
       : null;
@@ -127,11 +125,11 @@ export function SubscriptionPlans({ className }: SubscriptionPlansProps) {
                 </h3>
                 <p className="text-green-700 text-sm">
                   You're currently subscribed to {currentPlan.name}
-                  {userSubscription?.endDate && (
+                  {subscriptionStatus?.expiryDate && (
                     <span>
                       {" "}
                       - Expires{" "}
-                      {new Date(userSubscription.endDate).toLocaleDateString()}
+                      {new Date(subscriptionStatus.expiryDate).toLocaleDateString()}
                     </span>
                   )}
                 </p>

@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
@@ -59,6 +60,7 @@ const signupSchema = z
 type SignupFormData = z.infer<typeof signupSchema>;
 
 export default function SignupPage() {
+  const { t } = useTranslation();
   const form = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -326,11 +328,9 @@ export default function SignupPage() {
 
               <div className="text-center mb-6">
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                  Create account
+                  {t("auth.signup.title")}
                 </h1>
-                <p className="text-gray-600">
-                  Start your journey to career success
-                </p>
+                <p className="text-gray-600">{t("auth.signup.subtitle")}</p>
               </div>
 
               <Form {...form}>
@@ -663,22 +663,22 @@ export default function SignupPage() {
                     {isLoading ? (
                       <div className="flex items-center space-x-2">
                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        <span>Creating account...</span>
+                        <span>{t("auth.signup.creating")}</span>
                       </div>
                     ) : (
-                      "Create account"
+                      t("auth.signup.submit")
                     )}
                   </Button>
                 </form>
               </Form>
 
               <p className="mt-6 text-center text-sm text-gray-600">
-                Already have an account?{" "}
+                {t("auth.login.noAccountText")}{" "}
                 <Link
                   href="/login"
                   className="font-medium text-purple-600 hover:text-purple-500 transition-colors"
                 >
-                  Sign in
+                  {t("auth.login.submit")}
                 </Link>
               </p>
             </div>

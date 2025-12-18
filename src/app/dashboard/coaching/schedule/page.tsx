@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -18,6 +19,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
 export default function CoachSessionsPage() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("upcoming");
   const [sessions, setSessions] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -32,7 +34,11 @@ export default function CoachSessionsPage() {
   const SESSION_CACHE_KEY = "coach_sessions_all";
   const CACHE_TTL = 1000 * 60 * 2; // 2 minutes
 
-  async function fetchWithRetry(fn: () => Promise<any>, retries = 2, delay = 300) {
+  async function fetchWithRetry(
+    fn: () => Promise<any>,
+    retries = 2,
+    delay = 300
+  ) {
     try {
       return await fn();
     } catch (err) {
@@ -47,7 +53,7 @@ export default function CoachSessionsPage() {
       setIsLoading(true);
 
       // Check cache
-      const cached = (globalThis as any).__sessionCache ??= new Map();
+      const cached = ((globalThis as any).__sessionCache ??= new Map());
       const entry = cached.get(SESSION_CACHE_KEY);
       if (entry && Date.now() - entry.ts < CACHE_TTL) {
         setSessions(entry.data);
@@ -56,7 +62,9 @@ export default function CoachSessionsPage() {
 
       const { getCoachSessions } = await import("@/services/coachService");
 
-      const rawResponse: any = await fetchWithRetry(() => getCoachSessions("all"));
+      const rawResponse: any = await fetchWithRetry(() =>
+        getCoachSessions("all")
+      );
 
       const normalize = (await import("@/lib/normalizeSessions")).default;
       const normalized = normalize(rawResponse);
@@ -68,7 +76,7 @@ export default function CoachSessionsPage() {
       cached.set(SESSION_CACHE_KEY, { ts: Date.now(), data: normalized });
     } catch (error) {
       console.error("Failed to fetch sessions:", error);
-      toast.error("Failed to load sessions");
+      toast.error(t("coaching.dashboard.failedToLoad"));
     } finally {
       setIsLoading(false);
     }
@@ -105,7 +113,7 @@ export default function CoachSessionsPage() {
 
   const confirmReschedule = async () => {
     if (!selectedSession || !rescheduleDate || !rescheduleTime) {
-      toast.error("Please select a new date and time");
+      toast.error(t("coaching.dashboard.selectDateTime"));
       return;
     }
 
@@ -122,12 +130,12 @@ export default function CoachSessionsPage() {
 
       await rescheduleSession(selectedSession.id, { start, end });
 
-      toast.success("Session rescheduled successfully");
+      toast.success(t("coaching.dashboard.rescheduleSuccess"));
       setIsRescheduleOpen(false);
       fetchSessions(); // Refresh list
     } catch (error) {
       console.error("Reschedule error:", error);
-      toast.error("Failed to reschedule session");
+      toast.error(t("coaching.dashboard.rescheduleFailed"));
     }
   };
 
@@ -141,12 +149,12 @@ export default function CoachSessionsPage() {
         cancelReason || "Cancelled by coach"
       );
 
-      toast.success("Session cancelled successfully");
+      toast.success(t("coaching.dashboard.sessionCancelled"));
       setIsCancelOpen(false);
       fetchSessions(); // Refresh list
     } catch (error) {
       console.error("Cancel error:", error);
-      toast.error("Failed to cancel session");
+      toast.error(t("coaching.dashboard.cancelFailed"));
     }
   };
 

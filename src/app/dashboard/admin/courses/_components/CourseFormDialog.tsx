@@ -114,13 +114,13 @@ export function CourseFormDialog({
             {/* Basic Information */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-gray-900">
-                Basic Information
+                {t("admin.courses.form.labels.basicInformation")}
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
                   <Label htmlFor="title">
-                    {t("courses.title") || "Course Title"} *
+                    {t("admin.courses.form.labels.title")} *
                   </Label>
                   <Input
                     id="title"
@@ -133,7 +133,7 @@ export function CourseFormDialog({
 
                 <div>
                   <Label htmlFor="provider">
-                    {t("courses.provider") || "Provider"} *
+                    {t("admin.courses.form.labels.provider")} *
                   </Label>
                   <Input
                     id="provider"
@@ -146,7 +146,7 @@ export function CourseFormDialog({
 
                 <div>
                   <Label htmlFor="instructor">
-                    {t("courses.instructor") || "Instructor"} *
+                    {t("admin.courses.form.labels.instructor")} *
                   </Label>
                   <Input
                     id="instructor"
@@ -159,7 +159,7 @@ export function CourseFormDialog({
 
                 <div>
                   <Label htmlFor="category">
-                    {t("courses.category") || "Category"} *
+                    {t("admin.courses.form.labels.category")} *
                   </Label>
                   <Input
                     id="category"
@@ -171,7 +171,9 @@ export function CourseFormDialog({
                 </div>
 
                 <div>
-                  <Label htmlFor="difficulty">Difficulty *</Label>
+                  <Label htmlFor="difficulty">
+                    {t("admin.courses.form.labels.difficulty")}
+                  </Label>
                   <Select
                     value={formData.difficulty}
                     onValueChange={(value) => handleChange("difficulty", value)}
@@ -180,15 +182,23 @@ export function CourseFormDialog({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Beginner">Beginner</SelectItem>
-                      <SelectItem value="Intermediate">Intermediate</SelectItem>
-                      <SelectItem value="Advanced">Advanced</SelectItem>
+                      <SelectItem value="Beginner">
+                        {t("courses.difficulty.beginner")}
+                      </SelectItem>
+                      <SelectItem value="Intermediate">
+                        {t("courses.difficulty.intermediate")}
+                      </SelectItem>
+                      <SelectItem value="Advanced">
+                        {t("courses.difficulty.advanced")}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div>
-                  <Label htmlFor="duration">Duration (weeks) *</Label>
+                  <Label htmlFor="duration">
+                    {t("admin.courses.form.labels.duration")}
+                  </Label>
                   <Input
                     id="duration"
                     type="number"
@@ -202,7 +212,9 @@ export function CourseFormDialog({
                 </div>
 
                 <div>
-                  <Label htmlFor="estimatedHours">Hours per Week *</Label>
+                  <Label htmlFor="estimatedHours">
+                    {t("admin.courses.form.labels.hoursPerWeek")}
+                  </Label>
                   <Input
                     id="estimatedHours"
                     type="number"
@@ -216,7 +228,9 @@ export function CourseFormDialog({
                 </div>
 
                 <div className="md:col-span-2">
-                  <Label htmlFor="shortDescription">Short Description *</Label>
+                  <Label htmlFor="shortDescription">
+                    {t("admin.courses.form.labels.shortDescription")} *
+                  </Label>
                   <Textarea
                     id="shortDescription"
                     value={formData.shortDescription}
@@ -230,7 +244,9 @@ export function CourseFormDialog({
                 </div>
 
                 <div className="md:col-span-2">
-                  <Label htmlFor="fullDescription">Full Description *</Label>
+                  <Label htmlFor="fullDescription">
+                    {t("admin.courses.form.labels.fullDescription")} *
+                  </Label>
                   <Textarea
                     id="fullDescription"
                     value={formData.fullDescription}
@@ -247,11 +263,15 @@ export function CourseFormDialog({
 
             {/* Media */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900">Media</h3>
+              <h3 className="text-lg font-semibold text-gray-900">
+                {t("admin.courses.form.labels.media")}
+              </h3>
 
               <div className="grid grid-cols-1 gap-4">
                 <div>
-                  <Label htmlFor="thumbnailUrl">Thumbnail URL *</Label>
+                  <Label htmlFor="thumbnailUrl">
+                    {t("admin.courses.form.labels.thumbnailUrl")} *
+                  </Label>
                   <Input
                     id="thumbnailUrl"
                     value={formData.thumbnailUrl}
@@ -264,7 +284,9 @@ export function CourseFormDialog({
                 </div>
 
                 <div>
-                  <Label htmlFor="videoUrl">Video URL</Label>
+                  <Label htmlFor="videoUrl">
+                    {t("admin.courses.form.labels.videoUrl")}
+                  </Label>
                   <Input
                     id="videoUrl"
                     value={formData.videoUrl}
@@ -278,12 +300,14 @@ export function CourseFormDialog({
             {/* Location & Language */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-gray-900">
-                Location & Language
+                {t("admin.courses.form.labels.locationLanguage")}
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="language">Language *</Label>
+                  <Label htmlFor="language">
+                    {t("admin.courses.form.labels.language")} *
+                  </Label>
                   <Input
                     id="language"
                     value={formData.language}
@@ -294,7 +318,9 @@ export function CourseFormDialog({
                 </div>
 
                 <div>
-                  <Label htmlFor="country">Country *</Label>
+                  <Label htmlFor="country">
+                    {t("admin.courses.form.labels.country")} *
+                  </Label>
                   <Input
                     id="country"
                     value={formData.country}
@@ -305,7 +331,9 @@ export function CourseFormDialog({
                 </div>
 
                 <div>
-                  <Label htmlFor="region">Region *</Label>
+                  <Label htmlFor="region">
+                    {t("admin.courses.form.labels.region")} *
+                  </Label>
                   <Input
                     id="region"
                     value={formData.region}

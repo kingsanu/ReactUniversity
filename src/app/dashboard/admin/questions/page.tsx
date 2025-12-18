@@ -11,34 +11,45 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Plus, FileQuestion, FolderOpen } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function QuestionsPage() {
+  const { t } = useTranslation();
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Questions Bank</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {t("admin.questions.title")}
+          </h1>
           <p className="text-muted-foreground">
-            Manage questions and categories for assessments
+            {t("admin.questions.subtitle")}
           </p>
         </div>
         <Button>
-          <Plus className="mr-2 h-4 w-4" /> Add Question
+          <Plus className="mr-2 h-4 w-4" /> {t("admin.questions.add")}
         </Button>
       </div>
 
       <div className="flex items-center space-x-2">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Search questions..." className="pl-8" />
+          <Input
+            placeholder={t("admin.questions.searchPlaceholder")}
+            className="pl-8"
+          />
         </div>
       </div>
 
       <Tabs defaultValue="all" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="all">All Questions</TabsTrigger>
-          <TabsTrigger value="categories">Categories</TabsTrigger>
-          <TabsTrigger value="archived">Archived</TabsTrigger>
+          <TabsTrigger value="all">{t("admin.questions.tabs.all")}</TabsTrigger>
+          <TabsTrigger value="categories">
+            {t("admin.questions.tabs.categories")}
+          </TabsTrigger>
+          <TabsTrigger value="archived">
+            {t("admin.questions.tabs.archived")}
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="all" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -53,14 +64,14 @@ export default function QuestionsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-sm text-muted-foreground mt-2">
-                    What is the primary purpose of React hooks?
+                    {t("admin.questions.sampleQuestion")}
                   </div>
                   <div className="flex items-center mt-4 space-x-2">
                     <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
-                      Frontend
+                      {t("admin.questions.tags.frontend")}
                     </span>
                     <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
-                      React
+                      {t("admin.questions.tags.react")}
                     </span>
                   </div>
                 </CardContent>
@@ -83,7 +94,7 @@ export default function QuestionsPage() {
                   <CardContent>
                     <div className="text-2xl font-bold">24</div>
                     <p className="text-xs text-muted-foreground">
-                      Questions in this category
+                      {t("admin.questions.questionsInCategory")}
                     </p>
                   </CardContent>
                 </Card>

@@ -2,8 +2,10 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 
 export default function PaymentSuccess() {
+  const { t } = useTranslation();
   const searchParams = useSearchParams();
   const router = useRouter();
   const [status, setStatus] = useState<
@@ -65,11 +67,9 @@ export default function PaymentSuccess() {
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              Verifying Payment...
+              {t("payments.verifying")}
             </h2>
-            <p className="text-gray-600">
-              Please wait while we confirm your payment.
-            </p>
+            <p className="text-gray-600">{t("payments.pleaseWait")}</p>
           </div>
         )}
 
@@ -91,35 +91,36 @@ export default function PaymentSuccess() {
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Payment Successful! 🎉
+              {t("payments.successTitle")}
             </h2>
             <p className="text-gray-600 mb-6">
               {paymentDetails?.description
                 ?.toLowerCase()
                 .includes("coaching session")
-                ? "Thank you for your payment. Your coaching session has been booked."
-                : "Thank you for your payment. Your subscription is now active."}
+                ? t("payments.successSession")
+                : t("payments.successSubscription")}
             </p>
 
             {paymentDetails && (
               <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left">
                 <h3 className="font-semibold text-gray-900 mb-2">
-                  Payment Details
+                  {t("payments.details")}
                 </h3>
                 {paymentDetails.amount && (
                   <p className="text-sm text-gray-600">
-                    <strong>Amount:</strong> $
+                    <strong>{t("payments.amount")}</strong> $
                     {(paymentDetails.amount / 100).toFixed(2)}
                   </p>
                 )}
                 {paymentDetails.description && (
                   <p className="text-sm text-gray-600">
-                    <strong>Description:</strong> {paymentDetails.description}
+                    <strong>{t("payments.description")}</strong>{" "}
+                    {paymentDetails.description}
                   </p>
                 )}
                 {paymentDetails.createdAt && (
                   <p className="text-sm text-gray-600">
-                    <strong>Date:</strong>{" "}
+                    <strong>{t("payments.date")}</strong>{" "}
                     {new Date(paymentDetails.createdAt).toLocaleDateString()}
                   </p>
                 )}
@@ -133,8 +134,8 @@ export default function PaymentSuccess() {
               {paymentDetails?.description
                 ?.toLowerCase()
                 .includes("coaching session")
-                ? "View My Sessions"
-                : "Continue to Dashboard"}
+                ? t("payments.viewMySessions")
+                : t("payments.continueToDashboard")}
             </button>
           </div>
         )}
@@ -157,11 +158,9 @@ export default function PaymentSuccess() {
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Payment Failed
+              {t("payments.failedTitle")}
             </h2>
-            <p className="text-gray-600 mb-6">
-              There was an issue with your payment. Please try again.
-            </p>
+            <p className="text-gray-600 mb-6">{t("payments.failedText")}</p>
             <div className="space-y-3">
               <Link
                 href={
@@ -173,13 +172,13 @@ export default function PaymentSuccess() {
                 }
                 className="block w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-center"
               >
-                Try Again
+                {t("payments.tryAgain")}
               </Link>
               <button
                 onClick={handleContinue}
                 className="w-full border border-gray-300 text-gray-700 py-3 px-4 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
               >
-                Back to Dashboard
+                {t("payments.backToDashboard")}
               </button>
             </div>
           </div>
@@ -203,17 +202,14 @@ export default function PaymentSuccess() {
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Verification Error
+              {t("payments.errorTitle")}
             </h2>
-            <p className="text-gray-600 mb-6">
-              Unable to verify payment status. Please contact support if you
-              were charged.
-            </p>
+            <p className="text-gray-600 mb-6">{t("payments.errorText")}</p>
             <button
               onClick={handleContinue}
               className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
             >
-              Continue to Dashboard
+              {t("payments.continueToDashboard")}
             </button>
           </div>
         )}

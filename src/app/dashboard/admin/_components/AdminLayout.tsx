@@ -4,24 +4,26 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useGlobalStore } from "@/store/useGlobalStore";
+import { useTranslation } from "react-i18next";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
 const adminNavItems = [
-  { name: "Dashboard", path: "/dashboard/admin", icon: "📊" },
-  { name: "Subscription Plans", path: "/dashboard/admin/plans", icon: "💳" },
-  { name: "Users", path: "/dashboard/admin/users", icon: "👥" },
-  { name: "Coaches", path: "/dashboard/admin/coaches", icon: "🎓" },
-  { name: "Courses", path: "/dashboard/admin/courses", icon: "📚" },
-  { name: "Careers", path: "/dashboard/admin/careers", icon: "💼" },
-  { name: "360° Questions", path: "/dashboard/admin/questions", icon: "❓" },
-  { name: "Analytics", path: "/dashboard/admin/analytics", icon: "📈" },
-  { name: "Settings", path: "/dashboard/admin/settings", icon: "⚙️" },
+  { key: "dashboard", path: "/dashboard/admin", icon: "📊" },
+  { key: "plans", path: "/dashboard/admin/plans", icon: "💳" },
+  { key: "users", path: "/dashboard/admin/users", icon: "👥" },
+  { key: "coaches", path: "/dashboard/admin/coaches", icon: "🎓" },
+  { key: "courses", path: "/dashboard/admin/courses", icon: "📚" },
+  { key: "careers", path: "/dashboard/admin/careers", icon: "💼" },
+  { key: "questions", path: "/dashboard/admin/questions", icon: "❓" },
+  { key: "analytics", path: "/dashboard/admin/analytics", icon: "📈" },
+  { key: "settings", path: "/dashboard/admin/settings", icon: "⚙️" },
 ];
 
 export function AdminLayout({ children }: AdminLayoutProps) {
+  const { t } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { logout } = useGlobalStore();
   const router = useRouter();
@@ -60,7 +62,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                 <span className="text-white font-bold text-sm">A</span>
               </div>
               <div>
-                <span className="text-xl font-bold">Admin Panel</span>
+                <span className="text-xl font-bold">
+                  {t("admin.layout.panelTitle")}
+                </span>
                 <p className="text-red-200 text-xs">UNIV.365</p>
               </div>
             </div>
@@ -95,7 +99,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               className="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-red-200 hover:bg-red-800 hover:text-white"
             >
               <span className="mr-3 text-base">{item.icon}</span>
-              <span>{item.name}</span>
+              <span>{t(`admin.layout.nav.${item.key}`)}</span>
             </Link>
           ))}
         </nav>
@@ -107,14 +111,14 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             className="flex items-center w-full px-3 py-2.5 text-sm font-medium text-red-200 hover:text-white hover:bg-red-800 rounded-lg transition-colors"
           >
             <span className="mr-3">👤</span>
-            <span>User Dashboard</span>
+            <span>{t("admin.layout.userDashboard")}</span>
           </button>
           <button
             onClick={handleLogout}
             className="flex items-center w-full px-3 py-2.5 text-sm font-medium text-red-200 hover:text-white hover:bg-red-800 rounded-lg transition-colors"
           >
             <span className="mr-3">🚪</span>
-            <span>Logout</span>
+            <span>{t("admin.layout.logout")}</span>
           </button>
         </div>
       </aside>
@@ -147,7 +151,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             {/* Admin Title */}
             <div className="flex items-center space-x-4">
               <h1 className="text-lg font-semibold text-gray-900">
-                Administrator Dashboard
+                {t("admin.layout.headerTitle")}
               </h1>
             </div>
 

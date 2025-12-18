@@ -5,14 +5,17 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const tabs = [
-  { name: "Overview", path: "/dashboard/benchmarks/overview" },
-  { name: "Compensation", path: "/dashboard/benchmarks/compensation" },
-  { name: "Market Analysis", path: "/dashboard/benchmarks/market" },
-  { name: "Skills & Learning", path: "/dashboard/benchmarks/skills" },
-  { name: "Demographics", path: "/dashboard/benchmarks/demographics" },
+  { key: "overview", path: "/dashboard/benchmarks/overview" },
+  { key: "compensation", path: "/dashboard/benchmarks/compensation" },
+  { key: "market", path: "/dashboard/benchmarks/market" },
+  { key: "skills", path: "/dashboard/benchmarks/skills" },
+  { key: "demographics", path: "/dashboard/benchmarks/demographics" },
 ];
 
+import { useTranslation } from "react-i18next";
+
 export function BenchmarksNav() {
+  const { t } = useTranslation();
   const pathname = usePathname();
 
   return (
@@ -31,7 +34,7 @@ export function BenchmarksNav() {
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
               )}
             >
-              {tab.name}
+              {t(`dashboard.benchmarks.tabs.${tab.key}`)}
             </Link>
           );
         })}

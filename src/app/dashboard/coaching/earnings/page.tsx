@@ -34,8 +34,10 @@ import {
 } from "@/services/coachService";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 export default function EarningsPage() {
+  const { t } = useTranslation();
   const [earningsStats, setEarningsStats] = useState<CoachEarningsStats | null>(
     null
   );
@@ -129,10 +131,10 @@ export default function EarningsPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-            Earnings & Payouts
+            {t("coaching.earnings.title")}
           </h1>
           <p className="text-gray-500 font-medium mt-1">
-            Track your revenue, platform fees, and payouts.
+            {t("coaching.earnings.subtitle")}
           </p>
         </div>
         <Button variant="outline" className="gap-2">
