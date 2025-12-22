@@ -22,16 +22,19 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
+import { useTranslation } from "react-i18next";
+
 export function SingleInviteForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [contractStart, setContractStart] = useState<Date>();
   const [contractEnd, setContractEnd] = useState<Date>();
   const [isLoading, setIsLoading] = useState(false);
+  const { t } = useTranslation();
 
   const handleSubmit = async () => {
     if (!email || !name) {
-      toast.error("Please fill in all required fields");
+      toast.error(t("admin.invite.fillRequired", "Please fill in all required fields"));
       return;
     }
 
@@ -45,13 +48,13 @@ export function SingleInviteForm() {
         contractEnd: contractEnd ? format(contractEnd, "yyyy-MM-dd") : undefined,
       });
 
-      toast.success(`An invitation has been sent to ${name} (${email})`);
+      toast.success(t("admin.invite.success", { name, email, defaultValue: `An invitation has been sent to ${name} (${email})` }));
       setName("");
       setEmail("");
       setContractStart(undefined);
       setContractEnd(undefined);
     } catch (error) {
-      toast.error("Failed to send invitation. Please try again.");
+      toast.error(t("admin.invite.error", "Failed to send invitation. Please try again."));
     } finally {
       setIsLoading(false);
     }
@@ -61,28 +64,28 @@ export function SingleInviteForm() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Mail className="h-5 w-5" />
-          Invite Single Coach
+          <Mail className="h-5 w-5" aria-hidden="true" />
+          {t("admin.invite.singleTitle", "Invite Single Coach")}
         </CardTitle>
         <CardDescription>
-          Send an email invitation to a new coach.
+          {t("admin.invite.singleDescription", "Send an email invitation to a new coach.")}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
+            <Label htmlFor="name">{t("admin.invite.fullName", "Full Name")}</Label>
             <Input
               id="name"
               type="text"
-              placeholder="John Doe"
+              placeholder={t("admin.invite.namePlaceholder", "John Doe")}
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Email Address</Label>
+            <Label htmlFor="email">{t("admin.invite.email", "Email Address")}</Label>
             <Input
               id="email"
               type="email"
@@ -94,7 +97,7 @@ export function SingleInviteForm() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2 flex flex-col">
-              <Label>Contract Start Date</Label>
+              <Label>{t("admin.invite.contractStart", "Contract Start Date")}</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -104,8 +107,8 @@ export function SingleInviteForm() {
                       !contractStart && "text-muted-foreground"
                     )}
                   >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {contractStart ? format(contractStart, "PPP") : <span>Pick a date</span>}
+                    <CalendarIcon className="mr-2 h-4 w-4" aria-hidden="true" />
+                    {contractStart ? format(contractStart, "PPP") : <span>{t("common.pickDate", "Pick a date")}</span>}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -122,7 +125,7 @@ export function SingleInviteForm() {
               </Popover>
             </div>
             <div className="space-y-2 flex flex-col">
-              <Label>Contract End Date</Label>
+              <Label>{t("admin.invite.contractEnd", "Contract End Date")}</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -132,8 +135,8 @@ export function SingleInviteForm() {
                       !contractEnd && "text-muted-foreground"
                     )}
                   >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {contractEnd ? format(contractEnd, "PPP") : <span>Pick a date</span>}
+                    <CalendarIcon className="mr-2 h-4 w-4" aria-hidden="true" />
+                    {contractEnd ? format(contractEnd, "PPP") : <span>{t("common.pickDate", "Pick a date")}</span>}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -159,11 +162,11 @@ export function SingleInviteForm() {
           >
             {isLoading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Sending...
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
+                {t("common.sending", "Sending...")}
               </>
             ) : (
-              "Send Invitation"
+              t("admin.invite.sendButton", "Send Invitation")
             )}
           </Button>
         </form>

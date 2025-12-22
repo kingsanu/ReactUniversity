@@ -313,7 +313,6 @@ export function Question360Manager() {
     fetchQuestions();
   }, []);
 
-  const { t } = useTranslation();
 
   // Loading state
   if (loading) {

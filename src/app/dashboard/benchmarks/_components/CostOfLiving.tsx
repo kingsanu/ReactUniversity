@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { IndexData } from "@/services/benchmarkService";
 import { DollarSign, Home, ShoppingBag } from "lucide-react";
 
@@ -10,6 +11,8 @@ interface CostOfLivingProps {
 }
 
 export default function CostOfLiving({ data, isLoading }: CostOfLivingProps) {
+  const { t } = useTranslation();
+
   if (isLoading || !data) {
     return (
        <div className="h-[200px] w-full bg-slate-50 rounded-lg animate-pulse" />
@@ -29,7 +32,7 @@ export default function CostOfLiving({ data, isLoading }: CostOfLivingProps) {
           <div className="p-2 bg-white rounded-md shadow-sm">
              <DollarSign className="h-5 w-5 text-slate-500"/>
           </div>
-          <span className="text-sm font-medium text-slate-600">Cost of Living Index</span>
+          <span className="text-sm font-medium text-slate-600">{t("benchmarks.costOfLivingIndex")}</span>
         </div>
         <span className={`text-xl font-bold ${getColor(data.costOfLiving)}`}>
           {data.costOfLiving.toFixed(1)}
@@ -41,7 +44,7 @@ export default function CostOfLiving({ data, isLoading }: CostOfLivingProps) {
           <div className="p-2 bg-white rounded-md shadow-sm">
              <Home className="h-5 w-5 text-slate-500"/>
           </div>
-          <span className="text-sm font-medium text-slate-600">Rent Index</span>
+          <span className="text-sm font-medium text-slate-600">{t("benchmarks.rentIndex")}</span>
         </div>
         <span className={`text-xl font-bold ${getColor(data.rentIndex)}`}>
           {data.rentIndex.toFixed(1)}
@@ -53,7 +56,7 @@ export default function CostOfLiving({ data, isLoading }: CostOfLivingProps) {
           <div className="p-2 bg-white rounded-md shadow-sm">
              <ShoppingBag className="h-5 w-5 text-slate-500"/>
           </div>
-          <span className="text-sm font-medium text-slate-600">Purchasing Power</span>
+          <span className="text-sm font-medium text-slate-600">{t("benchmarks.purchasingPower")}</span>
         </div>
         <span className={`text-xl font-bold ${getColor(100 - data.purchasingPower)}`}>
           {data.purchasingPower.toFixed(1)}

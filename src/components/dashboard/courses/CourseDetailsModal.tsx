@@ -65,7 +65,10 @@ export function CourseDetailsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl lg:min-w-5xl max-h-[90vh] p-0 flex flex-col">
+      <DialogContent 
+        className="max-w-6xl lg:min-w-5xl max-h-[90vh] p-0 flex flex-col"
+        aria-describedby={undefined}
+      >
         {/* Fixed Header */}
         <DialogHeader className="border-b pb-4 px-6 pt-6 flex-shrink-0">
           <DialogTitle className="text-3xl font-bold text-gray-900 leading-tight">
@@ -111,47 +114,47 @@ export function CourseDetailsModal({
                       course.difficulty
                     )}`}
                   >
-                    {t(`courses.difficulty.${course.difficulty.toLowerCase()}`)}
+                    {t(`courses.difficulty.${course.difficulty.toLowerCase()}`, course.difficulty)}
                   </span>
                   <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                     {course.category}
                   </span>
                   {course.certificate && (
                     <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium flex items-center gap-1">
-                      <Award className="w-3 h-3" />
-                      {t("courses.certificate")}
+                      <Award className="w-3 h-3" aria-hidden="true" />
+                      {t("courses.certificate", "Certificate")}
                     </span>
                   )}
                   {enrollment && enrollment.status !== "completed" && (
                     <span className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm font-medium">
-                      {t("courses.inProgress")}
+                      {t("courses.inProgress", "In Progress")}
                     </span>
                   )}
                   {enrollment?.status === "completed" && (
                     <span className="px-3 py-1 bg-purple-600 text-white rounded-full text-sm font-medium flex items-center gap-1">
-                      <CheckCircle className="w-3 h-3" />
-                      {t("courses.completed")}
+                      <CheckCircle className="w-3 h-3" aria-hidden="true" />
+                      {t("courses.completed", "Completed")}
                     </span>
                   )}
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                   <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    <span>
+                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" aria-hidden="true" />
+                    <span aria-label={`${formatRating(course.rating)} stars`}>
                       {formatRating(course.rating)} ({course.reviewCount})
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4" />
-                    <span>{course.enrollmentCount.toLocaleString()}</span>
+                    <Users className="w-4 h-4" aria-hidden="true" />
+                    <span>{course.enrollmentCount.toLocaleString()} {t("courses.students", "students")}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4" />
+                    <Clock className="w-4 h-4" aria-hidden="true" />
                     <span>{formatDuration(course.duration)}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Globe className="w-4 h-4" />
+                    <Globe className="w-4 h-4" aria-hidden="true" />
                     <span>{course.language}</span>
                   </div>
                 </div>
@@ -163,13 +166,13 @@ export function CourseDetailsModal({
               {/* Learning Objectives */}
               <div>
                 <h4 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <Target className="w-5 h-5" />
-                  {t("courses.learningObjectives")}
+                  <Target className="w-5 h-5" aria-hidden="true" />
+                  {t("courses.learningObjectives", "Learning Objectives")}
                 </h4>
                 <ul className="space-y-2">
                   {course.learningObjectives.map((objective, index) => (
                     <li key={index} className="flex items-start gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                      <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" aria-hidden="true" />
                       <span className="text-gray-700 text-sm">{objective}</span>
                     </li>
                   ))}
@@ -179,13 +182,13 @@ export function CourseDetailsModal({
               {/* Prerequisites */}
               <div>
                 <h4 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <BookOpen className="w-5 h-5" />
-                  {t("courses.prerequisites")}
+                  <BookOpen className="w-5 h-5" aria-hidden="true" />
+                  {t("courses.prerequisites", "Prerequisites")}
                 </h4>
                 <ul className="space-y-2">
                   {course.prerequisites.map((prerequisite, index) => (
                     <li key={index} className="flex items-start gap-2">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full mt-2 flex-shrink-0" />
+                      <div className="w-2 h-2 bg-gray-400 rounded-full mt-2 flex-shrink-0" aria-hidden="true" />
                       <span className="text-gray-700 text-sm">
                         {prerequisite}
                       </span>
@@ -198,7 +201,7 @@ export function CourseDetailsModal({
             {/* Syllabus Preview */}
             <div>
               <h4 className="text-lg font-semibold text-gray-900 mb-3">
-                {t("courses.syllabus")}
+                {t("courses.syllabus", "Syllabus Preview")}
               </h4>
               <div className="space-y-3">
                 {course.syllabus.slice(0, 4).map((module) => (
@@ -206,7 +209,7 @@ export function CourseDetailsModal({
                     key={module.id}
                     className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg"
                   >
-                    <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0">
+                    <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0" aria-hidden="true">
                       {module.week}
                     </div>
                     <div className="flex-1">
@@ -217,7 +220,7 @@ export function CourseDetailsModal({
                         {module.description}
                       </p>
                       <p className="text-xs text-gray-500 mt-1">
-                        {module.estimatedHours} {t("courses.hours")}
+                        {module.estimatedHours} {t("courses.hours", "hours")}
                       </p>
                     </div>
                   </div>
@@ -226,6 +229,7 @@ export function CourseDetailsModal({
                   <p className="text-sm text-gray-600 text-center">
                     {t("courses.andMoreModules", {
                       count: course.syllabus.length - 4,
+                      defaultValue: `+${course.syllabus.length - 4} more modules`
                     })}
                   </p>
                 )}
@@ -235,7 +239,7 @@ export function CourseDetailsModal({
             {/* Skills You'll Gain */}
             <div>
               <h4 className="text-lg font-semibold text-gray-900 mb-3">
-                {t("courses.skills")}
+                {t("courses.skills", "Skills You'll Gain")}
               </h4>
               <div className="flex flex-wrap gap-2">
                 {course.skills.map((skill, index) => (
@@ -259,27 +263,27 @@ export function CourseDetailsModal({
             }}
             className="flex-1 flex items-center gap-2"
           >
-            <ExternalLink className="w-4 h-4" />
+            <ExternalLink className="w-4 h-4" aria-hidden="true" />
             {enrollment?.status === "completed"
-              ? t("courses.reviewOnCoursera")
-              : t("courses.startCourse")}
+              ? t("courses.reviewOnCoursera", "Review on Coursera")
+              : t("courses.startCourse", "Start Course")}
           </Button>
           {enrollment &&
             enrollment.status !== "completed" &&
             onMarkCompleted && (
-              <Button
+                <Button
                 variant="outline"
                 className="flex-1 flex items-center gap-2"
                 onClick={() => {
                   void onMarkCompleted(course);
                 }}
               >
-                <CheckCircle className="w-4 h-4" />
-                {t("courses.markCompleted")}
+                <CheckCircle className="w-4 h-4" aria-hidden="true" />
+                {t("courses.markCompleted", "Mark as Completed")}
               </Button>
             )}
           <Button variant="outline" onClick={onClose}>
-            {t("common.close")}
+            {t("common.close", "Close")}
           </Button>
         </div>
       </DialogContent>

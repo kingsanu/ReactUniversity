@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { PieData } from "@/services/benchmarkService";
+import { DynamicPieChart } from "@/lib/dynamic-imports";
 
 interface WorkModeChartProps {
   data?: PieData[];
@@ -23,7 +24,7 @@ export default function WorkModeChart({ data, isLoading }: WorkModeChartProps) {
   return (
     <div className="h-[300px] w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <PieChart>
+        <DynamicPieChart>
           <Pie
             data={data}
             cx="50%"
@@ -41,7 +42,7 @@ export default function WorkModeChart({ data, isLoading }: WorkModeChartProps) {
              contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
           />
           <Legend verticalAlign="bottom" height={36}/>
-        </PieChart>
+        </DynamicPieChart>
       </ResponsiveContainer>
     </div>
   );

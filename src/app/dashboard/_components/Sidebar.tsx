@@ -91,6 +91,7 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
           onClick={onClose}
+          aria-hidden="true"
         />
       )}
 
@@ -101,13 +102,14 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
           isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
           className
         )}
+        aria-label={t("accessibility.navigation")}
       >
         {/* Logo */}
         <div className="p-6 border-b border-slate-800/50">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-                <span className="text-white font-bold text-lg">
+                <span className="text-white font-bold text-lg" aria-hidden="true">
                   {currentSidebarData.logo.icon}
                 </span>
               </div>
@@ -117,16 +119,21 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
             </div>
             {/* Mobile Close Button */}
             <button
+              type="button"
               onClick={onClose}
-              className="lg:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+              className="lg:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+              aria-label={t("accessibility.closeMenu")}
             >
-              <XIcon className="w-6 h-6" />
+              <XIcon className="w-6 h-6" aria-hidden="true" />
             </button>
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
+        <nav 
+          className="flex-1 px-4 py-6 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent"
+          aria-label={t("accessibility.navigation")}
+        >
           {currentSidebarData.navigation.map((item) => {
             const isExpanded = expandedItems.includes(item.id);
             const hasSubmenu =
@@ -138,43 +145,73 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
             return (
               <div key={item.id} className="mb-1">
                 {/* Main Menu Item */}
-                <div
-                  className={cn(
-                    "group flex items-center justify-between px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer border border-transparent",
-                    isActive
-                      ? "bg-white/10 backdrop-blur-sm text-white border-white/5 shadow-sm"
-                      : "text-slate-400 hover:bg-slate-800/50 hover:text-white hover:border-slate-700/50"
-                  )}
-                  onClick={() =>
-                    hasSubmenu
-                      ? toggleExpanded(item.id)
-                      : router.push(item.path)
-                  }
-                >
-                  <div className="flex items-center flex-1">
-                    <Icon
-                      className={cn(
-                        "w-5 h-5 mr-3 transition-colors",
-                        isActive
-                          ? "text-blue-400"
-                          : "text-slate-500 group-hover:text-slate-300"
-                      )}
-                    />
-                    <span>{t(item.name)}</span>
-                  </div>
-                  {hasSubmenu && (
+                {hasSubmenu ? (
+                  <button
+                    type="button"
+                    className={cn(
+                      "group flex items-center justify-between w-full px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 border border-transparent text-left focus:outline-none focus:ring-2 focus:ring-blue-500",
+                      isActive
+                        ? "bg-white/10 backdrop-blur-sm text-white border-white/5 shadow-sm"
+                        : "text-slate-400 hover:bg-slate-800/50 hover:text-white hover:border-slate-700/50"
+                    )}
+                    onClick={() => toggleExpanded(item.id)}
+                    aria-expanded={isExpanded}
+                    aria-controls={`submenu-${item.id}`}
+                  >
+                    <span className="flex items-center flex-1">
+                      <Icon
+                        className={cn(
+                          "w-5 h-5 mr-3 transition-colors",
+                          isActive
+                            ? "text-blue-400"
+                            : "text-slate-500 group-hover:text-slate-300"
+                        )}
+                        aria-hidden="true"
+                      />
+                      <span>{t(item.name)}</span>
+                    </span>
                     <ChevronDown
                       className={cn(
                         "w-4 h-4 text-slate-500 transition-transform duration-200",
                         isExpanded ? "rotate-180 text-slate-300" : ""
                       )}
+                      aria-hidden="true"
                     />
-                  )}
-                </div>
+                  </button>
+                ) : (
+                  <Link
+                    href={item.path}
+                    className={cn(
+                      "group flex items-center justify-between px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500",
+                      isActive
+                        ? "bg-white/10 backdrop-blur-sm text-white border-white/5 shadow-sm"
+                        : "text-slate-400 hover:bg-slate-800/50 hover:text-white hover:border-slate-700/50"
+                    )}
+                    aria-current={isActive ? "page" : undefined}
+                  >
+                    <span className="flex items-center flex-1">
+                      <Icon
+                        className={cn(
+                          "w-5 h-5 mr-3 transition-colors",
+                          isActive
+                            ? "text-blue-400"
+                            : "text-slate-500 group-hover:text-slate-300"
+                        )}
+                        aria-hidden="true"
+                      />
+                      <span>{t(item.name)}</span>
+                    </span>
+                  </Link>
+                )}
 
                 {/* Submenu */}
                 {hasSubmenu && isExpanded && (
-                  <div className="ml-4 mt-1 pl-4 border-l border-slate-800 space-y-1">
+                  <div 
+                    id={`submenu-${item.id}`}
+                    className="ml-4 mt-1 pl-4 border-l border-slate-800 space-y-1"
+                    role="group"
+                    aria-label={t(item.name)}
+                  >
                     {(item as any).submenu?.map((subItem: any) => {
                       const isSubItemActive = isItemActive(subItem.path);
                       return (
@@ -182,11 +219,12 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
                           key={subItem.path}
                           href={subItem.path}
                           className={cn(
-                            "block px-3 py-2 text-sm rounded-lg transition-all duration-200",
+                            "block px-3 py-2 text-sm rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500",
                             isSubItemActive
                               ? "text-white bg-blue-600/20 font-medium"
                               : "text-slate-500 hover:text-white hover:bg-slate-800/50"
                           )}
+                          aria-current={isSubItemActive ? "page" : undefined}
                         >
                           {t(subItem.name)}
                         </Link>
@@ -203,7 +241,7 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
         <div className="p-4 border-t border-slate-800/50 bg-slate-950/30">
           <div className="flex items-center gap-3 mb-4 px-2">
             <Avatar className="h-10 w-10 border border-slate-700">
-              <AvatarImage src={`/api/users/${user?.id}/avatar`} />
+              <AvatarImage src={`/api/users/${user?.id}/avatar`} alt="" />
               <AvatarFallback className="bg-slate-800 text-slate-300">
                 {user?.name?.charAt(0).toUpperCase() || "U"}
               </AvatarFallback>
@@ -219,10 +257,11 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
           </div>
 
           <button
+            type="button"
             onClick={handleLogout}
-            className="flex items-center justify-center w-full px-4 py-2.5 text-sm font-medium text-red-400 hover:text-white hover:bg-red-500/10 rounded-xl transition-all duration-200 border border-transparent hover:border-red-500/20"
+            className="flex items-center justify-center w-full px-4 py-2.5 text-sm font-medium text-red-400 hover:text-white hover:bg-red-500/10 rounded-xl transition-all duration-200 border border-transparent hover:border-red-500/20 focus:outline-none focus:ring-2 focus:ring-red-500"
           >
-            <LogOut className="w-4 h-4 mr-2" />
+            <LogOut className="w-4 h-4 mr-2" aria-hidden="true" />
             <span>{t("common.logout")}</span>
           </button>
         </div>
@@ -238,6 +277,7 @@ function XIcon({ className }: { className?: string }) {
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
+      aria-hidden="true"
     >
       <path
         strokeLinecap="round"
@@ -248,3 +288,4 @@ function XIcon({ className }: { className?: string }) {
     </svg>
   );
 }
+

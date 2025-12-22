@@ -1,6 +1,7 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
+import { useTranslation } from "react-i18next";
 
 interface OnboardingLayoutProps {
   children: React.ReactNode;
@@ -17,6 +18,8 @@ export function OnboardingLayout({
   title,
   description,
 }: OnboardingLayoutProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="h-screen bg-white flex overflow-hidden">
       {/* Left Panel - Visual/Brand */}
@@ -24,33 +27,41 @@ export function OnboardingLayout({
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80')] bg-cover bg-center opacity-20 mix-blend-overlay"></div>
         <div className="relative z-10">
           <div className="h-10 w-10 bg-white rounded-lg flex items-center justify-center mb-8">
-            <span className="text-black font-bold text-xl">U</span>
+            <span className="text-black font-bold text-xl" aria-hidden="true">U</span>
           </div>
           <h1 className="text-4xl font-bold tracking-tight mb-4">
-            Join our community of world-class coaches.
+            {t("onboarding.welcomeTitle", "Join our community of world-class coaches.")}
           </h1>
           <p className="text-gray-400 text-lg">
-            Share your expertise, mentor the next generation, and grow your impact.
+            {t("onboarding.welcomeSubtitle", "Share your expertise, mentor the next generation, and grow your impact.")}
           </p>
         </div>
         <div className="relative z-10">
           <div className="flex gap-2 mb-4">
             {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-1 w-full bg-white/20 rounded-full overflow-hidden">
+              <div 
+                key={i} 
+                className="h-1 w-full bg-white/20 rounded-full overflow-hidden"
+                role="progressbar"
+                aria-valuenow={i <= currentStep ? 100 : 0}
+                aria-label={t("onboarding.stepLabel", { step: i, defaultValue: `Step ${i}` })}
+              >
                 <div 
                   className={cn("h-full bg-white transition-all duration-500", i <= currentStep ? "w-full" : "w-0")}
                 />
               </div>
             ))}
           </div>
-          <p className="text-sm text-gray-400">Step {currentStep} of {totalSteps}</p>
+          <p className="text-sm text-gray-400">
+            {t("onboarding.stepProgress", { current: currentStep, total: totalSteps, defaultValue: `Step ${currentStep} of ${totalSteps}` })}
+          </p>
         </div>
       </div>
 
       {/* Right Panel - Form */}
       <div className="flex-1 flex flex-col h-full overflow-y-auto overflow-x-hidden bg-gray-50/30 relative">
         {/* Decorative Graphic */}
-        <div className="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-gradient-to-br from-blue-100/40 to-purple-100/40 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-gradient-to-br from-blue-100/40 to-purple-100/40 rounded-full blur-3xl pointer-events-none" aria-hidden="true"></div>
         
         <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-20 xl:px-24 min-h-min">
           <div className="mx-auto w-full max-w-2xl relative z-10">

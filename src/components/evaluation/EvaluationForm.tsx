@@ -216,7 +216,14 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({
         </p>
         
         {/* Progress Bar */}
-        <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+        <div 
+          className="w-full bg-gray-200 rounded-full h-2 mb-4"
+          role="progressbar"
+          aria-valuenow={Math.round(progress)}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="Evaluation progress"
+        >
           <motion.div 
             className="bg-blue-600 h-2 rounded-full"
             initial={{ width: 0 }}
@@ -224,13 +231,13 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({
             transition={{ duration: 0.3 }}
           />
         </div>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-500" aria-hidden="true">
           Progress: {Math.round(progress)}% complete
         </p>
       </div>
 
       {/* Section Navigation */}
-      <div className="flex flex-wrap gap-2 mb-8">
+      <div className="flex flex-wrap gap-2 mb-8" role="tablist" aria-label="Evaluation sections">
         {categories.map((category, index) => {
           const isActive = index === currentSection;
           const isCompleted = competencyCategories[category].every(comp => {
@@ -242,6 +249,10 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({
             <button
               key={category}
               onClick={() => setCurrentSection(index)}
+              role="tab"
+              aria-selected={isActive}
+              aria-controls={`panel-${index}`}
+              id={`tab-${index}`}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 isActive 
                   ? 'bg-blue-600 text-white' 
@@ -252,7 +263,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({
             >
               {category}
               {isCompleted && (
-                <span className="ml-2 text-green-600">✓</span>
+                <span className="ml-2 text-green-600" aria-label="Completed">✓</span>
               )}
             </button>
           );
@@ -284,6 +295,9 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({
           exit={{ opacity: 0, x: -20 }}
           transition={{ duration: 0.3 }}
           className="space-y-8"
+          role="tabpanel"
+          id={`panel-${currentSection}`}
+          aria-labelledby={`tab-${currentSection}`}
         >
           <h2 className="text-2xl font-semibold text-gray-900 mb-6">
             {currentCategory}
@@ -306,16 +320,18 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({
 
                 {/* Rating Scale */}
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <label id={`label-${competency.id}`} className="block text-sm font-medium text-gray-700 mb-3">
                     How would you rate this competency? *
                   </label>
-                  <div className="grid grid-cols-5 gap-2">
+                  <div className="grid grid-cols-5 gap-2" role="radiogroup" aria-labelledby={`label-${competency.id}`}>
                     {session.ratingScale.labels.map((option) => {
                       const isSelected = ratingResponse?.rating === option.value;
                       return (
                         <button
                           key={option.value}
                           type="button"
+                          role="radio"
+                          aria-checked={isSelected}
                           onClick={() => updateResponse(`${competency.id}_rating`, 'rating', option.value)}
                           className={`p-3 rounded-lg border-2 transition-all text-center ${
                             isSelected

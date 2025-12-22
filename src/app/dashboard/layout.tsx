@@ -4,16 +4,7 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useGlobalStore } from "@/store/useGlobalStore";
-import { Sidebar } from "@/components/dashboard/Sidebar"; // Changed to use the shared sidebar component if available, OR reuse local one. 
-// Wait, the page.tsx used "./_components/Sidebar". Let's verify where the robust Sidebar is. 
-// k:\2025\timcare\src\components\dashboard\Sidebar.tsx exists (I viewed it in Step 11).
-// k:\2025\timcare\src\app\dashboard\_components\Sidebar.tsx likely also exists. 
-// The one in src/components/dashboard/Sidebar.tsx seemed complete. Let's use the one from page.tsx logic for consistency first.
-// Actually, let's use the local one to minimize breakage for now, or check if they are duplicates. 
-// 'k:\2025\timcare\src\components\dashboard\Sidebar.tsx' vs 'k:\2025\timcare\src\app\dashboard\_components\Sidebar.tsx'
-// I will assume the one used in page.tsx is the correct one for the dashboard.
-// Re-checking imports in page.tsx: import { Sidebar } from "./_components/Sidebar";
-
+import { useTranslation } from "react-i18next";
 import { Sidebar as DashboardSidebar } from "./_components/Sidebar";
 import { TopNav } from "./_components/TopNav";
 import { Button } from "@/components/ui/button";
@@ -36,6 +27,7 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
   const { user } = useGlobalStore();
+  const { t } = useTranslation();
 
   // Check if user is a coach (case-insensitive)
   const isCoach = user.role && user.role.toLowerCase() === "coach";
@@ -53,21 +45,22 @@ export default function DashboardLayout({
               size="icon"
               onClick={() => setSidebarOpen(true)}
               className="lg:hidden"
+              aria-label={t("accessibility.openMenu", "Open menu")}
             >
-              <Menu className="h-5 w-5" />
+              <Menu className="h-5 w-5" aria-hidden="true" />
             </Button>
 
             <div className="flex items-center gap-2 ml-auto">
               {/* Notifications */}
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
+              <Button variant="ghost" size="icon" className="relative" aria-label={t("nav.notifications", "Notifications")}>
+                <Bell className="h-5 w-5" aria-hidden="true" />
+                <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full" aria-hidden="true"></span>
               </Button>
 
               {/* User Profile Menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full">
+                  <Button variant="ghost" size="icon" className="rounded-full" aria-label={t("accessibility.userMenu", "User menu")}>
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={`/api/users/${user.id}/avatar`} />
                       <AvatarFallback>
@@ -89,13 +82,13 @@ export default function DashboardLayout({
                   <DropdownMenuItem
                     onClick={() => router.push("/dashboard/coaching/profile")}
                   >
-                    <User className="mr-2 h-4 w-4" />
-                    Profile
+                    <User className="mr-2 h-4 w-4" aria-hidden="true" />
+                    {t("nav.profile", "Profile")}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => router.push("/dashboard/coaching/settings")}
                   >
-                    Settings
+                    {t("nav.settings", "Settings")}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
@@ -105,14 +98,14 @@ export default function DashboardLayout({
                     }}
                     className="text-red-600"
                   >
-                    Logout
+                    {t("common.logout", "Logout")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
           </div>
 
-          <main className="flex-1 overflow-y-auto bg-gray-50">
+          <main id="main-content" tabIndex={-1} className="flex-1 overflow-y-auto bg-gray-50 focus:outline-none">
              {children}
           </main>
         </div>
@@ -128,10 +121,11 @@ export default function DashboardLayout({
       <div className="flex-1 flex flex-col overflow-hidden lg:ml-0 transition-all duration-300">
         <TopNav onMenuClick={() => setSidebarOpen(true)} />
 
-        <main className="flex-1 overflow-y-auto">
+        <main id="main-content" tabIndex={-1} className="flex-1 overflow-y-auto focus:outline-none">
             {children}
         </main>
       </div>
     </div>
   );
 }
+

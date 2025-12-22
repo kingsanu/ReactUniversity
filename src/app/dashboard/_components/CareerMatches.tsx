@@ -12,21 +12,22 @@ export function CareerMatches({ className }: CareerMatchesProps) {
   const { t } = useTranslation();
 
   return (
-    <motion.div
+    <motion.section
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
         "bg-white rounded-lg border border-gray-200 p-6",
         className
       )}
+      aria-labelledby="career-matches-heading"
     >
-      <h3 className="text-lg font-semibold text-gray-900 mb-6">
+      <h2 id="career-matches-heading" className="text-lg font-semibold text-gray-900 mb-6">
         {t("dashboard.top3CareerMatch")}
-      </h3>
+      </h2>
 
-      <div className="space-y-4">
+      <ul className="space-y-4" role="list">
         {careerMatches.map((match, index) => (
-          <motion.div
+          <motion.li
             key={match.id}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -35,7 +36,10 @@ export function CareerMatches({ className }: CareerMatchesProps) {
           >
             <div className="flex items-center space-x-3">
               {/* Company Icon */}
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600">
+              <div 
+                className="w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600"
+                aria-hidden="true"
+              >
                 <span className="text-white font-bold text-sm">
                   {match.company.charAt(0)}
                 </span>
@@ -43,9 +47,9 @@ export function CareerMatches({ className }: CareerMatchesProps) {
 
               {/* Job Info */}
               <div>
-                <h4 className="font-medium text-gray-900 text-sm">
+                <h3 className="font-medium text-gray-900 text-sm">
                   {match.title}
-                </h4>
+                </h3>
                 <p className="text-xs text-gray-500">{match.company}</p>
               </div>
             </div>
@@ -53,8 +57,12 @@ export function CareerMatches({ className }: CareerMatchesProps) {
             {/* Progress and Action */}
             <div className="flex items-center space-x-3">
               {/* Progress Circle */}
-              <div className="relative w-10 h-10">
-                <svg className="w-10 h-10 transform -rotate-90">
+              <div 
+                className="relative w-10 h-10"
+                role="img"
+                aria-label={`${match.progress}% match`}
+              >
+                <svg className="w-10 h-10 transform -rotate-90" aria-hidden="true">
                   <circle
                     cx="20"
                     cy="20"
@@ -82,7 +90,7 @@ export function CareerMatches({ className }: CareerMatchesProps) {
                     transition={{ delay: index * 0.2, duration: 1 }}
                   />
                 </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
                   <span className="text-xs font-medium text-gray-700">
                     {match.progress}%
                   </span>
@@ -90,12 +98,17 @@ export function CareerMatches({ className }: CareerMatchesProps) {
               </div>
 
               {/* Arrow Button */}
-              <button className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors">
+              <button 
+                type="button"
+                className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label={`View ${match.title} at ${match.company}`}
+              >
                 <svg
                   className="w-4 h-4 text-gray-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
@@ -106,13 +119,17 @@ export function CareerMatches({ className }: CareerMatchesProps) {
                 </svg>
               </button>
             </div>
-          </motion.div>
+          </motion.li>
         ))}
-      </div>
+      </ul>
 
-      <button className="w-full text-sm text-blue-600 hover:text-blue-700 mt-4 py-2">
+      <button 
+        type="button"
+        className="w-full text-sm text-blue-600 hover:text-blue-700 mt-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
+      >
         {t("dashboard.showMore")}
       </button>
-    </motion.div>
+    </motion.section>
   );
 }
+

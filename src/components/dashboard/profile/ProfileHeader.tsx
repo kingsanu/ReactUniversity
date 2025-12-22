@@ -25,7 +25,7 @@ export function ProfileHeader() {
           size="sm" 
           className="absolute top-6 right-6 bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border-white/20 border transition-all rounded-full px-4"
         >
-          <FiCamera className="mr-2" /> Edit Cover
+          <FiCamera className="mr-2" aria-hidden="true" /> Edit Cover
         </Button>
       </div>
 
@@ -52,8 +52,8 @@ export function ProfileHeader() {
                 <AvatarFallback className="text-4xl bg-gradient-to-br from-indigo-100 to-white text-indigo-600">JD</AvatarFallback>
                 </Avatar>
             </div>
-            <button className="absolute bottom-4 right-4 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all border-2 border-white dark:border-gray-900">
-              <FiCamera size={18} />
+            <button className="absolute bottom-4 right-4 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all border-2 border-white dark:border-gray-900" aria-label="Change profile picture">
+              <FiCamera size={18} aria-hidden="true" />
             </button>
           </motion.div>
 
@@ -77,13 +77,13 @@ export function ProfileHeader() {
                 
                 <div className="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400 font-medium pt-1">
                   <span className="flex items-center px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full">
-                    <FiMapPin className="mr-2 text-gray-700 dark:text-gray-300" /> San Francisco, CA
+                    <FiMapPin className="mr-2 text-gray-700 dark:text-gray-300" aria-hidden="true" /> San Francisco, CA
                   </span>
                   <a href="#" className="flex items-center px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                    <FiLink className="mr-2 text-gray-700 dark:text-gray-300" /> johndoe.design
+                    <FiLink className="mr-2 text-gray-700 dark:text-gray-300" aria-hidden="true" /> johndoe.design
                   </a>
                   <span className="flex items-center px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full">
-                    <FiMail className="mr-2 text-gray-700 dark:text-gray-300" /> john@example.com
+                    <FiMail className="mr-2 text-gray-700 dark:text-gray-300" aria-hidden="true" /> john@example.com
                   </span>
                 </div>
               </div>
@@ -93,11 +93,11 @@ export function ProfileHeader() {
                  <Button className="flex-1 lg:flex-none bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-200 rounded-xl px-6 h-11 font-semibold shadow-lg shadow-gray-200 dark:shadow-none">
                     Edit Profile
                  </Button>
-                 <Button variant="outline" className="flex-1 lg:flex-none border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl h-11 w-11 p-0 flex items-center justify-center">
-                    <FiLinkedin size={20} className="text-blue-700" />
+                 <Button variant="outline" className="flex-1 lg:flex-none border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl h-11 w-11 p-0 flex items-center justify-center" aria-label="LinkedIn Profile">
+                    <FiLinkedin size={20} className="text-blue-700" aria-hidden="true" />
                  </Button>
-                 <Button variant="outline" className="flex-1 lg:flex-none border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl h-11 w-11 p-0 flex items-center justify-center">
-                    <FiTwitter size={20} className="text-blue-400" />
+                 <Button variant="outline" className="flex-1 lg:flex-none border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl h-11 w-11 p-0 flex items-center justify-center" aria-label="Twitter Profile">
+                    <FiTwitter size={20} className="text-blue-400" aria-hidden="true" />
                  </Button>
               </div>
             </motion.div>

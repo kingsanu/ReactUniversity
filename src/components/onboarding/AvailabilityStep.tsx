@@ -8,6 +8,7 @@ import { Plus, Trash2, Copy, Clock, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 interface AvailabilityStepProps {
   data: CoachOnboardingData["availability"];
@@ -16,6 +17,7 @@ interface AvailabilityStepProps {
 }
 
 export function AvailabilityStep({ data, onNext, onBack }: AvailabilityStepProps) {
+  const { t } = useTranslation();
   const [schedule, setSchedule] = React.useState<WeeklySchedule[]>(data.weeklySchedule);
   const [timezone, setTimezone] = React.useState(data.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone);
 
@@ -66,7 +68,7 @@ export function AvailabilityStep({ data, onNext, onBack }: AvailabilityStepProps
       if (day.enabled) {
         for (const slot of day.timeSlots) {
           if (slot.start >= slot.end) {
-            toast.error(`Invalid time range on ${day.day}: Start time must be before end time`);
+            toast.error(t("onboarding.availability.invalidTimeRange", { day: day.day, defaultValue: `Invalid time range on ${day.day}: Start time must be before end time` }));
             return;
           }
         }
@@ -79,15 +81,15 @@ export function AvailabilityStep({ data, onNext, onBack }: AvailabilityStepProps
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       <div className="bg-blue-50/50 p-6 rounded-xl border border-blue-100 flex items-start gap-4">
-        <div className="p-2 bg-blue-100 rounded-lg text-blue-600">
+        <div className="p-2 bg-blue-100 rounded-lg text-blue-600" aria-hidden="true">
           <Globe className="h-5 w-5" />
         </div>
         <div className="flex-1">
-          <Label htmlFor="timezone" className="text-blue-900 font-semibold">Timezone</Label>
-          <p className="text-sm text-blue-700/80 mb-3">Set your local timezone for accurate scheduling.</p>
+          <Label htmlFor="timezone" className="text-blue-900 font-semibold">{t("onboarding.availability.timezone", "Timezone")}</Label>
+          <p className="text-sm text-blue-700/80 mb-3">{t("onboarding.availability.timezoneDesc", "Set your local timezone for accurate scheduling.")}</p>
           <Select value={timezone} onValueChange={setTimezone}>
             <SelectTrigger className="bg-white border-blue-200 text-blue-900 focus:ring-blue-200">
-              <SelectValue placeholder="Select timezone" />
+              <SelectValue placeholder={t("onboarding.availability.selectTimezone", "Select timezone")} />
             </SelectTrigger>
             <SelectContent className="max-h-[300px]">
               {Intl.supportedValuesOf('timeZone').map((tz) => (
@@ -102,8 +104,8 @@ export function AvailabilityStep({ data, onNext, onBack }: AvailabilityStepProps
 
       <div className="space-y-4">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="font-semibold text-gray-900">Weekly Schedule</h3>
-          <span className="text-sm text-gray-500">Set your recurring availability</span>
+          <h3 className="font-semibold text-gray-900">{t("onboarding.availability.weeklySchedule", "Weekly Schedule")}</h3>
+          <span className="text-sm text-gray-500">{t("onboarding.availability.scheduleDesc", "Set your recurring availability")}</span>
         </div>
         
         <div className="space-y-3">
@@ -132,7 +134,7 @@ export function AvailabilityStep({ data, onNext, onBack }: AvailabilityStepProps
                       day.enabled ? "text-gray-900" : "text-gray-400"
                     )}
                   >
-                    {day.day}
+                    {t(`days.${day.day.toLowerCase()}`, day.day)}
                   </Label>
                 </div>
 
@@ -144,8 +146,10 @@ export function AvailabilityStep({ data, onNext, onBack }: AvailabilityStepProps
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         className="text-sm text-gray-400 italic py-1"
+                        role="status"
+                        aria-label={t("onboarding.availability.unavailableLabel", "Unavailable on this day")}
                       >
-                        Unavailable
+                        {t("onboarding.availability.unavailable", "Unavailable")}
                       </motion.div>
                     ) : (
                       <motion.div
@@ -157,15 +161,23 @@ export function AvailabilityStep({ data, onNext, onBack }: AvailabilityStepProps
                         {day.timeSlots.map((slot, slotIndex) => (
                           <div key={slotIndex} className="flex items-center gap-3 group">
                             <div className="flex items-center gap-2 bg-gray-50 p-1 rounded-md border border-gray-200">
-                              <Clock className="h-4 w-4 text-gray-400 ml-2" />
+                              <Clock className="h-4 w-4 text-gray-400 ml-2" aria-hidden="true" />
+                              <label htmlFor={`start-time-${dayIndex}-${slotIndex}`} className="sr-only">
+                                {t("onboarding.availability.startTimeLabel", { index: slotIndex + 1, day: day.day, defaultValue: `Start time for period ${slotIndex + 1} on ${day.day}` })}
+                              </label>
                               <input
+                                id={`start-time-${dayIndex}-${slotIndex}`}
                                 type="time"
                                 value={slot.start}
                                 onChange={(e) => handleTimeChange(dayIndex, slotIndex, "start", e.target.value)}
                                 className="bg-transparent border-none text-sm font-medium text-gray-900 focus:ring-0 w-24 p-1"
                               />
-                              <span className="text-gray-300">|</span>
+                              <span className="text-gray-300" aria-hidden="true">|</span>
+                              <label htmlFor={`end-time-${dayIndex}-${slotIndex}`} className="sr-only">
+                                {t("onboarding.availability.endTimeLabel", { index: slotIndex + 1, day: day.day, defaultValue: `End time for period ${slotIndex + 1} on ${day.day}` })}
+                              </label>
                               <input
+                                id={`end-time-${dayIndex}-${slotIndex}`}
                                 type="time"
                                 value={slot.end}
                                 onChange={(e) => handleTimeChange(dayIndex, slotIndex, "end", e.target.value)}
@@ -178,8 +190,9 @@ export function AvailabilityStep({ data, onNext, onBack }: AvailabilityStepProps
                               size="icon"
                               onClick={() => handleRemoveTimeSlot(dayIndex, slotIndex)}
                               className="h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all"
+                              aria-label={t("onboarding.availability.removeSlotLabel", { index: slotIndex + 1, day: day.day, defaultValue: `Remove time slot ${slotIndex + 1} for ${day.day}` })}
                             >
-                              <Trash2 className="h-4 w-4" />
+                              <Trash2 className="h-4 w-4" aria-hidden="true" />
                             </Button>
                           </div>
                         ))}
@@ -190,14 +203,14 @@ export function AvailabilityStep({ data, onNext, onBack }: AvailabilityStepProps
                             onClick={() => handleAddTimeSlot(dayIndex)}
                             className="text-xs font-medium text-blue-600 hover:text-blue-700 flex items-center transition-colors"
                           >
-                            <Plus className="h-3 w-3 mr-1" /> Add another period
+                            <Plus className="h-3 w-3 mr-1" aria-hidden="true" /> {t("onboarding.availability.addPeriod", "Add another period")}
                           </button>
                           <button
                             type="button"
                             onClick={() => copyToAll(dayIndex)}
                             className="text-xs font-medium text-gray-400 hover:text-gray-600 flex items-center transition-colors"
                           >
-                            <Copy className="h-3 w-3 mr-1" /> Copy to all days
+                            <Copy className="h-3 w-3 mr-1" aria-hidden="true" /> {t("onboarding.availability.copyToAll", "Copy to all days")}
                           </button>
                         </div>
                       </motion.div>
@@ -212,10 +225,10 @@ export function AvailabilityStep({ data, onNext, onBack }: AvailabilityStepProps
 
       <div className="flex justify-between pt-6 border-t border-gray-100">
         <Button type="button" variant="ghost" onClick={onBack} className="text-gray-500 hover:text-gray-900">
-          Back
+          {t("common.back", "Back")}
         </Button>
         <Button type="submit" className="bg-black text-white hover:bg-gray-800 px-8">
-          Continue
+          {t("common.continue", "Continue")}
         </Button>
       </div>
     </form>

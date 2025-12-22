@@ -66,7 +66,7 @@ export function ProfileOverview() {
           <Card className="border border-gray-100 dark:border-gray-800 shadow-sm bg-white dark:bg-gray-900 rounded-3xl p-2">
             <CardHeader className="px-6 pt-6 pb-2">
               <CardTitle className="text-xl font-bold flex items-center">
-                <FiTrendingUp className="mr-2 text-green-500" /> Current Competencies
+                <FiTrendingUp className="mr-2 text-green-500" aria-hidden="true" /> Current Competencies
               </CardTitle>
             </CardHeader>
             <CardContent className="px-6 pb-6 pt-4">
@@ -78,10 +78,17 @@ export function ProfileOverview() {
                 ].map((skill) => (
                     <div key={skill.label}>
                         <div className="flex justify-between mb-3 text-sm font-semibold text-gray-700 dark:text-gray-200">
-                            <span>{skill.label}</span>
-                            <span>{skill.val}%</span>
+                            <span id={`skill-label-${skill.label.replace(/\s+/g, '-')}`}>{skill.label}</span>
+                            <span aria-hidden="true">{skill.val}%</span>
                         </div>
-                        <div className="h-3 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                        <div 
+                            className="h-3 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden"
+                            role="progressbar"
+                            aria-valuenow={skill.val}
+                            aria-valuemin={0}
+                            aria-valuemax={100}
+                            aria-labelledby={`skill-label-${skill.label.replace(/\s+/g, '-')}`}
+                        >
                             <motion.div 
                                 initial={{ width: 0 }}
                                 animate={{ width: `${skill.val}%` }}
@@ -114,7 +121,7 @@ export function ProfileOverview() {
                         <h3 className="text-3xl font-extrabold">{stat.value}</h3>
                     </div>
                     <div className="p-2.5 bg-white/20 backdrop-blur-md rounded-xl">
-                        <stat.icon size={20} className="text-white" />
+                        <stat.icon size={20} className="text-white" aria-hidden="true" />
                     </div>
                 </div>
                 {/* Decorative circle */}
@@ -128,7 +135,7 @@ export function ProfileOverview() {
           <Card className="border-none shadow-sm bg-gray-50/50 dark:bg-gray-800/20 rounded-3xl">
             <CardHeader>
               <CardTitle className="text-lg font-bold flex items-center">
-                 <FiClock className="mr-2 text-gray-400" /> Recent Activity
+                 <FiClock className="mr-2 text-gray-400" aria-hidden="true" /> Recent Activity
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -143,7 +150,7 @@ export function ProfileOverview() {
                 ].map((activity, i) => (
                     <div key={i} className="flex gap-4 p-3 rounded-xl hover:bg-white dark:hover:bg-gray-800 transition-colors relative z-10 group cursor-pointer">
                         <div className={cn("shrink-0 w-8 h-8 rounded-full flex items-center justify-center ring-4 ring-gray-50 dark:ring-gray-900", activity.bg, activity.text)}>
-                            <activity.icon size={14} />
+                            <activity.icon size={14} aria-hidden="true" />
                         </div>
                         <div className="flex-1 min-w-0">
                             <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate group-hover:text-blue-600 transition-colors">
@@ -157,7 +164,7 @@ export function ProfileOverview() {
               </div>
               
               <Button variant="ghost" className="w-full mt-4 text-xs font-semibold text-gray-500 hover:text-gray-900">
-                View All Activity <FiArrowUpRight className="ml-1" />
+                View All Activity <FiArrowUpRight className="ml-1" aria-hidden="true" />
               </Button>
             </CardContent>
           </Card>

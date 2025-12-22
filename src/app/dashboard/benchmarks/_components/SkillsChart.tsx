@@ -2,7 +2,6 @@
 
 import React from "react";
 import {
-  BarChart,
   Bar,
   XAxis,
   YAxis,
@@ -11,7 +10,10 @@ import {
   ResponsiveContainer,
   Cell
 } from "recharts";
+import { useTranslation } from "react-i18next";
 import { SkillData } from "@/services/benchmarkService";
+import { DynamicBarChart } from "@/lib/dynamic-imports";
+
 
 interface SkillsChartProps {
   data?: SkillData[];
@@ -19,10 +21,12 @@ interface SkillsChartProps {
 }
 
 export default function SkillsChart({ data, isLoading }: SkillsChartProps) {
+  const { t } = useTranslation();
+
   if (isLoading) {
     return (
       <div className="h-[300px] w-full flex items-center justify-center bg-slate-50 rounded-lg animate-pulse">
-        <span className="text-slate-400 font-medium">Loading skills...</span>
+        <span className="text-slate-400 font-medium">{t("benchmarks.loadingSkills")}</span>
       </div>
     );
   }
@@ -32,7 +36,7 @@ export default function SkillsChart({ data, isLoading }: SkillsChartProps) {
   return (
     <div className="h-[600px] w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart
+        <DynamicBarChart
           layout="vertical"
           data={data}
           margin={{
@@ -56,14 +60,14 @@ export default function SkillsChart({ data, isLoading }: SkillsChartProps) {
           <Tooltip 
             cursor={{ fill: '#f1f5f9' }}
             contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-            formatter={(value: number) => [`${value}% demand`, " Popularity"]}
+            formatter={(value: number) => [`${value}% ${t("benchmarks.demand") || "demand"}`, ` ${t("benchmarks.popularity") || "Popularity"}`]}
           />
           <Bar dataKey="popularity" radius={[0, 4, 4, 0]}>
             {data?.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
             ))}
           </Bar>
-        </BarChart>
+        </DynamicBarChart>
       </ResponsiveContainer>
     </div>
   );

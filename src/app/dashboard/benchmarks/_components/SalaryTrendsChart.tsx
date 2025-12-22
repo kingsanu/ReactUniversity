@@ -2,7 +2,6 @@
 
 import React from "react";
 import {
-  BarChart,
   Bar,
   XAxis,
   YAxis,
@@ -11,7 +10,10 @@ import {
   ResponsiveContainer,
   Legend
 } from "recharts";
+import { useTranslation } from "react-i18next";
 import { SalaryData } from "@/services/benchmarkService";
+import { DynamicBarChart } from "@/lib/dynamic-imports";
+
 
 interface SalaryTrendsChartProps {
   data?: SalaryData[];
@@ -19,10 +21,12 @@ interface SalaryTrendsChartProps {
 }
 
 export default function SalaryTrendsChart({ data, isLoading }: SalaryTrendsChartProps) {
+  const { t } = useTranslation();
+
   if (isLoading) {
     return (
       <div className="h-[350px] w-full flex items-center justify-center bg-slate-50 rounded-lg animate-pulse">
-        <span className="text-slate-400 font-medium">Loading salary data...</span>
+        <span className="text-slate-400 font-medium">{t("benchmarks.loadingSalaryData")}</span>
       </div>
     );
   }
@@ -34,7 +38,7 @@ export default function SalaryTrendsChart({ data, isLoading }: SalaryTrendsChart
   return (
     <div className="h-[350px] w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart
+        <DynamicBarChart
           data={data}
           margin={{
             top: 20,
@@ -86,10 +90,10 @@ export default function SalaryTrendsChart({ data, isLoading }: SalaryTrendsChart
             labelStyle={{ fontWeight: 600, color: '#1e293b', marginBottom: '8px' }}
           />
           <Legend wrapperStyle={{ paddingTop: '20px' }} iconType="circle" />
-          <Bar dataKey="min" fill="url(#colorMin)" name="Min Salary" radius={[6, 6, 0, 0]} />
-          <Bar dataKey="avg" fill="url(#colorAvg)" name="Average Salary" radius={[6, 6, 0, 0]} />
-          <Bar dataKey="max" fill="url(#colorMax)" name="Max Salary" radius={[6, 6, 0, 0]} />
-        </BarChart>
+          <Bar dataKey="min" fill="url(#colorMin)" name={t("benchmarks.minSalary")} radius={[6, 6, 0, 0]} />
+          <Bar dataKey="avg" fill="url(#colorAvg)" name={t("benchmarks.averageSalary")} radius={[6, 6, 0, 0]} />
+          <Bar dataKey="max" fill="url(#colorMax)" name={t("benchmarks.maxSalary")} radius={[6, 6, 0, 0]} />
+        </DynamicBarChart>
       </ResponsiveContainer>
     </div>
   );

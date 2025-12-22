@@ -41,7 +41,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
-import { BookingModal } from "@/components/coaching/BookingModal";
+import { DynamicBookingModal } from "@/lib/dynamic-imports";
 import { useGlobalStore } from "@/store/useGlobalStore";
 
 interface Session {
@@ -641,7 +641,7 @@ export default function MySessionsPage() {
       </Dialog>
 
       {/* Booking Modal for Rescheduling */}
-      <BookingModal
+      <DynamicBookingModal
         coach={rescheduleCoach}
         isOpen={bookingModalOpen}
         onClose={() => setBookingModalOpen(false)}

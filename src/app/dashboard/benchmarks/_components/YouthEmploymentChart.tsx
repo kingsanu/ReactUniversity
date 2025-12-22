@@ -2,7 +2,6 @@
 
 import React from "react";
 import {
-  LineChart,
   Line,
   XAxis,
   YAxis,
@@ -11,7 +10,9 @@ import {
   ResponsiveContainer,
   Legend
 } from "recharts";
+import { useTranslation } from "react-i18next";
 import { BenchmarkData } from "@/services/benchmarkService";
+import { DynamicLineChart } from "@/lib/dynamic-imports";
 
 interface YouthEmploymentChartProps {
   data?: BenchmarkData[];
@@ -19,10 +20,12 @@ interface YouthEmploymentChartProps {
 }
 
 export default function YouthEmploymentChart({ data, isLoading }: YouthEmploymentChartProps) {
+  const { t } = useTranslation();
+
   if (isLoading) {
     return (
       <div className="h-[300px] w-full flex items-center justify-center bg-slate-50 rounded-lg animate-pulse">
-        <span className="text-slate-400 font-medium">Loading data...</span>
+        <span className="text-slate-400 font-medium">{t("benchmarks.loadingData")}</span>
       </div>
     );
   }
@@ -30,7 +33,7 @@ export default function YouthEmploymentChart({ data, isLoading }: YouthEmploymen
   return (
     <div className="h-[300px] w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+        <DynamicLineChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
           <XAxis 
             dataKey="year" 
@@ -55,9 +58,9 @@ export default function YouthEmploymentChart({ data, isLoading }: YouthEmploymen
             strokeWidth={3} 
             dot={{ r: 4, fill: '#10b981', strokeWidth: 2, stroke: '#fff' }}
             activeDot={{ r: 6 }}
-            name="Employment Rate"
+            name={t("benchmarks.employmentRate")}
           />
-        </LineChart>
+        </DynamicLineChart>
       </ResponsiveContainer>
     </div>
   );

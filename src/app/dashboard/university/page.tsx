@@ -26,8 +26,6 @@ import {
   GraduationCap,
   Filter,
 } from "lucide-react";
-import { Sidebar } from "../_components/Sidebar";
-import { TopNav } from "../_components/TopNav";
 import {
   Sheet,
   SheetContent,
@@ -44,7 +42,6 @@ export default function UniversityPage() {
   const [selectedUniversity, setSelectedUniversity] =
     React.useState<University | null>(null);
   const [activeTab, setActiveTab] = React.useState("recommended");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const listQuery = useUniversityList(filters, 1, 20);
   const recoQuery = useUniversityRecommendations(userId);
@@ -86,16 +83,11 @@ export default function UniversityPage() {
     (filters.hasHousing ? 1 : 0);
 
   return (
-    <div className="flex h-screen bg-gray-50/30">
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+    <div className="relative">
+      {/* Subtle background pattern */}
+      <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-[0.02] pointer-events-none" />
 
-      <div className="flex-1 flex flex-col overflow-hidden lg:ml-0 relative">
-        {/* Subtle background pattern */}
-        <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-[0.02] pointer-events-none" />
-
-        <TopNav onMenuClick={() => setSidebarOpen(true)} />
-
-        <main className="flex-1 overflow-y-auto relative z-10">
+      <main className="flex-1 overflow-y-auto relative z-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* Header */}
             <motion.div
@@ -356,8 +348,7 @@ export default function UniversityPage() {
               }
             />
           </div>
-        </main>
-      </div>
+      </main>
     </div>
   );
 }

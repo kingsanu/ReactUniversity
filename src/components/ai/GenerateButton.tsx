@@ -10,8 +10,9 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import { Sparkles, Loader } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
-import { ContentGenerationModal } from "./ContentGenerationModal";
+import { DynamicContentGenerationModal } from "@/lib/dynamic-imports";
 
 export type AIFieldType =
   | "summary"
@@ -60,6 +61,7 @@ export function GenerateButton({
   size = "sm",
   variant = "icon",
 }: GenerateButtonProps) {
+  const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const sizeClasses = {
@@ -76,51 +78,20 @@ export function GenerateButton({
       "flex items-center gap-1 px-3 py-1.5 rounded text-xs font-medium transition-colors border border-primary text-primary hover:bg-primary/5",
   };
 
-  const fieldLabels: Record<string, string> = {
-    summary: "Professional Summary",
-    objective: "Career Objective",
-    bullets: "Job Bullets",
-    project: "Project Description",
-    skill: "Skill Description",
-    experience_description: "Experience Description",
-    experience_bullets: "Experience Bullets",
-    education_description: "Education Description",
-    project_description: "Project Description",
-    project_bullets: "Project Bullets",
-    course_description: "Course Description",
-    award_description: "Award Description",
-    organization_description: "Organization Description",
-    publication_description: "Publication Description",
-    language_description: "Language Description",
-    volunteer_description: "Volunteer Description",
-    reference_description: "Reference Description",
-    declaration_text: "Declaration Text",
-    custom_description: "Custom Section Description",
-    custom_bullets: "Custom Section Bullets",
+  const getFieldLabel = (field: string) => {
+    return t(`ai.fields.${field}.label`, {
+      defaultValue: field.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
+    });
   };
 
-  const fieldTooltips: Record<string, string> = {
-    summary: "Generate professional summary using AI",
-    objective: "Generate career objective using AI",
-    bullets: "Generate achievement-focused bullet points using AI",
-    project: "Generate project description using AI",
-    skill: "Generate skill description using AI",
-    experience_description: "Generate experience description using AI",
-    experience_bullets: "Generate experience bullet points using AI",
-    education_description: "Generate education description using AI",
-    project_description: "Generate project description using AI",
-    project_bullets: "Generate project bullet points using AI",
-    course_description: "Generate course description using AI",
-    award_description: "Generate award description using AI",
-    organization_description: "Generate organization description using AI",
-    publication_description: "Generate publication description using AI",
-    language_description: "Generate language description using AI",
-    volunteer_description: "Generate volunteer work description using AI",
-    reference_description: "Generate reference description using AI",
-    declaration_text: "Generate declaration text using AI",
-    custom_description: "Generate custom section description using AI",
-    custom_bullets: "Generate custom section bullet points using AI",
+  const getFieldTooltip = (field: string) => {
+    return t(`ai.fields.${field}.tooltip`, {
+      defaultValue: `Generate ${field.replace(/_/g, ' ')} using AI`
+    });
   };
+
+  const label = getFieldLabel(field);
+  const tooltip = getFieldTooltip(field);
 
   const handleClick = () => {
     setIsModalOpen(true);
@@ -152,13 +123,13 @@ export function GenerateButton({
           "disabled:opacity-50 disabled:cursor-not-allowed",
           className
         )}
-        title={fieldTooltips[field]}
-        aria-label={`${fieldTooltips[field]} (${fieldLabels[field]})`}
+        title={tooltip}
+        aria-label={`${tooltip} (${label})`}
       >
         {isLoading ? (
           <>
-            <Loader className={cn(sizeClasses[size], "animate-spin")} />
-            {showLabel && <span>Generating...</span>}
+            <Loader className={cn(sizeClasses[size], "animate-spin")} aria-hidden="true" />
+            {showLabel && <span>{t("common.generating", "Generating...")}</span>}
           </>
         ) : (
           <>
@@ -166,16 +137,16 @@ export function GenerateButton({
               initial={{ rotate: 0, scale: 1 }}
               whileHover={{ rotate: [0, -8, 8, 0], scale: 1.06 }}
               transition={{ duration: 0.6 }}
-              aria-hidden
+              aria-hidden="true"
             >
               <Sparkles className={sizeClasses[size]} />
             </motion.span>
-            {showLabel && <span>Generate</span>}
+            {showLabel && <span>{t("common.generate", "Generate")}</span>}
           </>
         )}
       </motion.button>
 
-      <ContentGenerationModal
+      <DynamicContentGenerationModal
         isOpen={isModalOpen}
         field={field}
         context={context}
@@ -185,3 +156,4 @@ export function GenerateButton({
     </>
   );
 }
+

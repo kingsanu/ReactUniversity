@@ -99,10 +99,10 @@ export default function MarketPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="w-5 h-5 text-pink-500" />
-                Youth Employment Rate
+                {t("dashboard.benchmarks.market.youthEmploymentTitle")}
               </CardTitle>
               <CardDescription>
-                Employment trends for professionals under 25 in {country}.
+                {t("dashboard.benchmarks.market.youthEmploymentDesc", { country })}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -149,19 +149,19 @@ export default function MarketPage() {
                     variant="outline"
                     className="text-white border-white/20"
                   >
-                    Fintech
+                    {t("common.fintech", { defaultValue: "Fintech" })}
                   </Badge>
                   <Badge
                     variant="outline"
                     className="text-white border-white/20"
                   >
-                    HealthTech
+                    {t("common.healthtech", { defaultValue: "HealthTech" })}
                   </Badge>
                   <Badge
                     variant="outline"
                     className="text-white border-white/20"
                   >
-                    AI/ML
+                    {t("common.aiml", { defaultValue: "AI/ML" })}
                   </Badge>
                 </div>
               </div>

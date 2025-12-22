@@ -195,6 +195,7 @@ export const sidebarData = {
       submenu: [
         { name: "Career Paths Explorer", path: "/dashboard/career-paths" },
         { name: "University Suggestions", path: "/dashboard/university" },
+        { name: "Job Market Pulse", path: "/dashboard/career/market" },
       ],
     },
     {
@@ -211,10 +212,16 @@ export const sidebarData = {
       ],
     },
     {
-      id: "courses",
-      name: "dashboard.courses",
+      id: "learning",
+      name: "Learning",
       icon: "learning",
-      path: "/dashboard/learning/courses",
+      path: "/dashboard/learning",
+      submenu: [
+        { name: "dashboard.courses", path: "/dashboard/learning/courses" },
+        { name: "Smart Gaps Analysis", path: "/dashboard/learning/gaps" },
+        { name: "Certifications", path: "/dashboard/learning/certifications" },
+        { name: "Progress", path: "/dashboard/progress" },
+      ],
     },
     {
       id: "resumes",

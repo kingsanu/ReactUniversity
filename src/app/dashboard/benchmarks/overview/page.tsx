@@ -231,7 +231,7 @@ export default function OverviewPage() {
                   <Link
                     href={`/dashboard/benchmarks/compensation?country=${country}&career=${career}`}
                   >
-                    Details <ArrowRight className="ml-2 w-3 h-3" />
+                    {t("benchmarks.details")} <ArrowRight className="ml-2 w-3 h-3" />
                   </Link>
                 </Button>
               </div>

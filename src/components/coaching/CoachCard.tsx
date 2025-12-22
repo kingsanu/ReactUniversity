@@ -20,6 +20,7 @@ export function CoachCard({ coach, onBook }: CoachCardProps) {
   const { t } = useTranslation();
 
   return (
+    <article aria-labelledby={`coach-${coach.id}-name`}>
     <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 p-0 shadow-none">
       <CardHeader className="!p-0 ">
         <div className="h-32 bg-gradient-to-r from-blue-500 to-purple-600 relative">
@@ -34,22 +35,26 @@ export function CoachCard({ coach, onBook }: CoachCardProps) {
       <CardContent className="pt-14 px-6 pb-4">
         <div className="flex justify-between items-start mb-2">
           <div>
-            <h3 className="text-xl font-bold text-gray-900">{coach.name}</h3>
+            <h3 id={`coach-${coach.id}-name`} className="text-xl font-bold text-gray-900">{coach.name}</h3>
             <p className="text-sm text-gray-500 font-medium">{coach.title}</p>
           </div>
-          <div className="flex items-center bg-yellow-50 px-2 py-1 rounded text-yellow-700 text-xs font-bold">
-            <Star className="h-3 w-3 fill-yellow-500 text-yellow-500 mr-1" />
-            {coach.rating} ({Array.isArray(coach.reviews) ? coach.reviews.length : coach.reviews})
+          <div 
+            className="flex items-center bg-yellow-50 px-2 py-1 rounded text-yellow-700 text-xs font-bold"
+            role="img"
+            aria-label={`Rating: ${coach.rating} out of 5, ${Array.isArray(coach.reviews) ? coach.reviews.length : coach.reviews} reviews`}
+          >
+            <Star className="h-3 w-3 fill-yellow-500 text-yellow-500 mr-1" aria-hidden="true" />
+            <span aria-hidden="true">{coach.rating} ({Array.isArray(coach.reviews) ? coach.reviews.length : coach.reviews})</span>
           </div>
         </div>
 
         <div className="space-y-2 mt-4">
           <div className="flex items-center text-sm text-gray-600">
-            <MapPin className="h-4 w-4 mr-2 text-gray-400" />
+            <MapPin className="h-4 w-4 mr-2 text-gray-400" aria-hidden="true" />
             {coach.location}
           </div>
           <div className="flex items-center text-sm text-gray-600">
-            <Clock className="h-4 w-4 mr-2 text-gray-400" />
+            <Clock className="h-4 w-4 mr-2 text-gray-400" aria-hidden="true" />
             {/* Simple availability display for now */}
             {coach.availability ? t("coaching.viewSchedule") : t("coaching.contactForAvailability")}
           </div>
@@ -79,5 +84,6 @@ export function CoachCard({ coach, onBook }: CoachCardProps) {
         </div>
       </CardFooter>
     </Card>
+    </article>
   );
 }

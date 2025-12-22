@@ -11,8 +11,9 @@ export function ActivityChart() {
       className="bg-white p-6 rounded-lg shadow-sm border"
     >
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">Your Activity</h3>
-        <select className="text-sm border rounded px-2 py-1 text-gray-600">
+        <h3 className="text-lg font-semibold text-gray-900" id="activity-chart-title">Your Activity</h3>
+        <label htmlFor="activity-period" className="sr-only">Select Period</label>
+        <select id="activity-period" className="text-sm border rounded px-2 py-1 text-gray-600">
           <option>Mar 2022 - Oct 2022</option>
         </select>
       </div>

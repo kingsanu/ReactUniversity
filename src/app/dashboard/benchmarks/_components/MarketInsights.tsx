@@ -4,6 +4,7 @@ import React from "react";
 import { InsightData } from "@/services/benchmarkService";
 import { TrendingUp, TrendingDown, Minus, ArrowUpRight, ArrowDownRight, Activity } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { useTranslation } from "react-i18next";
 
 interface MarketInsightsProps {
   data?: InsightData[];
@@ -11,6 +12,8 @@ interface MarketInsightsProps {
 }
 
 export default function MarketInsights({ data, isLoading }: MarketInsightsProps) {
+  const { t } = useTranslation();
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -44,9 +47,47 @@ export default function MarketInsights({ data, isLoading }: MarketInsightsProps)
     }
   };
 
+  const translateInsight = (item: InsightData) => {
+    const labelKey = item.label.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const mapping: Record<string, { label: string; desc: string }> = {
+      demandgrowth: { 
+        label: t("dashboard.benchmarks.market.insights.demandGrowth"), 
+        desc: t("dashboard.benchmarks.market.insights.demandGrowthDesc") 
+      },
+      talentsupply: { 
+        label: t("dashboard.benchmarks.market.insights.talentSupply"), 
+        desc: t("dashboard.benchmarks.market.insights.talentSupplyDesc") 
+      },
+      remoteopportunity: { 
+        label: t("dashboard.benchmarks.market.insights.remoteOpportunity"), 
+        desc: t("dashboard.benchmarks.market.insights.remoteOpportunityDesc") 
+      },
+      avgfilltime: { 
+        label: t("dashboard.benchmarks.market.insights.avgFillTime"), 
+        desc: t("dashboard.benchmarks.market.insights.avgFillTimeDesc") 
+      },
+    };
+
+    const localized = mapping[labelKey];
+    if (!localized) return item;
+
+    let localizedValue = item.value;
+    if (item.value === "Moderate") localizedValue = t("benchmarks.moderate");
+    if (item.value === "High") localizedValue = t("benchmarks.high");
+    if (item.value === "Low") localizedValue = t("benchmarks.low");
+
+    return {
+      ...item,
+      label: localized.label,
+      description: localized.desc,
+      value: localizedValue
+    };
+  };
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {data?.map((item, index) => {
+      {data?.map((rawItem, index) => {
+        const item = translateInsight(rawItem);
         const theme = getTheme(item.trend, index);
         return (
           <Card 
@@ -62,7 +103,7 @@ export default function MarketInsights({ data, isLoading }: MarketInsightsProps)
                 </div>
                 {item.trend !== 'neutral' && (
                   <span className={`text-xs font-semibold px-2 py-1 rounded-full ${theme.bg} ${theme.text}`}>
-                    {item.trend === 'up' ? 'Rising' : 'Falling'}
+                    {item.trend === 'up' ? t("benchmarks.rising") : t("benchmarks.falling")}
                   </span>
                 )}
               </div>

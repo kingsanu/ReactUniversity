@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useGlobalStore } from "@/store/useGlobalStore";
+import { SkipLink } from "@/components/accessibility/AccessibilityHelpers";
+import { LanguageSync } from "@/components/accessibility/LanguageSync";
 import "../lib/i18n";
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
@@ -42,5 +44,12 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      <SkipLink />
+      <LanguageSync />
+      {children}
+    </>
+  );
 }
+

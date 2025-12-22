@@ -36,13 +36,19 @@ export function FeaturedCoaches() {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div 
+        className="grid grid-cols-1 md:grid-cols-3 gap-6"
+        role="status"
+        aria-busy="true"
+        aria-label="Loading featured coaches"
+      >
         {[1, 2, 3].map((i) => (
           <Card
             key={i}
             className="border-0 shadow-sm bg-white/50 animate-pulse h-[320px] rounded-2xl"
           />
         ))}
+        <span className="sr-only">Loading coaches...</span>
       </div>
     );
   }
@@ -54,7 +60,7 @@ export function FeaturedCoaches() {
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <div className="p-2 bg-blue-100 rounded-lg">
+            <div className="p-2 bg-blue-100 rounded-lg" aria-hidden="true">
               <Sparkles className="h-5 w-5 text-blue-600" />
             </div>
             {t("coaching.featuredCoaches")}
@@ -70,7 +76,7 @@ export function FeaturedCoaches() {
         >
           <Link href="/dashboard/book-coach">
             {t("coaching.viewAllCoaches")}{" "}
-            <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
+            <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" aria-hidden="true" />
           </Link>
         </Button>
       </div>
@@ -96,25 +102,32 @@ export function FeaturedCoaches() {
                   <div className="relative">
                     <div className="absolute -inset-1 bg-white rounded-full opacity-20 group-hover:opacity-40 transition-opacity blur-sm" />
                     <Avatar className="h-24 w-24 border-[4px] border-white shadow-lg">
-                      <AvatarImage src={coach.image} className="object-cover" />
+                      <AvatarImage src={coach.image} className="object-cover" alt="" />
                       <AvatarFallback className="bg-gradient-to-br from-slate-100 to-slate-200 text-slate-700 text-2xl font-bold">
                         {coach.name.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
                     <div
                       className="absolute bottom-1 right-1 bg-green-500 h-4 w-4 rounded-full border-[3px] border-white shadow-sm"
-                      title="Available"
-                    ></div>
+                      role="status"
+                      aria-label="Available"
+                    >
+                      <span className="sr-only">Available</span>
+                    </div>
                   </div>
                 </div>
 
                 {/* Rating Badge */}
-                <div className="absolute top-4 right-6 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1.5 border border-gray-100">
-                  <Star className="h-3.5 w-3.5 text-yellow-500 fill-yellow-500" />
-                  <span className="font-bold text-xs text-gray-900">
+                <div 
+                  className="absolute top-4 right-6 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1.5 border border-gray-100"
+                  role="img"
+                  aria-label={`Rating: ${coach.rating || "5.0"} out of 5 stars, ${Array.isArray(coach.reviews) ? coach.reviews.length : coach.reviews || 0} reviews`}
+                >
+                  <Star className="h-3.5 w-3.5 text-yellow-500 fill-yellow-500" aria-hidden="true" />
+                  <span className="font-bold text-xs text-gray-900" aria-hidden="true">
                     {coach.rating || "5.0"}
                   </span>
-                  <span className="text-[10px] text-gray-500">
+                  <span className="text-[10px] text-gray-500" aria-hidden="true">
                     (
                     {Array.isArray(coach.reviews)
                       ? coach.reviews.length
@@ -158,7 +171,7 @@ export function FeaturedCoaches() {
                   <div className="flex items-center justify-between text-sm text-gray-500 pt-2 border-t border-gray-50">
                     {coach.location && (
                       <div className="flex items-center gap-1.5">
-                        <MapPin className="h-3.5 w-3.5 text-gray-400" />
+                        <MapPin className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
                         <span className="truncate max-w-[120px]">
                           {coach.location}
                         </span>

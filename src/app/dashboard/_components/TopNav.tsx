@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { UserProfileDropdown } from "@/components/ui/user-profile-dropdown";
+import { AccessibleLanguageSwitcher } from "@/components/accessibility/AccessibleLanguageSwitcher";
 import { Search, Bell, Menu } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,10 @@ export function TopNav({ className, onMenuClick }: TopNavProps) {
   ];
 
   return (
-    <header className={cn("bg-white border-b border-slate-100 shadow-sm sticky top-0 z-40", className)}>
+    <header 
+      className={cn("bg-white border-b border-slate-100 shadow-sm sticky top-0 z-40", className)}
+      role="banner"
+    >
       <div className="flex items-center justify-between px-4 md:px-8 py-4">
         {/* Mobile Menu Button */}
         <Button
@@ -29,12 +33,13 @@ export function TopNav({ className, onMenuClick }: TopNavProps) {
           size="icon"
           onClick={onMenuClick}
           className="lg:hidden text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+          aria-label={t("accessibility.openMenu")}
         >
-          <Menu className="h-5 w-5" />
+          <Menu className="h-5 w-5" aria-hidden="true" />
         </Button>
 
         {/* Navigation Tabs */}
-        <nav className="hidden md:flex items-center space-x-8">
+        <nav className="hidden md:flex items-center space-x-8" aria-label={t("accessibility.navigation")}>
           {translatedNavItems.map((item) => (
             <button
               key={item.name}
@@ -44,6 +49,7 @@ export function TopNav({ className, onMenuClick }: TopNavProps) {
                   ? "text-blue-600 border-blue-600"
                   : "text-slate-500 border-transparent hover:text-slate-800 hover:border-slate-200"
               )}
+              aria-current={item.active ? "page" : undefined}
             >
               {item.name}
             </button>
@@ -55,26 +61,41 @@ export function TopNav({ className, onMenuClick }: TopNavProps) {
           {/* Search */}
           <div className="relative hidden sm:block group">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-4 w-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+              <Search className="h-4 w-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" aria-hidden="true" />
             </div>
             <Input
-              type="text"
+              type="search"
               placeholder={t("common.search")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-48 md:w-72 pl-10 bg-slate-50 border-slate-200 focus:bg-white focus:border-blue-500 focus:ring-blue-500/20 rounded-full transition-all duration-200"
+              aria-label={t("common.search")}
             />
           </div>
 
           {/* Mobile Search Button */}
-          <Button variant="ghost" size="icon" className="sm:hidden text-slate-500 hover:text-slate-700">
-            <Search className="h-5 w-5" />
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="sm:hidden text-slate-500 hover:text-slate-700"
+            aria-label={t("common.search")}
+          >
+            <Search className="h-5 w-5" aria-hidden="true" />
           </Button>
 
+          {/* Language Switcher */}
+          <AccessibleLanguageSwitcher />
+
           {/* Notifications */}
-          <Button variant="ghost" size="icon" className="relative text-slate-500 hover:text-slate-700 hover:bg-slate-50 rounded-full">
-            <Bell className="h-5 w-5" />
-            <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border-2 border-white"></span>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="relative text-slate-500 hover:text-slate-700 hover:bg-slate-50 rounded-full"
+            aria-label={t("nav.notifications")}
+          >
+            <Bell className="h-5 w-5" aria-hidden="true" />
+            <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border-2 border-white" aria-hidden="true"></span>
+            <span className="sr-only">{t("nav.notificationsCount", { count: 3, defaultValue: "3 new notifications" })}</span>
           </Button>
 
           {/* User Profile Dropdown */}
@@ -86,3 +107,4 @@ export function TopNav({ className, onMenuClick }: TopNavProps) {
     </header>
   );
 }
+

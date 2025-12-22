@@ -1,57 +1,48 @@
 "use client";
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CoursesCatalog } from "../../../../components/dashboard/courses/CoursesCatalog";
-import { Breadcrumb } from "../../../../components/ui/breadcrumb";
-import { BookOpen } from "lucide-react";
-import { Sidebar } from "../../_components/Sidebar";
-import { TopNav } from "../../_components/TopNav";
+import { ArrowLeft, BookOpen, Zap } from "lucide-react";
+import Link from "next/link";
+
 
 export default function CoursesPage() {
   const { t } = useTranslation();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      
-      <div className="flex-1 flex flex-col overflow-hidden lg:ml-0">
-        <TopNav onMenuClick={() => setSidebarOpen(true)} />
+    <main className="min-h-screen bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
         
-        <main className="flex-1 overflow-y-auto bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            {/* Breadcrumb */}
-            <Breadcrumb
-              items={[
-                { label: t("nav.learning"), href: "/dashboard/learning" },
-                { label: t("dashboard.courses") },
-              ]}
-            />
+        {/* Header Section */}
+        <div className="space-y-6">
+           <Link 
+             href="/dashboard/learning" 
+             className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors group"
+           >
+               <div className="p-1.5 rounded-lg bg-white border border-slate-200 mr-2 group-hover:border-indigo-200 transition-all">
+                  <ArrowLeft className="w-4 h-4" />
+               </div>
+               {t("nav.learning")}
+           </Link>
+           
+           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+               <div className="space-y-4 max-w-2xl">
+                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-xs font-bold uppercase tracking-wider">
+                      <Zap className="w-3.5 h-3.5 fill-blue-600" />
+                      Curated Catalog
+                   </div>
+                   <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-[1.1]">
+                      Explore <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Courses</span>
+                   </h1>
+                   <p className="text-slate-500 text-lg leading-relaxed">
+                      {t("courses.discoverCourses")}
+                   </p>
+               </div>
+           </div>
+        </div>
 
-            {/* Header Section */}
-            <div className="mb-10 mt-6">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative">
-                <div className="space-y-2 max-w-2xl">
-                  <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                    <div className="p-2.5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg shadow-blue-200">
-                      <BookOpen className="w-6 h-6 text-white" />
-                    </div>
-                    {t("dashboard.courseCatalog")}
-                  </h1>
-                  <p className="text-gray-500 text-lg ml-[3.75rem] leading-relaxed">
-                    {t("courses.discoverCourses")}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Courses Catalog */}
-            <div className="">
-              <CoursesCatalog />
-            </div>
-          </div>
-        </main>
+        {/* Courses Catalog */}
+        <CoursesCatalog />
       </div>
-    </div>
+    </main>
   );
 }

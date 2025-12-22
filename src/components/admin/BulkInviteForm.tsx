@@ -154,12 +154,14 @@ export function BulkInviteForm() {
                 accept=".csv"
                 onChange={handleFileChange}
                 required
+                aria-describedby="csv-hint"
               />
+              <p id="csv-hint" className="text-xs text-muted-foreground">Accepted format: .csv</p>
             </div>
             <Button type="submit" disabled={isLoading || !file} className="w-full">
               {isLoading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
                   Processing...
                 </>
               ) : (

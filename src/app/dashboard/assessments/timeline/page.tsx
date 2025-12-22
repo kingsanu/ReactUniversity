@@ -1,24 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
-import { Sidebar } from "../../_components/Sidebar";
-import { TopNav } from "../../_components/TopNav";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { Calendar, History, Clock } from "lucide-react";
 
 export default function AssessmentTimelinePage() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const { t } = useTranslation();
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-
-      <div className="flex-1 flex flex-col overflow-hidden lg:ml-0">
-        <TopNav onMenuClick={() => setSidebarOpen(true)} />
-
-        <main className="flex-1 overflow-y-auto bg-gray-50/50 p-6">
+    <main className="flex-1 overflow-y-auto bg-gray-50/50 p-6">
           <div className="max-w-7xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -50,8 +41,6 @@ export default function AssessmentTimelinePage() {
               </p>
             </motion.div>
           </div>
-        </main>
-      </div>
-    </div>
+    </main>
   );
 }

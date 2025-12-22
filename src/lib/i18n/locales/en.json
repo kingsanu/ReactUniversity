@@ -278,7 +278,129 @@
     "backToInstructions": "Back to Instructions",
     "submitAnswer": "Submit Answer",
     "startTest": "Start Test",
+    "benchmarks": {
+      "header": {
+        "title": "Industry Benchmarks",
+        "description": "Visualizing global career trends, salary distributions, and supply-demand metrics.",
+        "shareReport": "Share Report",
+        "selectCountryPlaceholder": "Select Country",
+        "selectCareerPlaceholder": "Select Career"
+      },
+      "overview": {
+        "salaryTitle": "Regional Salary Trends",
+        "topSkills": "Most In-Demand Skills",
+        "workMode": "Work Mode Distribution",
+        "costOfLiving": "Cost of Living Comparison",
+        "certifications": "Recommended Certifications",
+        "viewAll": "View All",
+        "marketPulse": "Career Market Pulse",
+        "marketPulseDesc": "Real-time indicators of demand and sentiment.",
+        "liveUpdates": "Live Updates"
+      },
+      "market": {
+        "title": "Market Benchmarks",
+        "subtitle": "Analysis of market growth, talent supply, and employment trends.",
+        "employabilityScore": "Employability Score",
+        "employabilityDesc": "Trending readiness score based on market shifts and hiring data.",
+        "analysisLabel": "Analysis:",
+        "analysis": "The current market for {{career}} shows resilient demand with emerging specialization requirements.",
+        "youthEmploymentTitle": "Youth Employment Rate",
+        "youthEmploymentDesc": "Employment trends for professionals under 25 in {{country}}.",
+        "marketForecast": "Market Forecast",
+        "positiveOutlook": "Positive Outlook",
+        "positiveOutlookDesc": "Projected growth across key innovation sectors in the next 18 months.",
+        "projectedHotspots": "Projected Hotspots",
+        "recruiterSentiment": "Recruiter Sentiment",
+        "hiringSpeed": "Hiring Speed",
+        "badgeFast": "Fast",
+        "interviewTech": "Interview Tech",
+        "badgeRemote": "Remote",
+        "contractRoles": "Contract Roles",
+        "badgeIncreasing": "Increasing",
+        "insights": {
+          "demandGrowth": "Demand Growth",
+          "demandGrowthDesc": "Year-over-year job posting growth.",
+          "talentSupply": "Talent Supply",
+          "talentSupplyDesc": "Ratio of applicants to open positions.",
+          "remoteOpportunity": "Remote Opportunity",
+          "remoteOpportunityDesc": "Percentage of roles offering remote work.",
+          "avgFillTime": "Avg. Fill Time",
+          "avgFillTimeDesc": "Time to fill an open position."
+        }
+      },
+      "skills": {
+        "title": "Skill Benchmarking",
+        "subtitle": "Compare your skillset against global market requirements",
+        "mostInDemand": "Most In-Demand Competencies",
+        "emergingTechWatch": "Emerging Tech Watch",
+        "emergingDesc": "Technologies gaining rapid traction in this sector",
+        "topCertifications": "Top Industry Certifications",
+        "certificationsDesc": "Credentials most requested by recruiters in {{country}}"
+      },
+      "demographics": {
+        "title": "Market Demographics",
+        "subtitle": "Workplace diversity, work-life balance, and inclusivity metrics",
+        "workModeTitle": "Work Mode Preferences",
+        "workModeDesc": "Current distribution of workplace arrangements",
+        "remote": "Remote",
+        "hybrid": "Hybrid",
+        "onsite": "On-site",
+        "genderDiversityTitle": "Gender Distribution",
+        "inclusivityTitle": "Inclusivity Benchmarks",
+        "inclusivityDesc": "Availability of essential workplace benefits",
+        "badges": {
+          "parentalLeave": "Paid Parental Leave",
+          "flexHours": "Flexible Hours",
+          "wellness": "Wellness Programs"
+        },
+        "enterpriseTrendTitle": "Enterprise vs Startup Split"
+      },
+      "compensation": {
+        "avgAnnualSalary": "Average Annual Salary",
+        "sinceLastYear": "since last year",
+        "purchasePowerIndex": "Purchasing Power Index",
+        "relativeToNYC": "Relative to NYC (Base 100)",
+        "estimatedTakeHome": "Estimated Take-Home (Net)",
+        "afterEstimatedTaxes": "After estimated local taxes",
+        "detailedSalaryTitle": "Detailed Salary Distribution",
+        "cardDescription": "Comprehensive breakdown for {{career}} in {{country}}",
+        "keyObservation": "Key Observation",
+        "keyObservationDesc": "The median salary for {{career}} in {{country}} has shown consistent growth over the past 3 years."
+      }
+    },
     "nextExample": "Next Example"
+  },
+  "benchmarks": {
+    "marketDemand": "Market Demand",
+    "high": "High",
+    "topGrowth": "Top 10% Growth",
+    "talentSupply": "Talent Supply",
+    "moderate": "Moderate",
+    "balancedCompetition": "Balanced Competition",
+    "employability": "Employability",
+    "basedOnProfile": "Based on your current profile",
+    "loadingTrends": "Loading trends...",
+    "employmentRate": "Employment Rate",
+    "employabilityScore": "Employability Score",
+    "rising": "Rising",
+    "falling": "Falling",
+    "loadingData": "Loading data...",
+    "loadingWorkModes": "Loading work modes...",
+    "loadingSkills": "Loading skills...",
+    "loadingSalaryData": "Loading salary data...",
+    "loadingDemographics": "Loading demographics...",
+    "noDataAvailable": "No data available",
+    "minSalary": "Min Salary",
+    "averageSalary": "Average Salary",
+    "maxSalary": "Max Salary",
+    "costOfLivingIndex": "Cost of Living Index",
+    "rentIndex": "Rent Index",
+    "purchasingPower": "Purchasing Power",
+    "rentBurden": "Rent Burden",
+    "groceries": "Groceries",
+    "details": "Details",
+    "low": "Low",
+    "veryHigh": "Very High"
   },
   "home": {
     "title": "TimsCare",
@@ -477,6 +599,19 @@
       }
     },
     "transactions": {
+      "title": "Transactions",
+      "subtitle": "Monitor all system transactions and payments",
+      "searchPlaceholder": "Search transactions...",
+      "statusPlaceholder": "Status",
+      "status": {
+        "all": "All Status",
+        "completed": "Completed",
+        "pending": "Pending",
+        "failed": "Failed",
+        "refunded": "Refunded"
+      },
+      "exportReport": "Export Report",
+      "noTransactions": "No transactions found.",
       "table": {
         "id": "Transaction ID",
         "user": "User",
@@ -560,31 +695,19 @@
       "expiringContracts": "Expiring Contracts"
     },
     "careers": {
+      "title": "Careers",
+      "header": {
+        "title": "Career Manager"
+      },
+      "confirmDelete": "Are you sure you want to delete this career?",
+      "createTitle": "Create Career",
+      "editTitle": "Edit Career",
+      "form": {
+        "title": "Title (English)",
+        "shortDescription": "Short description (English)"
+      },
       "loading": "Loading...",
       "accessDenied": "Access denied"
-    },
-    "transactions": {
-      "title": "Transactions",
-      "subtitle": "Monitor all system transactions and payments",
-      "searchPlaceholder": "Search transactions...",
-      "statusPlaceholder": "Status",
-      "status": {
-        "all": "All Status",
-        "completed": "Completed",
-        "pending": "Pending",
-        "failed": "Failed",
-        "refunded": "Refunded"
-      },
-      "exportReport": "Export Report",
-      "noTransactions": "No transactions found.",
-      "table": {
-        "id": "Transaction ID",
-        "user": "User",
-        "date": "Date",
-        "method": "Method",
-        "status": "Status",
-        "amount": "Amount"
-      }
     },
     "courses": {
       "title": "Courses",
@@ -644,19 +767,6 @@
         "cancel": "Cancel"
       },
       "confirmDelete": "Are you sure you want to delete this course?"
-    },
-    "careers": {
-      "title": "Careers",
-      "header": {
-        "title": "Career Manager"
-      },
-      "confirmDelete": "Are you sure you want to delete this career?",
-      "createTitle": "Create Career",
-      "editTitle": "Edit Career",
-      "form": {
-        "title": "Title (English)",
-        "shortDescription": "Short description (English)"
-      }
     }
   },
   "subscribe": {
@@ -782,11 +892,6 @@
       "noPhoneNumbers": "No evaluators have phone numbers available for SMS invitations.",
       "smsComingSoon": "SMS functionality coming soon!"
     }
-  },
-  "language": {
-    "english": "English",
-    "spanish": "Spanish",
-    "switchLanguage": "Switch Language"
   },
   "testPCA": {
     "title": "PCA API Testing",
@@ -1157,5 +1262,30 @@
         }
       }
     }
+  },
+  "language": {
+    "english": "English",
+    "spanish": "Spanish",
+    "switchLanguage": "Switch language",
+    "selectLanguage": "Select language",
+    "menuOpen": "Language menu is open. Use arrow keys to navigate.",
+    "currentLanguage": "Current language is {{language}}"
+  },
+  "accessibility": {
+    "skipToContent": "Skip to main content",
+    "navigation": "Main navigation",
+    "breadcrumb": "Breadcrumb navigation",
+    "closeMenu": "Close menu",
+    "openMenu": "Open menu",
+    "loading": "Loading content",
+    "expandSection": "Expand section",
+    "collapseSection": "Collapse section",
+    "externalLink": "Opens in new tab",
+    "required": "Required field",
+    "optional": "Optional",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Information"
   }
 }

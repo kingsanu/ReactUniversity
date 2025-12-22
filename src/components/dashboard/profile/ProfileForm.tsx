@@ -111,20 +111,20 @@ export function ProfileForm() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                     <Label htmlFor="fullName">Full Name</Label>
-                    <Input id="fullName" {...register("fullName")} className="bg-white/50 dark:bg-gray-900/50" />
-                    {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName.message}</p>}
+                    <Input id="fullName" {...register("fullName")} className="bg-white/50 dark:bg-gray-900/50" aria-invalid={!!errors.fullName} />
+                    {errors.fullName && <p role="alert" className="text-red-500 text-xs mt-1">{errors.fullName.message}</p>}
                 </div>
                 
                 <div className="space-y-2">
                     <Label htmlFor="headline">Headline</Label>
-                    <Input id="headline" {...register("headline")} placeholder="e.g. Software Engineer" className="bg-white/50 dark:bg-gray-900/50" />
-                    {errors.headline && <p className="text-red-500 text-xs mt-1">{errors.headline.message}</p>}
+                    <Input id="headline" {...register("headline")} placeholder="e.g. Software Engineer" className="bg-white/50 dark:bg-gray-900/50" aria-invalid={!!errors.headline} />
+                    {errors.headline && <p role="alert" className="text-red-500 text-xs mt-1">{errors.headline.message}</p>}
                 </div>
 
                 <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" {...register("email")} className="bg-white/50 dark:bg-gray-900/50" />
-                    {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+                    <Input id="email" type="email" {...register("email")} className="bg-white/50 dark:bg-gray-900/50" aria-invalid={!!errors.email} />
+                    {errors.email && <p role="alert" className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
                 </div>
 
                 <div className="space-y-2">
@@ -139,8 +139,9 @@ export function ProfileForm() {
                     id="bio" 
                     {...register("bio")} 
                     className="min-h-[120px] bg-white/50 dark:bg-gray-900/50 resize-none" 
+                    aria-invalid={!!errors.bio}
                 />
-                <p className="text-xs text-gray-500 text-right">{watch("bio")?.length || 0}/500 characters</p>
+                <p className="text-xs text-gray-500 text-right" aria-live="polite">{watch("bio")?.length || 0}/500 characters</p>
                 </div>
             </CardContent>
         </Card>
@@ -154,24 +155,24 @@ export function ProfileForm() {
             <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                        <Label className="flex items-center gap-2"><FiLink /> Website / Portfolio</Label>
-                        <Input {...register("socialLinks.website")} placeholder="https://..." className="bg-white/50 dark:bg-gray-900/50" />
-                        {errors.socialLinks?.website && <p className="text-red-500 text-xs">{errors.socialLinks.website.message}</p>}
+                        <Label htmlFor="social-website" className="flex items-center gap-2"><FiLink aria-hidden="true" /> Website / Portfolio</Label>
+                        <Input id="social-website" {...register("socialLinks.website")} placeholder="https://..." className="bg-white/50 dark:bg-gray-900/50" />
+                        {errors.socialLinks?.website && <p role="alert" className="text-red-500 text-xs">{errors.socialLinks.website.message}</p>}
                     </div>
                     <div className="space-y-2">
-                        <Label className="flex items-center gap-2"><FiGithub /> GitHub</Label>
-                        <Input {...register("socialLinks.github")} placeholder="https://github.com/..." className="bg-white/50 dark:bg-gray-900/50" />
-                        {errors.socialLinks?.github && <p className="text-red-500 text-xs">{errors.socialLinks.github.message}</p>}
+                        <Label htmlFor="social-github" className="flex items-center gap-2"><FiGithub aria-hidden="true" /> GitHub</Label>
+                        <Input id="social-github" {...register("socialLinks.github")} placeholder="https://github.com/..." className="bg-white/50 dark:bg-gray-900/50" />
+                        {errors.socialLinks?.github && <p role="alert" className="text-red-500 text-xs">{errors.socialLinks.github.message}</p>}
                     </div>
                     <div className="space-y-2">
-                        <Label className="flex items-center gap-2"><FiTwitter /> Twitter / X</Label>
-                        <Input {...register("socialLinks.twitter")} placeholder="https://twitter.com/..." className="bg-white/50 dark:bg-gray-900/50" />
-                        {errors.socialLinks?.twitter && <p className="text-red-500 text-xs">{errors.socialLinks.twitter.message}</p>}
+                        <Label htmlFor="social-twitter" className="flex items-center gap-2"><FiTwitter aria-hidden="true" /> Twitter / X</Label>
+                        <Input id="social-twitter" {...register("socialLinks.twitter")} placeholder="https://twitter.com/..." className="bg-white/50 dark:bg-gray-900/50" />
+                        {errors.socialLinks?.twitter && <p role="alert" className="text-red-500 text-xs">{errors.socialLinks.twitter.message}</p>}
                     </div>
                     <div className="space-y-2">
-                        <Label className="flex items-center gap-2"><FiLinkedin /> LinkedIn</Label>
-                        <Input {...register("socialLinks.linkedin")} placeholder="https://linkedin.com/in/..." className="bg-white/50 dark:bg-gray-900/50" />
-                        {errors.socialLinks?.linkedin && <p className="text-red-500 text-xs">{errors.socialLinks.linkedin.message}</p>}
+                        <Label htmlFor="social-linkedin" className="flex items-center gap-2"><FiLinkedin aria-hidden="true" /> LinkedIn</Label>
+                        <Input id="social-linkedin" {...register("socialLinks.linkedin")} placeholder="https://linkedin.com/in/..." className="bg-white/50 dark:bg-gray-900/50" />
+                        {errors.socialLinks?.linkedin && <p role="alert" className="text-red-500 text-xs">{errors.socialLinks.linkedin.message}</p>}
                     </div>
                 </div>
             </CardContent>
@@ -183,7 +184,7 @@ export function ProfileForm() {
             {/* Skills Tags */}
             <Card className="border-none shadow-sm bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm h-full">
                 <CardHeader>
-                    <CardTitle className="text-xl">Skills & Technologies</CardTitle>
+                    <CardTitle className="text-xl" id="skills-title">Skills & Technologies</CardTitle>
                     <CardDescription>Press Enter to add a skill.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -193,12 +194,14 @@ export function ProfileForm() {
                         onKeyDown={handleAddSkill}
                         placeholder="Type a skill and press Enter..."
                         className="bg-white/50 dark:bg-gray-900/50"
+                        aria-labelledby="skills-title"
+                        aria-label="Add a new skill"
                     />
-                    <div className="flex flex-wrap gap-2 min-h-[100px] content-start">
+                    <div className="flex flex-wrap gap-2 min-h-[100px] content-start" role="list" aria-label="Skills list">
                         {currentSkills.map((skill) => (
-                            <Badge key={skill} variant="secondary" className="px-3 py-1 text-sm bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300">
+                            <Badge key={skill} variant="secondary" className="px-3 py-1 text-sm bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300" role="listitem">
                                 {skill}
-                                <button type="button" onClick={() => removeSkill(skill)} className="ml-2 hover:text-red-500">×</button>
+                                <button type="button" onClick={() => removeSkill(skill)} className="ml-2 hover:text-red-500" aria-label={`Remove skill ${skill}`}>×</button>
                             </Badge>
                         ))}
                         {currentSkills.length === 0 && <span className="text-sm text-gray-400 italic">No skills added yet.</span>}
@@ -214,7 +217,7 @@ export function ProfileForm() {
                         <CardDescription>Rate your proficiency (0-100).</CardDescription>
                     </div>
                     <Button type="button" variant="outline" size="sm" onClick={() => appendCompetency({ label: "New Skill", level: 50 })}>
-                        <FiPlus className="mr-2" /> Add
+                        <FiPlus className="mr-2" aria-hidden="true" /> Add
                     </Button>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -224,9 +227,11 @@ export function ProfileForm() {
                                 <Input 
                                     {...register(`competencies.${index}.label`)} 
                                     className="h-8 border-none bg-transparent font-medium p-0 focus-visible:ring-0" 
+                                    aria-label={`Competency name for item ${index + 1}`}
+                                    placeholder="Skill Name"
                                 />
-                                <button type="button" onClick={() => removeCompetency(index)} className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <FiTrash2 size={16} />
+                                <button type="button" onClick={() => removeCompetency(index)} className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" aria-label={`Remove competency ${index + 1}`}>
+                                    <FiTrash2 size={16} aria-hidden="true" />
                                 </button>
                             </div>
                             <div className="flex items-center gap-4">
@@ -236,8 +241,9 @@ export function ProfileForm() {
                                     step={1} 
                                     className="flex-1"
                                     onValueChange={(vals) => setValue(`competencies.${index}.level`, vals[0])}
+                                    aria-label={`Proficiency level for ${watch(`competencies.${index}.label`) || "competency"}`}
                                 />
-                                <span className="text-sm font-bold w-12 text-right">{watch(`competencies.${index}.level`)}%</span>
+                                <span className="text-sm font-bold w-12 text-right" aria-hidden="true">{watch(`competencies.${index}.level`)}%</span>
                             </div>
                         </div>
                     ))}
@@ -253,7 +259,7 @@ export function ProfileForm() {
                 "Saving Changes..."
             ) : (
                 <>
-                    <FiSave className="mr-2" /> Save Profile Changes
+                    <FiSave className="mr-2" aria-hidden="true" /> Save Profile Changes
                 </>
             )}
             </Button>

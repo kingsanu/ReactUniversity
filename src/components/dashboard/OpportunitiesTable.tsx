@@ -34,9 +34,9 @@ export function OpportunitiesTable() {
     >
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-semibold text-gray-900">Opportunities for you</h3>
-        <button className="text-sm text-gray-500 flex items-center space-x-2">
+        <button className="text-sm text-gray-500 flex items-center space-x-2" aria-label="Filter opportunities">
           <span>Filter</span>
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
           </svg>
         </button>
@@ -46,12 +46,12 @@ export function OpportunitiesTable() {
         <table className="w-full">
           <thead>
             <tr className="text-left text-sm text-gray-500 border-b">
-              <th className="pb-3">No.</th>
-              <th className="pb-3">Cat no.</th>
-              <th className="pb-3">Driver</th>
-              <th className="pb-3">Status</th>
-              <th className="pb-3">Rating</th>
-              <th className="pb-3"></th>
+              <th className="pb-3" scope="col">No.</th>
+              <th className="pb-3" scope="col">Cat no.</th>
+              <th className="pb-3" scope="col">Driver</th>
+              <th className="pb-3" scope="col">Status</th>
+              <th className="pb-3" scope="col">Rating</th>
+              <th className="pb-3" scope="col"><span className="sr-only">Actions</span></th>
             </tr>
           </thead>
           <tbody className="space-y-4">
@@ -67,7 +67,7 @@ export function OpportunitiesTable() {
                 <td className="py-4 text-sm text-gray-700">{opportunity.catNo}</td>
                 <td className="py-4">
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+                    <div className="w-8 h-8 bg-gray-200 rounded-full" aria-hidden="true"></div>
                     <span className="text-sm text-gray-700">{opportunity.role}</span>
                   </div>
                 </td>
@@ -76,9 +76,9 @@ export function OpportunitiesTable() {
                     {opportunity.status}
                   </span>
                 </td>
-                <td className="py-4 text-sm text-gray-500">★★★★★</td>
+                <td className="py-4 text-sm text-gray-500" aria-label="5 out of 5 stars">★★★★★</td>
                 <td className="py-4">
-                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700" aria-label={`Apply for ${opportunity.role}`}>
                     Apply
                   </Button>
                 </td>

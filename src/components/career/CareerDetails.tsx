@@ -97,8 +97,9 @@ export default function CareerDetails() {
           <button
             onClick={() => router.back()}
             className="flex items-center text-gray-500 hover:text-indigo-600 transition-colors mb-4 text-sm font-medium"
+            aria-label={t("common.back", "Back to Careers")}
           >
-            <ArrowLeft className="w-4 h-4 mr-1" />
+            <ArrowLeft className="w-4 h-4 mr-1" aria-hidden="true" />
             {t("common.back", "Back to Careers")}
           </button>
 
@@ -115,12 +116,12 @@ export default function CareerDetails() {
                 <div className="flex flex-wrap items-center gap-3 mt-3">
                   {career.remoteEligible && (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      <Globe className="w-3 h-3 mr-1" />
+                      <Globe className="w-3 h-3 mr-1" aria-hidden="true" />
                       Remote Eligible
                     </span>
                   )}
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    <Building2 className="w-3 h-3 mr-1" />
+                    <Building2 className="w-3 h-3 mr-1" aria-hidden="true" />
                     {(career.industries || [])[0] || "General"}
                   </span>
                 </div>
@@ -145,6 +146,7 @@ export default function CareerDetails() {
                         fill="transparent"
                         stroke="#e5e7eb"
                         strokeWidth="3"
+                        role="presentation"
                       />
                       <circle
                         cx="16"
@@ -158,6 +160,7 @@ export default function CareerDetails() {
                           2 * Math.PI * 14 * (1 - matchScore / 100)
                         }`}
                         strokeLinecap="round"
+                        role="presentation"
                       />
                     </svg>
                   </div>
@@ -179,10 +182,10 @@ export default function CareerDetails() {
           {/* Left Column: Main Info */}
           <div className="lg:col-span-2 space-y-8">
             {/* About Section */}
-            <section className="bg-white rounded-xl border border-gray-200 p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                <BookOpen className="w-5 h-5 mr-2 text-indigo-500" />
-                About this Role
+            <section className="bg-white rounded-xl border border-gray-200 p-6" aria-labelledby="about-role-heading">
+              <h2 id="about-role-heading" className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                <BookOpen className="w-5 h-5 mr-2 text-indigo-500" aria-hidden="true" />
+                {t("career.details.about", "About this Role")}
               </h2>
               <p className="text-gray-600 leading-relaxed whitespace-pre-line">
                 {longDesc}
@@ -191,15 +194,15 @@ export default function CareerDetails() {
 
             {/* Responsibilities */}
             {career.responsibilities && career.responsibilities.length > 0 && (
-              <section className="bg-white rounded-xl border border-gray-200 p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                  <Target className="w-5 h-5 mr-2 text-indigo-500" />
-                  Key Responsibilities
+              <section className="bg-white rounded-xl border border-gray-200 p-6" aria-labelledby="responsibilities-heading">
+                <h2 id="responsibilities-heading" className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                  <Target className="w-5 h-5 mr-2 text-indigo-500" aria-hidden="true" />
+                  {t("career.details.responsibilities", "Key Responsibilities")}
                 </h2>
                 <ul className="space-y-3">
                   {career.responsibilities.map((resp, idx) => (
                     <li key={idx} className="flex items-start">
-                      <CheckCircle2 className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
+                      <CheckCircle2 className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" aria-hidden="true" />
                       <span className="text-gray-700">
                         {resp[language === "spanish" ? "es" : "en"] || resp.en}
                       </span>
@@ -213,8 +216,8 @@ export default function CareerDetails() {
             {career.skills && career.skills.length > 0 && (
               <section className="bg-white rounded-xl border border-gray-200 p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                  <Zap className="w-5 h-5 mr-2 text-indigo-500" />
-                  Required Skills
+                  <Zap className="w-5 h-5 mr-2 text-indigo-500" aria-hidden="true" />
+                  {t("career.details.requiredSkills", "Required Skills")}
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {career.skills.map((skill) => (
@@ -236,7 +239,7 @@ export default function CareerDetails() {
                             : "bg-gray-200 text-gray-700"
                         }`}
                       >
-                        {skill.levelRequired}
+                        {t(`career.level.${skill.levelRequired}`, skill.levelRequired || "Not specified")}
                       </span>
                     </div>
                   ))}
@@ -250,10 +253,10 @@ export default function CareerDetails() {
             {/* Salary Card */}
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
-                Compensation
+                {t("career.details.compensation", "Compensation")}
               </h3>
               <div className="flex items-center mb-2">
-                <DollarSign className="w-8 h-8 text-green-600 mr-3" />
+                <DollarSign className="w-8 h-8 text-green-600 mr-3" aria-hidden="true" />
                 <div>
                   <div className="text-2xl font-bold text-gray-900">
                     {formatCurrency(
@@ -262,45 +265,45 @@ export default function CareerDetails() {
                     )}
                   </div>
                   <div className="text-xs text-gray-500">
-                    Median Annual Salary
+                    {t("career.details.medianSalary", "Median Annual Salary")}
                   </div>
                 </div>
               </div>
               <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between text-sm text-gray-600">
-                <span>Min: {formatCurrency(career.salaryRange?.min)}</span>
-                <span>Max: {formatCurrency(career.salaryRange?.max)}</span>
+                <span>{t("common.min", "Min")}: {formatCurrency(career.salaryRange?.min)}</span>
+                <span>{t("common.max", "Max")}: {formatCurrency(career.salaryRange?.max)}</span>
               </div>
             </div>
 
             {/* Demand Card */}
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
-                Market Demand
+                {t("career.details.marketDemand", "Market Demand")}
               </h3>
               <div className="flex items-center mb-4">
-                <TrendingUp className="w-8 h-8 text-blue-600 mr-3" />
+                <TrendingUp className="w-8 h-8 text-blue-600 mr-3" aria-hidden="true" />
                 <div>
                   <div className="text-2xl font-bold text-gray-900">
                     {career.demandStats?.growthPercent
                       ? `+${(career.demandStats.growthPercent * 100).toFixed(
                           1
                         )}%`
-                      : "Stable"}
+                      : t("career.stable", "Stable")}
                   </div>
-                  <div className="text-xs text-gray-500">Annual Growth</div>
+                  <div className="text-xs text-gray-500">{t("career.details.annualGrowth", "Annual Growth")}</div>
                 </div>
               </div>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Open Jobs</span>
+                  <span className="text-gray-600">{t("career.details.openJobs", "Open Jobs")}</span>
                   <span className="font-medium">
-                    {career.demandStats?.jobCount?.toLocaleString()}
+                    {career.demandStats?.jobCount?.toLocaleString(language === "spanish" ? "es-ES" : "en-US")}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">New (30d)</span>
+                  <span className="text-gray-600">{t("career.details.newJobs", "New (30d)")}</span>
                   <span className="font-medium text-green-600">
-                    +{career.demandStats?.postedLast30Days?.toLocaleString()}
+                    +{career.demandStats?.postedLast30Days?.toLocaleString(language === "spanish" ? "es-ES" : "en-US")}
                   </span>
                 </div>
               </div>
@@ -309,26 +312,26 @@ export default function CareerDetails() {
             {/* Education & Meta */}
             <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
               <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                Requirements
+                {t("career.details.requirements", "Requirements")}
               </h3>
 
               <div className="flex items-start">
-                <Award className="w-5 h-5 text-gray-400 mr-3 mt-0.5" />
+                <Award className="w-5 h-5 text-gray-400 mr-3 mt-0.5" aria-hidden="true" />
                 <div>
                   <span className="block text-sm font-medium text-gray-900">
-                    Education Level
+                    {t("career.details.educationLevel", "Education Level")}
                   </span>
                   <span className="block text-sm text-gray-500 capitalize">
-                    {career.educationLevel || "Not specified"}
+                    {t(`career.education.${career.educationLevel}`, career.educationLevel || "Not specified")}
                   </span>
                 </div>
               </div>
 
               <div className="flex items-start">
-                <MapPin className="w-5 h-5 text-gray-400 mr-3 mt-0.5" />
+                <MapPin className="w-5 h-5 text-gray-400 mr-3 mt-0.5" aria-hidden="true" />
                 <div>
                   <span className="block text-sm font-medium text-gray-900">
-                    Locations
+                    {t("career.details.locations", "Locations")}
                   </span>
                   <div className="flex flex-wrap gap-1 mt-1">
                     {career.locationSupport?.map((loc) => (

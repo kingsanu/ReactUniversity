@@ -282,7 +282,10 @@ export function BookingModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[1000px] w-full p-0 overflow-hidden gap-0 bg-white text-gray-900 border-gray-200 shadow-2xl rounded-xl">
+      <DialogContent 
+        className="sm:max-w-[1000px] w-full p-0 overflow-hidden gap-0 bg-white text-gray-900 border-gray-200 shadow-2xl rounded-xl"
+        aria-describedby={undefined}
+      >
         <div className="flex flex-col md:flex-row min-h-[550px]">
           {/* Column 1: Coach Info (Sidebar) */}
           <div className="w-full md:w-[280px] p-6 border-r border-gray-100 flex flex-col bg-white">
@@ -318,7 +321,7 @@ export function BookingModal({
 
               <div className="space-y-4 text-gray-600 text-sm">
                 <div className="flex items-center">
-                  <Clock className="h-4 w-4 mr-3 text-gray-400" />
+                  <Clock className="h-4 w-4 mr-3 text-gray-400" aria-hidden="true" />
                   <span className="font-medium">
                     {slotsData?.sessionDurationMinutes
                       ? `${slotsData.sessionDurationMinutes} min`
@@ -326,11 +329,11 @@ export function BookingModal({
                   </span>
                 </div>
                 <div className="flex items-center">
-                  <Video className="h-4 w-4 mr-3 text-gray-400" />
+                  <Video className="h-4 w-4 mr-3 text-gray-400" aria-hidden="true" />
                   <span className="font-medium">Google Meet</span>
                 </div>
                 <div className="flex items-center">
-                  <Globe className="h-4 w-4 mr-3 text-gray-400" />
+                  <Globe className="h-4 w-4 mr-3 text-gray-400" aria-hidden="true" />
                   <span className="font-medium">Asia/Kolkata</span>
                 </div>
               </div>
@@ -358,10 +361,11 @@ export function BookingModal({
                         newMonth.setMonth(newMonth.getMonth() - 1);
                         setCurrentMonth(newMonth);
                       }}
+                      aria-label="Previous month"
                     >
-                      <ChevronLeft className="h-4 w-4" />
+                      <ChevronLeft className="h-4 w-4" aria-hidden="true" />
                     </Button>
-                    <span className="text-base font-semibold text-gray-900">
+                    <span className="text-base font-semibold text-gray-900" id="calendar-month-label">
                       {format(currentMonth, "MMMM yyyy")}
                     </span>
                     <Button
@@ -373,8 +377,9 @@ export function BookingModal({
                         newMonth.setMonth(newMonth.getMonth() + 1);
                         setCurrentMonth(newMonth);
                       }}
+                      aria-label="Next month"
                     >
-                      <ChevronRight className="h-4 w-4" />
+                      <ChevronRight className="h-4 w-4" aria-hidden="true" />
                     </Button>
                   </div>
 
@@ -428,7 +433,7 @@ export function BookingModal({
                   {/* Coach Timezone Info */}
                   <div className="mt-4 pt-4 border-t border-gray-100 text-sm text-gray-500 flex flex-col gap-2">
                     <div className="flex items-center gap-2">
-                      <Globe className="h-4 w-4" />
+                      <Globe className="h-4 w-4" aria-hidden="true" />
                       <span>
                         Times shown in {slotsData?.timezone || timezone}
                       </span>
@@ -449,8 +454,8 @@ export function BookingModal({
                       {date ? format(date, "EEEE, MMM d") : "Select a date"}
                     </h4>
                     {isLoadingSlots ? (
-                      <div className="flex items-center text-sm text-gray-500 mt-1">
-                        <Loader2 className="h-3 w-3 animate-spin mr-2" />
+                      <div className="flex items-center text-sm text-gray-500 mt-1" role="status">
+                        <Loader2 className="h-3 w-3 animate-spin mr-2" aria-hidden="true" />
                         Checking availability...
                       </div>
                     ) : (
@@ -470,8 +475,8 @@ export function BookingModal({
                         <p>Select a date to see available times</p>
                       </div>
                     ) : isLoadingSlots ? (
-                      <div className="flex flex-col items-center justify-center h-full text-gray-400 text-sm">
-                        <Loader2 className="h-8 w-8 animate-spin text-blue-600 mb-3" />
+                      <div className="flex flex-col items-center justify-center h-full text-gray-400 text-sm" role="status">
+                        <Loader2 className="h-8 w-8 animate-spin text-blue-600 mb-3" aria-hidden="true" />
                         <p>Loading slots...</p>
                       </div>
                     ) : availableTimeSlots.length === 0 ? (
@@ -611,7 +616,7 @@ export function BookingModal({
                     >
                       {isBooking ? (
                         <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
                           Processing...
                         </>
                       ) : mode === "reschedule" ? (

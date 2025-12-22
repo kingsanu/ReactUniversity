@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { CoachOnboardingData } from "./types";
 import { Check, Calendar, Mail, ArrowRight, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface CalendarSyncStepProps {
   data: CoachOnboardingData["calendarIntegrations"];
@@ -17,6 +18,7 @@ export function CalendarSyncStep({
   onNext,
   onBack,
 }: CalendarSyncStepProps) {
+  const { t } = useTranslation();
   const [integrations, setIntegrations] = React.useState(data);
 
   const handleConnect = async (provider: "google" | "outlook") => {
@@ -74,7 +76,7 @@ export function CalendarSyncStep({
             url
           );
           alert(
-            `Calendar integration is not available yet. The API returned: ${url}`
+            t("onboarding.calendar.apiError", { url, defaultValue: `Calendar integration is not available yet. The API returned: ${url}` })
           );
           return;
         }
@@ -93,7 +95,7 @@ export function CalendarSyncStep({
         url.includes("login.microsoftonline.com");
       if (!isOAuthUrl) {
         console.warn(`URL doesn't appear to be an OAuth URL:`, url);
-        alert(`Unexpected redirect URL received. Please contact support.`);
+        alert(t("onboarding.calendar.unexpectedUrl", "Unexpected redirect URL received. Please contact support."));
         return;
       }
 
@@ -102,7 +104,7 @@ export function CalendarSyncStep({
     } catch (error) {
       console.error(`Failed to get ${provider} auth URL:`, error);
       const message = (error && (error as any).message) || String(error);
-      alert(`Failed to connect calendar: ${message}`);
+      alert(t("onboarding.calendar.connectFailed", { message, defaultValue: `Failed to connect calendar: ${message}` }));
       // Fallback for demo/testing if API fails or is not implemented
       setIntegrations((prev) => ({
         ...prev,
@@ -118,17 +120,15 @@ export function CalendarSyncStep({
   return (
     <div className="space-y-8">
       <div className="bg-green-50/50 p-6 rounded-xl border border-green-100 flex items-start gap-4">
-        <div className="p-2 bg-green-100 rounded-lg text-green-600">
+        <div className="p-2 bg-green-100 rounded-lg text-green-600" aria-hidden="true">
           <ShieldCheck className="h-5 w-5" />
         </div>
         <div>
           <h3 className="text-green-900 font-semibold">
-            Why connect your calendar?
+            {t("onboarding.calendar.whyConnect", "Why connect your calendar?")}
           </h3>
           <p className="text-sm text-green-700/80 mt-1">
-            We'll automatically check for conflicts so you never get
-            double-booked. We only access your free/busy status, not your event
-            details.
+            {t("onboarding.calendar.whyConnectDesc", "We'll automatically check for conflicts so you never get double-booked. We only access your free/busy status, not your event details.")}
           </p>
         </div>
       </div>
@@ -146,14 +146,14 @@ export function CalendarSyncStep({
           <div className="flex items-center gap-5">
             <div className="h-12 w-12 bg-white rounded-xl flex items-center justify-center shadow-sm border border-gray-100 shrink-0">
               {/* Google Icon Placeholder */}
-              <span className="font-bold text-blue-600 text-xl">G</span>
+              <span className="font-bold text-blue-600 text-xl" aria-hidden="true">G</span>
             </div>
             <div>
               <h4 className="font-bold text-gray-900 text-lg">
-                Google Calendar
+                {t("onboarding.calendar.google", "Google Calendar")}
               </h4>
               <p className="text-sm text-gray-500">
-                Connect your Gmail or G Suite calendar
+                {t("onboarding.calendar.googleDesc", "Connect your Gmail or G Suite calendar")}
               </p>
             </div>
           </div>
@@ -167,13 +167,14 @@ export function CalendarSyncStep({
                 ? "border-blue-200 text-blue-700 hover:bg-blue-100 hover:text-blue-800 bg-blue-50"
                 : "bg-black text-white hover:bg-gray-800"
             )}
+            aria-label={integrations.google ? t("onboarding.calendar.googleConnected", "Google Calendar Connected") : t("onboarding.calendar.connectGoogle", "Connect Google Calendar")}
           >
             {integrations.google ? (
               <>
-                <Check className="h-4 w-4 mr-2" /> Connected
+                <Check className="h-4 w-4 mr-2" aria-hidden="true" /> {t("onboarding.calendar.connected", "Connected")}
               </>
             ) : (
-              "Connect"
+              t("onboarding.calendar.connect", "Connect")
             )}
           </Button>
         </div>
@@ -189,14 +190,14 @@ export function CalendarSyncStep({
         >
           <div className="flex items-center gap-5">
             <div className="h-12 w-12 bg-white rounded-xl flex items-center justify-center shadow-sm border border-gray-100 shrink-0">
-              <Mail className="h-6 w-6 text-blue-500" />
+              <Mail className="h-6 w-6 text-blue-500" aria-hidden="true" />
             </div>
             <div>
               <h4 className="font-bold text-gray-900 text-lg">
-                Outlook Calendar
+                {t("onboarding.calendar.outlook", "Outlook Calendar")}
               </h4>
               <p className="text-sm text-gray-500">
-                Connect Office 365 or Exchange
+                {t("onboarding.calendar.outlookDesc", "Connect Office 365 or Exchange")}
               </p>
             </div>
           </div>
@@ -210,13 +211,14 @@ export function CalendarSyncStep({
                 ? "border-blue-200 text-blue-700 hover:bg-blue-100 hover:text-blue-800 bg-blue-50"
                 : "bg-black text-white hover:bg-gray-800"
             )}
+            aria-label={integrations.outlook ? t("onboarding.calendar.outlookConnected", "Outlook Calendar Connected") : t("onboarding.calendar.connectOutlook", "Connect Outlook Calendar")}
           >
             {integrations.outlook ? (
               <>
-                <Check className="h-4 w-4 mr-2" /> Connected
+                <Check className="h-4 w-4 mr-2" aria-hidden="true" /> {t("onboarding.calendar.connected", "Connected")}
               </>
             ) : (
-              "Connect"
+              t("onboarding.calendar.connect", "Connect")
             )}
           </Button>
         </div>
@@ -228,13 +230,13 @@ export function CalendarSyncStep({
           onClick={onBack}
           className="text-gray-500 hover:text-gray-900"
         >
-          Back
+          {t("common.back", "Back")}
         </Button>
         <Button
           onClick={handleSubmit}
           className="bg-black text-white hover:bg-gray-800 px-8 h-12 text-base shadow-lg shadow-black/10 hover:shadow-xl hover:-translate-y-0.5 transition-all"
         >
-          Complete Setup <ArrowRight className="ml-2 h-4 w-4" />
+          {t("onboarding.calendar.completeSetup", "Complete Setup")} <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
         </Button>
       </div>
     </div>

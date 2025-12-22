@@ -26,6 +26,8 @@ import {
 import { cn } from "@/lib/utils";
 import { useGlobalStore } from "@/store/useGlobalStore";
 
+import { useTranslation } from "react-i18next";
+
 export function UniversityDetailsModal({
   university,
   isOpen,
@@ -35,10 +37,8 @@ export function UniversityDetailsModal({
   matchReasons,
   recommendedPrograms,
 }: UniversityDetailsModalProps) {
-  const { language } = useGlobalStore();
+  const { t } = useTranslation();
   if (!university) return null;
-
-  const t = (en: string, es: string) => (language === "spanish" ? es : en);
 
   const tuition =
     university.tuition.international ??
@@ -48,7 +48,10 @@ export function UniversityDetailsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl p-0 overflow-hidden gap-0 border-none shadow-2xl">
+      <DialogContent 
+        className="max-w-5xl p-0 overflow-hidden gap-0 border-none shadow-2xl"
+        aria-describedby={undefined}
+      >
         {/* Header Section */}
         <div className="relative h-64 w-full bg-slate-900">
           {university.coverImage ? (
@@ -84,12 +87,12 @@ export function UniversityDetailsModal({
                   </h2>
                   <div className="flex items-center gap-4 text-slate-200">
                     <div className="flex items-center gap-1.5">
-                      <MapPin className="h-4 w-4 text-blue-400" />
+                      <MapPin className="h-4 w-4 text-blue-400" aria-hidden="true" />
                       <span className="font-medium">{university.city}, {university.country}</span>
                     </div>
-                    <div className="w-1 h-1 rounded-full bg-slate-500" />
+                    <div className="w-1 h-1 rounded-full bg-slate-500" aria-hidden="true" />
                     <div className="flex items-center gap-1.5">
-                      <Building2 className="h-4 w-4 text-blue-400" />
+                      <Building2 className="h-4 w-4 text-blue-400" aria-hidden="true" />
                       <span className="font-medium">{university.type}</span>
                     </div>
                   </div>
@@ -98,11 +101,11 @@ export function UniversityDetailsModal({
 
               {typeof matchScore === "number" && (
                 <div className="flex flex-col items-end mb-2">
-                  <div className="flex items-center gap-2 bg-emerald-500/20 backdrop-blur-md border border-emerald-500/30 px-4 py-2 rounded-xl">
-                    <TrendingUp className="h-5 w-5 text-emerald-400" />
-                    <span className="text-3xl font-bold text-emerald-400">{matchScore}%</span>
-                    <span className="text-xs font-medium text-emerald-200 uppercase tracking-wide ml-1">
-                      {t("Match", "Coincidencia")}
+                  <div className="flex items-center gap-2 bg-emerald-500/20 backdrop-blur-md border border-emerald-500/30 px-4 py-2 rounded-xl" role="status" aria-label={`${t("university.matchScore", "Match score")}: ${matchScore}%`}>
+                    <TrendingUp className="h-5 w-5 text-emerald-400" aria-hidden="true" />
+                    <span className="text-3xl font-bold text-emerald-400" aria-hidden="true">{matchScore}%</span>
+                    <span className="text-xs font-medium text-emerald-200 uppercase tracking-wide ml-1" aria-hidden="true">
+                      {t("university.match", "Match")}
                     </span>
                   </div>
                 </div>
@@ -118,8 +121,8 @@ export function UniversityDetailsModal({
             {/* Description */}
             <div>
               <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
-                <Building2 className="h-5 w-5 text-blue-600" />
-                {t("About", "Sobre la universidad")}
+                <Building2 className="h-5 w-5 text-blue-600" aria-hidden="true" />
+                {t("university.about", "About")}
               </h3>
               <p className="text-gray-600 leading-relaxed text-base">
                 {university.description}
@@ -130,13 +133,13 @@ export function UniversityDetailsModal({
             {matchReasons && matchReasons.length > 0 && (
               <div className="bg-emerald-50/50 rounded-2xl p-6 border border-emerald-100">
                 <h3 className="text-lg font-bold text-emerald-900 mb-4 flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                  {t("Why it's a great fit", "Por qué es una gran opción")}
+                  <CheckCircle2 className="h-5 w-5 text-emerald-600" aria-hidden="true" />
+                  {t("university.whyFit", "Why it's a great fit")}
                 </h3>
                 <div className="grid sm:grid-cols-2 gap-4">
                   {matchReasons.map((r, idx) => (
                     <div key={idx} className="flex items-start gap-3">
-                      <div className="mt-1.5 h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
+                      <div className="mt-1.5 h-2 w-2 rounded-full bg-emerald-500 shrink-0" aria-hidden="true" />
                       <span className="text-sm text-emerald-900 font-medium">{r}</span>
                     </div>
                   ))}
@@ -148,8 +151,8 @@ export function UniversityDetailsModal({
             {recommendedPrograms && recommendedPrograms.length > 0 && (
               <div>
                 <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <GraduationCap className="h-5 w-5 text-blue-600" />
-                  {t("Recommended Programs", "Programas Recomendados")}
+                  <GraduationCap className="h-5 w-5 text-blue-600" aria-hidden="true" />
+                  {t("university.recommendedPrograms", "Recommended Programs")}
                 </h3>
                 <div className="grid gap-3">
                   {recommendedPrograms.map((p) => (
@@ -166,12 +169,12 @@ export function UniversityDetailsModal({
                             {p.degree}
                           </span>
                           <span>{p.field}</span>
-                          {p.duration && <span>• {p.duration} {t("years", "años")}</span>}
+                          {p.duration && <span>• {p.duration} {t("university.years", "years")}</span>}
                         </div>
                       </div>
                       <div className="text-right">
                         <div className="text-sm font-bold text-emerald-600">
-                          {p.matchScore.toFixed(0)}% {t("Match", "Ajuste")}
+                          {p.matchScore.toFixed(0)}% {t("university.match", "Match")}
                         </div>
                       </div>
                     </div>
@@ -186,20 +189,20 @@ export function UniversityDetailsModal({
             {/* Quick Stats */}
             <div className="space-y-4">
               <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-                {t("Key Statistics", "Estadísticas Clave")}
+                {t("university.keyStats", "Key Statistics")}
               </h4>
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
-                  <div className="text-xs text-gray-500 mb-1">{t("Global Rank", "Ranking Global")}</div>
+                  <div className="text-xs text-gray-500 mb-1">{t("university.globalRank", "Global Rank")}</div>
                   <div className="text-lg font-bold text-gray-900 flex items-center gap-1">
-                    <Award className="h-4 w-4 text-amber-500" />
+                    <Award className="h-4 w-4 text-amber-500" aria-hidden="true" />
                     #{university.ranking.global || "-"}
                   </div>
                 </div>
                 <div className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
-                  <div className="text-xs text-gray-500 mb-1">{t("Acceptance", "Aceptación")}</div>
+                  <div className="text-xs text-gray-500 mb-1">{t("university.acceptance", "Acceptance")}</div>
                   <div className="text-lg font-bold text-gray-900 flex items-center gap-1">
-                    <Users className="h-4 w-4 text-blue-500" />
+                    <Users className="h-4 w-4 text-blue-500" aria-hidden="true" />
                     {university.acceptanceRate}%
                   </div>
                 </div>
@@ -207,8 +210,8 @@ export function UniversityDetailsModal({
 
               <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
                 <div className="flex items-center gap-2 mb-2">
-                  <DollarSign className="h-4 w-4 text-green-600" />
-                  <span className="text-sm font-bold text-gray-900">{t("Tuition", "Matrícula")}</span>
+                  <DollarSign className="h-4 w-4 text-green-600" aria-hidden="true" />
+                  <span className="text-sm font-bold text-gray-900">{t("university.tuition", "Tuition")}</span>
                 </div>
                 <div className="text-2xl font-bold text-gray-900">
                   ${(tuition).toLocaleString()}
@@ -217,7 +220,7 @@ export function UniversityDetailsModal({
                   </span>
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
-                  {t("Estimated per year", "Estimado por año")}
+                  {t("university.estimatedPerYear", "Estimated per year")}
                 </p>
               </div>
             </div>
@@ -226,12 +229,12 @@ export function UniversityDetailsModal({
             {university.highlights && university.highlights.length > 0 && (
               <div className="space-y-3">
                 <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-                  {t("Highlights", "Destacados")}
+                  {t("university.highlights", "Highlights")}
                 </h4>
                 <ul className="space-y-2">
                   {university.highlights.map((h, idx) => (
                     <li key={idx} className="flex items-start gap-2 text-sm text-gray-600">
-                      <CheckCircle2 className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" />
+                      <CheckCircle2 className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" aria-hidden="true" />
                       <span>{h}</span>
                     </li>
                   ))}
@@ -243,15 +246,15 @@ export function UniversityDetailsModal({
             <div className="space-y-3 pt-4 border-t border-gray-200">
               <Button className="w-full justify-between" asChild>
                 <a href={university.website} target="_blank" rel="noreferrer">
-                  {t("Visit Website", "Visitar Sitio Web")}
-                  <ExternalLink className="h-4 w-4" />
+                  {t("university.visitWebsite", "Visit Website")}
+                  <ExternalLink className="h-4 w-4" aria-hidden="true" />
                 </a>
               </Button>
               {university.admissionsUrl && (
                 <Button variant="outline" className="w-full justify-between" asChild>
                   <a href={university.admissionsUrl} target="_blank" rel="noreferrer">
-                    {t("Admissions", "Admisiones")}
-                    <ExternalLink className="h-4 w-4" />
+                    {t("university.admissions", "Admissions")}
+                    <ExternalLink className="h-4 w-4" aria-hidden="true" />
                   </a>
                 </Button>
               )}

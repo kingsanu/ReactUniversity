@@ -20,7 +20,7 @@ export function StatCard({ title, subtitle, icon, buttonText, variant = 'primary
           <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
           <p className="text-sm text-gray-500">{subtitle}</p>
         </div>
-        <div className="text-2xl">{icon}</div>
+        <div className="text-2xl" aria-hidden="true">{icon}</div>
       </div>
       <button 
         className={`w-full py-2 px-4 rounded text-sm font-medium transition ${

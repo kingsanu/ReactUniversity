@@ -2,8 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Sidebar } from "../_components/Sidebar";
-import { TopNav } from "../_components/TopNav";
 import {
   Plus,
   MoreVertical,
@@ -241,18 +239,8 @@ export default function MyResumesPage() {
   );
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      {/* Sidebar */}
-      <Sidebar isOpen={true} />
-
-      {/* Main Content */}
-      <div className="flex flex-col flex-1 overflow-hidden">
-        {/* Top Navigation */}
-        <TopNav />
-
-        {/* Content Area */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="flex-1 overflow-y-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* Header with Create Button */}
             <div className="flex items-center justify-between mb-8">
               <div>
@@ -346,8 +334,6 @@ export default function MyResumesPage() {
               </motion.div>
             )}
           </div>
-        </div>
-      </div>
     </div>
   );
 }

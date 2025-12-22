@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -15,20 +15,8 @@ import {
   MapPin,
   Globe,
   Tag,
-  DollarSign,
 } from "lucide-react";
-
-const personalInfoSchema = z.object({
-  name: z.string().min(2, "Name is required"),
-  title: z.string().min(2, "Job title is required"),
-  bio: z.string().min(10, "Bio must be at least 10 characters"),
-  specialization: z.string().min(2, "Specialization is required"),
-  location: z.string().min(2, "Location is required"),
-  languages: z.string().min(2, "At least one language is required"),
-  tags: z.string().min(2, "At least one tag is required"),
-});
-
-type PersonalInfoFormValues = z.infer<typeof personalInfoSchema>;
+import { useTranslation } from "react-i18next";
 
 interface PersonalInfoStepProps {
   data: CoachOnboardingData["personalInfo"];
@@ -36,9 +24,22 @@ interface PersonalInfoStepProps {
 }
 
 export function PersonalInfoStep({ data, onNext }: PersonalInfoStepProps) {
+  const { t } = useTranslation();
   const [imagePreview, setImagePreview] = React.useState<string | null>(
     data.image
   );
+
+  const personalInfoSchema = useMemo(() => z.object({
+    name: z.string().min(2, t("onboarding.validation.nameRequired", "Name is required")),
+    title: z.string().min(2, t("onboarding.validation.titleRequired", "Job title is required")),
+    bio: z.string().min(10, t("onboarding.validation.bioMin", "Bio must be at least 10 characters")),
+    specialization: z.string().min(2, t("onboarding.validation.specializationRequired", "Specialization is required")),
+    location: z.string().min(2, t("onboarding.validation.locationRequired", "Location is required")),
+    languages: z.string().min(2, t("onboarding.validation.languageRequired", "At least one language is required")),
+    tags: z.string().min(2, t("onboarding.validation.tagRequired", "At least one tag is required")),
+  }), [t]);
+
+  type PersonalInfoFormValues = z.infer<typeof personalInfoSchema>;
 
   const {
     register,
@@ -88,23 +89,24 @@ export function PersonalInfoStep({ data, onNext }: PersonalInfoStepProps) {
           <Avatar className="h-20 w-20 border-2 border-white shadow-md">
             <AvatarImage src={imagePreview || ""} className="object-cover" />
             <AvatarFallback className="bg-gray-200 text-gray-400">
-              <User className="h-8 w-8" />
+              <User className="h-8 w-8" aria-hidden="true" />
             </AvatarFallback>
           </Avatar>
-          <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200">
+          <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200" aria-hidden="true">
             <Upload className="h-5 w-5 text-white" />
           </div>
           <input
             type="file"
             accept="image/*"
+            aria-label={t("onboarding.personalInfo.uploadPhoto", "Upload profile photo")}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             onChange={handleImageUpload}
           />
         </div>
         <div>
-          <h3 className="font-semibold text-gray-900">Profile Photo</h3>
+          <h3 className="font-semibold text-gray-900">{t("onboarding.personalInfo.profilePhoto", "Profile Photo")}</h3>
           <p className="text-sm text-gray-500 mt-1">
-            Upload a professional photo. JPG, GIF or PNG. Max size of 800K.
+            {t("onboarding.personalInfo.uploadHint", "Upload a professional photo. JPG, GIF or PNG. Max size of 800K.")}
           </p>
         </div>
       </div>
@@ -112,49 +114,51 @@ export function PersonalInfoStep({ data, onNext }: PersonalInfoStepProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label htmlFor="name" className="text-gray-700 font-medium">
-            Full Name
+            {t("onboarding.personalInfo.fullName", "Full Name")}
           </Label>
           <div className="relative">
-            <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
             <Input
               id="name"
               {...register("name")}
+              aria-invalid={!!errors.name}
+              aria-describedby={errors.name ? "name-error" : undefined}
               className="pl-9 bg-gray-50/30 border-gray-200 focus:bg-white transition-all h-11"
-              placeholder="e.g. Sarah Wilson"
+              placeholder={t("onboarding.personalInfo.namePlaceholder", "e.g. Sarah Wilson")}
             />
           </div>
           {errors.name && (
-            <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
+            <p id="name-error" className="text-red-500 text-xs mt-1" role="alert">{errors.name.message}</p>
           )}
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="title" className="text-gray-700 font-medium">
-            Job Title
+            {t("onboarding.personalInfo.jobTitle", "Job Title")}
           </Label>
           <div className="relative">
-            <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
             <Input
               id="title"
               {...register("title")}
               className="pl-9 bg-gray-50/30 border-gray-200 focus:bg-white transition-all h-11"
-              placeholder="e.g. Senior Career Coach"
+              placeholder={t("onboarding.personalInfo.titlePlaceholder", "e.g. Senior Career Coach")}
             />
           </div>
           {errors.title && (
-            <p className="text-red-500 text-xs mt-1">{errors.title.message}</p>
+            <p id="title-error" className="text-red-500 text-xs mt-1" role="alert">{errors.title.message}</p>
           )}
         </div>
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="bio" className="text-gray-700 font-medium">
-          Bio
+          {t("onboarding.personalInfo.bio", "Bio")}
         </Label>
         <Textarea
           id="bio"
           {...register("bio")}
-          placeholder="Tell us about your experience and coaching style..."
+          placeholder={t("onboarding.personalInfo.bioPlaceholder", "Tell us about your experience and coaching style...")}
           className="min-h-[120px] bg-gray-50/30 border-gray-200 focus:bg-white transition-all resize-none p-4"
         />
         {errors.bio && (
@@ -165,19 +169,21 @@ export function PersonalInfoStep({ data, onNext }: PersonalInfoStepProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label htmlFor="specialization" className="text-gray-700 font-medium">
-            Primary Specialization
+            {t("onboarding.personalInfo.specialization", "Primary Specialization")}
           </Label>
           <div className="relative">
-            <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
             <Input
               id="specialization"
               {...register("specialization")}
+              aria-invalid={!!errors.specialization}
+              aria-describedby={errors.specialization ? "specialization-error" : undefined}
               className="pl-9 bg-gray-50/30 border-gray-200 focus:bg-white transition-all h-11"
-              placeholder="e.g. Tech Leadership"
+              placeholder={t("onboarding.personalInfo.specializationPlaceholder", "e.g. Tech Leadership")}
             />
           </div>
           {errors.specialization && (
-            <p className="text-red-500 text-xs mt-1">
+            <p id="specialization-error" className="text-red-500 text-xs mt-1" role="alert">
               {errors.specialization.message}
             </p>
           )}
@@ -185,19 +191,19 @@ export function PersonalInfoStep({ data, onNext }: PersonalInfoStepProps) {
 
         <div className="space-y-2">
           <Label htmlFor="location" className="text-gray-700 font-medium">
-            Location
+            {t("onboarding.personalInfo.location", "Location")}
           </Label>
           <div className="relative">
-            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
             <Input
               id="location"
               {...register("location")}
               className="pl-9 bg-gray-50/30 border-gray-200 focus:bg-white transition-all h-11"
-              placeholder="e.g. San Francisco, CA"
+              placeholder={t("onboarding.personalInfo.locationPlaceholder", "e.g. San Francisco, CA")}
             />
           </div>
           {errors.location && (
-            <p className="text-red-500 text-xs mt-1">
+            <p id="location-error" className="text-red-500 text-xs mt-1" role="alert">
               {errors.location.message}
             </p>
           )}
@@ -207,15 +213,15 @@ export function PersonalInfoStep({ data, onNext }: PersonalInfoStepProps) {
       <div className="grid grid-cols-1 gap-6">
         <div className="space-y-2">
           <Label htmlFor="languages" className="text-gray-700 font-medium">
-            Languages
+            {t("onboarding.personalInfo.languages", "Languages")}
           </Label>
           <div className="relative">
-            <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
             <Input
               id="languages"
               {...register("languages")}
               className="pl-9 bg-gray-50/30 border-gray-200 focus:bg-white transition-all h-11"
-              placeholder="e.g. English, Spanish"
+              placeholder={t("onboarding.personalInfo.languagesPlaceholder", "e.g. English, Spanish")}
             />
           </div>
           {errors.languages && (
@@ -228,15 +234,15 @@ export function PersonalInfoStep({ data, onNext }: PersonalInfoStepProps) {
 
       <div className="space-y-2">
         <Label htmlFor="tags" className="text-gray-700 font-medium">
-          Skills / Tags
+          {t("onboarding.personalInfo.skills", "Skills / Tags")}
         </Label>
         <div className="relative">
-          <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
           <Input
             id="tags"
             {...register("tags")}
             className="pl-9 bg-gray-50/30 border-gray-200 focus:bg-white transition-all h-11"
-            placeholder="e.g. Leadership, Management, Public Speaking"
+            placeholder={t("onboarding.personalInfo.skillsPlaceholder", "e.g. Leadership, Management, Public Speaking")}
           />
         </div>
         {errors.tags && (
@@ -248,7 +254,7 @@ export function PersonalInfoStep({ data, onNext }: PersonalInfoStepProps) {
         type="submit"
         className="w-full bg-black text-white hover:bg-gray-800 h-12 text-base font-medium rounded-lg shadow-lg shadow-black/10 transition-all hover:shadow-xl hover:-translate-y-0.5"
       >
-        Continue to Availability
+        {t("onboarding.personalInfo.continue", "Continue to Availability")}
       </Button>
     </form>
   );

@@ -176,3 +176,75 @@ export const getRecommendedCertifications = async (career: string): Promise<Cert
     { name: "Master Class in Leadership", provider: "LinkedIn Learning", duration: "4 weeks" },
   ];
 };
+export interface SkillGapData {
+  skill: string;
+  currentLevel: "None" | "Beginner" | "Intermediate";
+  requiredLevel: "Advanced" | "Expert";
+  marketValueBoost: number; // Potential salary increase
+  employabilityBoost: number; // Percentage increase in employability
+  priority: "High" | "Medium" | "Low";
+  estimatedWeeks: number;
+}
+
+export interface ROIData {
+  currentSalary: number;
+  potentialSalary: number;
+  currentEmployability: number;
+  potentialEmployability: number;
+  totalTimeInvestmentHours: number;
+  timeToROIWeeks: number;
+}
+
+export const getSkillGaps = async (userId: string): Promise<SkillGapData[]> => {
+  await new Promise((resolve) => setTimeout(resolve, 800));
+  return [
+    {
+      skill: "TypeScript",
+      currentLevel: "Beginner",
+      requiredLevel: "Advanced",
+      marketValueBoost: 5000,
+      employabilityBoost: 15,
+      priority: "High",
+      estimatedWeeks: 4,
+    },
+    {
+      skill: "AWS Cloud Architecture",
+      currentLevel: "None",
+      requiredLevel: "Advanced",
+      marketValueBoost: 8000,
+      employabilityBoost: 20,
+      priority: "High",
+      estimatedWeeks: 8,
+    },
+    {
+      skill: "GraphQL",
+      currentLevel: "None",
+      requiredLevel: "Advanced",
+      marketValueBoost: 3000,
+      employabilityBoost: 8,
+      priority: "Medium",
+      estimatedWeeks: 3,
+    },
+    {
+      skill: "System Design",
+      currentLevel: "Intermediate",
+      requiredLevel: "Expert",
+      marketValueBoost: 10000,
+      employabilityBoost: 12,
+      priority: "Medium",
+      estimatedWeeks: 6,
+    },
+  ];
+};
+
+export const getROIAnalysis = async (userId: string): Promise<ROIData> => {
+  await new Promise((resolve) => setTimeout(resolve, 600));
+  return {
+    currentSalary: 85000,
+    potentialSalary: 111000,
+    currentEmployability: 65,
+    potentialEmployability: 92,
+    totalTimeInvestmentHours: 120,
+    timeToROIWeeks: 24,
+  };
+};

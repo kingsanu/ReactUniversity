@@ -34,6 +34,7 @@ import {
   AIGenerationContext,
   AIGenerationResponse,
 } from "@/services/resumeService";
+import { useTranslation } from "react-i18next";
 
 export type GenerationStep = "config" | "loading" | "result";
 
@@ -63,6 +64,7 @@ export function ContentGenerationModal({
   onApply,
   onAlternatives,
 }: ContentGenerationModalProps) {
+  const { t } = useTranslation();
   const [step, setStep] = useState<GenerationStep>("config");
   const [generatedContent, setGeneratedContent] =
     useState<GenerationResult | null>(null);
@@ -75,26 +77,26 @@ export function ContentGenerationModal({
   const [missingKeywords, setMissingKeywords] = useState<string[]>([]);
 
   const fieldLabels: Record<string, string> = {
-    summary: "Professional Summary",
-    objective: "Career Objective",
-    bullets: "Job Bullet Points",
-    project: "Project Description",
-    skill: "Skill Description",
-    experience_description: "Experience Description",
-    experience_bullets: "Experience Bullet Points",
-    education_description: "Education Description",
-    project_description: "Project Description",
-    project_bullets: "Project Bullet Points",
-    course_description: "Course Description",
-    award_description: "Award Description",
-    organization_description: "Organization Description",
-    publication_description: "Publication Description",
-    language_description: "Language Description",
-    volunteer_description: "Volunteer Work Description",
-    reference_description: "Reference Description",
-    declaration_text: "Declaration Text",
-    custom_description: "Custom Section Description",
-    custom_bullets: "Custom Section Bullet Points",
+    summary: t("ai.fields.summary", "Professional Summary"),
+    objective: t("ai.fields.objective", "Career Objective"),
+    bullets: t("ai.fields.bullets", "Job Bullet Points"),
+    project: t("ai.fields.project", "Project Description"),
+    skill: t("ai.fields.skill", "Skill Description"),
+    experience_description: t("ai.fields.experienceDesc", "Experience Description"),
+    experience_bullets: t("ai.fields.experienceBullets", "Experience Bullet Points"),
+    education_description: t("ai.fields.educationDesc", "Education Description"),
+    project_description: t("ai.fields.projectDesc", "Project Description"),
+    project_bullets: t("ai.fields.projectBullets", "Project Bullet Points"),
+    course_description: t("ai.fields.courseDesc", "Course Description"),
+    award_description: t("ai.fields.awardDesc", "Award Description"),
+    organization_description: t("ai.fields.organizationDesc", "Organization Description"),
+    publication_description: t("ai.fields.publicationDesc", "Publication Description"),
+    language_description: t("ai.fields.languageDesc", "Language Description"),
+    volunteer_description: t("ai.fields.volunteerDesc", "Volunteer Work Description"),
+    reference_description: t("ai.fields.referenceDesc", "Reference Description"),
+    declaration_text: t("ai.fields.declaration", "Declaration Text"),
+    custom_description: t("ai.fields.customDesc", "Custom Section Description"),
+    custom_bullets: t("ai.fields.customBullets", "Custom Section Bullet Points"),
   };
 
   // Build ATS-optimized prompt based on field type and context
@@ -406,9 +408,9 @@ Requirements:
     setMissingKeywords((prev) => prev.filter((k) => k !== keyword));
     try {
       await navigator.clipboard.writeText(keyword);
-      toast.success("Keyword added to context and copied to clipboard.");
+      toast.success(t("ai.modal.keywordAddedCopied", "Keyword added to context and copied to clipboard."));
     } catch (err) {
-      toast.success("Keyword added to context.");
+      toast.success(t("ai.modal.keywordAdded", "Keyword added to context."));
     }
   };
 
@@ -429,7 +431,7 @@ Requirements:
 
     if (isEmpty(contentToApply)) {
       // Provide user feedback and don't call the parent change handler when content is empty
-      toast.error("No content to apply. Please generate valid content first.");
+      toast.error(t("ai.modal.noContentError", "No content to apply. Please generate valid content first."));
       return;
     }
 
@@ -437,16 +439,14 @@ Requirements:
     console.debug("ContentGenerationModal apply: ", contentToApply);
     try {
       onApply(contentToApply!);
-      toast.success("Applied generated content");
+      toast.success(t("ai.modal.appliedSuccess", "Applied generated content"));
     } catch (err) {
       console.error("Failed to apply generated content", err);
-      toast.error("Failed to apply generated content");
+      toast.error(t("ai.modal.appliedError", "Failed to apply generated content"));
       return;
     }
 
-    // Close modal after a brief delay to avoid potential race conditions where
-    // the parent immediately re-renders and unmounts this component before state
-    // updates flow through. A short delay helps ensure smoother UX.
+    // Close modal after a brief delay
     setTimeout(() => onClose(), 50);
   };
 
@@ -481,30 +481,35 @@ Requirements:
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-background rounded-lg border border-border shadow-lg">
+      <div 
+        className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-background rounded-lg border border-border shadow-lg"
+        role="dialog"
+        aria-labelledby="modal-title"
+        aria-modal="true"
+      >
         {/* Header */}
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background px-6 py-4">
           <div>
-            <h2 className="text-lg font-semibold text-foreground">
-              ✨ AI Content Generator
+            <h2 id="modal-title" className="text-lg font-semibold text-foreground">
+              ✨ {t("ai.modal.title", "AI Content Generator")}
             </h2>
             <p className="text-xs text-muted-foreground">
-              {fieldLabels[field]} - Optimized for ATS
+              {fieldLabels[field]} - {t("ai.modal.subtitle", "Optimized for ATS")}
             </p>
             <div aria-live="polite" className="sr-only">
               {isGenerating
-                ? "Generating content"
+                ? t("ai.modal.statusGenerating", "Generating content")
                 : generatedContent
-                ? "AI generation complete"
-                : "Configure generation settings"}
+                ? t("ai.modal.statusComplete", "AI generation complete")
+                : t("ai.modal.statusConfig", "Configure generation settings")}
             </div>
           </div>
           <button
             onClick={onClose}
             className="p-1 hover:bg-accent rounded transition-colors"
-            aria-label="Close"
+            aria-label={t("common.close", "Close")}
           >
-            <X className="w-5 h-5 text-muted-foreground" />
+            <X className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
           </button>
         </div>
 
@@ -521,11 +526,11 @@ Requirements:
 
               {/* Error Message */}
               {error && (
-                <div className="flex gap-2 p-3 bg-destructive/10 border border-destructive rounded-lg">
-                  <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+                <div role="alert" className="flex gap-2 p-3 bg-destructive/10 border border-destructive rounded-lg">
+                  <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" aria-hidden="true" />
                   <div>
                     <p className="text-sm font-medium text-destructive">
-                      Generation Failed
+                      {t("ai.modal.generationFailed", "Generation Failed")}
                     </p>
                     <p className="text-xs text-destructive/80">{error}</p>
                   </div>
@@ -538,7 +543,7 @@ Requirements:
                   onClick={onClose}
                   className="px-4 py-2 border border-input rounded-lg text-sm font-medium hover:bg-accent transition-colors"
                 >
-                  Cancel
+                  {t("common.cancel", "Cancel")}
                 </button>
                 <button
                   onClick={handleGenerate}
@@ -547,12 +552,12 @@ Requirements:
                 >
                   {isGenerating ? (
                     <>
-                      <Loader className="w-4 h-4 animate-spin" />
-                      <span>Generating...</span>
+                      <Loader className="w-4 h-4 animate-spin" aria-hidden="true" />
+                      <span>{t("common.generating", "Generating...")}</span>
                     </>
                   ) : (
                     <>
-                      <span>✨ Generate</span>
+                      <span>✨ {t("common.generate", "Generate")}</span>
                     </>
                   )}
                 </button>
@@ -562,17 +567,17 @@ Requirements:
 
           {/* Loading Step */}
           {step === "loading" && (
-            <div className="flex flex-col items-center justify-center py-12 space-y-4">
+            <div className="flex flex-col items-center justify-center py-12 space-y-4" role="status" aria-label={t("ai.modal.statusGenerating", "Generating content")}>
               <div className="relative w-12 h-12">
                 <div className="absolute inset-0 bg-primary/20 rounded-full animate-pulse" />
-                <Loader className="w-12 h-12 text-primary animate-spin" />
+                <Loader className="w-12 h-12 text-primary animate-spin" aria-hidden="true" />
               </div>
               <div className="text-center space-y-2">
                 <p className="text-sm font-medium text-foreground">
-                  Generating content...
+                  {t("ai.modal.generatingContent", "Generating content...")}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  This usually takes 2-5 seconds
+                  {t("ai.modal.generatingTime", "This usually takes 2-5 seconds")}
                 </p>
               </div>
             </div>
@@ -589,7 +594,7 @@ Requirements:
               {/* Generated Content */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-foreground">
-                  Generated Content
+                  {t("ai.modal.generatedContent", "Generated Content")}
                 </label>
                 <div className="p-3 bg-muted/30 border border-border rounded-lg">
                   {Array.isArray(generatedContent.content) ? (
@@ -599,7 +604,7 @@ Requirements:
                           key={idx}
                           className="text-sm text-foreground flex gap-2"
                         >
-                          <span className="text-muted-foreground flex-shrink-0">
+                          <span className="text-muted-foreground flex-shrink-0" aria-hidden="true">
                             •
                           </span>
                           <span>{bullet}</span>
@@ -630,8 +635,7 @@ Requirements:
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <label className="text-sm font-medium text-foreground">
-                      Alternatives ({selectedAlternativeIndex + 1} of{" "}
-                      {alternatives.length + 1})
+                      {t("ai.modal.alternatives", { current: selectedAlternativeIndex + 1, total: alternatives.length + 1, defaultValue: `Alternatives (${selectedAlternativeIndex + 1} of ${alternatives.length + 1})` })}
                     </label>
                     <div className="flex gap-1">
                       <button
@@ -642,8 +646,9 @@ Requirements:
                         }
                         disabled={selectedAlternativeIndex === 0}
                         className="p-1 hover:bg-accent rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        aria-label={t("common.previous", "Previous alternative")}
                       >
-                        <ChevronLeft className="w-4 h-4" />
+                        <ChevronLeft className="w-4 h-4" aria-hidden="true" />
                       </button>
                       <button
                         onClick={() =>
@@ -658,8 +663,9 @@ Requirements:
                           selectedAlternativeIndex === alternatives.length - 1
                         }
                         className="p-1 hover:bg-accent rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        aria-label={t("common.next", "Next alternative")}
                       >
-                        <ChevronRight className="w-4 h-4" />
+                        <ChevronRight className="w-4 h-4" aria-hidden="true" />
                       </button>
                     </div>
                   </div>
@@ -672,15 +678,15 @@ Requirements:
                   onClick={handleCopyToClipboard}
                   className="flex items-center gap-2 px-3 py-2 border border-input rounded-lg text-sm hover:bg-accent transition-colors"
                 >
-                  <Copy className="w-4 h-4" />
-                  {copied ? "Copied!" : "Copy"}
+                  <Copy className="w-4 h-4" aria-hidden="true" />
+                  {copied ? t("common.copied", "Copied!") : t("common.copy", "Copy")}
                 </button>
                 <button
                   onClick={handleRegenerate}
                   className="flex items-center gap-2 px-3 py-2 border border-input rounded-lg text-sm hover:bg-accent transition-colors"
                 >
-                  <RotateCcw className="w-4 h-4" />
-                  Regenerate
+                  <RotateCcw className="w-4 h-4" aria-hidden="true" />
+                  {t("common.regenerate", "Regenerate")}
                 </button>
                 <button
                   onClick={handleApply}
@@ -697,9 +703,10 @@ Requirements:
                         .length === 0)
                   }
                   className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label={t("ai.modal.useThis", "Use this generated content")}
                 >
-                  <Check className="w-4 h-4" />
-                  Use This
+                  <Check className="w-4 h-4" aria-hidden="true" />
+                  {t("ai.modal.useThisBtn", "Use This")}
                 </button>
               </div>
             </motion.div>

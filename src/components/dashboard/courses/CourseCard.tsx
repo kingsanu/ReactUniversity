@@ -57,9 +57,10 @@ export function CourseCard({
       transition={{ duration: 0.3 }}
       className="h-full"
     >
-      <div 
+      <article 
         className="bg-white rounded-3xl p-5 hover:shadow-xl transition-all duration-300 cursor-pointer group relative overflow-hidden border border-gray-100 h-full flex flex-col"
         onClick={() => onViewDetails(course)}
+        aria-labelledby={`course-${course.id}-title`}
       >
         {/* Hover Gradient Overlay */}
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-indigo-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
@@ -88,7 +89,7 @@ export function CourseCard({
             )}
             {enrollmentStatus === "completed" && (
               <Badge className="bg-purple-600 hover:bg-purple-700 text-white border-none shadow-sm backdrop-blur-sm gap-1">
-                <CheckCircle2 className="w-3 h-3" />
+                <CheckCircle2 className="w-3 h-3" aria-hidden="true" />
                 {t("courses.completed")}
               </Badge>
             )}
@@ -99,11 +100,11 @@ export function CourseCard({
         <div className="flex flex-col flex-grow">
           <div className="flex items-start justify-between mb-3">
             <div>
-              <h3 className="font-bold text-lg text-gray-900 leading-tight group-hover:text-blue-600 transition-colors line-clamp-2 mb-1">
+              <h3 id={`course-${course.id}-title`} className="font-bold text-lg text-gray-900 leading-tight group-hover:text-blue-600 transition-colors line-clamp-2 mb-1">
                 {course.title}
               </h3>
               <p className="text-sm font-medium text-gray-500 flex items-center gap-1.5">
-                <BookOpen className="w-3.5 h-3.5" />
+                <BookOpen className="w-3.5 h-3.5" aria-hidden="true" />
                 {course.provider}
               </p>
             </div>
@@ -118,11 +119,11 @@ export function CourseCard({
               {t(`courses.difficulty.${course.difficulty.toLowerCase()}`)}
             </Badge>
             <Badge variant="secondary" className="bg-gray-50 text-gray-600 hover:bg-gray-100 border-gray-100 font-medium">
-              <Clock className="w-3 h-3 mr-1 text-gray-400" />
+              <Clock className="w-3 h-3 mr-1 text-gray-400" aria-hidden="true" />
               {formatDuration(course.duration)}
             </Badge>
             <Badge variant="secondary" className="bg-gray-50 text-gray-600 hover:bg-gray-100 border-gray-100 font-medium">
-              <Star className="w-3 h-3 mr-1 text-yellow-500 fill-yellow-500" />
+              <Star className="w-3 h-3 mr-1 text-yellow-500 fill-yellow-500" aria-hidden="true" />
               {formatRating(course.rating)}
             </Badge>
           </div>
@@ -155,22 +156,23 @@ export function CourseCard({
                    void onMarkCompleted(course);
                  }}
                  className="h-9 w-9 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-full transition-colors"
-                 title={t("courses.markCompleted")}
+                 aria-label={t("courses.markCompleted")}
                >
-                 <CheckCircle2 className="h-5 w-5" />
+                 <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
                </Button>
               )}
               <Button 
                 variant="ghost" 
                 size="icon" 
                 className="h-9 w-9 text-gray-300 group-hover:text-blue-500 transition-colors rounded-full hover:bg-blue-50"
+                aria-label={`View ${course.title} details`}
               >
-                <ArrowUpRight className="h-5 w-5" />
+                <ArrowUpRight className="h-5 w-5" aria-hidden="true" />
               </Button>
             </div>
           </div>
         </div>
-      </div>
+      </article>
     </motion.div>
   );
 }

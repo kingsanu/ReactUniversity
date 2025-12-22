@@ -14,8 +14,6 @@ import {
   getUserEvaluationGroups,
   createEvaluationGroup,
 } from "@/services/evaluationService";
-import { Sidebar } from "../_components/Sidebar";
-import { TopNav } from "../_components/TopNav";
 import {
   Brain,
   Target,
@@ -38,7 +36,6 @@ export default function AssessmentsPage() {
   const { pcaData, hasPCA, isCompleted } = usePCAData();
   const { isLoading } = useEvaluationData();
   const [showInviteModal, setShowInviteModal] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const { invalidateSpecificAssessment } = useAssessmentCache();
   const [isStartingEvaluation, setIsStartingEvaluation] = useState(false);
   
@@ -124,13 +121,7 @@ export default function AssessmentsPage() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-
-      <div className="flex-1 flex flex-col overflow-hidden lg:ml-0">
-        <TopNav onMenuClick={() => setSidebarOpen(true)} />
-
-        <main className="flex-1 overflow-y-auto bg-gray-50/50">
+    <div className="flex-1 overflow-y-auto bg-gray-50/50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header Section */}
         <div className="mb-10">
@@ -508,8 +499,6 @@ export default function AssessmentsPage() {
             </div>
           </div>
         </motion.div>
-      </div>
-        </main>
       </div>
     </div>
   );

@@ -39,7 +39,7 @@ export function UniversityCard({
     0;
 
   return (
-    <motion.div
+    <motion.article
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
@@ -48,6 +48,7 @@ export function UniversityCard({
         "hover:shadow-lg hover:border-gray-200 hover:-translate-y-1",
         variant === "featured" ? "border-blue-100 ring-1 ring-blue-50" : "border-gray-100"
       )}
+      aria-labelledby={`university-${university.id}-name`}
     >
       {/* Header Image Area */}
       <div className="relative h-40 w-full overflow-hidden rounded-t-2xl bg-gray-50">
@@ -71,9 +72,13 @@ export function UniversityCard({
 
         {/* Match Score Badge */}
         {typeof matchScore === "number" && (
-          <div className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 text-xs font-bold text-emerald-600 shadow-sm backdrop-blur-sm">
-            <TrendingUp className="h-3.5 w-3.5" />
-            {matchScore}%
+          <div 
+            className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 text-xs font-bold text-emerald-600 shadow-sm backdrop-blur-sm"
+            role="img"
+            aria-label={`${matchScore}% match score`}
+          >
+            <TrendingUp className="h-3.5 w-3.5" aria-hidden="true" />
+            <span aria-hidden="true">{matchScore}%</span>
           </div>
         )}
 
@@ -84,8 +89,9 @@ export function UniversityCard({
             variant="secondary"
             className="bg-white/90 hover:bg-white text-gray-900 shadow-sm backdrop-blur-sm gap-2 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300"
             onClick={() => onViewDetails?.(university)}
+            aria-label={`Quick view ${university.name}`}
           >
-            <Eye className="h-4 w-4" />
+            <Eye className="h-4 w-4" aria-hidden="true" />
             {t("Quick View", "Vista Rápida")}
           </Button>
         </div>
@@ -110,11 +116,11 @@ export function UniversityCard({
         </div>
 
         <div className="mb-4">
-          <h3 className="text-lg font-bold text-gray-900 line-clamp-1 group-hover:text-blue-600 transition-colors">
+          <h3 id={`university-${university.id}-name`} className="text-lg font-bold text-gray-900 line-clamp-1 group-hover:text-blue-600 transition-colors">
             {university.name}
           </h3>
           <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
-            <MapPin className="h-3.5 w-3.5 shrink-0" />
+            <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
             <span className="line-clamp-1">
               {university.city}, {university.country}
             </span>
@@ -128,7 +134,7 @@ export function UniversityCard({
               {t("Rank", "Ranking")}
             </span>
             <div className="flex items-center gap-1.5 text-sm font-bold text-gray-700">
-              <Star className="h-3.5 w-3.5 text-amber-400 fill-amber-400" />
+              <Star className="h-3.5 w-3.5 text-amber-400 fill-amber-400" aria-hidden="true" />
               #{university.ranking.global || "-"}
             </div>
           </div>
@@ -175,7 +181,7 @@ export function UniversityCard({
             onClick={() => onViewDetails?.(university)}
           >
             {t("View Details", "Ver Detalles")}
-            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover/btn:translate-x-0.5" />
+            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover/btn:translate-x-0.5" aria-hidden="true" />
           </Button>
           
           <div className="flex items-center gap-1 border-l border-gray-100 pl-2">
@@ -192,17 +198,18 @@ export function UniversityCard({
                 e.stopPropagation();
                 onFavoriteToggle?.(university.id);
               }}
+              aria-label={isFavorite ? `Remove ${university.name} from favorites` : `Add ${university.name} to favorites`}
             >
               {isFavorite ? (
-                <Heart className="h-4 w-4 fill-current" />
+                <Heart className="h-4 w-4 fill-current" aria-hidden="true" />
               ) : (
-                <Heart className="h-4 w-4" />
+                <Heart className="h-4 w-4" aria-hidden="true" />
               )}
             </Button>
           </div>
         </div>
       </div>
-    </motion.div>
+    </motion.article>
   );
 }
 

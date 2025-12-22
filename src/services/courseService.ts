@@ -225,3 +225,21 @@ export async function adminDeleteCourseApi(id: string) {
     return adminDeleteCourse(id);
   }
 }
+
+export async function getRecommendationsBySkills(skills: string[]): Promise<Course[]> {
+  const allCourses = await listCourses();
+  
+  // Simple mock matching logic: if course title contains skill
+  const recommended = (allCourses.courses || []).filter(course => 
+    skills.some(skill => 
+      course.title.toLowerCase().includes(skill.toLowerCase())
+    )
+  );
+
+  // Fallback if no direct matches, just return top rated
+  if (recommended.length === 0) {
+    return (allCourses.courses || []).slice(0, 3);
+  }
+
+  return simulateNetworkDelay(recommended.slice(0, 4));
+}

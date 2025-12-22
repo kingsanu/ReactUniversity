@@ -278,7 +278,129 @@
     "backToInstructions": "Volver a las Instrucciones",
     "submitAnswer": "Enviar Respuesta",
     "startTest": "Comenzar Prueba",
+    "benchmarks": {
+      "header": {
+        "title": "Indicadores del Sector",
+        "description": "Visualización de tendencias globales de carrera, distribuciones salariales y métricas de oferta y demanda.",
+        "shareReport": "Compartir Informe",
+        "selectCountryPlaceholder": "Seleccionar País",
+        "selectCareerPlaceholder": "Seleccionar Carrera"
+      },
+      "overview": {
+        "salaryTitle": "Tendencias Salariales Regionales",
+        "topSkills": "Habilidades más Demandadas",
+        "workMode": "Distribución de Modalidad de Trabajo",
+        "costOfLiving": "Comparación de Costo de Vida",
+        "certifications": "Certificaciones Recomendadas",
+        "viewAll": "Ver Todo",
+        "marketPulse": "Pulso del Mercado Laboral",
+        "marketPulseDesc": "Indicadores en tiempo real de demanda y sentimiento.",
+        "liveUpdates": "Actualizaciones en Vivo"
+      },
+      "market": {
+        "title": "Indicadores de Mercado",
+        "subtitle": "Análisis del crecimiento del mercado, oferta de talento y tendencias de empleo.",
+        "employabilityScore": "Puntuación de Empleabilidad",
+        "employabilityDesc": "Puntuación de preparación basada en cambios del mercado y datos de contratación.",
+        "analysisLabel": "Análisis:",
+        "analysis": "El mercado actual para {{career}} muestra una demanda resiliente con requisitos de especialización emergentes.",
+        "youthEmploymentTitle": "Tasa de Empleo Juvenil",
+        "youthEmploymentDesc": "Tendencias de empleo para profesionales menores de 25 años en {{country}}.",
+        "marketForecast": "Pronóstico del Mercado",
+        "positiveOutlook": "Panorama Positivo",
+        "positiveOutlookDesc": "Crecimiento proyectado en sectores clave de innovación en los próximos 18 meses.",
+        "projectedHotspots": "Puntos Críticos Proyectados",
+        "recruiterSentiment": "Sentimiento del Reclutador",
+        "hiringSpeed": "Velocidad de Contratación",
+        "badgeFast": "Rápida",
+        "interviewTech": "Tecnología de Entrevista",
+        "badgeRemote": "Remota",
+        "contractRoles": "Roles por Contrato",
+        "badgeIncreasing": "En Aumento",
+        "insights": {
+          "demandGrowth": "Crecimiento de Demanda",
+          "demandGrowthDesc": "Crecimiento de publicaciones de empleo año tras año.",
+          "talentSupply": "Oferta de Talento",
+          "talentSupplyDesc": "Relación de solicitantes por puestos vacantes.",
+          "remoteOpportunity": "Oportunidad Remota",
+          "remoteOpportunityDesc": "Porcentaje de roles que ofrecen trabajo remoto.",
+          "avgFillTime": "Tiempo Promedio de Cobertura",
+          "avgFillTimeDesc": "Tiempo para cubrir una posición abierta."
+        }
+      },
+      "skills": {
+        "title": "Evaluación de Habilidades",
+        "subtitle": "Compara tu conjunto de habilidades con los requisitos del mercado global",
+        "mostInDemand": "Competencias más Demandadas",
+        "emergingTechWatch": "Vigilancia de Tecnologías Emergentes",
+        "emergingDesc": "Tecnologías que ganan tracción rápida en este sector",
+        "topCertifications": "Principales Certificaciones de la Industria",
+        "certificationsDesc": "Credenciales más solicitadas por los reclutadores en {{country}}"
+      },
+      "demographics": {
+        "title": "Demografía del Mercado",
+        "subtitle": "Diversidad en el lugar de trabajo, equilibrio vida-trabajo y métricas de inclusividad",
+        "workModeTitle": "Preferencias de Modalidad de Trabajo",
+        "workModeDesc": "Distribución actual de los arreglos de trabajo",
+        "remote": "Remoto",
+        "hybrid": "Híbrido",
+        "onsite": "Presencial",
+        "genderDiversityTitle": "Distribución de Género",
+        "inclusivityTitle": "Indicadores de Inclusividad",
+        "inclusivityDesc": "Disponibilidad de beneficios esenciales en el lugar de trabajo",
+        "badges": {
+          "parentalLeave": "Licencia Parental Paga",
+          "flexHours": "Horario Flexible",
+          "wellness": "Programas de Bienestar"
+        },
+        "enterpriseTrendTitle": "División Empresa vs Startup"
+      },
+      "compensation": {
+        "avgAnnualSalary": "Salario Anual Promedio",
+        "sinceLastYear": "desde el año pasado",
+        "purchasePowerIndex": "Índice de Poder Adquisitivo",
+        "relativeToNYC": "Relativo a NYC (Base 100)",
+        "estimatedTakeHome": "Salario Neto Estimado",
+        "afterEstimatedTaxes": "Después de impuestos locales estimados",
+        "detailedSalaryTitle": "Distribución Salarial Detallada",
+        "cardDescription": "Desglose completo para {{career}} en {{country}}",
+        "keyObservation": "Observación Clave",
+        "keyObservationDesc": "El salario medio para {{career}} en {{country}} ha mostrado un crecimiento constante en los últimos 3 años."
+      }
+    },
     "nextExample": "Siguiente Ejemplo"
+  },
+  "benchmarks": {
+    "marketDemand": "Demanda del Mercado",
+    "high": "Alta",
+    "topGrowth": "Top 10% de Crecimiento",
+    "talentSupply": "Oferta de Talento",
+    "moderate": "Moderada",
+    "balancedCompetition": "Competencia Equilibrada",
+    "employability": "Empleabilidad",
+    "basedOnProfile": "Basado en tu perfil actual",
+    "loadingTrends": "Cargando tendencias...",
+    "employmentRate": "Tasa de Empleo",
+    "employabilityScore": "Puntuación de Empleabilidad",
+    "rising": "En aumento",
+    "falling": "En descenso",
+    "loadingData": "Cargando datos...",
+    "loadingWorkModes": "Cargando modalidades...",
+    "loadingSkills": "Cargando habilidades...",
+    "loadingSalaryData": "Cargando datos salariales...",
+    "loadingDemographics": "Cargando demografía...",
+    "noDataAvailable": "No hay datos disponibles",
+    "minSalary": "Salario Mín",
+    "averageSalary": "Salario Promedio",
+    "maxSalary": "Salario Máx",
+    "costOfLivingIndex": "Índice de Costo de Vida",
+    "rentIndex": "Índice de Alquiler",
+    "purchasingPower": "Poder Adquisitivo",
+    "rentBurden": "Carga de Alquiler",
+    "groceries": "Comestibles",
+    "details": "Detalles",
+    "low": "Baja",
+    "veryHigh": "Muy Alta"
   },
   "home": {
     "title": "TimsCare",
@@ -507,10 +629,34 @@
       }
     },
     "careers": {
+      "title": "Carreras",
+      "header": {
+        "title": "Gestor de Carreras"
+      },
+      "confirmDelete": "¿Estás seguro de que quieres eliminar esta carrera?",
+      "createTitle": "Crear Carrera",
+      "editTitle": "Editar Carrera",
+      "form": {
+        "title": "Título (Inglés)",
+        "shortDescription": "Descripción corta (Inglés)"
+      },
       "loading": "Cargando...",
       "accessDenied": "Acceso denegado"
     },
     "transactions": {
+      "title": "Transacciones",
+      "subtitle": "Monitorea todas las transacciones y pagos del sistema",
+      "searchPlaceholder": "Buscar transacciones...",
+      "statusPlaceholder": "Estado",
+      "status": {
+        "all": "Todos los Estados",
+        "completed": "Completado",
+        "pending": "Pendiente",
+        "failed": "Fallido",
+        "refunded": "Reembolsado"
+      },
+      "exportReport": "Exportar Informe",
+      "noTransactions": "No se encontraron transacciones.",
       "table": {
         "id": "ID de Transacción",
         "user": "Usuario",
@@ -561,29 +707,6 @@
         "categoryLabel": "Categoría",
         "questionLabel": "Texto de pregunta en español",
         "questionNumberLabel": "Número de pregunta"
-      }
-    },
-    "transactions": {
-      "title": "Transacciones",
-      "subtitle": "Monitorea todas las transacciones y pagos del sistema",
-      "searchPlaceholder": "Buscar transacciones...",
-      "statusPlaceholder": "Estado",
-      "status": {
-        "all": "Todos",
-        "completed": "Completado",
-        "pending": "Pendiente",
-        "failed": "Fallido",
-        "refunded": "Reembolsado"
-      },
-      "exportReport": "Exportar informe",
-      "noTransactions": "No se encontraron transacciones.",
-      "table": {
-        "id": "ID de Transacción",
-        "user": "Usuario",
-        "date": "Fecha",
-        "method": "Método",
-        "status": "Estado",
-        "amount": "Monto"
       }
     },
     "courses": {
@@ -644,19 +767,6 @@
         "cancel": "Cancelar"
       },
       "confirmDelete": "¿Estás seguro de que deseas eliminar este curso?"
-    },
-    "careers": {
-      "title": "Carreras",
-      "header": {
-        "title": "Administrador de Carreras"
-      },
-      "confirmDelete": "¿Estás seguro de que deseas eliminar esta carrera?",
-      "createTitle": "Crear Carrera",
-      "editTitle": "Editar Carrera",
-      "form": {
-        "title": "Título (Inglés)",
-        "shortDescription": "Descripción corta (Inglés)"
-      }
     }
   },
   "subscribe": {
@@ -781,11 +891,6 @@
       "noPhoneNumbers": "Ningún evaluador tiene número de teléfono disponible para invitaciones SMS.",
       "smsComingSoon": "La funcionalidad de SMS estará disponible pronto."
     }
-  },
-  "language": {
-    "english": "Inglés",
-    "spanish": "Español",
-    "switchLanguage": "Cambiar Idioma"
   },
   "testPCA": {
     "title": "Pruebas de la API PCA",
@@ -1155,5 +1260,30 @@
         }
       }
     }
+  },
+  "language": {
+    "english": "Inglés",
+    "spanish": "Español",
+    "switchLanguage": "Cambiar idioma",
+    "selectLanguage": "Seleccionar idioma",
+    "menuOpen": "El menú de idiomas está abierto. Use las teclas de flecha para navegar.",
+    "currentLanguage": "El idioma actual es {{language}}"
+  },
+  "accessibility": {
+    "skipToContent": "Saltar al contenido principal",
+    "navigation": "Navegación principal",
+    "breadcrumb": "Navegación de migas de pan",
+    "closeMenu": "Cerrar menú",
+    "openMenu": "Abrir menú",
+    "loading": "Cargando contenido",
+    "expandSection": "Expandir sección",
+    "collapseSection": "Contraer sección",
+    "externalLink": "Se abre en nueva pestaña",
+    "required": "Campo requerido",
+    "optional": "Opcional",
+    "error": "Error",
+    "success": "Éxito",
+    "warning": "Advertencia",
+    "info": "Información"
   }
 }

@@ -13,14 +13,15 @@ export function ActionCards({ className }: ActionCardsProps) {
   const { t } = useTranslation();
 
   return (
-    <div
+    <section
       className={cn(
         "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4",
         className
       )}
+      aria-label={t("dashboard.learningTools")}
     >
       {actionCards.map((card, index) => (
-        <motion.div
+        <motion.article
           key={card.id}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -39,13 +40,14 @@ export function ActionCards({ className }: ActionCardsProps) {
                 {t(card.badge)}
               </span>
             </div>
-          )}{" "}
+          )}
           {/* Icon */}
           <div
             className={cn(
               "w-12 h-12 rounded-lg flex items-center justify-center mb-3",
               card.id === 1 ? "bg-blue-100" : "bg-gray-100"
             )}
+            aria-hidden="true"
           >
             <span className="text-2xl">{card.icon}</span>
           </div>
@@ -56,21 +58,21 @@ export function ActionCards({ className }: ActionCardsProps) {
             </h3>
             <p className="text-sm text-gray-500">{t(card.subtitle)}</p>
           </div>
-          {/* Action Button */}
-          <Link href={card.link}>
-            <button
-              className={cn(
-                "w-full py-2 px-3 rounded-md text-sm font-medium transition-colors",
-                card.variant === "primary"
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              )}
-            >
-              {t(card.action)}
-            </button>
+          {/* Action Button - styled Link instead of nested button */}
+          <Link
+            href={card.link}
+            className={cn(
+              "block w-full py-2 px-3 rounded-md text-sm font-medium text-center transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2",
+              card.variant === "primary"
+                ? "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500"
+            )}
+          >
+            {t(card.action)}
           </Link>
-        </motion.div>
+        </motion.article>
       ))}
-    </div>
+    </section>
   );
 }
+

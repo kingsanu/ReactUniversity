@@ -198,7 +198,11 @@ export function CoachesTable() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge className={`${getStatusColor(coach.status)} border-0 px-2.5 py-0.5 rounded-md font-medium capitalize shadow-none`}>
+                      <Badge 
+                        className={`${getStatusColor(coach.status)} border-0 px-2.5 py-0.5 rounded-md font-medium capitalize shadow-none`}
+                        role="status"
+                        aria-label={`Status: ${coach.status || "Unknown"}`}
+                      >
                         {coach.status || "Unknown"}
                       </Badge>
                     </TableCell>
@@ -214,11 +218,15 @@ export function CoachesTable() {
                     </TableCell>
                     <TableCell>
                       {contractStatus ? (
-                        <Badge className={`${contractStatus.color} border-0 px-2.5 py-0.5 rounded-md font-medium shadow-none`}>
+                        <Badge 
+                          className={`${contractStatus.color} border-0 px-2.5 py-0.5 rounded-md font-medium shadow-none`}
+                          role="status"
+                          aria-label={`Contract status: ${contractStatus.label}`}
+                        >
                           {contractStatus.label}
                         </Badge>
                       ) : (
-                        <span className="text-sm text-gray-400">—</span>
+                        <span className="text-sm text-gray-400" aria-label="No contract status">—</span>
                       )}
                     </TableCell>
                     <TableCell>
@@ -230,8 +238,13 @@ export function CoachesTable() {
                     <TableCell className="pr-6 text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600">
-                            <MoreHorizontal className="h-4 w-4" />
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600"
+                            aria-label={`Actions for ${coach.name || coach.fullName}`}
+                          >
+                            <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48 rounded-xl p-1 shadow-xl border-gray-100">

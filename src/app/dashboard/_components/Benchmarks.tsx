@@ -12,18 +12,19 @@ export function Benchmarks({ className }: BenchmarksProps) {
   const { benchmarks } = dashboardData;
 
   return (
-    <motion.div
+    <motion.section
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
         "bg-white rounded-lg border border-gray-200 p-6",
         className
       )}
+      aria-labelledby="benchmarks-heading"
     >
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-gray-900">
+        <h2 id="benchmarks-heading" className="text-lg font-semibold text-gray-900">
           {t("dashboard.benchmarks.common.title")}
-        </h3>
+        </h2>
         <span className="text-sm text-gray-500">
           {t("dashboard.benchmarks.common.today")}
         </span>
@@ -44,9 +45,9 @@ export function Benchmarks({ className }: BenchmarksProps) {
                 "text-sm font-medium",
                 benchmarks.change >= 0 ? "text-green-600" : "text-red-600"
               )}
+              aria-label={benchmarks.change >= 0 ? `Up ${Math.abs(benchmarks.change)} percent` : `Down ${Math.abs(benchmarks.change)} percent`}
             >
-              {benchmarks.change >= 0 ? "↑" : "↓"} {Math.abs(benchmarks.change)}
-              %
+              <span aria-hidden="true">{benchmarks.change >= 0 ? "↑" : "↓"}</span> {Math.abs(benchmarks.change)}%
             </span>
             <span className="text-sm text-gray-500">
               {t("dashboard.benchmarks.common.comparedToYesterday", {
@@ -71,6 +72,7 @@ export function Benchmarks({ className }: BenchmarksProps) {
           </div>
         </div>
       </div>
-    </motion.div>
+    </motion.section>
   );
 }
+

@@ -26,7 +26,7 @@ export function CompetencyChart() {
 
       <div className="flex items-center space-x-8">
         {/* Doughnut Chart Placeholder */}
-        <div className="relative w-48 h-48">
+        <div className="relative w-48 h-48" aria-hidden="true">
           <svg width="192" height="192" className="transform -rotate-90">
             <circle
               cx="96"
@@ -65,18 +65,19 @@ export function CompetencyChart() {
         </div>
 
         {/* Legend */}
-        <div className="space-y-3">
+        <div className="space-y-3" role="list">
           {competencyData.map((item) => (
-            <div key={item.name} className="flex items-center space-x-3">
+            <div key={item.name} className="flex items-center space-x-3" role="listitem">
               <div
                 className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: item.color }}
+                aria-hidden="true"
               />
               <span className="text-sm text-gray-700">{item.name}</span>
               <span className="text-sm font-medium text-gray-900">
                 {item.percentage}%
               </span>
-              <span className="text-xs text-green-600">↑</span>
+              <span className="text-xs text-green-600" aria-label="Trending up">↑</span>
             </div>
           ))}
         </div>

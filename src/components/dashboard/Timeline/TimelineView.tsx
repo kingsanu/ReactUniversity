@@ -184,10 +184,11 @@ function TimelineEventCard({ event, isLast, onClick }: TimelineEventCardProps) {
   const hasMetadata = event.metadata && Object.keys(event.metadata).length > 0;
 
   return (
+
     <div className="relative flex gap-6 pb-12 last:pb-0 group">
       {/* Timeline line */}
       {!isLast && (
-        <div className="absolute left-[22px] top-12 bottom-0 w-px bg-gray-100" />
+        <div className="absolute left-[22px] top-12 bottom-0 w-px bg-gray-100" aria-hidden="true" />
       )}
 
       {/* Timeline dot */}
@@ -198,6 +199,7 @@ function TimelineEventCard({ event, isLast, onClick }: TimelineEventCardProps) {
             colors.border,
             colors.text
           )}
+          aria-hidden="true"
         >
           <IconComponent className="h-5 w-5" strokeWidth={1.5} />
         </div>
@@ -211,10 +213,20 @@ function TimelineEventCard({ event, isLast, onClick }: TimelineEventCardProps) {
       >
         <div
           className={cn(
-            "rounded-xl border bg-white p-5 transition-all duration-300 hover:shadow-sm hover:border-gray-300 cursor-pointer",
+            "rounded-xl border bg-white p-5 transition-all duration-300 hover:shadow-sm hover:border-gray-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500",
             "border-gray-100"
           )}
           onClick={() => onClick?.() || setIsExpanded(!isExpanded)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onClick?.() || setIsExpanded(!isExpanded);
+            }
+          }}
+          role="button"
+          tabIndex={0}
+          aria-expanded={hasMetadata ? isExpanded : undefined}
+          aria-label={`${event.title}, ${event.type}. Click to ${isExpanded ? 'collapse' : 'expand'} details.`}
         >
           {/* Header */}
           <div className="flex items-start justify-between gap-4 mb-2">
@@ -245,6 +257,7 @@ function TimelineEventCard({ event, isLast, onClick }: TimelineEventCardProps) {
                   "h-6 w-6 rounded-full flex items-center justify-center transition-transform duration-300 text-gray-400",
                   isExpanded ? "rotate-180 bg-gray-50 text-gray-600" : ""
                 )}
+                aria-hidden="true"
               >
                 <ChevronDown className="h-4 w-4" />
               </div>
@@ -277,6 +290,7 @@ function TimelineEventCard({ event, isLast, onClick }: TimelineEventCardProps) {
                       ? "bg-blue-500"
                       : "bg-gray-400"
                   )}
+                  aria-hidden="true"
                 />
                 {event.status === "completed"
                   ? language === "spanish"
@@ -304,7 +318,8 @@ function TimelineEventCard({ event, isLast, onClick }: TimelineEventCardProps) {
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="mt-4 pt-4 border-t border-dashed border-gray-100 overflow-hidden"
+                className="mt-4 pt-4 border-t border-dashed border-gray-100 overflow-hidden cursor-default"
+                onClick={(e) => e.stopPropagation()}
               >
                 <EventMetadata event={event} language={language} />
               </motion.div>

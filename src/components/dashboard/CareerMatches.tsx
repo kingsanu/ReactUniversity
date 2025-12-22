@@ -49,8 +49,15 @@ export function CareerMatches() {
             </div>
             
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 relative">
-                <svg className="w-12 h-12 transform -rotate-90">
+              <div 
+                className="w-12 h-12 relative" 
+                role="progressbar" 
+                aria-valuenow={match.progress} 
+                aria-valuemin={0} 
+                aria-valuemax={100}
+                aria-label={`${match.title} match score`}
+              >
+                <svg className="w-12 h-12 transform -rotate-90" aria-hidden="true">
                   <circle
                     cx="24"
                     cy="24"
@@ -79,8 +86,11 @@ export function CareerMatches() {
                   </span>
                 </div>
               </div>
-              <button className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition">
-                <span className="text-gray-600">→</span>
+              <button 
+                className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition"
+                aria-label={`View details for ${match.title}`}
+              >
+                <span className="text-gray-600" aria-hidden="true">→</span>
               </button>
             </div>
           </motion.div>

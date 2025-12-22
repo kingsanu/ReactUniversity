@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { DollarSign, Info } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface PricingStepProps {
   data: {
@@ -26,6 +27,7 @@ const PLATFORM_FEE_PERCENTAGE = 15;
 const CURRENCIES = [{ code: "USD", symbol: "$", name: "US Dollar" }];
 
 export function PricingStep({ data, onNext, onBack }: PricingStepProps) {
+  const { t } = useTranslation();
   const [hourlyRate, setHourlyRate] = useState(data.hourlyRate || 50);
   const [errors, setErrors] = useState<{ hourlyRate?: string }>({});
 
@@ -37,10 +39,10 @@ export function PricingStep({ data, onNext, onBack }: PricingStepProps) {
     const newErrors: { hourlyRate?: string } = {};
 
     if (!hourlyRate || hourlyRate < 10) {
-      newErrors.hourlyRate = "Hourly rate must be at least $10";
+      newErrors.hourlyRate = t("onboarding.pricing.minRate", "Hourly rate must be at least $10");
     }
     if (hourlyRate > 500) {
-      newErrors.hourlyRate = "Hourly rate cannot exceed $500";
+      newErrors.hourlyRate = t("onboarding.pricing.maxRate", "Hourly rate cannot exceed $500");
     }
 
     setErrors(newErrors);
@@ -59,10 +61,10 @@ export function PricingStep({ data, onNext, onBack }: PricingStepProps) {
       <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="hourlyRate">
-            Hourly Rate ({selectedCurrency?.symbol})
+            {t("onboarding.pricing.hourlyRate", { symbol: selectedCurrency?.symbol, defaultValue: "Hourly Rate ($)" })}
           </Label>
           <div className="relative">
-            <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" aria-hidden="true" />
             <Input
               id="hourlyRate"
               type="number"
@@ -71,16 +73,22 @@ export function PricingStep({ data, onNext, onBack }: PricingStepProps) {
               step="5"
               value={hourlyRate}
               onChange={(e) => setHourlyRate(Number(e.target.value))}
+              aria-invalid={!!errors.hourlyRate}
+              aria-describedby={errors.hourlyRate ? "hourlyRate-error" : undefined}
               className="pl-9"
               placeholder="50"
             />
           </div>
           {errors.hourlyRate && (
-            <p className="text-sm text-red-600">{errors.hourlyRate}</p>
+            <p id="hourlyRate-error" className="text-sm text-red-600" role="alert">{errors.hourlyRate}</p>
           )}
           <p className="text-sm text-muted-foreground">
-            Set your hourly coaching rate (minimum {selectedCurrency?.symbol}10,
-            maximum {selectedCurrency?.symbol}500)
+            {t("onboarding.pricing.hint", { 
+              symbol: selectedCurrency?.symbol, 
+              min: 10, 
+              max: 500, 
+              defaultValue: "Set your hourly coaching rate (minimum $10, maximum $500)" 
+            })}
           </p>
         </div>
 
@@ -88,30 +96,31 @@ export function PricingStep({ data, onNext, onBack }: PricingStepProps) {
         <Card className="bg-muted/50 border-dashed">
           <CardContent className="pt-6">
             <div className="flex items-start gap-2 mb-4">
-              <Info className="h-4 w-4 text-muted-foreground mt-0.5" />
+              <Info className="h-4 w-4 text-muted-foreground mt-0.5" aria-hidden="true" />
               <div className="text-sm text-muted-foreground">
                 <p className="font-medium text-foreground mb-1">
-                  Earnings Breakdown
+                  {t("onboarding.pricing.earningsBreakdown", "Earnings Breakdown")}
                 </p>
                 <p>
-                  Our platform charges a {PLATFORM_FEE_PERCENTAGE}% service fee
-                  to cover payment processing, platform maintenance, and
-                  support.
+                  {t("onboarding.pricing.platformFeeDesc", { 
+                    fee: PLATFORM_FEE_PERCENTAGE, 
+                    defaultValue: `Our platform charges a ${PLATFORM_FEE_PERCENTAGE}% service fee to cover payment processing, platform maintenance, and support.` 
+                  })}
                 </p>
               </div>
             </div>
 
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Client pays:</span>
+                <span className="text-muted-foreground">{t("onboarding.pricing.clientPays", "Client pays:")}</span>
                 <span className="font-medium">
                   {selectedCurrency?.symbol}
-                  {hourlyRate.toFixed(2)}/hour
+                  {hourlyRate.toFixed(2)}/{t("common.hour", "hour")}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">
-                  Platform fee ({PLATFORM_FEE_PERCENTAGE}%):
+                  {t("onboarding.pricing.platformFee", { fee: PLATFORM_FEE_PERCENTAGE, defaultValue: `Platform fee (${PLATFORM_FEE_PERCENTAGE}%):` })}
                 </span>
                 <span className="text-red-600">
                   -{selectedCurrency?.symbol}
@@ -120,22 +129,23 @@ export function PricingStep({ data, onNext, onBack }: PricingStepProps) {
               </div>
               <div className="h-px bg-border my-2" />
               <div className="flex justify-between text-base font-semibold">
-                <span>You earn:</span>
+                <span>{t("onboarding.pricing.youEarn", "You earn:")}</span>
                 <span className="text-green-600">
                   {selectedCurrency?.symbol}
-                  {yourEarnings.toFixed(2)}/hour
+                  {yourEarnings.toFixed(2)}/{t("common.hour", "hour")}
                 </span>
               </div>
             </div>
 
             <div className="mt-4 p-3 bg-background rounded-md border">
               <p className="text-xs text-muted-foreground">
-                <strong>Example:</strong> If you complete 20 hours of coaching
-                per month, you'll earn approximately{" "}
-                <span className="font-semibold text-foreground">
-                  {selectedCurrency?.symbol}
-                  {(yourEarnings * 20).toFixed(2)}/month
-                </span>
+                 {/* This one is tricky with nesting. I'll use Trans or simple interpolation string. Simple string for now. */}
+                 {/* <strong>Example:</strong> If you complete 20 hours... */}
+                 {t("onboarding.pricing.example", { 
+                    count: 20, 
+                    amount: `${selectedCurrency?.symbol}${(yourEarnings * 20).toFixed(2)}`,
+                    defaultValue: `When coaching 20 hours/month, you'll earn approx. ${selectedCurrency?.symbol}${(yourEarnings * 20).toFixed(2)}/month`
+                 })}
               </p>
             </div>
           </CardContent>
@@ -149,10 +159,10 @@ export function PricingStep({ data, onNext, onBack }: PricingStepProps) {
           onClick={onBack}
           className="flex-1"
         >
-          Back
+          {t("common.back", "Back")}
         </Button>
         <Button type="submit" className="flex-1">
-          Continue
+          {t("common.continue", "Continue")}
         </Button>
       </div>
     </form>

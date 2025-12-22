@@ -54,13 +54,14 @@ function StatCard({
     >
       <div className="h-full flex flex-col justify-between rounded-xl bg-white p-6 border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all duration-300 group">
         <div className="flex items-start justify-between mb-4">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gray-50 text-gray-600 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gray-50 text-gray-600 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors" aria-hidden="true">
             <Icon className="h-5 w-5" strokeWidth={1.5} />
           </div>
           {trend && (
             <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full uppercase tracking-wide">
-              <ArrowUpRight className="w-3 h-3" />
+              <ArrowUpRight className="w-3 h-3" aria-hidden="true" />
               {trend}
+              <span className="sr-only">increase</span>
             </div>
           )}
         </div>
@@ -96,8 +97,16 @@ function ProgressRing({
   const offset = circumference - (progress / 100) * circumference;
 
   return (
-    <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
-      <svg width={size} height={size} className="transform -rotate-90">
+    <div 
+      className="relative flex items-center justify-center" 
+      style={{ width: size, height: size }}
+      role="progressbar"
+      aria-valuenow={progress}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-label="Overall Progress"
+    >
+      <svg width={size} height={size} className="transform -rotate-90" aria-hidden="true">
         {/* Background circle */}
         <circle
           cx={size / 2}
@@ -125,7 +134,7 @@ function ProgressRing({
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-        <span className="text-3xl font-bold text-gray-900 tracking-tight">{progress}%</span>
+        <span className="text-3xl font-bold text-gray-900 tracking-tight" aria-hidden="true">{progress}%</span>
       </div>
     </div>
   );
@@ -165,6 +174,7 @@ function BreakdownItem({
             ? "bg-emerald-50 border-emerald-100 text-emerald-600" 
             : "bg-white border-gray-100 text-gray-400 group-hover:border-gray-200 group-hover:text-gray-600"
         )}
+        aria-hidden="true"
       >
         {isCompleted ? (
           <CheckCircle2 className="h-4 w-4" strokeWidth={2} />

@@ -46,43 +46,46 @@ export default function CareerCard({ career }: { career: CareerRole }) {
 
   // Determine match color and label
   let matchColorClass = "text-red-600 bg-red-50 border-red-100";
-  let matchLabel = "Low Match";
+  let matchLabel = t("career.match.low", "Low Match");
   if (matchScore > 80) {
     matchColorClass = "text-emerald-600 bg-emerald-50 border-emerald-100";
-    matchLabel = "High Match";
+    matchLabel = t("career.match.high", "High Match");
   } else if (matchScore > 60) {
     matchColorClass = "text-amber-600 bg-amber-50 border-amber-100";
-    matchLabel = "Good Match";
+    matchLabel = t("career.match.good", "Good Match");
   }
 
   return (
-    <motion.div
+    <motion.article
       className="bg-white rounded-3xl p-6 hover:shadow-xl transition-all duration-300 cursor-pointer group relative overflow-hidden border border-gray-100 h-full flex flex-col"
       layout
       onClick={() => router.push(`/careers/${career.id}`)}
       onMouseEnter={() => prefetch.prefetchCareer?.(career.id)}
+      aria-labelledby={`career-${career.id}-title`}
     >
       {/* Hover Gradient Overlay */}
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
 
       <div className="flex items-start justify-between mb-5">
         <div>
-          <h4 className="font-bold text-gray-900 text-lg leading-tight group-hover:text-indigo-600 transition-colors line-clamp-1">
+          <h3 id={`career-${career.id}-title`} className="font-bold text-gray-900 text-lg leading-tight group-hover:text-indigo-600 transition-colors line-clamp-1">
             {title}
-          </h4>
+          </h3>
           <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-1.5 font-medium">
-            <Briefcase className="h-3 w-3" />
-            {(career.industries || [])[0] || "General"}
+            <Briefcase className="h-3 w-3" aria-hidden="true" />
+            {(career.industries || [])[0] || t("career.general", "General")}
           </div>
         </div>
 
         {/* Match Score Badge */}
         <div
           className={`flex flex-col items-center justify-center px-2.5 py-1.5 rounded-lg border ${matchColorClass}`}
+          role="img"
+          aria-label={`${matchScore}% ${t("career.match.match", "match")} - ${matchLabel}`}
         >
-          <span className="text-sm font-bold leading-none">{matchScore}%</span>
-          <span className="text-[9px] font-medium uppercase tracking-wider opacity-80 mt-0.5">
-            Match
+          <span className="text-sm font-bold leading-none" aria-hidden="true">{matchScore}%</span>
+          <span className="text-[9px] font-medium uppercase tracking-wider opacity-80 mt-0.5" aria-hidden="true">
+            {t("career.match.label", "Match")}
           </span>
         </div>
       </div>
@@ -97,8 +100,8 @@ export default function CareerCard({ career }: { career: CareerRole }) {
             variant="secondary"
             className="bg-gray-50 text-gray-700 hover:bg-gray-100 border-gray-100 font-medium px-2.5 py-1"
           >
-            <DollarSign className="h-3 w-3 mr-1 text-gray-400" />$
-            {(career.salaryRange.median / 1000).toFixed(0)}k/yr
+            <DollarSign className="h-3 w-3 mr-1 text-gray-400" aria-hidden="true" />
+            {t("career.salary.yearly", { value: (career.salaryRange.median / 1000).toFixed(0), currency: "$" })}k/yr
           </Badge>
         )}
         {career.remoteEligible && (
@@ -106,8 +109,8 @@ export default function CareerCard({ career }: { career: CareerRole }) {
             variant="secondary"
             className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-100 font-medium px-2.5 py-1"
           >
-            <Globe className="h-3 w-3 mr-1 text-blue-400" />
-            Remote
+            <Globe className="h-3 w-3 mr-1 text-blue-400" aria-hidden="true" />
+            {t("career.remote", "Remote")}
           </Badge>
         )}
         {career.demandStats?.growthPercent &&
@@ -116,8 +119,8 @@ export default function CareerCard({ career }: { career: CareerRole }) {
               variant="secondary"
               className="bg-green-50 text-green-700 hover:bg-green-100 border-green-100 font-medium px-2.5 py-1"
             >
-              <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
-              High Demand
+              <TrendingUp className="h-3 w-3 mr-1 text-green-500" aria-hidden="true" />
+              {t("career.highDemand", "High Demand")}
             </Badge>
           )}
       </div>
@@ -154,11 +157,12 @@ export default function CareerCard({ career }: { career: CareerRole }) {
             variant="ghost"
             size="icon"
             className="h-8 w-8 text-gray-300 group-hover:text-indigo-500 transition-colors rounded-full hover:bg-indigo-50"
+            aria-label={t("career.viewDetails", { title })}
           >
-            <ArrowUpRight className="h-4 w-4" />
+            <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
           </Button>
         </div>
       </div>
-    </motion.div>
+    </motion.article>
   );
 }

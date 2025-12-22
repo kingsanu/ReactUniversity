@@ -2,17 +2,17 @@
 
 import React from "react";
 import {
-  LineChart,
   Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Area,
-  AreaChart
+  Area
 } from "recharts";
+import { useTranslation } from "react-i18next";
 import { BenchmarkData } from "@/services/benchmarkService";
+import { DynamicAreaChart } from "@/lib/dynamic-imports";
 
 interface EmployabilityChartProps {
   data?: BenchmarkData[];
@@ -20,10 +20,12 @@ interface EmployabilityChartProps {
 }
 
 export default function EmployabilityChart({ data, isLoading }: EmployabilityChartProps) {
+  const { t } = useTranslation();
+
   if (isLoading) {
     return (
       <div className="h-[300px] w-full flex items-center justify-center bg-slate-50 rounded-lg animate-pulse">
-        <span className="text-slate-400 font-medium">Loading trends...</span>
+        <span className="text-slate-400 font-medium">{t("benchmarks.loadingTrends")}</span>
       </div>
     );
   }
@@ -31,7 +33,7 @@ export default function EmployabilityChart({ data, isLoading }: EmployabilityCha
   if (!data || data.length === 0) {
     return (
       <div className="h-[300px] w-full flex items-center justify-center bg-slate-50 rounded-lg">
-        <span className="text-slate-400 font-medium">No data available</span>
+        <span className="text-slate-400 font-medium">{t("benchmarks.noDataAvailable")}</span>
       </div>
     );
   }
@@ -39,7 +41,7 @@ export default function EmployabilityChart({ data, isLoading }: EmployabilityCha
   return (
     <div className="h-[300px] w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+        <DynamicAreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
@@ -71,9 +73,9 @@ export default function EmployabilityChart({ data, isLoading }: EmployabilityCha
             strokeWidth={3}
             fillOpacity={1} 
             fill="url(#colorValue)" 
-            name="Employability Score"
+            name={t("benchmarks.employabilityScore")}
           />
-        </AreaChart>
+        </DynamicAreaChart>
       </ResponsiveContainer>
     </div>
   );

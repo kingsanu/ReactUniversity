@@ -18,7 +18,7 @@ import {
   ChevronRight,
   ArrowLeft,
 } from "lucide-react";
-import { BookingModal } from "@/components/coaching/BookingModal";
+import { DynamicBookingModal } from "@/lib/dynamic-imports";
 import { useParams, useRouter } from "next/navigation";
 import { Coach } from "@/types/coach";
 import { motion } from "motion/react";
@@ -315,7 +315,7 @@ export default function CoachProfilePage() {
         </div>
       </div>
 
-      <BookingModal
+      <DynamicBookingModal
         coach={coach}
         isOpen={isBookingModalOpen}
         onClose={() => setIsBookingModalOpen(false)}
