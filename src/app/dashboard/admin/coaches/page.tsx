@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SingleInviteForm } from "@/components/admin/SingleInviteForm";
 import { BulkInviteForm } from "@/components/admin/BulkInviteForm";
 import { CoachesTable } from "@/components/admin/CoachesTable";
 import { Button } from "@/components/ui/button";
-import { Plus, Users, UserCheck, UserPlus, Clock } from "lucide-react";
+import { Plus, Users, UserCheck, UserPlus, Clock, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   Dialog,
@@ -16,17 +16,75 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Coach } from "@/types/coach";
+
+interface CoachStats {
+  totalCoaches: number;
+  activeNow: number;
+  pendingInvites: number;
+  expiringContracts: number;
+}
 
 export default function CoachesPage() {
   const { t } = useTranslation();
   const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [stats, setStats] = useState<CoachStats>({
+    totalCoaches: 0,
+    activeNow: 0,
+    pendingInvites: 0,
+    expiringContracts: 0,
+  });
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
 
-  // Mock stats - in a real app these would come from an API
-  const stats = [
+  // Fetch coach stats from API
+  useEffect(() => {
+    const fetchCoachStats = async () => {
+      setIsLoadingStats(true);
+      try {
+        const { getAllCoachesAdmin } = await import("@/services/coachService");
+        const response = await getAllCoachesAdmin({ page: 1, limit: 500 });
+        
+        const anyResponse = response as any;
+        let coaches: Coach[] = [];
+        
+        if (Array.isArray(anyResponse)) {
+          coaches = anyResponse;
+        } else if (anyResponse?.data && Array.isArray(anyResponse.data)) {
+          coaches = anyResponse.data;
+        } else if (anyResponse?.data?.data && Array.isArray(anyResponse.data.data)) {
+          coaches = anyResponse.data.data;
+        }
+
+        const today = new Date();
+        const thirtyDaysFromNow = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+        const calculatedStats: CoachStats = {
+          totalCoaches: coaches.length,
+          activeNow: coaches.filter((c) => c.status === "active").length,
+          pendingInvites: coaches.filter((c) => c.status === "invited" || c.status === "pending").length,
+          expiringContracts: coaches.filter((c) => {
+            if (!c.contractEnd) return false;
+            const endDate = new Date(c.contractEnd);
+            return endDate >= today && endDate <= thirtyDaysFromNow;
+          }).length,
+        };
+
+        setStats(calculatedStats);
+      } catch (error) {
+        console.error("Failed to fetch coach stats:", error);
+      } finally {
+        setIsLoadingStats(false);
+      }
+    };
+
+    fetchCoachStats();
+  }, []);
+
+  const statsData = [
     {
       labelKey: "admin.coaches.totalCoaches",
       label: "Total Coaches",
-      value: "24",
+      value: isLoadingStats ? "..." : stats.totalCoaches.toString(),
       icon: Users,
       color: "text-blue-600",
       bg: "bg-blue-50/50",
@@ -35,7 +93,7 @@ export default function CoachesPage() {
     {
       labelKey: "admin.coaches.activeNow",
       label: "Active Now",
-      value: "18",
+      value: isLoadingStats ? "..." : stats.activeNow.toString(),
       icon: UserCheck,
       color: "text-green-600",
       bg: "bg-green-50/50",
@@ -44,7 +102,7 @@ export default function CoachesPage() {
     {
       labelKey: "admin.coaches.pendingInvites",
       label: "Pending Invites",
-      value: "4",
+      value: isLoadingStats ? "..." : stats.pendingInvites.toString(),
       icon: UserPlus,
       color: "text-orange-600",
       bg: "bg-orange-50/50",
@@ -53,7 +111,7 @@ export default function CoachesPage() {
     {
       labelKey: "admin.coaches.expiringContracts",
       label: "Expiring Contracts",
-      value: "2",
+      value: isLoadingStats ? "..." : stats.expiringContracts.toString(),
       icon: Clock,
       color: "text-red-600",
       bg: "bg-red-50/50",
@@ -121,7 +179,7 @@ export default function CoachesPage() {
 
         {/* Bento Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {stats.map((stat, index) => (
+          {statsData.map((stat, index) => (
             <div
               key={index}
               className={`group relative overflow-hidden rounded-2xl border ${stat.border} bg-white p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1`}

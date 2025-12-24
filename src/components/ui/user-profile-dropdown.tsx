@@ -89,7 +89,7 @@ export function UserProfileDropdown() {
         >
           <Avatar className="h-10 w-10">
             <AvatarImage
-              src={user.id ? `/api/users/${user.id}/avatar` : undefined}
+              src={user.avatar || user.image || undefined}
               alt={getUserDisplayName()}
             />
             <AvatarFallback className="bg-blue-600 text-white font-medium">

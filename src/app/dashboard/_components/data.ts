@@ -268,12 +268,6 @@ export const coachSidebarData = {
       path: "/dashboard",
     },
     {
-      id: "coaching-dashboard",
-      name: "Coaching Dashboard",
-      icon: "dashboard",
-      path: "/dashboard/coaching/dashboard",
-    },
-    {
       id: "sessions",
       name: "Sessions",
       icon: "opportunities",

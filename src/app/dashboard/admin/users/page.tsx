@@ -3,9 +3,11 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAdminAccess } from "@/hooks/useAdminAccess";
 import { useAdminUsers } from "@/hooks/useAdminUsers";
+import { createUser } from "@/services/adminUsersService";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -15,12 +17,23 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   Search,
   MoreHorizontal,
   UserCheck,
   UserX,
   Mail,
   Filter,
+  Plus,
+  Loader2,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -49,12 +62,23 @@ export default function AdminUsersPage() {
   const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
+  
+  // Add User Modal State
+  const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [newUser, setNewUser] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "student",
+  });
 
   // Use the new hook for data fetching
   const {
     data,
     isLoading: usersLoading,
     error,
+    refetch,
   } = useAdminUsers({
     page,
     limit: 20,
@@ -66,6 +90,31 @@ export default function AdminUsersPage() {
   const users = data?.items || [];
   const totalPages = data ? Math.ceil(data.total / data.limit) : 1;
   const loading = usersLoading;
+
+  // Handle Add User Submit
+  const handleAddUser = async () => {
+    if (!newUser.name || !newUser.email || !newUser.password) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    setIsCreating(true);
+    try {
+      await createUser({
+        name: newUser.name,
+        email: newUser.email,
+        password: newUser.password,
+      });
+      toast.success("User created successfully!");
+      setIsAddUserOpen(false);
+      setNewUser({ name: "", email: "", password: "", role: "student" });
+      refetch();
+    } catch (error: any) {
+      toast.error(error.message || "Failed to create user");
+    } finally {
+      setIsCreating(false);
+    }
+  };
 
   // Handle admin access check
   useEffect(() => {
@@ -157,7 +206,73 @@ export default function AdminUsersPage() {
               </SelectContent>
             </Select>
           </div>
-          <Button>{t("admin.users.addUser")}</Button>
+          
+          {/* Add User Dialog */}
+          <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                {t("admin.users.addUser")}
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Add New User</DialogTitle>
+                <DialogDescription>
+                  Create a new user account. They will receive their login credentials.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="name">Full Name *</Label>
+                  <Input
+                    id="name"
+                    placeholder="Enter full name"
+                    value={newUser.name}
+                    onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="email">Email *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter email address"
+                    value={newUser.email}
+                    onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="password">Password *</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Enter password"
+                    value={newUser.password}
+                    onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Password must be at least 6 characters with uppercase, lowercase, and number.
+                  </p>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsAddUserOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleAddUser} disabled={isCreating}>
+                  {isCreating ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    "Create User"
+                  )}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
 
         <div className="border rounded-lg bg-white">

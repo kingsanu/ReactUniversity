@@ -25,6 +25,13 @@ export interface AdminUsersFilters {
   status?: string;
 }
 
+export interface CreateUserData {
+  name: string;
+  email: string;
+  password: string;
+  roleId?: string;
+}
+
 /**
  * Get all users with pagination and filtering (Admin only)
  */
@@ -46,3 +53,46 @@ export async function getAdminUsers(
   );
   return response.data || response;
 }
+
+/**
+ * Create a new user (Admin only)
+ */
+export async function createUser(data: CreateUserData): Promise<AdminUser> {
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const response = await fetch(`${API_BASE_URL}/authapi/signup`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    try {
+      const errorJson = JSON.parse(errorText);
+      // Handle ASP.NET validation errors format
+      if (errorJson.errors) {
+        const errorMessages = Object.entries(errorJson.errors)
+          .map(([field, messages]) => {
+            if (Array.isArray(messages)) {
+              return messages.join(", ");
+            }
+            return String(messages);
+          })
+          .join("; ");
+        throw new Error(errorMessages || "Validation failed");
+      }
+      throw new Error(errorJson.message || errorJson.title || "Failed to create user");
+    } catch (e) {
+      if (e instanceof Error && e.message !== errorText) {
+        throw e;
+      }
+      throw new Error(errorText || "Failed to create user");
+    }
+  }
+
+  const result = await response.json();
+  return result.data || result;
+}
+

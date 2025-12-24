@@ -207,7 +207,7 @@ export default function CoachOnboardingPage({
 
 
       // Redirect to dashboard
-      router.push(response.redirectUrl || `/dashboard/coaching/dashboard`);
+      router.push(response.redirectUrl || `/dashboard`);
     } catch (error) {
       console.error("Submission error:", error);
       toast.error("Failed to submit onboarding data. Please try again.");

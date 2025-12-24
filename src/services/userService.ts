@@ -45,7 +45,7 @@ export async function uploadProfileAvatar(
   file: File
 ): Promise<{ avatarUrl: string }> {
   const formData = new FormData();
-  formData.append("avatar", file);
+  formData.append("file", file);
 
   const response = await fetch(`${API_BASE_URL}/api/v1/user/profile/avatar`, {
     method: "POST",
@@ -57,14 +57,14 @@ export async function uploadProfileAvatar(
 
   if (!response.ok) throw new Error("Failed to upload avatar");
   const json = await response.json();
-  return json.data || json;
+  return { avatarUrl: json.url || json.data?.url || json.avatarUrl || "" };
 }
 
 export async function uploadProfileCover(
   file: File
 ): Promise<{ coverUrl: string }> {
   const formData = new FormData();
-  formData.append("cover", file);
+  formData.append("file", file);
 
   const response = await fetch(`${API_BASE_URL}/api/v1/user/profile/cover`, {
     method: "POST",
@@ -76,7 +76,7 @@ export async function uploadProfileCover(
 
   if (!response.ok) throw new Error("Failed to upload cover");
   const json = await response.json();
-  return json.data || json;
+  return { coverUrl: json.url || json.data?.url || json.coverUrl || "" };
 }
 
 export async function getUserActivity(): Promise<UserActivity[]> {

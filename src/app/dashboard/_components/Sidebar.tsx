@@ -241,7 +241,7 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
         <div className="p-4 border-t border-slate-800/50 bg-slate-950/30">
           <div className="flex items-center gap-3 mb-4 px-2">
             <Avatar className="h-10 w-10 border border-slate-700">
-              <AvatarImage src={`/api/users/${user?.id}/avatar`} alt="" />
+              <AvatarImage src={user?.avatar || user?.image || undefined} alt="" />
               <AvatarFallback className="bg-slate-800 text-slate-300">
                 {user?.name?.charAt(0).toUpperCase() || "U"}
               </AvatarFallback>

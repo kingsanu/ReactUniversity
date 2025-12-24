@@ -217,7 +217,7 @@ export default function CoachProfilePage() {
                         avatarPreview ||
                         user.image ||
                         user.avatar ||
-                        `/api/users/${user.id}/avatar`
+                        undefined
                       }
                       className="object-cover"
                     />

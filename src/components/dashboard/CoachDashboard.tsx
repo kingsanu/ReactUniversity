@@ -86,7 +86,7 @@ const INITIAL_AVAILABILITY = {
   ],
 };
 
-export default function CoachDashboardPage() {
+export function CoachDashboard() {
   const { t } = useTranslation();
   const { user } = useGlobalStore();
   const [activeTab, setActiveTab] = useState("upcoming");
@@ -125,7 +125,6 @@ export default function CoachDashboardPage() {
         console.log("📦 Raw API response - availability:", availabilityData);
 
         // Handle different response structures
-        // The API might return { data: { data: [...] } } or { data: [...] } or just [...]
         const rawSessions = Array.isArray((sessionsData as any)?.data?.data)
           ? (sessionsData as any).data.data
           : Array.isArray((sessionsData as any)?.data)
@@ -141,7 +140,7 @@ export default function CoachDashboardPage() {
 
           let date = "TBD";
           let time = "TBD";
-          let duration = "1 hour"; // Default
+          let duration = "1 hour";
 
           if (startTime) {
             try {
@@ -180,7 +179,7 @@ export default function CoachDashboardPage() {
         setUpcomingSessions(upcoming);
         setPastSessions(past);
 
-        // Handle student data parsing from nested structure { data: { data: [...], total: 3 } }
+        // Handle student data parsing
         const studentsResponse = studentsData as any;
         const studentsList = Array.isArray(studentsResponse?.data?.data)
           ? studentsResponse.data.data
@@ -247,11 +246,6 @@ export default function CoachDashboardPage() {
           "@/services/coachService"
         );
         const dateStr = format(rescheduleDate, "yyyy-MM-dd");
-        // We need the coachId. Assuming 'user.id' is the coach's ID since this is the coach dashboard.
-        // However, fetching availability usually requires the coach's ID.
-        // If this is the coach viewing their own dashboard, they shouldn't need to fetch public slots...
-        // BUT the requirement says "fetch slots from backend".
-        // Let's assume we use the user.id as coachId.
         const response = await getCoachAvailableSlots(user.id, dateStr);
         setAvailableSlots(response.slots || []);
       } catch (error) {
@@ -274,9 +268,8 @@ export default function CoachDashboardPage() {
     try {
       const { rescheduleSession } = await import("@/services/coachService");
 
-      // Construct start/end time from date and time inputs
       const timeParts = selectedTime.match(/(\d+):(\d+)(am|pm)/i);
-      if (!timeParts) return; // Should not happen given the UI
+      if (!timeParts) return;
 
       let hours = parseInt(timeParts[1]);
       const minutes = parseInt(timeParts[2]);
@@ -285,13 +278,11 @@ export default function CoachDashboardPage() {
       if (meridian === "pm" && hours < 12) hours += 12;
       if (meridian === "am" && hours === 12) hours = 0;
 
-      // Create date objects ensuring we keep local timezone correctness
-      // The API expects ISO strings.
       const startObj = new Date(rescheduleDate);
       startObj.setHours(hours, minutes, 0, 0);
 
       const endObj = new Date(startObj);
-      endObj.setMinutes(startObj.getMinutes() + 60); // Default 60 min duration
+      endObj.setMinutes(startObj.getMinutes() + 60);
 
       const start = startObj.toISOString();
       const end = endObj.toISOString();
@@ -351,7 +342,7 @@ export default function CoachDashboardPage() {
               <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full blur opacity-30 group-hover:opacity-50 transition duration-500"></div>
               <Avatar className="h-16 w-16 sm:h-20 sm:w-20 border-4 border-white shadow-xl relative">
                 <AvatarImage
-                  src={`/api/users/${user.id}/avatar`}
+                  src={user.avatar || user.image || undefined}
                   className="object-cover"
                 />
                 <AvatarFallback className="bg-gradient-to-br from-gray-900 to-black text-white text-2xl">
@@ -390,7 +381,6 @@ export default function CoachDashboardPage() {
                     className="w-5 h-5 text-gray-300"
                     aria-label="Calendar Icon"
                   />{" "}
-                  {/* Changed Icon */}
                   <span>Manage Availability</span>
                 </div>
               </Button>
@@ -633,7 +623,7 @@ export default function CoachDashboardPage() {
                     No upcoming sessions
                   </h3>
                   <p className="text-gray-500 max-w-sm mx-auto text-lg leading-relaxed">
-                    You don't have any scheduled sessions yet. <br />
+                    You don&apos;t have any scheduled sessions yet. <br />
                     <span className="text-blue-600 font-medium">
                       Time to take a break!
                     </span>
@@ -714,7 +704,6 @@ export default function CoachDashboardPage() {
           </Tabs>
         </div>
 
-        {/* Reschedule Dialog */}
         {/* Reschedule Dialog */}
         <Dialog open={isRescheduleOpen} onOpenChange={setIsRescheduleOpen}>
           <DialogContent className="sm:max-w-[900px] w-full p-0 overflow-hidden gap-0 bg-white border-0 shadow-2xl rounded-3xl">
@@ -803,99 +792,45 @@ export default function CoachDashboardPage() {
               </div>
 
               {/* Column 2: Time Slots */}
-              <div className="w-full md:w-[320px] bg-gray-50/50 flex flex-col border-t md:border-t-0">
-                <div className="p-6 border-b border-gray-200/50">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
-                      <AvatarImage src={selectedSession?.studentImage} />
-                      <AvatarFallback className="bg-gray-900 text-white text-xs">
-                        {selectedSession?.studentName?.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-bold text-gray-900 text-sm truncate">
-                        {selectedSession?.studentName}
-                      </p>
-                      <p className="text-xs text-gray-500 truncate">
-                        {selectedSession?.topic
-                          ?.replace(/-/g, " ")
-                          .toUpperCase()}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+              <div className="flex-1 p-6 sm:p-8 bg-gray-50/50 flex flex-col">
+                <h3 className="font-semibold text-gray-900 mb-4">
+                  Available Times
+                </h3>
 
-                <div className="flex-1 p-6 flex flex-col min-h-[300px]">
-                  <h4 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-blue-500" />
-                    Available Times
-                    {rescheduleDate && (
-                      <span className="text-gray-400 font-normal ml-auto text-xs">
-                        {format(rescheduleDate, "MMM d")}
-                      </span>
-                    )}
-                  </h4>
-
-                  <div className="flex-1 overflow-y-auto custom-scrollbar -mr-2 pr-2">
-                    {isLoadingSlots ? (
-                      <div className="h-full flex flex-col items-center justify-center text-gray-400 space-y-3">
-                        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
-                        <p className="text-xs">Checking availability...</p>
-                      </div>
-                    ) : !rescheduleDate ? (
-                      <div className="h-full flex flex-col items-center justify-center text-gray-400 text-center p-4">
-                        <CalendarDays className="h-10 w-10 mb-3 opacity-20" />
-                        <p className="text-sm">Select a date to see times</p>
-                      </div>
-                    ) : availableSlots.length === 0 ? (
-                      <div className="h-full flex flex-col items-center justify-center text-gray-400 text-center p-4">
-                        <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
-                          <Clock className="h-5 w-5 opacity-30" />
-                        </div>
-                        <p className="text-sm font-medium text-gray-600 mb-1">
-                          No slots available
-                        </p>
-                        <p className="text-xs">Try selecting another date</p>
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-2 gap-2">
-                        {availableSlots.map((time) => (
-                          <button
-                            key={time}
-                            onClick={() => setSelectedTime(time)}
-                            className={cn(
-                              "px-3 py-2 text-sm font-medium rounded-xl border transition-all text-center",
-                              selectedTime === time
-                                ? "bg-blue-600 text-white border-blue-600 shadow-md transform scale-[1.02]"
-                                : "bg-white border-gray-200 text-gray-700 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50"
-                            )}
-                          >
-                            {time}
-                          </button>
-                        ))}
-                      </div>
-                    )}
+                {isLoadingSlots ? (
+                  <div className="flex-1 flex items-center justify-center">
+                    <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
                   </div>
-                </div>
-
-                <div className="p-6 border-t border-gray-200/50 bg-white md:bg-transparent">
-                  <div className="flex gap-3">
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsRescheduleOpen(false)}
-                      className="flex-1 h-11 rounded-xl font-semibold border-gray-200 hover:bg-gray-50"
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      onClick={confirmReschedule}
-                      disabled={!selectedTime || isLoadingSlots}
-                      className="flex-1 bg-black text-white hover:bg-gray-800 h-11 rounded-xl font-semibold shadow-lg shadow-black/5 disabled:opacity-50"
-                    >
-                      Confirm
-                    </Button>
+                ) : availableSlots.length > 0 ? (
+                  <div className="grid grid-cols-2 gap-2 flex-1 content-start">
+                    {availableSlots.map((slot) => (
+                      <Button
+                        key={slot}
+                        variant={selectedTime === slot ? "default" : "outline"}
+                        className={cn(
+                          "h-11 rounded-xl font-medium transition-all",
+                          selectedTime === slot &&
+                            "bg-blue-600 text-white border-blue-600"
+                        )}
+                        onClick={() => setSelectedTime(slot)}
+                      >
+                        {slot}
+                      </Button>
+                    ))}
                   </div>
-                </div>
+                ) : (
+                  <div className="flex-1 flex items-center justify-center text-gray-400 text-sm">
+                    No available slots for this date
+                  </div>
+                )}
+
+                <Button
+                  className="w-full mt-6 h-12 rounded-xl bg-black text-white hover:bg-gray-800 font-semibold"
+                  onClick={confirmReschedule}
+                  disabled={!selectedTime}
+                >
+                  Confirm Reschedule
+                </Button>
               </div>
             </div>
           </DialogContent>
@@ -904,3 +839,5 @@ export default function CoachDashboardPage() {
     </div>
   );
 }
+
+export default CoachDashboard;

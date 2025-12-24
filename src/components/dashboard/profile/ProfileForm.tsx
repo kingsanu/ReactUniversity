@@ -13,14 +13,17 @@ import { FiSave, FiGithub, FiTwitter, FiLinkedin, FiPlus, FiTrash2, FiLink } fro
 import { toast } from "sonner";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getUserProfile, updateUserProfile } from "@/services/userService";
+import { useGlobalStore } from "@/store/useGlobalStore";
+import { Loader2 } from "lucide-react";
 
 // Robust Schema
 const profileSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters"),
-  headline: z.string().max(100, "Headline must be less than 100 characters"),
-  bio: z.string().max(500, "Bio must be less than 500 characters"),
-  location: z.string(),
+  headline: z.string().max(100, "Headline must be less than 100 characters").optional(),
+  bio: z.string().max(500, "Bio must be less than 500 characters").optional(),
+  location: z.string().optional(),
   email: z.string().email(),
   phone: z.string().optional(),
   socialLinks: z.object({
@@ -39,31 +42,74 @@ const profileSchema = z.object({
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export function ProfileForm() {
+  const { user, setUser } = useGlobalStore();
   const [newSkill, setNewSkill] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
-  const { register, control, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<ProfileFormValues>({
+  const { register, control, handleSubmit, setValue, watch, reset, formState: { errors, isSubmitting } } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      fullName: "John Doe",
-      headline: "Senior Product Designer",
-      bio: "Passionate about creating intuitive and beautiful user experiences.",
-      location: "San Francisco, CA",
-      email: "john.doe@example.com",
-      phone: "+1 (555) 123-4567",
+      fullName: "",
+      headline: "",
+      bio: "",
+      location: "",
+      email: "",
+      phone: "",
       socialLinks: {
-        website: "https://johndoe.design",
-        github: "https://github.com/johndoe",
-        twitter: "https://twitter.com/johndoe",
-        linkedin: "https://linkedin.com/in/johndoe",
+        website: "",
+        github: "",
+        twitter: "",
+        linkedin: "",
       },
-      skills: ["UI/UX", "Product Design", "React", "Figma", "Design Systems"],
-      competencies: [
-          { label: "Advanced React Patterns", level: 78 },
-          { label: "System Design", level: 55 },
-          { label: "UI Animation", level: 92 }
-      ]
+      skills: [],
+      competencies: []
     }
   });
+
+  // Fetch profile data on mount
+  useEffect(() => {
+    const fetchProfile = async () => {
+      setIsLoading(true);
+      try {
+        const profile = await getUserProfile();
+        // Reset form with fetched data
+        reset({
+          fullName: profile.fullName || user.name || "",
+          headline: profile.headline || "",
+          bio: profile.bio || "",
+          location: profile.location || "",
+          email: profile.email || user.email || "",
+          phone: profile.phone || "",
+          socialLinks: {
+            website: profile.socialLinks?.website || "",
+            github: profile.socialLinks?.github || "",
+            twitter: profile.socialLinks?.twitter || "",
+            linkedin: profile.socialLinks?.linkedin || "",
+          },
+          skills: profile.skills || [],
+          competencies: []
+        });
+      } catch (error) {
+        console.error("Failed to fetch profile:", error);
+        // Fallback to global store data
+        reset({
+          fullName: user.name || "",
+          headline: "",
+          bio: "",
+          location: "",
+          email: user.email || "",
+          phone: "",
+          socialLinks: { website: "", github: "", twitter: "", linkedin: "" },
+          skills: [],
+          competencies: []
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [reset, user.name, user.email]);
 
   const { fields: competencyFields, append: appendCompetency, remove: removeCompetency } = useFieldArray({
     control,
@@ -87,11 +133,34 @@ export function ProfileForm() {
   };
 
   const onSubmit = async (data: ProfileFormValues) => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    console.log("Updated Profile Data:", data);
-    toast.success("Profile updated successfully");
+    try {
+      await updateUserProfile({
+        fullName: data.fullName,
+        headline: data.headline,
+        bio: data.bio,
+        location: data.location,
+        phone: data.phone,
+        socialLinks: data.socialLinks,
+        skills: data.skills,
+      });
+      // Update global store with new name
+      setUser({ name: data.fullName });
+      toast.success("Profile updated successfully");
+    } catch (error: any) {
+      console.error("Failed to update profile:", error);
+      toast.error(error.message || "Failed to update profile");
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <span className="ml-3 text-gray-500">Loading profile...</span>
+      </div>
+    );
+  }
+
 
   return (
     <motion.div

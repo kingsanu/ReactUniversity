@@ -283,7 +283,7 @@ export default function MySessionsPage() {
             <div className="relative">
               <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full blur opacity-25"></div>
               <Avatar className="h-16 w-16 border-4 border-white shadow-xl relative">
-                <AvatarImage src={`/api/users/${user?.id}/avatar`} />
+                <AvatarImage src={user?.avatar || user?.image || undefined} />
                 <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-xl font-bold">
                   {user?.name?.charAt(0).toUpperCase() || "U"}
                 </AvatarFallback>

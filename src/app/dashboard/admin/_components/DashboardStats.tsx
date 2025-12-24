@@ -1,59 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { motion } from "motion/react";
-import { Users, CreditCard, Activity, FileQuestion, TrendingUp, ArrowUpRight, ArrowDownRight } from "lucide-react";
-import { questions360Service } from "@/services/questions360Service";
-
-interface DashboardStatsData {
-  totalUsers: number;
-  activeSubscriptions: number;
-  totalRevenue: number;
-  questionsStats: {
-    total: number;
-    active: number;
-    inactive: number;
-  };
-}
+import { Users, CreditCard, Activity, GraduationCap, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { useAdminAnalytics } from "@/hooks/useAdminAnalytics";
 
 export function DashboardStats() {
-  const [stats, setStats] = useState<DashboardStatsData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: analytics, isLoading, error } = useAdminAnalytics("month");
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        setLoading(true);
-        
-        // Fetch real questions stats
-        const questionsData = await questions360Service.getAllQuestions();
-        const questions = Array.isArray(questionsData) ? questionsData : [];
-        const activeQuestions = questions.filter((q) => q.isActive).length;
-
-        // Mock other data (simulate API delay)
-        await new Promise((resolve) => setTimeout(resolve, 800));
-
-        setStats({
-          totalUsers: 1247,
-          activeSubscriptions: 892,
-          totalRevenue: 26450.0,
-          questionsStats: {
-            total: questions.length,
-            active: activeQuestions,
-            inactive: questions.length - activeQuestions,
-          },
-        });
-      } catch (error) {
-        console.error("Failed to fetch dashboard stats:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStats();
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {[...Array(4)].map((_, i) => (
@@ -63,48 +17,63 @@ export function DashboardStats() {
     );
   }
 
-  if (!stats) return null;
+  if (error || !analytics) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="col-span-full bg-red-50 border border-red-100 rounded-2xl p-6 text-center">
+          <p className="text-red-600 font-medium">Failed to load analytics data</p>
+          <p className="text-red-400 text-sm mt-1">Please try refreshing the page</p>
+        </div>
+      </div>
+    );
+  }
+
+  const { stats } = analytics;
 
   const statItems = [
     {
       label: "Total Users",
       value: stats.totalUsers.toLocaleString(),
-      subValue: "+12% from last month",
+      subValue: `${stats.monthlyGrowth.users >= 0 ? "+" : ""}${stats.monthlyGrowth.users.toFixed(1)}% from last month`,
       icon: Users,
       color: "text-blue-600",
       bg: "bg-blue-50/50",
       border: "border-blue-100",
-      trend: "up",
+      trend: stats.monthlyGrowth.users >= 0 ? "up" : "down",
+      trendValue: stats.monthlyGrowth.users,
     },
     {
-      label: "Monthly Revenue",
-      value: `$${stats.totalRevenue.toLocaleString()}`,
-      subValue: "+15% from last month",
+      label: "Total Revenue",
+      value: `$${stats.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      subValue: `${stats.monthlyGrowth.revenue >= 0 ? "+" : ""}${stats.monthlyGrowth.revenue.toFixed(1)}% from last month`,
       icon: CreditCard,
       color: "text-green-600",
       bg: "bg-green-50/50",
       border: "border-green-100",
-      trend: "up",
+      trend: stats.monthlyGrowth.revenue >= 0 ? "up" : "down",
+      trendValue: stats.monthlyGrowth.revenue,
     },
     {
-      label: "Active Subscriptions",
-      value: stats.activeSubscriptions.toLocaleString(),
-      subValue: "72% conversion rate",
-      icon: Activity,
+      label: "Active Courses",
+      value: stats.activeCourses.toLocaleString(),
+      subValue: `${stats.monthlyGrowth.courses >= 0 ? "+" : ""}${stats.monthlyGrowth.courses.toFixed(1)}% from last month`,
+      icon: GraduationCap,
       color: "text-purple-600",
       bg: "bg-purple-50/50",
       border: "border-purple-100",
-      trend: "up",
+      trend: stats.monthlyGrowth.courses >= 0 ? "up" : "down",
+      trendValue: stats.monthlyGrowth.courses,
     },
     {
-      label: "360° Questions",
-      value: stats.questionsStats.total.toString(),
-      subValue: `${stats.questionsStats.active} active questions`,
-      icon: FileQuestion,
+      label: "Growth Rate",
+      value: `${stats.growthRate.toFixed(1)}%`,
+      subValue: "Overall platform growth",
+      icon: Activity,
       color: "text-orange-600",
       bg: "bg-orange-50/50",
       border: "border-orange-100",
-      trend: "neutral",
+      trend: stats.growthRate >= 0 ? "up" : "down",
+      trendValue: stats.growthRate,
     },
   ];
 
@@ -125,10 +94,15 @@ export function DashboardStats() {
               <div className={`w-10 h-10 rounded-xl ${item.bg} flex items-center justify-center`}>
                 <item.icon className={`h-5 w-5 ${item.color}`} />
               </div>
-              {item.trend === "up" && (
+              {item.trend === "up" ? (
                 <div className="flex items-center text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">
                   <TrendingUp className="h-3 w-3 mr-1" />
-                  +12%
+                  +{Math.abs(item.trendValue).toFixed(1)}%
+                </div>
+              ) : (
+                <div className="flex items-center text-xs font-medium text-red-600 bg-red-50 px-2 py-1 rounded-full">
+                  <TrendingDown className="h-3 w-3 mr-1" />
+                  -{Math.abs(item.trendValue).toFixed(1)}%
                 </div>
               )}
             </div>

@@ -29,7 +29,7 @@ export default function DashboardPage() {
   // If user is a coach, render the coach dashboard content
   if (isCoach) {
     const CoachDashboard = dynamic(
-      () => import("@/app/dashboard/coaching/dashboard/page"),
+      () => import("@/components/dashboard/CoachDashboard"),
       { ssr: false }
     );
     return <CoachDashboard />;

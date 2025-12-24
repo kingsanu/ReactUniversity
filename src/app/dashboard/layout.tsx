@@ -62,7 +62,7 @@ export default function DashboardLayout({
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="rounded-full" aria-label={t("accessibility.userMenu", "User menu")}>
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={`/api/users/${user.id}/avatar`} />
+                      <AvatarImage src={user.avatar || user.image || undefined} />
                       <AvatarFallback>
                         {user.name?.charAt(0).toUpperCase() || "C"}
                       </AvatarFallback>

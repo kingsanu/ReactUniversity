@@ -46,7 +46,7 @@ export default function AnalyticsPage() {
   const { t } = useTranslation();
   const [period, setPeriod] = useState<"week" | "month" | "year">("month");
 
-  const { data: analytics, isLoading } = useAdminAnalytics(period);
+  const { data: analytics, isLoading, error, refetch } = useAdminAnalytics(period);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -68,7 +68,7 @@ export default function AnalyticsPage() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="p-6 md:p-8 space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
@@ -96,10 +96,43 @@ export default function AnalyticsPage() {
     );
   }
 
-  if (!analytics) return null;
+  if (error || !analytics) {
+    return (
+      <div className="p-6 md:p-8 space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">
+              {t("admin.analytics.title")}
+            </h1>
+            <p className="text-muted-foreground">
+              Platform analytics overview
+            </p>
+          </div>
+        </div>
+        <Card className="border-red-200 bg-red-50/50">
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mb-4">
+              <Activity className="h-8 w-8 text-red-500" />
+            </div>
+            <h3 className="text-xl font-semibold text-red-700 mb-2">Server Error</h3>
+            <p className="text-red-600 text-center max-w-md mb-4">
+              Unable to load analytics data. The server may be temporarily unavailable or there was a network issue.
+            </p>
+            <Button 
+              variant="outline" 
+              onClick={() => refetch()}
+              className="border-red-300 text-red-700 hover:bg-red-100"
+            >
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 md:p-8 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

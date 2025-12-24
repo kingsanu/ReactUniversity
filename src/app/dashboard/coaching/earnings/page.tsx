@@ -59,7 +59,13 @@ export default function EarningsPage() {
         getCoachEarningsHistory(),
       ]);
       setEarningsStats(statsResponse);
-      setEarningsHistory(historyResponse);
+      // Handle different response structures - might be array or {data: [...]}
+      const historyData = Array.isArray(historyResponse) 
+        ? historyResponse 
+        : Array.isArray((historyResponse as any)?.data) 
+          ? (historyResponse as any).data 
+          : [];
+      setEarningsHistory(historyData);
       setError(null);
     } catch (error) {
       console.error("Failed to fetch earnings data:", error);
