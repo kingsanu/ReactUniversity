@@ -294,16 +294,14 @@ export async function getAdminUsers(params: {
   status?: string;
 }): Promise<AdminUsersResponse> {
   const queryParams = new URLSearchParams();
-  if (params.page) queryParams.append("page", params.page.toString());
-  if (params.limit) queryParams.append("limit", params.limit.toString());
-  if (params.search) queryParams.append("search", params.search);
-  if (params.role && params.role !== "all")
-    queryParams.append("role", params.role);
-  if (params.status && params.status !== "all")
-    queryParams.append("status", params.status);
+  queryParams.append("page", (params.page || 1).toString());
+  queryParams.append("limit", (params.limit || 20).toString());
+  queryParams.append("search", params.search || "");
+  queryParams.append("role", params.role || "");
+  queryParams.append("status", params.status || "");
 
   const response = await fetch(
-    `${API_BASE_URL}/api/admin/users?${queryParams}`,
+    `${API_BASE_URL}/api/v1/admin/users?${queryParams}`,
     {
       headers: getHeaders(),
     }
@@ -342,14 +340,13 @@ export async function getAdminTransactions(params: {
   status?: string;
 }): Promise<AdminTransactionsResponse> {
   const queryParams = new URLSearchParams();
-  if (params.page) queryParams.append("page", params.page.toString());
-  if (params.limit) queryParams.append("limit", params.limit.toString());
-  if (params.search) queryParams.append("search", params.search);
-  if (params.status && params.status !== "all")
-    queryParams.append("status", params.status);
+  queryParams.append("page", (params.page || 1).toString());
+  queryParams.append("limit", (params.limit || 20).toString());
+  queryParams.append("search", params.search || "");
+  queryParams.append("status", params.status || "");
 
   const response = await fetch(
-    `${API_BASE_URL}/api/admin/transactions?${queryParams}`,
+    `${API_BASE_URL}/api/v1/admin/transactions?${queryParams}`,
     {
       headers: getHeaders(),
     }

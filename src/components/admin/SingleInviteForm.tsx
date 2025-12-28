@@ -89,7 +89,7 @@ export function SingleInviteForm() {
             <Input
               id="email"
               type="email"
-              placeholder="coach@example.com"
+              placeholder={t('admin.invite.emailPlaceholder')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required

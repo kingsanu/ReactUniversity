@@ -191,18 +191,13 @@ export default function TimelinePage() {
                           </svg>
                         </div>
                         <h3 className="text-lg font-bold text-gray-900 mb-2">
-                          {language === "spanish"
-                            ? "Error al cargar la línea de tiempo"
-                            : "Error loading timeline"}
+                          {t('dashboard.timelineErrorTitle')}
                         </h3>
                         <p className="text-sm text-gray-500 mb-4 max-w-xs mx-auto">
-                          {error?.message ||
-                            (language === "spanish"
-                              ? "Ocurrió un problema al intentar cargar tus eventos."
-                              : "There was a problem loading your events.")}
+                          {error?.message || t('dashboard.timelineErrorMessage')}
                         </p>
                         <Button onClick={() => refetch()} variant="outline" size="sm">
-                          {language === "spanish" ? "Reintentar" : "Try Again"}
+                          {t('common.tryAgain')}
                         </Button>
                       </div>
                     ) : (

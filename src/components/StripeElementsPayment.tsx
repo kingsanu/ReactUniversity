@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   Elements,
@@ -72,21 +73,23 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     }
   };
 
+  const { t } = useTranslation();
+  const formattedAmount = `$${(amount / 100).toFixed(2)}`;
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Order Summary */}
       <div className="bg-gray-50 rounded-lg p-4">
-        <h3 className="font-semibold text-gray-900 mb-2">Order Summary</h3>
+        <h3 className="font-semibold text-gray-900 mb-2">{t("payments.orderSummary")}</h3>
         <div className="flex justify-between items-center">
           <span className="text-gray-600">{description}</span>
-          <span className="font-semibold text-gray-900">${(amount / 100).toFixed(2)}</span>
+          <span className="font-semibold text-gray-900">{formattedAmount}</span>
         </div>
       </div>
 
       {/* Card Element */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Card Information
+          {t("payments.cardInformation")}
         </label>
         <div className="border border-gray-300 rounded-lg p-3">
           <CardElement
@@ -122,7 +125,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           disabled={!stripe || processing}
           className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
         >
-          {processing ? "Processing..." : `Pay $${(amount / 100).toFixed(2)}`}
+          {processing ? t("payments.processing") : t("payments.payAmount", { amount: formattedAmount })}
         </button>
         <button
           type="button"
@@ -130,7 +133,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           disabled={processing}
           className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 disabled:opacity-50 transition-colors"
         >
-          Cancel
+          {t("common.cancel")}
         </button>
       </div>
 
@@ -139,7 +142,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
         </svg>
-        <span>Your payment information is secure and encrypted</span>
+        <span>{t("payments.securityNotice")}</span>
       </div>
     </form>
   );
@@ -173,6 +176,7 @@ const StripeElementsPayment: React.FC<StripeElementsPaymentProps> = ({
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
 
   const handleStartPayment = async () => {
     if (disabled) return;
@@ -236,11 +240,12 @@ const StripeElementsPayment: React.FC<StripeElementsPaymentProps> = ({
   };
 
   if (showPaymentForm && clientSecret) {
+    const { t } = useTranslation();
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
         <div className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
           <div className="p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Complete Payment</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">{t("payments.completePayment")}</h2>
             <Elements stripe={stripePromise}>
               <PaymentForm
                 clientSecret={clientSecret}
@@ -263,7 +268,7 @@ const StripeElementsPayment: React.FC<StripeElementsPaymentProps> = ({
       disabled={disabled || loading}
       className={className}
     >
-      {children || (loading ? "Initializing..." : "Pay with Card")}
+      {children || (loading ? t("payments.initializing") : t("payments.payWithCard"))}
     </button>
   );
 };

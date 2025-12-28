@@ -158,7 +158,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             {/* Admin User Info */}
             <div className="flex items-center space-x-4">
               <div className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
-                Super Admin
+                {t('admin.layout.superAdmin')}
               </div>
               <button className="flex items-center justify-center w-8 h-8 bg-red-600 rounded-full text-white text-sm font-medium">
                 A

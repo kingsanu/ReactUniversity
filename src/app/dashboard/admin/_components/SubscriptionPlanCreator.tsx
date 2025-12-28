@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   createAllSubscriptionPlans,
   createSingleSubscriptionPlan,
@@ -8,6 +9,7 @@ import {
 } from "@/utils/createSubscriptionPlans";
 
 export default function SubscriptionPlanCreator() {
+  const { t } = useTranslation();
   const [isCreating, setIsCreating] = useState(false);
   const [results, setResults] = useState<any[]>([]);
   const [showResults, setShowResults] = useState(false);
@@ -57,7 +59,7 @@ export default function SubscriptionPlanCreator() {
 
   return (
     <div className="bg-white rounded-lg shadow p-6 mb-6">
-      <h3 className="text-lg font-semibold mb-4">Create Subscription Plans</h3>
+      <h3 className="text-lg font-semibold mb-4">{t('admin.plans.createTitle')}</h3>
 
       <div className="space-y-4">
         {/* Create All Button */}
@@ -67,7 +69,7 @@ export default function SubscriptionPlanCreator() {
             disabled={isCreating}
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isCreating ? "Creating..." : "Create All 3 Plans"}
+            {isCreating ? t('admin.plans.creating') : t('admin.plans.createAll', { count: subscriptionPlansToCreate.length })}
           </button>
         </div>
 
@@ -85,7 +87,7 @@ export default function SubscriptionPlanCreator() {
                 disabled={isCreating}
                 className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed w-full"
               >
-                {isCreating ? "Creating..." : "Create This Plan"}
+                {isCreating ? t('admin.plans.creating') : t('admin.plans.createThisPlan')}
               </button>
             </div>
           ))}
@@ -94,7 +96,7 @@ export default function SubscriptionPlanCreator() {
         {/* Results Display */}
         {showResults && (
           <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <h4 className="font-medium mb-3">Creation Results:</h4>
+            <h4 className="font-medium mb-3">{t('admin.plans.creationResultsTitle')}</h4>
             <div className="space-y-2">
               {results.map((result, index) => (
                 <div
@@ -128,7 +130,7 @@ export default function SubscriptionPlanCreator() {
 
         {/* Plans Preview */}
         <div className="mt-6">
-          <h4 className="font-medium mb-3">Plans to be created:</h4>
+          <h4 className="font-medium mb-3">{t('admin.plans.previewTitle')}</h4>
           <div className="space-y-3">
             {subscriptionPlansToCreate.map((plan, index) => (
               <div key={index} className="border-l-4 border-blue-500 pl-4 py-2">
@@ -150,7 +152,7 @@ export default function SubscriptionPlanCreator() {
                       <li key={fIndex}>{feature}</li>
                     ))}
                     {plan.features.length > 3 && (
-                      <li>... and {plan.features.length - 3} more</li>
+                      <li>{t('admin.plans.moreFeatures', { count: plan.features.length - 3 })}</li>
                     )}
                   </ul>
                 </div>

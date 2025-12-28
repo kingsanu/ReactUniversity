@@ -1,11 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
 import { useAdminAccess } from "@/hooks/useAdminAccess";
 import { useAdminUsers } from "@/hooks/useAdminUsers";
 import { createUser } from "@/services/adminUsersService";
 import { Button } from "@/components/ui/button";
-import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -59,8 +59,8 @@ export default function AdminUsersPage() {
   const { t } = useTranslation();
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [roleFilter, setRoleFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [roleFilter, setRoleFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [page, setPage] = useState(1);
   
   // Add User Modal State
@@ -94,7 +94,7 @@ export default function AdminUsersPage() {
   // Handle Add User Submit
   const handleAddUser = async () => {
     if (!newUser.name || !newUser.email || !newUser.password) {
-      toast.error("Please fill in all required fields");
+      toast.error(t('admin.users.fillRequired'));
       return;
     }
 
@@ -105,12 +105,12 @@ export default function AdminUsersPage() {
         email: newUser.email,
         password: newUser.password,
       });
-      toast.success("User created successfully!");
+      toast.success(t('admin.users.success'));
       setIsAddUserOpen(false);
       setNewUser({ name: "", email: "", password: "", role: "student" });
       refetch();
     } catch (error: any) {
-      toast.error(error.message || "Failed to create user");
+      toast.error(error.message || t('admin.users.error'));
     } finally {
       setIsCreating(false);
     }
@@ -175,7 +175,7 @@ export default function AdminUsersPage() {
                 <SelectValue placeholder={t("admin.users.rolePlaceholder")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">
+                <SelectItem value="">
                   {t("admin.users.roles.all")}
                 </SelectItem>
                 <SelectItem value="student">
@@ -194,7 +194,7 @@ export default function AdminUsersPage() {
                 <SelectValue placeholder={t("admin.users.statusPlaceholder")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">
+                <SelectItem value="">
                   {t("admin.users.status.all")}
                 </SelectItem>
                 <SelectItem value="active">
@@ -217,17 +217,17 @@ export default function AdminUsersPage() {
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>Add New User</DialogTitle>
+                <DialogTitle>{t('admin.users.dialogTitle')}</DialogTitle>
                 <DialogDescription>
-                  Create a new user account. They will receive their login credentials.
+                  {t('admin.users.dialogDescription')}
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="name">Full Name *</Label>
+                  <Label htmlFor="name">{t('admin.users.nameLabel')}</Label>
                   <Input
                     id="name"
-                    placeholder="Enter full name"
+                    placeholder={t('admin.users.namePlaceholder')}
                     value={newUser.name}
                     onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
                   />
@@ -237,37 +237,37 @@ export default function AdminUsersPage() {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="Enter email address"
+                    placeholder={t('admin.users.emailPlaceholder')}
                     value={newUser.email}
                     onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="password">Password *</Label>
+                  <Label htmlFor="password">{t('admin.users.passwordLabel')}</Label>
                   <Input
                     id="password"
                     type="password"
-                    placeholder="Enter password"
+                    placeholder={t('admin.users.passwordPlaceholder')}
                     value={newUser.password}
                     onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
                   />
                   <p className="text-xs text-muted-foreground">
-                    Password must be at least 6 characters with uppercase, lowercase, and number.
+                    {t('admin.users.passwordHint')}
                   </p>
                 </div>
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsAddUserOpen(false)}>
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
                 <Button onClick={handleAddUser} disabled={isCreating}>
                   {isCreating ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Creating...
+                      {t('admin.users.creating')}
                     </>
                   ) : (
-                    "Create User"
+                    t('admin.users.createUser')
                   )}
                 </Button>
               </DialogFooter>
@@ -344,7 +344,7 @@ export default function AdminUsersPage() {
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
+                            <span className="sr-only">{t('admin.users.openMenu')}</span>
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>

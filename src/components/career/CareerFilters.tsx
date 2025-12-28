@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useSearchTracking } from "@/hooks/useTrackingHooks";
 
 export function CareerFilters({
   filters,
@@ -26,9 +27,14 @@ export function CareerFilters({
 }) {
   const { language } = useGlobalStore();
   const { t } = useTranslation();
+  const trackSearch = useSearchTracking("careers", "/careers");
 
   const handleChange = (key: string, value: string) => {
     onChange({ ...filters, [key]: value === "all" ? undefined : value });
+    // Track search queries
+    if (key === "search" && value.length >= 2) {
+      trackSearch(value);
+    }
   };
 
   return (

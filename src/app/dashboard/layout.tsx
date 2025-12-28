@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { Sidebar as DashboardSidebar } from "./_components/Sidebar";
 import { TopNav } from "./_components/TopNav";
 import { Button } from "@/components/ui/button";
+import { usePageViewTracking } from "@/hooks/usePageViewTracking";
 import { Bell, Menu, User } from "lucide-react";
 import {
   DropdownMenu,
@@ -28,6 +29,9 @@ export default function DashboardLayout({
   const router = useRouter();
   const { user } = useGlobalStore();
   const { t } = useTranslation();
+
+  // Track page views across dashboard routes
+  usePageViewTracking();
 
   // Check if user is a coach (case-insensitive)
   const isCoach = user.role && user.role.toLowerCase() === "coach";

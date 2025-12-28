@@ -31,8 +31,10 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Coach } from "@/types/coach";
 import { toast } from "sonner";
+import { useTranslation } from 'react-i18next';
 
 export function CoachesTable() {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [contractFilter, setContractFilter] = useState("all");
   const [coaches, setCoaches] = useState<Coach[]>([]);
@@ -59,7 +61,7 @@ export function CoachesTable() {
         }
       } catch (error) {
         console.error("Failed to fetch coaches:", error);
-        toast.error("Failed to load coaches");
+        toast.error(t('admin.coaches.loadingFailed'));
       } finally {
         setIsLoading(false);
       }
@@ -94,13 +96,9 @@ export function CoachesTable() {
     const daysRemaining = Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
     if (daysRemaining < 0) {
-      return { label: "Expired", color: "bg-red-100 text-red-800 hover:bg-red-100", days: daysRemaining };
-    } else if (daysRemaining < 7) {
-      return { label: `${daysRemaining}d left`, color: "bg-red-100 text-red-800 hover:bg-red-100", days: daysRemaining };
-    } else if (daysRemaining < 30) {
-      return { label: `${daysRemaining}d left`, color: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100", days: daysRemaining };
+      return { label: t('admin.coaches.contractStatus.expired'), color: "bg-red-100 text-red-800 hover:bg-red-100", days: daysRemaining };
     } else {
-      return { label: `${daysRemaining}d left`, color: "bg-green-100 text-green-800 hover:bg-green-100", days: daysRemaining };
+      return { label: t('admin.coaches.contractStatus.daysLeft', { days: daysRemaining }), color: daysRemaining < 30 ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-100" : "bg-green-100 text-green-800 hover:bg-green-100", days: daysRemaining };
     }
   };
 
@@ -122,13 +120,13 @@ export function CoachesTable() {
         <div className="flex items-center gap-2 w-full md:w-auto">
           <Select value={contractFilter} onValueChange={setContractFilter}>
             <SelectTrigger className="w-full md:w-[200px] h-11 bg-gray-50/50 border-transparent focus:bg-white focus:border-blue-500/20 focus:ring-4 focus:ring-blue-500/10 rounded-xl transition-all">
-              <SelectValue placeholder="Filter by contract" />
+              <SelectValue placeholder={t('admin.coaches.filterByContract')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Contracts</SelectItem>
-              <SelectItem value="active">Active (30+ days)</SelectItem>
-              <SelectItem value="expiring">Expiring Soon</SelectItem>
-              <SelectItem value="expired">Expired</SelectItem>
+              <SelectItem value="all">{t('admin.coaches.filters.allContracts')}</SelectItem>
+              <SelectItem value="active">{t('admin.coaches.filters.active')}</SelectItem>
+              <SelectItem value="expiring">{t('admin.coaches.filters.expiring')}</SelectItem>
+              <SelectItem value="expired">{t('admin.coaches.filters.expired')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -136,7 +134,7 @@ export function CoachesTable() {
         <div className="relative w-full md:w-80 group">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
           <Input
-            placeholder="Search coaches..."
+            placeholder={t('admin.coaches.searchPlaceholder')}
             className="pl-10 h-11 bg-gray-50/50 border-transparent focus:bg-white focus:border-blue-500/20 focus:ring-4 focus:ring-blue-500/10 rounded-xl transition-all"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -149,13 +147,13 @@ export function CoachesTable() {
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50/50 hover:bg-gray-50/50 border-b border-gray-100">
-              <TableHead className="py-4 pl-6 font-semibold text-gray-900">Coach</TableHead>
-              <TableHead className="font-semibold text-gray-900">Status</TableHead>
-              <TableHead className="font-semibold text-gray-900">Specialization</TableHead>
-              <TableHead className="font-semibold text-gray-900">Contract Period</TableHead>
-              <TableHead className="font-semibold text-gray-900">Contract Status</TableHead>
-              <TableHead className="font-semibold text-gray-900">Students</TableHead>
-              <TableHead className="pr-6 text-right font-semibold text-gray-900">Actions</TableHead>
+              <TableHead className="py-4 pl-6 font-semibold text-gray-900">{t('admin.coaches.table.coach')}</TableHead>
+              <TableHead className="font-semibold text-gray-900">{t('admin.coaches.table.status')}</TableHead>
+              <TableHead className="font-semibold text-gray-900">{t('admin.coaches.table.specialization')}</TableHead>
+              <TableHead className="font-semibold text-gray-900">{t('admin.coaches.table.contractPeriod')}</TableHead>
+              <TableHead className="font-semibold text-gray-900">{t('admin.coaches.table.contractStatus')}</TableHead>
+              <TableHead className="font-semibold text-gray-900">{t('admin.coaches.table.students')}</TableHead>
+              <TableHead className="pr-6 text-right font-semibold text-gray-900">{t('admin.coaches.table.actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -164,7 +162,7 @@ export function CoachesTable() {
                 <TableCell colSpan={7} className="h-32 text-center">
                   <div className="flex flex-col items-center justify-center gap-2">
                     <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-                    <p className="text-sm text-gray-500">Loading coaches...</p>
+                    <p className="text-sm text-gray-500">{t('admin.coaches.loading')}</p>
                   </div>
                 </TableCell>
               </TableRow>
@@ -172,8 +170,8 @@ export function CoachesTable() {
               <TableRow>
                 <TableCell colSpan={7} className="h-32 text-center">
                   <div className="flex flex-col items-center justify-center gap-2">
-                    <p className="text-lg font-medium text-gray-900">No coaches found</p>
-                    <p className="text-sm text-gray-500">Try adjusting your search or filters</p>
+                    <p className="text-lg font-medium text-gray-900">{t('admin.coaches.noCoaches')}</p>
+                    <p className="text-sm text-gray-500">{t('admin.coaches.tryAdjustingFilters')}</p>
                   </div>
                 </TableCell>
               </TableRow>
@@ -201,9 +199,9 @@ export function CoachesTable() {
                       <Badge 
                         className={`${getStatusColor(coach.status)} border-0 px-2.5 py-0.5 rounded-md font-medium capitalize shadow-none`}
                         role="status"
-                        aria-label={`Status: ${coach.status || "Unknown"}`}
+                        aria-label={`Status: ${coach.status || t('common.unknown')}`}
                       >
-                        {coach.status || "Unknown"}
+                        {coach.status || t('common.unknown')}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -212,7 +210,7 @@ export function CoachesTable() {
                     <TableCell>
                       <div className="flex flex-col text-xs text-gray-500">
                         <span>{coach.contractStart ? new Date(coach.contractStart).toLocaleDateString() : "—"}</span>
-                        <span className="text-gray-300">to</span>
+                        <span className="text-gray-300">{t('common.to')}</span>
                         <span>{coach.contractEnd ? new Date(coach.contractEnd).toLocaleDateString() : "—"}</span>
                       </div>
                     </TableCell>
@@ -232,7 +230,7 @@ export function CoachesTable() {
                     <TableCell>
                       <div className="flex items-center gap-1.5">
                         <span className="font-semibold text-gray-900">{coach.activeStudents || 0}</span>
-                        <span className="text-xs text-gray-500">active</span>
+                        <span className="text-xs text-gray-500">{t('admin.coaches.studentsActive')}</span>
                       </div>
                     </TableCell>
                     <TableCell className="pr-6 text-right">
@@ -248,21 +246,21 @@ export function CoachesTable() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48 rounded-xl p-1 shadow-xl border-gray-100">
-                          <DropdownMenuLabel className="px-2 py-1.5 text-xs text-gray-500 font-normal">Actions</DropdownMenuLabel>
+                          <DropdownMenuLabel className="px-2 py-1.5 text-xs text-gray-500 font-normal">{t('common.actions')}</DropdownMenuLabel>
                           <DropdownMenuItem
                             className="rounded-lg cursor-pointer focus:bg-gray-50"
                             onClick={() => {
                                 if (coach.email) {
                                     navigator.clipboard.writeText(coach.email);
-                                    toast.success("Email copied");
+                                    toast.success(t('admin.coaches.toast.emailCopied'));
                                 }
                             }}
                           >
-                            Copy Email
+                            {t('admin.coaches.actions.copyEmail')}
                           </DropdownMenuItem>
                           <DropdownMenuSeparator className="bg-gray-100 my-1" />
-                          <DropdownMenuItem className="rounded-lg cursor-pointer focus:bg-gray-50">View Details</DropdownMenuItem>
-                          <DropdownMenuItem className="rounded-lg cursor-pointer focus:bg-gray-50">Edit Coach</DropdownMenuItem>
+                          <DropdownMenuItem className="rounded-lg cursor-pointer focus:bg-gray-50">{t('admin.coaches.actions.viewDetails')}</DropdownMenuItem>
+                          <DropdownMenuItem className="rounded-lg cursor-pointer focus:bg-gray-50">{t('admin.coaches.actions.editCoach')}</DropdownMenuItem>
                           {coach.status === "invited" && (
                             <DropdownMenuItem
                               className="rounded-lg cursor-pointer text-blue-600 focus:text-blue-700 focus:bg-blue-50"
@@ -271,18 +269,18 @@ export function CoachesTable() {
                                 try {
                                   const { inviteCoach } = await import("@/services/coachService");
                                   await inviteCoach({ email: coach.email });
-                                  toast.success(`Invitation resent`);
+                                  toast.success(t('admin.coaches.toast.invitationResent'));
                                 } catch (error) {
-                                  toast.error("Failed to resend");
+                                  toast.error(t('admin.coaches.toast.failedToResend'));
                                 }
                               }}
                             >
                               <Mail className="mr-2 h-4 w-4" />
-                              Resend Invite
+                              {t('admin.coaches.actions.resendInvite')}
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuItem className="rounded-lg cursor-pointer text-red-600 focus:text-red-700 focus:bg-red-50">
-                            Deactivate
+                            {t('admin.coaches.actions.deactivate')}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

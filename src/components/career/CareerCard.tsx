@@ -19,6 +19,7 @@ import {
   Globe,
   Briefcase,
 } from "lucide-react";
+import { telemetry } from "@/services/telemetryService";
 
 export default function CareerCard({ career }: { career: CareerRole }) {
   const router = useRouter();
@@ -59,7 +60,10 @@ export default function CareerCard({ career }: { career: CareerRole }) {
     <motion.article
       className="bg-white rounded-3xl p-6 hover:shadow-xl transition-all duration-300 cursor-pointer group relative overflow-hidden border border-gray-100 h-full flex flex-col"
       layout
-      onClick={() => router.push(`/careers/${career.id}`)}
+      onClick={() => {
+        telemetry.trackCareer("view", career.id, title, "career_card");
+        router.push(`/careers/${career.id}`);
+      }}
       onMouseEnter={() => prefetch.prefetchCareer?.(career.id)}
       aria-labelledby={`career-${career.id}-title`}
     >

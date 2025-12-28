@@ -2,12 +2,14 @@
 
 import { motion } from "motion/react";
 import { useGlobalStore } from "@/store/useGlobalStore";
+import { useTranslation } from 'react-i18next';
 import { useDashboardAssessmentSummary } from "@/hooks/useAssessmentQueries";
 import { CheckCircle2, Circle, Clock, Brain, Target, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function AssessmentProgressCard() {
   const { user } = useGlobalStore();
+  const { t } = useTranslation();
   
   // Use React Query for assessment data
   const { 
@@ -71,10 +73,10 @@ export function AssessmentProgressCard() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-lg font-bold text-gray-900">
-            Assessment Journey
+            {t('dashboard.assessmentJourney')}
           </h3>
           <p className="text-sm text-gray-500 mt-1">
-            Your professional growth path
+            {t('dashboard.assessmentSubtitle')}
           </p>
         </div>
         <div className="text-right">
@@ -102,8 +104,8 @@ export function AssessmentProgressCard() {
           />
         </div>
         <div className="mt-2 flex justify-between text-xs text-gray-500 font-medium" aria-hidden="true">
-          <span>Start</span>
-          <span>Professional Certified</span>
+          <span>{t('common.start')}</span>
+          <span>{t('dashboard.professionalCertified')}</span>
         </div>
       </div>
 

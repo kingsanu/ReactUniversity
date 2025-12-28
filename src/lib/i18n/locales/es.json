@@ -11,7 +11,32 @@
     "adminPanel": "Panel de Administración",
     "help": "Ayuda y Soporte",
     "logout": "Cerrar Sesión",
-    "learning": "Aprendizajes"
+    "learning": "Aprendizajes",
+    "benchmarks": "Referencias",
+    "careerEducation": "Carrera y Educación",
+    "careerPlanning": "Planificación de Carrera",
+    "transactions": "Transacciones",
+    "sessions": "Sesiones",
+    "schedule": "Horario",
+    "earnings": "Ganancias",
+    "users": "Usuarios",
+    "coaches": "Coaches",
+    "courses": "Cursos",
+    "careers": "Carreras",
+    "questions": "Preguntas",
+    "plans": "Planes",
+    "payouts": "Pagos",
+    "opportunities": "Oportunidades",
+    "university": "Sugerencias Universitarias",
+    "assessmentTimeline": "Cronograma de Evaluación",
+    "progressTimeline": "Cronograma de Progreso",
+    "milestones": "Hitos",
+    "resume": "Constructor de Currículum",
+    "resources": "Biblioteca de Recursos",
+    "internships": "Oportunidades de Prácticas",
+    "mentorship": "Coincidencias de Mentoría",
+    "coaching": "Coaching",
+    "mainNavigation": "Navegación principal"
   },
   "common": {
     "search": "Buscar aquí",
@@ -34,7 +59,183 @@
     "metrics": "Métricas",
     "feedback": "Comentarios",
     "results": "Resultados",
+    "selectPeriod": "Seleccionar periodo",
+    "filter": "Filtrar",
+    "actions": "Acciones",
+    "apply": "Aplicar",
+    "share": "Compartir",
+    "print": "Imprimir",
+    "download": "Descargar",
+    "generating": "Generando...",
+    "selectAll": "Seleccionar Todo",
+    "clear": "Limpiar",
+    "sending": "Enviando...",
+    "successful": "Exitoso",
+    "failed": "Fallido",
     "today": "Hoy"
+  },
+  "error": {
+    "somethingWentWrong": "Algo salió mal",
+    "unexpectedError": "Encontramos un error inesperado. Por favor, intenta actualizar la página o contacta al soporte si el problema persiste.",
+    "tryAgain": "Intentar de Nuevo"
+  },
+  "payments": {
+    "orderSummary": "Resumen del Pedido",
+    "cardInformation": "Información de la Tarjeta",
+    "completePayment": "Completar Pago",
+    "processing": "Procesando...",
+    "payAmount": "Pagar {{amount}}",
+    "securityNotice": "Su información de pago está segura y cifrada",
+    "initializing": "Inicializando...",
+    "payWithCard": "Pagar con Tarjeta",
+    "cardElementNotFound": "Elemento de tarjeta no encontrado"
+  },
+  "evaluation": {
+    "noReportData": "Datos del informe no disponibles",
+    "reportTitle": "Informe de Evaluación 360°",
+    "reportDescription": "Evaluación exhaustiva para {{name}}",
+    "evaluationPeriod": "Período de Evaluación",
+    "responseRate": "Tasa de Respuesta",
+    "overallScore": "Puntuación General",
+    "reportGenerated": "Informe Generado",
+    "overallPerformance": "Rendimiento General",
+    "topStrengths": "Fortalezas Principales",
+    "growthAreas": "Áreas de Crecimiento",
+    "performanceLevel": "Nivel de Rendimiento",
+    "tabs": {
+      "summary": "Resumen Ejecutivo",
+      "detailed": "Análisis Detallado",
+      "feedback": "Retroalimentación",
+      "recommendations": "Recomendaciones"
+    },
+    "totalEvaluators": "Evaluadores Totales",
+    "invitationsSent": "Invitaciones Enviadas",
+    "completed": "Completado",
+    "sendReminders": "Enviar Recordatorios",
+    "sendAllByEmail": "Enviar Todo por Correo",
+    "sendSelected": "Enviar Seleccionados",
+    "emailTemplate": "Plantilla de Correo",
+    "template": {
+      "subject": "Asunto",
+      "reminderDays": "Días de Recordatorio",
+      "message": "Mensaje",
+      "includeInstructions": "Incluir instrucciones",
+      "enableReminders": "Habilitar recordatorios"
+    },
+    "evaluators": "Evaluadores ({{count}})",
+    "emailResultsTitle": "Resultados de Invitación por Correo",
+    "details": "Detalles",
+    "closeResults": "Cerrar Resultados",
+    "groups": {
+      "all": "Todos los Grupos",
+      "self": "Auto",
+      "parents": "Padres",
+      "teachers": "Profesores",
+      "peers": "Compañeros"
+    },
+    "status": {
+      "notSent": "No Enviado",
+      "sent": "Enviado",
+      "opened": "Abierto",
+      "completed": "Completado",
+      "expired": "Expirado",
+      "unknown": "Desconocido"
+    },
+    "form": {
+      "additionalCommentsLabel": "Comentarios adicionales o ejemplos específicos (opcional)",
+      "additionalCommentsPlaceholder": "Comparte ejemplos específicos, observaciones o contexto adicional...",
+      "saveDraft": "Guardar borrador",
+      "saving": "Guardando..."
+    }
+  },
+  "admin": {
+    "coaches": {
+      "filterByContract": "Filtrar por contrato",
+      "filters": {
+        "allContracts": "Todos los Contratos",
+        "all": "Todos los Contratos",
+        "active": "Activo (30+ días)",
+        "expiring": "Próximo a Expirar",
+        "expired": "Expirado"
+      },
+      "searchPlaceholder": "Buscar coaches...",
+      "loading": "Cargando coaches...",
+      "noCoaches": "No se encontraron coaches",
+      "tryAdjustingFilters": "Intenta ajustar tu búsqueda o filtros",
+      "table": {
+        "coach": "Coach",
+        "status": "Estado",
+        "specialization": "Especialización",
+        "contractPeriod": "Periodo de Contrato",
+        "contractStatus": "Estado del Contrato",
+        "students": "Estudiantes",
+        "actions": "Acciones"
+      },
+      "studentsActive": "activo",
+      "actions": {
+        "copyEmail": "Copiar Email",
+        "viewDetails": "Ver Detalles",
+        "editCoach": "Editar Coach",
+        "resendInvite": "Reenviar Invitación",
+        "deactivate": "Desactivar"
+      },
+      "toast": {
+        "emailCopied": "Email copiado",
+        "invitationResent": "Invitación reenviada",
+        "failedToResend": "Error al reenviar"
+      }
+    },
+    "users": {
+      "title": "Usuarios",
+      "subtitle": "Gestiona usuarios y cuentas",
+      "searchPlaceholder": "Buscar usuarios...",
+      "rolePlaceholder": "Seleccionar rol",
+      "statusPlaceholder": "Seleccionar estado",
+      "roles": {
+        "all": "Todos",
+        "student": "Estudiante",
+        "coach": "Coach",
+        "admin": "Administrador"
+      },
+      "status": {
+        "all": "Todos",
+        "active": "Activo",
+        "inactive": "Inactivo"
+      },
+      "addUser": "Agregar usuario",
+      "dialogTitle": "Agregar nuevo usuario",
+      "dialogDescription": "Crea una cuenta nueva de usuario. Recibirán sus credenciales de acceso.",
+      "nameLabel": "Nombre completo *",
+      "namePlaceholder": "Ingresa nombre completo",
+      "emailPlaceholder": "Ingresa correo electrónico",
+      "passwordLabel": "Contraseña *",
+      "passwordPlaceholder": "Ingresa contraseña",
+      "passwordHint": "La contraseña debe tener al menos 6 caracteres con mayúsculas, minúsculas y número.",
+      "creating": "Creando...",
+      "createUser": "Crear usuario",
+      "fillRequired": "Por favor completa todos los campos obligatorios",
+      "success": "¡Usuario creado con éxito!",
+      "error": "Error al crear el usuario",
+      "noUsersFound": "No se encontraron usuarios",
+      "table": {
+        "name": "Nombre",
+        "email": "Correo",
+        "role": "Rol",
+        "status": "Estado",
+        "subscription": "Suscripción",
+        "joined": "Fecha de registro",
+        "actions": "Acciones"
+      },
+      "dropdown": {
+        "actions": "Acciones",
+        "copyEmail": "Copiar correo",
+        "viewProfile": "Ver perfil",
+        "editDetails": "Editar detalles",
+        "deactivateUser": "Desactivar usuario"
+      },
+      "emailCopied": "Correo copiado",
+      "openMenu": "Abrir menú"
+    }
   },
   "dashboard": {
     "title": "Panel de Control",
@@ -46,7 +247,72 @@
     "activityChart": "Gráfico de Actividad",
     "benchmarksLabel": "Referencias",
     "milestones": "Hitos",
+    "resumes": {
+      "title": "Mis currículums",
+      "description": "Gestiona tus currículums y crea nuevos para diferentes puestos",
+      "createButton": "Crear currículum"
+    },
     "learningTools": "Aprendizaje y Herramientas",
+    "timelineErrorTitle": "Error al cargar la línea de tiempo",
+    "timelineErrorMessage": "Ocurrió un problema al intentar cargar tus eventos.",
+    "opportunitiesForYou": "Oportunidades para ti",
+    "opportunitiesTable": {
+      "no": "N.º",
+      "catNo": "N.º de Cat.",
+      "driver": "Responsable",
+      "status": "Estado",
+      "rating": "Calificación",
+      "applyFor": "Solicitar a",
+      "apply": "Solicitar"
+    },
+    "assessmentJourney": "Viaje de Evaluación",
+    "assessmentSubtitle": "Tu trayectoria de crecimiento profesional",
+    "professionalCertified": "Profesional Certificado", 
+    "coach": {
+      "greeting": {
+        "morning": "Buenos Días",
+        "afternoon": "Buenas Tardes",
+        "evening": "Buenas Noches"
+      },
+      "defaultName": "Coach",
+      "upcomingSessions": "Tienes {{count}} próximas sesiones",
+      "manageAvailability": "Gestionar Disponibilidad",
+      "editAvailability": "Editar Disponibilidad",
+      "stats": {
+        "totalSessions": "Sesiones Totales",
+        "activeStudents": "Estudiantes Activos",
+        "sessions": "sesiones",
+        "students": "estudiantes"
+      },
+      "sessions": {
+        "title": "Tus Sesiones",
+        "description": "Gestiona tu horario de coaching",
+        "upcoming": "Próximas",
+        "nextSession": "próxima sesión pronto",
+        "noSessions": "sin sesiones",
+        "completed": "Completadas",
+        "lifetime": "total",
+        "date": "Fecha",
+        "time": "Hora",
+        "noUpcomingTitle": "No hay próximas sesiones",
+        "noScheduled": "Aún no tienes sesiones programadas.",
+        "takeABreak": "¡Hora de tomar un descanso!",
+        "noPastTitle": "No hay sesiones pasadas",
+        "historyPlaceholder": "Tu historial aparecerá aquí.",
+        "availableTimes": "Tiempos Disponibles",
+        "noAvailableSlots": "No hay horarios disponibles para esta fecha",
+        "rescheduleTitle": "Reprogramar Sesión",
+        "rescheduleDescription": "Selecciona una nueva fecha y hora para {{name}}",
+        "confirmed": "Confirmado"
+      },
+      "actions": {
+        "reschedule": "Reprogramar",
+        "joinCall": "Unirse a la llamada",
+        "viewNotes": "Ver notas",
+        "confirmReschedule": "Confirmar reprogramación"
+      }
+    },
+
     "courseCatalog": "Catálogo de Cursos",
     "resumeBuilder": "Constructor de Currículum",
     "resourceLibrary": "Biblioteca de Recursos",
@@ -71,6 +337,11 @@
     "beginAssessment": "Comenzar Evaluación",
     "recommended": "RECOMENDADO",
     "startCourse": "Iniciar Curso",
+    "liaAssessment": "Evaluación LIA",
+    "timeline": "Cronograma",
+    "jobMarketPulse": "Pulso del Mercado",
+    "smartGaps": "Análisis de Brechas Inteligentes",
+    "certifications": "Certificaciones",
     "goToCatalog": "Ir al catálogo",
     "browseCourses": "Explorar Cursos",
     "buildResume": "Crear Currículum",
@@ -356,6 +627,7 @@
         "enterpriseTrendTitle": "División Empresa vs Startup"
       },
       "compensation": {
+        "compensationTitle": "Compensación",
         "avgAnnualSalary": "Salario Anual Promedio",
         "sinceLastYear": "desde el año pasado",
         "purchasePowerIndex": "Índice de Poder Adquisitivo",
@@ -428,6 +700,9 @@
     "signup": {
       "title": "Crear cuenta",
       "subtitle": "Comienza tu camino hacia el éxito profesional",
+      "firstNamePlaceholder": "Juan",
+      "lastNamePlaceholder": "Pérez",
+      "emailPlaceholder": "juan@ejemplo.com",
       "submit": "Crear cuenta",
       "creating": "Creando cuenta..."
     }
@@ -500,12 +775,90 @@
       },
       "questions": {
         "title": "Preguntas 360°",
-        "description": "Configurar preguntas de retroalimentación."
+        "description": "Configurar preguntas de retroalimentación.",
+        "noQuestions": "No hay preguntas aún",
+        "noMatch": "No se encontraron preguntas",
+        "noQuestionsDescription": "Crea tu primera pregunta de evaluación 360° para comenzar.",
+        "tryAdjustFilters": "Intenta ajustar tus filtros para ver más preguntas.",
+        "createFirst": "Crear primera pregunta",
+        "activate": "Activar",
+        "deactivate": "Desactivar"
       },
       "settings": {
         "title": "Configuración del sistema",
         "description": "Configuración global de la plataforma."
       }
+    },
+    "apiTester": {
+      "title": "Herramientas de prueba de API",
+      "developmentOnly": "Solo desarrollo",
+      "testing": "Probando...",
+      "testPayment": "Probar APIs de pago",
+      "testStripeCheckout": "Probar Stripe Checkout",
+      "testRoleAPIs": "Probar APIs de roles",
+      "testAuthAPIs": "Probar APIs de autenticación",
+      "clearResults": "Borrar resultados",
+      "testResultsTitle": "Resultados de prueba"
+    },
+    "roleExplorer": {
+      "title": "Explorador de roles",
+      "fetchButton": "Obtener roles",
+      "current": "Actual",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "instruction": "Haz clic en \"Obtener roles\" para explorar los roles disponibles",
+      "availableRoles": "Roles disponibles",
+      "currentUserRole": "ID del rol del usuario",
+      "idLabel": "ID",
+      "fetchError": "Error al obtener roles"
+    },
+    "dev": {
+      "mil": {
+        "title": "Herramientas de desarrollo - Evaluación MIL",
+        "description": "Utilidades de prueba para el desarrollo y depuración de la evaluación MIL.",
+        "populateButton": "Poblar datos de prueba",
+        "clearButton": "Borrar todos los datos",
+        "populated": "¡Datos de prueba de MIL poblados!",
+        "populateFailed": "Error al poblar datos de MIL",
+        "cleared": "¡Datos de prueba de MIL borrados!",
+        "clearFailed": "Error al borrar datos de MIL"
+      }
+    },
+    "stripeTester": {
+      "title": "Probador de URL de Stripe",
+      "description": "Prueba la generación de URLs de checkout de Stripe para depurar problemas de pago",
+      "descriptionShort": "Depurar generación de URLs de checkout de Stripe",
+      "testButton": "Probar URLs",
+      "runTest": "Ejecutar prueba de URLs",
+      "resultsTitle": "Resultados de la prueba",
+      "urlsGeneratedSuccess": "URLs generadas correctamente",
+      "urlGenerationFailed": "Fallo al generar URLs",
+      "environmentInfo": "Información del entorno",
+      "debugDetails": "Detalles de depuración",
+      "quickFixesTitle": "Soluciones rápidas",
+      "ifUrlsInvalidLabel": "Si las URLs son inválidas:",
+      "fix1": "Verifica que estés ejecutando en un dominio apropiado (no localhost en producción)",
+      "fix2": "Asegúrate de que NEXT_PUBLIC_API_BASE_URL esté configurado correctamente",
+      "fix3": "Asegúrate de que el dominio incluya el protocolo https://",
+      "fix4": "Verifica que la URL de despliegue sea accesible",
+      "successUrlLabel": "URL de éxito",
+      "cancelUrlLabel": "URL de cancelación",
+      "baseUrlLabel": "URL base"
+    },
+    "plans": {
+      "editTitle": "Editar plan",
+      "createTitle": "Crear nuevo plan",
+      "planNameLabel": "Nombre del plan *",
+      "planNamePlaceholder": "p. ej., Plan Básico",
+      "priceLabel": "Precio (USD) *",
+      "pricePlaceholder": "29.99",
+      "intervalLabel": "Intervalo de facturación *",
+      "featuresLabel": "Características *",
+      "featurePlaceholder": "p. ej., Proyectos ilimitados",
+      "addFeature": "+ Agregar característica",
+      "createButton": "Crear plan",
+      "updateButton": "Actualizar plan",
+      "alreadyExists": "Ya existe"
     },
     "analytics": {
       "title": "Analítica",
@@ -541,6 +894,7 @@
       "headerTitle": "Panel de Administración",
       "userDashboard": "Panel de Usuario",
       "logout": "Cerrar sesión",
+      "superAdmin": "Super Admin",
       "nav": {
         "dashboard": "Panel",
         "plans": "Planes de Suscripción",
@@ -587,7 +941,76 @@
       "totalCoaches": "Coaches totales",
       "activeNow": "Activos ahora",
       "pendingInvites": "Invitaciones pendientes",
-      "expiringContracts": "Contratos por expirar"
+      "expiringContracts": "Contratos por expirar",
+      "filterByContract": "Filtrar por contrato",
+      "filters": {
+        "allContracts": "Todos los contratos",
+        "all": "Todos los contratos",
+        "active": "Activo (30+ días)",
+        "expiring": "Por expirar",
+        "expired": "Expirado"
+      },
+      "searchPlaceholder": "Buscar coaches...",
+      "loading": "Cargando coaches...",
+      "noCoaches": "No se encontraron coaches",
+      "tryAdjustingFilters": "Intenta ajustar tu búsqueda o filtros",
+      "table": {
+        "coach": "Coach",
+        "status": "Estado",
+        "specialization": "Especialización",
+        "contractPeriod": "Periodo de contrato",
+        "contractStatus": "Estado del contrato",
+        "students": "Estudiantes",
+        "actions": "Acciones"
+      },
+      "studentsActive": "activo",
+      "actions": {
+        "copyEmail": "Copiar correo",
+        "viewDetails": "Ver detalles",
+        "editCoach": "Editar coach",
+        "resendInvite": "Reenviar invitación",
+        "deactivate": "Desactivar"
+      },
+      "toast": {
+        "emailCopied": "Correo copiado",
+        "invitationResent": "Invitación reenviada",
+        "failedToResend": "Fallo al reenviar"
+      },
+      "loadingFailed": "Error al cargar coaches",
+      "contractStatus": {
+        "expired": "Expirado",
+        "daysLeft": "{{days}}d restantes"
+      }
+    },
+    "invite": {
+      "fillRequired": "Por favor completa todos los campos requeridos",
+      "success": "Se ha enviado una invitación a {{name}} ({{email}})",
+      "error": "Fallo al enviar la invitación. Intenta nuevamente.",
+      "singleTitle": "Invitar coach individual",
+      "singleDescription": "Envía una invitación por correo a un nuevo coach.",
+      "fullName": "Nombre completo",
+      "namePlaceholder": "John Doe",
+      "email": "Correo electrónico",
+      "emailPlaceholder": "coach@ejemplo.com",
+      "contractStart": "Fecha Inicio de Contrato",
+      "contractEnd": "Fecha Fin de Contrato",
+      "sendButton": "Enviar invitación",
+      "csvTemplateTitle": "Plantilla CSV",
+      "csvTemplateDescription": "Descarga la plantilla para asegurar el formato correcto.",
+      "downloadTemplate": "Descargar plantilla",
+      "uploadCSV": "Subir CSV",
+      "csvAcceptedFormat": "Formato aceptado: .csv",
+      "processing": "Procesando...",
+      "processBulkInvite": "Procesar invitación masiva",
+      "noValidRows": "No se encontraron filas válidas en el CSV",
+      "processedRecords": "Procesados {{count}} registros.",
+      "bulkProcessFailed": "Fallo al procesar la carga masiva",
+      "resultsTitle": "Resultados",
+      "results": {
+        "success": "{{count}} exitosos",
+        "failed": "{{count}} fallidos"
+      },
+      "errorsTitle": "Errores:"
     },
     "users": {
       "title": "Usuarios",
@@ -642,6 +1065,17 @@
       },
       "loading": "Cargando...",
       "accessDenied": "Acceso denegado"
+    },
+    "subscriptionPlans": {
+      "createTitle": "Crear planes de suscripción",
+      "creating": "Creando...",
+      "createAll": "Crear {{count}} planes",
+      "createThisPlan": "Crear este plan",
+      "creationResultsTitle": "Resultados de creación:",
+      "previewTitle": "Planes a crear:",
+      "moreFeatures": "... y {{count}} más",
+      "unknownError": "Error desconocido",
+      "createPlanSuccess": "Plan creado"
     },
     "transactions": {
       "title": "Transacciones",
@@ -890,7 +1324,87 @@
       "groupsIncomplete": "Por favor completa todos los grupos de evaluadores antes de enviar las invitaciones. Cada grupo debe tener al menos el número mínimo requerido de evaluadores.",
       "noPhoneNumbers": "Ningún evaluador tiene número de teléfono disponible para invitaciones SMS.",
       "smsComingSoon": "La funcionalidad de SMS estará disponible pronto."
+    },
+    "evaluatorManagement": {
+      "title": "Gestión de evaluadores",
+      "description": "Agrega y administra evaluadores para esta evaluación 360°",
+      "addEvaluator": "Agregar evaluador",
+      "nameLabel": "Nombre completo *",
+      "namePlaceholder": "Ingresa nombre completo",
+      "emailLabel": "Correo electrónico *",
+      "emailPlaceholder": "Ingresa correo electrónico",
+      "phoneLabel": "Número de teléfono (Opcional)",
+      "phonePlaceholder": "Ingresa número de teléfono",
+      "relationshipLabel": "Relación *",
+      "validationHeading": "Requisitos de evaluador no cumplidos",
+      "relationships": {
+        "parent": "p. ej., Madre, Padre, Tutor",
+        "teacher": "p. ej., Profesor de matemáticas, Consejero, Director",
+        "siblingFriend": "p. ej., Hermana, Mejor amigo, Compañero de clase",
+        "self": "Autoevaluación",
+        "default": "Relación"
+      },
+      "needMore": "Necesitas {{count}} evaluador(es) más",
+      "overLimit": "{{count}} evaluador(es) por encima del límite",
+      "countOfMax": "{{count}}/{{max}} evaluadores",
+      "fillRequired": "Por favor completa todos los campos requeridos",
+      "failedAdd": "Error al agregar evaluador. Por favor intenta de nuevo.",
+      "selectEvaluatorsMessage": "Por favor selecciona evaluadores para enviar invitaciones."
+    },
+    "config": {
+      "addCompetencyTitle": "Agregar nueva competencia",
+      "nameLabel": "Nombre *",
+      "namePlaceholder": "p. ej., Habilidades de comunicación",
+      "categoryLabel": "Categoría *",
+      "selectCategoryPlaceholder": "Selecciona categoría...",
+      "descriptionLabel": "Descripción",
+      "descriptionPlaceholder": "Describe lo que mide esta competencia...",
+      "weightLabel": "Peso",
+      "addCompetencyButton": "Agregar competencia",
+      "currentCompetencies": "Competencias actuales",
+      "noCompetencies": "No hay competencias configuradas todavía.",
+      "rating": {
+        "addOptionTitle": "Agregar opción de calificación",
+        "label": "Etiqueta *",
+        "labelPlaceholder": "p. ej., Excelente",
+        "description": "Descripción",
+        "descriptionPlaceholder": "Descripción opcional",
+        "addOptionButton": "Agregar opción"
+      }
     }
+  },
+
+
+  "profile": {
+    "personalInfoTitle": "Información personal",
+    "personalInfoDescription": "Actualiza tus datos principales.",
+    "headlinePlaceholder": "p. ej. Ingeniero de software",
+    "websitePlaceholder": "https://...",
+    "githubPlaceholder": "https://github.com/...",
+    "twitterPlaceholder": "https://twitter.com/...",
+    "linkedinPlaceholder": "https://linkedin.com/in/...",
+    "skillInputPlaceholder": "Escribe una habilidad y presiona Enter...",
+    "addSkillAria": "Agregar una nueva habilidad",
+    "skillNamePlaceholder": "Nombre de la habilidad",
+    "noSkillsYet": "No hay habilidades añadidas.",
+    "skillsDescription": "Presiona Enter para agregar una habilidad."
+  },
+  "booking": {
+    "enterDetailsTitle": "Ingresar detalles",
+    "topicLabel": "¿Sobre qué te gustaría hablar?",
+    "selectTopic": "Selecciona un tema",
+    "topics": {
+      "careerGuidance": "Orientación profesional",
+      "interviewPrep": "Preparación para entrevistas",
+      "resumeReview": "Revisión de currículum",
+      "skillDevelopment": "Desarrollo de habilidades"
+    },
+    "notesLabel": "Notas adicionales (Opcional)",
+    "prepNotesPlaceholder": "Comparte cualquier información que ayude a prepararnos para la reunión...",
+    "processing": "Procesando...",
+    "rescheduleSession": "Reprogramar sesión",
+    "bookAndPay": "Reservar y pagar",
+    "scheduleEvent": "Programar evento"
   },
   "testPCA": {
     "title": "Pruebas de la API PCA",
@@ -902,6 +1416,7 @@
     "clickToRun": "Haz clic en un botón arriba para ejecutar las pruebas...",
     "endpointsTitle": "Endpoints de la API que se prueban"
   },
+
   "timeline": {
     "benchmarks": {
       "marketDemand": "Demanda del mercado",

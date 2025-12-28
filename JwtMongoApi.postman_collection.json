@@ -213,7 +213,55 @@
                 "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
               ],
               "path": ["authapi", "login"]
-            }
+            },
+            "description": "Login with email and password. Returns JWT token and user information."
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/authapi/refresh",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["authapi", "refresh"]
+            },
+            "description": "Refresh access token using a valid refresh token. Allows users to stay logged in without requiring re-authentication.\n\n**Request Body:**\n- refreshToken: Required - Valid refresh token\n\n**Response:**\n- success: true\n- data:\n  - accessToken: New JWT access token\n  - refreshToken: New refresh token (rotated for security)\n  - expiresIn: Seconds until access token expires\n\n**Features:**\n- Refresh token rotation: Issues new refresh token with each refresh\n- Automatic token expiration handling\n- Revokes old refresh token after successful refresh\n\n**Note:** Also available at `/authapi/refresh-token` for backward compatibility"
+          }
+        },
+        {
+          "name": "Revoke Refresh Token",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/authapi/refresh",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["authapi", "refresh"]
+            },
+            "description": "Revoke all active refresh tokens for the authenticated user. Used for logout functionality.\n\n**Authentication:** Required (Bearer Token)\n\n**Response:**\n- success: true\n- message: \"Refresh token revoked\"\n\n**Behavior:**\n- Revokes all active refresh tokens for the authenticated user\n- Standard logout behavior\n- IP address logged for security audit\n\n**Note:** After revocation, user must login again to get new tokens"
           }
         },
         {
@@ -395,7 +443,7 @@
                 }
               ]
             },
-            "description": "Get paginated list of all coaches with their details and status for admin panel."
+            "description": "Get paginated list of all coaches with their details and status for admin panel.\n\n**Returns:**\n- List of coaches with:\n  - id, fullName, email, status, joinedAt, specialization, activeStudents\n  - **image**: Azure Blob Storage URL of coach profile image (e.g., https://careerblob.blob.core.windows.net/coach-profiles/coaches/profiles/coach_xxx.jpg)\n  - Base64 images are filtered out - only URLs are returned\n\n**Image Storage:**\n- Images are stored in Azure Blob Storage container 'coach-profiles'\n- Folder structure: coaches/profiles/\n- Returns empty string if image is base64 encoded or not available"
           }
         }
       ]
@@ -451,7 +499,7 @@
                   ],
                   "path": ["api", "v1", "upload"]
                 },
-                "description": "Upload coach profile picture. Accepts image files (.jpg, .jpeg, .png, .gif, .webp) up to 5MB."
+                "description": "Upload coach profile picture to Azure Blob Storage. Accepts image files (.jpg, .jpeg, .png, .gif, .webp) up to 5MB.\n\n**Returns:**\n- `url`: Public Azure Blob Storage URL of the uploaded image (e.g., https://careerblob.blob.core.windows.net/coach-profiles/coach_xxx.jpg)\n\n**Storage:** Images are stored in Azure Blob Storage container 'coach-profiles' and are publicly accessible via the returned URL."
               }
             },
             {
@@ -471,7 +519,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"personalInfo\": {\n    \"name\": \"Sarah Wilson\",\n    \"title\": \"Senior Career Coach\",\n    \"bio\": \"Experienced leader in tech with 10+ years of experience...\",\n    \"specialization\": \"Tech Leadership\",\n    \"location\": \"San Francisco, CA\",\n    \"languages\": [\"English\", \"Spanish\"],\n    \"tags\": [\"Leadership\", \"Management\", \"Tech\"],\n    \"image\": \"https://storage.example.com/coaches/profile_123.jpg\"\n  },\n  \"availability\": {\n    \"timezone\": \"America/Los_Angeles\",\n    \"weeklySchedule\": [\n      {\n        \"day\": \"Monday\",\n        \"enabled\": true,\n        \"timeSlots\": [\n          { \"start\": \"09:00\", \"end\": \"12:00\" },\n          { \"start\": \"13:00\", \"end\": \"17:00\" }\n        ]\n      },\n      {\n        \"day\": \"Tuesday\",\n        \"enabled\": true,\n        \"timeSlots\": [\n          { \"start\": \"09:00\", \"end\": \"12:00\" },\n          { \"start\": \"13:00\", \"end\": \"17:00\" }\n        ]\n      },\n      {\n        \"day\": \"Wednesday\",\n        \"enabled\": false,\n        \"timeSlots\": []\n      },\n      {\n        \"day\": \"Thursday\",\n        \"enabled\": true,\n        \"timeSlots\": [\n          { \"start\": \"09:00\", \"end\": \"12:00\" }\n        ]\n      },\n      {\n        \"day\": \"Friday\",\n        \"enabled\": true,\n        \"timeSlots\": [\n          { \"start\": \"09:00\", \"end\": \"17:00\" }\n        ]\n      },\n      {\n        \"day\": \"Saturday\",\n        \"enabled\": false,\n        \"timeSlots\": []\n      },\n      {\n        \"day\": \"Sunday\",\n        \"enabled\": false,\n        \"timeSlots\": []\n      }\n    ]\n  },\n  \"calendarIntegrations\": {\n    \"google\": {\n      \"connected\": false\n    },\n    \"outlook\": {\n      \"connected\": false\n    }\n  },\n  \"hourlyRate\": 75.50,\n  \"currency\": \"USD\",\n  \"password\": \"optional-password\"\n}"
+                  "raw": "{\n  \"personalInfo\": {\n    \"name\": \"Sarah Wilson\",\n    \"title\": \"Senior Career Coach\",\n    \"bio\": \"Experienced leader in tech with 10+ years of experience...\",\n    \"specialization\": \"Tech Leadership\",\n    \"location\": \"San Francisco, CA\",\n    \"languages\": [\"English\", \"Spanish\"],\n    \"tags\": [\"Leadership\", \"Management\", \"Tech\"],\n    \"image\": \"https://careerblob.blob.core.windows.net/coach-profiles/coach_123.jpg\"\n  },\n  \"availability\": {\n    \"timezone\": \"America/Los_Angeles\",\n    \"weeklySchedule\": [\n      {\n        \"day\": \"Monday\",\n        \"enabled\": true,\n        \"timeSlots\": [\n          { \"start\": \"09:00\", \"end\": \"12:00\" },\n          { \"start\": \"13:00\", \"end\": \"17:00\" }\n        ]\n      },\n      {\n        \"day\": \"Tuesday\",\n        \"enabled\": true,\n        \"timeSlots\": [\n          { \"start\": \"09:00\", \"end\": \"12:00\" },\n          { \"start\": \"13:00\", \"end\": \"17:00\" }\n        ]\n      },\n      {\n        \"day\": \"Wednesday\",\n        \"enabled\": false,\n        \"timeSlots\": []\n      },\n      {\n        \"day\": \"Thursday\",\n        \"enabled\": true,\n        \"timeSlots\": [\n          { \"start\": \"09:00\", \"end\": \"12:00\" }\n        ]\n      },\n      {\n        \"day\": \"Friday\",\n        \"enabled\": true,\n        \"timeSlots\": [\n          { \"start\": \"09:00\", \"end\": \"17:00\" }\n        ]\n      },\n      {\n        \"day\": \"Saturday\",\n        \"enabled\": false,\n        \"timeSlots\": []\n      },\n      {\n        \"day\": \"Sunday\",\n        \"enabled\": false,\n        \"timeSlots\": []\n      }\n    ]\n  },\n  \"calendarIntegrations\": {\n    \"google\": {\n      \"connected\": false\n    },\n    \"outlook\": {\n      \"connected\": false\n    }\n  },\n  \"hourlyRate\": 75.50,\n  \"currency\": \"USD\",\n  \"password\": \"optional-password\"\n}"
                 },
                 "url": {
                   "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/{{coachId}}/onboarding",
@@ -481,7 +529,7 @@
                   ],
                   "path": ["api", "v1", "coach", "{{coachId}}", "onboarding"]
                 },
-                "description": "Submit coach onboarding data including profile, availability, calendar preferences, pricing information, and optional password.\n\n**Request Body Fields:**\n- `personalInfo`: Required - Personal information (name, title, bio, specialization, location, languages, tags, image)\n- `availability`: Required - Weekly schedule with timezone and time slots\n- `calendarIntegrations`: Optional - Google and Outlook calendar integration settings\n- `hourlyRate`: **Required** - Coach's hourly rate as a decimal number (must be between 0.01 and 999999.99). This is required for coaches to accept bookings.\n- `currency`: **Required** - Currency code as a 3-letter ISO code (e.g., \"USD\", \"EUR\", \"GBP\"). Accepts both uppercase and lowercase (e.g., \"usd\" or \"USD\") - will be normalized to uppercase.\n- `password`: Optional - Password to set for the coach account (will be hashed before storage)\n\n**Note:** HourlyRate and Currency are required fields. Coaches cannot accept bookings without setting their hourly rate."
+                "description": "Submit coach onboarding data including profile, availability, calendar preferences, pricing information, and optional password.\n\n**Request Body Fields:**\n- `personalInfo`: Required - Personal information (name, title, bio, specialization, location, languages, tags, image)\n  - `image`: Can be either:\n    - **Azure Blob Storage URL** (e.g., https://careerblob.blob.core.windows.net/coach-profiles/coach_xxx.jpg) - Used directly\n    - **Base64 encoded image** (e.g., data:image/png;base64,iVBORw0KGgo...) - Automatically uploaded to Azure Blob Storage and URL stored\n- `availability`: Required - Weekly schedule with timezone and time slots\n- `calendarIntegrations`: Optional - Google and Outlook calendar integration settings\n- `hourlyRate`: **Required** - Coach's hourly rate as a decimal number (must be between 0.01 and 999999.99). This is required for coaches to accept bookings.\n- `currency`: **Required** - Currency code as a 3-letter ISO code (e.g., \"USD\", \"EUR\", \"GBP\"). Accepts both uppercase and lowercase (e.g., \"usd\" or \"USD\") - will be normalized to uppercase.\n- `password`: Optional - Password to set for the coach account (will be hashed before storage)\n\n**Image Storage:**\n- Base64 images are automatically uploaded to Azure Blob Storage container 'coach-profiles'\n- The stored `imageUrl` will be the Azure Blob Storage public URL\n- Supported formats: jpg, jpeg, png, gif, webp\n\n**Note:** HourlyRate and Currency are required fields. Coaches cannot accept bookings without setting their hourly rate."
               }
             },
             {
@@ -670,7 +718,7 @@
                   ],
                   "path": ["api", "v1", "coach", "{{coachId}}"]
                 },
-                "description": "Get full public profile of a coach including availability, ratings, and reviews."
+                "description": "Get full public profile of a coach including availability, ratings, and reviews.\n\n**Returns:**\n- **image**: Azure Blob Storage URL of coach profile image (e.g., https://careerblob.blob.core.windows.net/coach-profiles/coaches/profiles/coach_xxx.jpg)\n- Base64 images are filtered out - only URLs are returned\n- Returns empty string if image is base64 encoded or not available\n\n**Image Storage:**\n- Images stored in Azure Blob Storage container 'coach-profiles'\n- Folder structure: coaches/profiles/"
               }
             },
             {
@@ -733,7 +781,7 @@
                   ],
                   "path": ["api", "v1", "bookings"]
                 },
-                "description": "Book a coaching session with a coach. Requires authentication and payment.\n\n**Payment Flow Options:**\n\n**Option 1: PaymentIntent Flow (Default - No Redirect)**\n- Set `useCheckoutSession: false` or omit it\n- Payment happens on your frontend page using Stripe.js\n- No redirect from Stripe\n- You handle redirect manually after payment succeeds\n\n**Option 2: Checkout Session Flow (With Redirect)**\n- Set `useCheckoutSession: true`\n- Provide `successUrl` and `cancelUrl`\n- User is redirected to Stripe's hosted payment page\n- Stripe redirects back to your `successUrl` after payment\n\n**Request Body:**\n- coachId: Required - Coach ID\n- slot: Required - Object with start and end times (ISO 8601 format)\n- topic: Optional - Session topic\n- notes: Optional - Pre-session notes\n- useCheckoutSession: Optional - Boolean (default: false)\n- successUrl: Optional - Required if useCheckoutSession=true (e.g., \"https://yourdomain.com/booking-success?session_id={CHECKOUT_SESSION_ID}\")\n- cancelUrl: Optional - Required if useCheckoutSession=true (e.g., \"https://yourdomain.com/booking-cancelled\")\n\n**Response (PaymentIntent Flow):**\n- PaymentIntentId: Stripe payment intent ID\n- ClientSecret: Use this with Stripe.js to process payment\n- PaymentStatus: Current payment status\n- Amount: Calculated amount based on coach's hourly rate\n- Currency: Payment currency\n- Status: 'pending_payment' until payment succeeds\n\n**Response (Checkout Session Flow):**\n- PaymentIntentId: Stripe checkout session ID\n- ClientSecret: Stripe checkout session URL (redirect user to this URL)\n- PaymentStatus: 'pending'\n- Amount: Calculated amount based on coach's hourly rate\n- Currency: Payment currency\n- Status: 'pending_payment'\n\n**Note:** Booking is only created after successful payment via webhook. Coach must have hourly rate set. After payment, poll /api/stripe/booking-status/{paymentIntentId} to check booking status.\n\n**This example uses PaymentIntent flow (useCheckoutSession: false).**"
+                "description": "Book a coaching session with a coach. Requires authentication and payment.\n\n**Payment Flow Options:**\n\n**Option 1: PaymentIntent Flow (Default - No Redirect)**\n- Set `useCheckoutSession: false` or omit it\n- Payment happens on your frontend page using Stripe.js\n- No redirect from Stripe\n- You handle redirect manually after payment succeeds\n\n**Option 2: Checkout Session Flow (With Redirect)**\n- Set `useCheckoutSession: true`\n- Provide `successUrl` and `cancelUrl`\n- User is redirected to Stripe's hosted payment page\n- Stripe redirects back to your `successUrl` after payment\n\n**Request Body:**\n- coachId: Required - Coach ID\n- slot: Required - Object with start and end times (ISO 8601 format)\n- topic: Optional - Session topic\n- notes: Optional - Pre-session notes\n- useCheckoutSession: Optional - Boolean (default: false)\n- successUrl: Optional - Required if useCheckoutSession=true (e.g., \"https://yourdomain.com/booking-success?session_id={CHECKOUT_SESSION_ID}\")\n- cancelUrl: Optional - Required if useCheckoutSession=true (e.g., \"https://yourdomain.com/booking-cancelled\")\n\n**Response (PaymentIntent Flow):**\n- PaymentIntentId: Stripe payment intent ID\n- ClientSecret: Use this with Stripe.js to process payment\n- PaymentStatus: Current payment status\n- Amount: Calculated amount based on coach's hourly rate\n- Currency: Payment currency\n- Status: 'pending_payment' until payment succeeds\n\n**Response (Checkout Session Flow):**\n- PaymentIntentId: Stripe checkout session ID\n- ClientSecret: Stripe checkout session URL (redirect user to this URL)\n- PaymentStatus: 'pending'\n- Amount: Calculated amount based on coach's hourly rate\n- Currency: Payment currency\n- Status: 'pending_payment'\n\n**Email Notifications:**\n- After successful payment and booking creation, automatic confirmation emails are sent to:\n  - **Student**: Confirmation email with booking details, date, time, and payment information\n  - **Coach**: Notification email with student details, session time, and booking information\n- Emails are sent automatically via webhook after payment succeeds\n- Email failures do not affect booking creation (bookings succeed even if email fails)\n\n**Note:** Booking is only created after successful payment via webhook. Coach must have hourly rate set. After payment, poll /api/stripe/booking-status/{paymentIntentId} to check booking status.\n\n**This example uses PaymentIntent flow (useCheckoutSession: false).**"
               }
             },
             {
@@ -768,7 +816,7 @@
                   ],
                   "path": ["api", "v1", "bookings"]
                 },
-                "description": "Book a coaching session using Stripe Checkout Session flow (with redirect).\n\n**Checkout Session Flow:**\n1. This endpoint creates a Stripe Checkout Session\n2. Returns checkout session URL in `clientSecret` field\n3. Redirect user to the session URL: `window.location.href = response.data.clientSecret`\n4. User completes payment on Stripe's hosted page\n5. Stripe redirects back to your `successUrl` after payment\n6. Webhook automatically creates the booking\n7. Check booking status on your success page\n\n**Request Body:**\n- coachId: Required - Coach ID\n- slot: Required - Object with start and end times (ISO 8601 format)\n- topic: Optional - Session topic\n- notes: Optional - Pre-session notes\n- useCheckoutSession: Required - Must be `true`\n- successUrl: Required - URL to redirect after successful payment (use {CHECKOUT_SESSION_ID} placeholder)\n- cancelUrl: Required - URL to redirect if user cancels payment\n\n**Response:**\n- PaymentIntentId: Stripe checkout session ID\n- ClientSecret: Stripe checkout session URL (redirect user to this URL)\n- PaymentStatus: 'pending'\n- Amount: Calculated amount based on coach's hourly rate\n- Currency: Payment currency\n- Status: 'pending_payment'\n\n**Frontend Implementation:**\n```javascript\nconst response = await createBooking(bookingData, authToken);\nconst sessionUrl = response.data.clientSecret;\nwindow.location.href = sessionUrl; // Redirect to Stripe\n```\n\n**Note:** Booking is only created after successful payment via webhook. Coach must have hourly rate set."
+                "description": "Book a coaching session using Stripe Checkout Session flow (with redirect).\n\n**Checkout Session Flow:**\n1. This endpoint creates a Stripe Checkout Session\n2. Returns checkout session URL in `clientSecret` field\n3. Redirect user to the session URL: `window.location.href = response.data.clientSecret`\n4. User completes payment on Stripe's hosted page\n5. Stripe redirects back to your `successUrl` after payment\n6. Webhook automatically creates the booking\n7. **Automatic confirmation emails sent to coach and student**\n8. Check booking status on your success page\n\n**Request Body:**\n- coachId: Required - Coach ID\n- slot: Required - Object with start and end times (ISO 8601 format)\n- topic: Optional - Session topic\n- notes: Optional - Pre-session notes\n- useCheckoutSession: Required - Must be `true`\n- successUrl: Required - URL to redirect after successful payment (use {CHECKOUT_SESSION_ID} placeholder)\n- cancelUrl: Required - URL to redirect if user cancels payment\n\n**Response:**\n- PaymentIntentId: Stripe checkout session ID\n- ClientSecret: Stripe checkout session URL (redirect user to this URL)\n- PaymentStatus: 'pending'\n- Amount: Calculated amount based on coach's hourly rate\n- Currency: Payment currency\n- Status: 'pending_payment'\n\n**Email Notifications:**\n- After successful payment and booking creation, automatic confirmation emails are sent:\n  - **Student**: Confirmation email with booking details, date, time, and payment information\n  - **Coach**: Notification email with student details, session time, and booking information\n- Emails are sent automatically via webhook after payment succeeds\n- Email failures do not affect booking creation\n\n**Frontend Implementation:**\n```javascript\nconst response = await createBooking(bookingData, authToken);\nconst sessionUrl = response.data.clientSecret;\nwindow.location.href = sessionUrl; // Redirect to Stripe\n```\n\n**Note:** Booking is only created after successful payment via webhook. Coach must have hourly rate set."
               }
             },
             {
@@ -797,7 +845,7 @@
                     }
                   ]
                 },
-                "description": "Get user's own booking sessions (for students). Returns detailed session information including coach details, slot information, meeting links, payment status, and booking status.\n\n**Query Parameters:**\n- status: Optional - Filter by status ('upcoming', 'past', 'all')\n\n**Returns:**\n- List of user's bookings with coach details\n- Slot information (start/end times)\n- Meeting links\n- Session status and topic\n- Payment information:\n  - IsPaymentDone: Whether payment was completed\n  - PaidAt: Timestamp when payment was completed\n  - Amount: Payment amount\n  - Currency: Payment currency"
+                "description": "Get user's own booking sessions (for students). Returns detailed session information including coach details, slot information, meeting links, payment status, and booking status.\n\n**Query Parameters:**\n- status: Optional - Filter by status ('upcoming', 'past', 'all')\n\n**Returns:**\n- List of user's bookings with coach details:\n  - CoachName, CoachTitle, CoachImage (Azure Blob Storage URL)\n  - **StudentImage**: Azure Blob Storage URL of student avatar (e.g., https://careerblob.blob.core.windows.net/coach-profiles/users/avatars/avatar_xxx.jpg)\n  - Base64 images are filtered out - only URLs are returned\n- Slot information (start/end times)\n- Meeting links\n- Session status and topic\n- Payment information:\n  - IsPaymentDone: Whether payment was completed\n  - PaidAt: Timestamp when payment was completed\n  - Amount: Payment amount\n  - Currency: Payment currency\n\n**Image Storage:**\n- Coach images: coaches/profiles/ folder\n- Student avatars: users/avatars/ folder\n- All stored in Azure Blob Storage container 'coach-profiles'"
               }
             }
           ]
@@ -831,7 +879,7 @@
                     }
                   ]
                 },
-                "description": "Get list of upcoming and past sessions for the logged-in coach.\n\n**Query Parameters:**\n- status: Optional - Filter by status ('upcoming', 'past', 'all')\n\n**Returns:**\n- List of coach's bookings with student details\n- Session information (start/end times, topic)\n- Meeting links\n- Session status\n- Payment information:\n  - IsPaymentDone: Whether payment was completed\n  - PaidAt: Timestamp when payment was completed\n  - Amount: Payment amount\n  - Currency: Payment currency"
+                "description": "Get list of upcoming and past sessions for the logged-in coach.\n\n**Query Parameters:**\n- status: Optional - Filter by status ('upcoming', 'past', 'all')\n\n**Returns:**\n- List of coach's bookings with student details:\n  - StudentName: Name of the student\n  - **StudentImage**: Azure Blob Storage URL of student avatar (e.g., https://careerblob.blob.core.windows.net/coach-profiles/users/avatars/avatar_xxx.jpg)\n  - Base64 images are filtered out - only URLs are returned\n- Session information (start/end times, topic)\n- Meeting links\n- Session status\n- Payment information:\n  - IsPaymentDone: Whether payment was completed\n  - PaidAt: Timestamp when payment was completed\n  - Amount: Payment amount\n  - Currency: Payment currency\n\n**Student Image Storage:**\n- Student avatars are stored in Azure Blob Storage container 'coach-profiles'\n- Folder structure: users/avatars/\n- Returns empty string if avatar is base64 encoded or not available"
               }
             },
             {
@@ -1293,14 +1341,31 @@
                   }
                 ],
                 "url": {
-                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/me/payouts",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/me/payouts?page=1&limit=20",
                   "protocol": "https",
                   "host": [
                     "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
-                  "path": ["api", "v1", "coach", "me", "payouts"]
+                  "path": ["api", "v1", "coach", "me", "payouts"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "description": "Page number (default: 1)"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20",
+                      "description": "Items per page (default: 20)"
+                    },
+                    {
+                      "key": "status",
+                      "value": "completed",
+                      "description": "Filter by status: pending, processing, completed, failed (optional)"
+                    }
+                  ]
                 },
-                "description": "Get payout history for the coach. Returns all payouts with their status, amounts, and transaction details.\n\n**Returns:**\n- List of payouts (pending, processing, completed, failed)\n- Total payouts amount\n- Pending payouts amount\n- Each payout includes: id, amount, currency, status, requestedAt, processedAt, transactionId, notes"
+                "description": "Get paginated payout history for the coach with filtering options. Enhanced with pagination, status filtering, and detailed payout information.\n\n**Query Parameters:**\n- page: Page number (default: 1)\n- limit: Items per page (default: 20)\n- status: Optional - Filter by status (pending, processing, completed, failed)\n  - Use `status=completed` for past payouts\n  - Use `status=pending` for current pending payouts\n  - Use `status=processing` for currently processing payouts\n  - Use `status=failed` for failed payouts\n\n**Response includes:**\n- Data: List of payout items with full details\n- Each payout item includes:\n  - id: Payout ID\n  - amount: Total payout amount\n  - platformFeeAmount: Platform fee deducted\n  - netAmount: Amount after platform fee\n  - platformFeePercentage: Platform fee percentage\n  - currency: Currency code\n  - status: Payout status (pending, processing, completed, failed)\n  - requestedAt: When payout was requested\n  - processedAt: When payout was processed (if completed)\n  - approvedAt: When payout was approved\n  - periodStart: Start date of earnings period\n  - periodEnd: End date of earnings period\n  - transactionId: Stripe transfer ID (if Stripe Connect used)\n  - notes: Additional notes\n  - failureReason: Reason if payout failed\n- Total: Total number of payouts\n- Page: Current page number\n- Limit: Items per page\n- TotalPages: Total number of pages\n- TotalPayouts: Sum of completed payouts\n- PendingPayouts: Sum of pending/processing payouts\n- Summary: Statistics breakdown:\n  - completedCount, pendingCount, processingCount, failedCount\n  - completedAmount, pendingAmount, processingAmount\n\n**Example Usage:**\n- Get all payouts: `/api/v1/coach/me/payouts`\n- Get past completed payouts: `/api/v1/coach/me/payouts?status=completed`\n- Get current pending payouts: `/api/v1/coach/me/payouts?status=pending`\n- Get paginated results: `/api/v1/coach/me/payouts?page=1&limit=10`"
               }
             },
             {
@@ -1659,7 +1724,111 @@
                     }
                   ]
                 },
-                "description": "Get recent user activities including course enrollments, bookings, profile updates, etc.\n\n**Query Parameters:**\n- limit: Optional - Maximum number of activities (default: 50)\n\n**Returns:**\n- List of activity items\n- Each item includes: id, type, title, description, relatedEntityId, relatedEntityType, activityDate\n- Total count"
+                "description": "Get user activity timeline with metadata support. Returns activities including course enrollments, bookings, profile updates, etc.\n\n**Query Parameters:**\n- limit: Optional - Maximum number of activities (default: 50)\n\n**Returns:**\n- data: List of activity items\n- Each item includes:\n  - id: Activity ID\n  - type: Activity type (course_completed, application_sent, profile_updated, session_completed, certificate_earned)\n  - description: Activity description\n  - timestamp: Activity timestamp (ISO 8601)\n  - metadata: Optional metadata object with entityId and entityType\n  - Legacy fields: title, relatedEntityId, relatedEntityType, activityDate (for backward compatibility)\n- total: Total count\n\n**Activity Types:**\n- course_completed: Course completion\n- application_sent: Job application submitted\n- profile_updated: Profile information updated\n- session_completed: Coaching session completed\n- certificate_earned: Certificate earned"
+              }
+            },
+            {
+              "name": "Save Form Draft",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"formId\": \"profile_form\",\n  \"data\": {\n    \"fullName\": \"John Doe\",\n    \"bio\": \"In progress...\",\n    \"skills\": [\"JavaScript\", \"React\"]\n  },\n  \"step\": 1,\n  \"lastModified\": \"2025-12-26T10:00:00Z\"\n}"
+                },
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/user/drafts",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "user", "drafts"]
+                },
+                "description": "Save form draft for autosave functionality. Automatically updates existing drafts for the same formId.\n\n**Request Body:**\n- formId: Required - Form identifier (profile_form, evaluation_session_{id}, resume_builder, coach_onboarding)\n- data: Optional - Form data as object\n- step: Optional - Current step number\n- lastModified: Optional - Last modification timestamp (ISO 8601)\n\n**Response:**\n- success: true\n- draftId: Draft ID\n\n**Features:**\n- Auto-updates existing drafts for same formId\n- 24-hour expiration\n- Automatic cleanup of expired drafts\n\n**Supported Form IDs:**\n- profile_form: User profile form\n- evaluation_session_{id}: Evaluation form\n- resume_builder: Resume builder form\n- coach_onboarding: Coach onboarding form"
+              }
+            },
+            {
+              "name": "Get Drafts",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/user/drafts?formId=profile_form",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "user", "drafts"],
+                  "query": [
+                    {
+                      "key": "formId",
+                      "value": "profile_form",
+                      "description": "Optional - Filter by specific form ID",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Retrieve all saved drafts for the authenticated user. Can filter by formId.\n\n**Query Parameters:**\n- formId: Optional - Filter by specific form ID\n\n**Response:**\n- drafts: List of draft items\n- Each draft includes:\n  - draftId: Draft ID\n  - formId: Form identifier\n  - data: Form data object\n  - step: Current step (if applicable)\n  - lastModified: Last modification timestamp\n  - expiresAt: Expiration timestamp (24 hours from creation)\n\n**Note:** Only returns non-expired drafts"
+              }
+            },
+            {
+              "name": "Delete Draft",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/user/drafts/{{draftId}}",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "user", "drafts", "{{draftId}}"]
+                },
+                "description": "Delete a draft after form submission or user cancellation.\n\n**Path Parameters:**\n- draftId: Required - Draft ID to delete\n\n**Response:**\n- success: true\n\n**Note:** Only deletes drafts belonging to the authenticated user"
+              }
+            },
+            {
+              "name": "Get Session Analytics",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/user/sessions/analytics",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "user", "sessions", "analytics"]
+                },
+                "description": "Get user's personal session statistics and analytics.\n\n**Response:**\n- totalSessions: Total number of sessions\n- completedSessions: Number of completed sessions\n- cancelledSessions: Number of cancelled sessions\n- upcomingSessions: Number of upcoming confirmed sessions\n- averageRating: Average rating from completed sessions (0-5)\n- totalDuration: Total duration in minutes\n- topCoaches: Top 5 coaches by session count\n  - coachId: Coach ID\n  - name: Coach name\n  - sessions: Number of sessions with this coach\n- monthlyTrend: Monthly session trend\n  - month: Month in YYYY-MM format\n  - sessions: Number of sessions in that month\n\n**Note:** Ratings are retrieved from Review entity, not stored directly in Booking"
               }
             },
             {
@@ -1935,7 +2104,61 @@
                   ],
                   "path": ["api", "v1", "admin", "payouts", "{{payoutId}}", "approve"]
                 },
-                "description": "Approve a payout for processing. Changes status from 'pending' to 'processing' and records approval information.\n\n**Returns:**\n- payoutId, status, approvedBy, approvedAt\n\n**Note:**\n- Only pending payouts can be approved\n- Requires admin role (currently allows any authenticated user - TODO: add role check)\n- TODO: Trigger actual payout processing (Stripe transfer, bank transfer, etc.)"
+                "description": "Approve and process a payout. Automatically processes the payout using Stripe Connect (preferred) or marks it for manual bank transfer processing.\n\n**Processing Methods:**\n1. **Stripe Connect (Primary)**: If coach has a linked Stripe Connect account, the payout is automatically transferred via Stripe Transfer API. Status becomes 'completed'.\n2. **Manual Bank Transfer (Fallback)**: If Stripe Connect is unavailable but bank details exist in PayoutSettings, payout is marked as 'processing' for manual admin processing.\n\n**Success Response (200 OK):**\n- payoutId: Payout ID\n- status: 'completed' (Stripe transfer successful) or 'processing' (manual processing required)\n- transactionId: Stripe transfer ID (if Stripe Connect used, null for manual)\n- approvedBy: Admin user ID who approved\n- approvedAt: Approval timestamp\n- processedAt: Processing timestamp (when payout was processed)\n- message: Success message indicating processing status\n\n**Error Response (400 Bad Request):**\n- If payout processing fails (e.g., Stripe account not ready, missing bank details)\n- Returns error message with failure reason\n\n**Note:**\n- Only pending payouts can be approved\n- Requires admin role (currently allows any authenticated user - TODO: add role check)\n- Payout processing is automatic - no manual intervention needed for Stripe Connect accounts\n- For manual bank transfers, admin must process externally using logged bank details"
+              }
+            },
+            {
+              "name": "Get Payout History",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/admin/payouts/history?page=1&limit=20",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "admin", "payouts", "history"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "description": "Page number (default: 1)"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20",
+                      "description": "Items per page (default: 20)"
+                    },
+                    {
+                      "key": "status",
+                      "value": "completed",
+                      "description": "Filter by status: pending, processing, completed, failed (optional)"
+                    },
+                    {
+                      "key": "coachId",
+                      "value": "",
+                      "description": "Filter by coach ID (optional)"
+                    },
+                    {
+                      "key": "startDate",
+                      "value": "",
+                      "description": "Filter payouts from this date (ISO 8601 format, optional)"
+                    },
+                    {
+                      "key": "endDate",
+                      "value": "",
+                      "description": "Filter payouts until this date (ISO 8601 format, optional)"
+                    }
+                  ]
+                },
+                "description": "Get paginated payout processing history with filters. Useful for admin dashboard to view all payout transactions.\n\n**Query Parameters:**\n- page: Page number (default: 1)\n- limit: Items per page (default: 20)\n- status: Optional - Filter by status (pending, processing, completed, failed)\n- coachId: Optional - Filter by specific coach ID\n- startDate: Optional - Filter payouts from this date (ISO 8601 format)\n- endDate: Optional - Filter payouts until this date (ISO 8601 format)\n\n**Response includes:**\n- Items: List of payout items with full details\n- Each item includes: payoutId, coachId, coachName, coachEmail, amount, platformFeeAmount, netAmount, currency, periodStart, periodEnd, requestedAt, processedAt, approvedAt, approvedBy, transactionId, status, failureReason, notes\n- Total: Total number of payouts matching filters\n- Page: Current page number\n- Limit: Items per page\n- TotalPages: Total number of pages\n\n**Note:** Requires admin role (currently allows any authenticated user - TODO: add role check)"
               }
             },
             {
@@ -2096,6 +2319,28 @@
               }
             },
             {
+              "name": "Get Coach Statistics",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/admin/coaches/stats",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "admin", "coaches", "stats"]
+                },
+                "description": "Get aggregated statistics for all coaches in the system. Optimized for admin dashboard.\n\n**Response:**\n- totalCoaches: Total count of all coaches\n- activeNow: Count of coaches with status = \"active\" (onboarding completed)\n- pendingInvites: Count of coaches with status = \"invited\" or \"pending\"\n- expiringContracts: Count of coaches whose contractEnd is within next 30 days\n- statusBreakdown: Detailed breakdown by status\n  - active: Coaches with completed onboarding\n  - invited: Coaches with invited status\n  - pending: Coaches with onboarding_started status\n  - inactive: Other statuses\n\n**Performance:**\n- Aggregates data at database level\n- No client-side calculations required\n\n**Note:** Requires admin role (currently allows any authenticated user - TODO: add role check)"
+              }
+            },
+            {
               "name": "Get Analytics",
               "request": {
                 "method": "GET",
@@ -2123,8 +2368,84 @@
                 },
                 "description": "Get comprehensive platform analytics for admin dashboard.\n\n**Query Parameters:**\n- period: Time period - 'week', 'month', or 'year' (default: month)\n\n**Returns:**\n- stats: Overall statistics (totalUsers, totalRevenue, activeCourses, growthRate, monthlyGrowth)\n- revenueData: Revenue breakdown by period\n- userGrowthData: User growth data by period\n- topCoaches: Top 5 coaches by earnings (id, name, earnings, sessions, rating)\n- topCourses: Top 5 courses by enrollments (id, title, enrollments, revenue, rating)\n- recentActivity: Recent activity feed (last 20 items)\n\n**Note:** Requires admin role (currently allows any authenticated user - TODO: add role check)"
               }
+            },
+            {
+              "name": "Get Analytics Summary",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/admin/analytics/summary?period=week",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "admin", "analytics", "summary"],
+                  "query": [
+                    {
+                      "key": "period",
+                      "value": "week",
+                      "description": "Time period: day, week, month, year (default: week)"
+                    },
+                    {
+                      "key": "startDate",
+                      "value": "",
+                      "description": "Optional - Start date (ISO 8601 format)",
+                      "disabled": true
+                    },
+                    {
+                      "key": "endDate",
+                      "value": "",
+                      "description": "Optional - End date (ISO 8601 format)",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Get aggregated analytics summary based on telemetry events. Optimized for admin dashboard.\n\n**Query Parameters:**\n- period: Time period - 'day', 'week', 'month', 'year' (default: week)\n- startDate: Optional - Custom start date (ISO 8601)\n- endDate: Optional - Custom end date (ISO 8601)\n\n**Response:**\n- period: Selected time period\n- metrics:\n  - totalPageViews: Total page views\n  - uniqueVisitors: Unique visitor count\n  - avgSessionDuration: Average session duration (milliseconds)\n  - dau: Daily Active Users\n  - wau: Weekly Active Users\n  - mau: Monthly Active Users\n  - bounceRate: Bounce rate (0-1)\n  - newUsers: New user count\n  - returningUsers: Returning user count\n  - retentionRate: Retention rate (0-1)\n  - sessionsPerUser: Average sessions per user\n  - pagesPerSession: Average pages per session\n  - topPages: Top pages by views\n  - eventBreakdown: Event counts by type\n  - completionRates: Form completion rates\n    - resumeBuilder: Resume builder completion rate\n    - assessments: Assessment completion rate\n    - coachOnboarding: Coach onboarding completion rate\n    - profileSetup: Profile setup completion rate\n  - dailyActiveUsersTrend: Daily active users trend\n\n**Data Source:** Telemetry events (90-day retention)\n\n**Note:** Requires admin role (currently allows any authenticated user - TODO: add role check)"
+              }
             }
           ]
+        }
+      ]
+    },
+    {
+      "name": "Telemetry",
+      "item": [
+        {
+          "name": "Track Events",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"events\": [\n    {\n      \"type\": \"page_view\",\n      \"timestamp\": \"2025-12-26T10:00:00Z\",\n      \"properties\": {\n        \"page\": \"/dashboard/career-paths\",\n        \"duration\": 45000\n      }\n    },\n    {\n      \"type\": \"click\",\n      \"timestamp\": \"2025-12-26T10:00:15Z\",\n      \"properties\": {\n        \"elementId\": \"career_123\",\n        \"elementType\": \"button\",\n        \"page\": \"/dashboard/career-paths\"\n      }\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/telemetry/events",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "telemetry", "events"]
+            },
+            "description": "Submit batch of telemetry events for analytics tracking. All data is privacy-compliant (no PII stored).\n\n**Request Body:**\n- events: Required - Array of event objects (max 100 per request)\n  - type: Required - Event type (see supported types below)\n  - timestamp: Optional - Event timestamp (ISO 8601). Defaults to current time\n  - properties: Optional - Event properties object (no PII allowed)\n\n**Supported Event Types:**\n- page_view, click, favorite_add, favorite_remove\n- form_save, form_complete\n- session_book, session_complete, session_cancel\n- assessment_start, assessment_complete\n- resume_step_complete\n- login, logout\n- course_start, course_progress, course_complete\n- career_view, career_explore\n- coach_view, search, error\n\n**Response:**\n- success: true\n- eventsReceived: Number of events successfully saved\n\n**Privacy Features:**\n- User IDs are hashed (SHA256 + salt)\n- PII fields automatically stripped (email, name, phone, address)\n- Rate limiting: Max 100 events per request\n- 90-day automatic expiration\n\n**Rate Limiting:**\n- Maximum 100 events per request\n- Maximum 1000 events per minute per user\n\n**Note:** Invalid event types are skipped, not rejected"
+          }
         }
       ]
     },

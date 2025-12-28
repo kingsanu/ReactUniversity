@@ -10,13 +10,16 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { FiSave, FiGithub, FiTwitter, FiLinkedin, FiPlus, FiTrash2, FiLink } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getUserProfile, updateUserProfile } from "@/services/userService";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { Loader2 } from "lucide-react";
+import { useFormAutosave } from "@/hooks/useFormAutosave";
+import { telemetry } from "@/services/telemetryService";
 
 // Robust Schema
 const profileSchema = z.object({
@@ -45,8 +48,9 @@ export function ProfileForm() {
   const { user, setUser } = useGlobalStore();
   const [newSkill, setNewSkill] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const { t } = useTranslation();
 
-  const { register, control, handleSubmit, setValue, watch, reset, formState: { errors, isSubmitting } } = useForm<ProfileFormValues>({
+  const { register, control, handleSubmit, setValue, watch, reset, getValues, formState: { errors, isSubmitting } } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       fullName: "",
@@ -64,6 +68,15 @@ export function ProfileForm() {
       skills: [],
       competencies: []
     }
+  });
+
+  // Autosave hook for form drafts
+  const autosave = useFormAutosave("profile_form", {
+    debounceMs: 2000,
+    onRestoreSuccess: (data) => {
+      reset(data as ProfileFormValues);
+      toast.info("Draft restored from previous session");
+    },
   });
 
   // Fetch profile data on mount
@@ -133,6 +146,7 @@ export function ProfileForm() {
   };
 
   const onSubmit = async (data: ProfileFormValues) => {
+    const startTime = Date.now();
     try {
       await updateUserProfile({
         fullName: data.fullName,
@@ -145,6 +159,10 @@ export function ProfileForm() {
       });
       // Update global store with new name
       setUser({ name: data.fullName });
+      // Clear autosave draft on successful submit
+      await autosave.clearDraft();
+      // Track form completion
+      telemetry.trackForm("complete", "profile_form", "/dashboard/profile", Date.now() - startTime);
       toast.success("Profile updated successfully");
     } catch (error: any) {
       console.error("Failed to update profile:", error);
@@ -173,8 +191,8 @@ export function ProfileForm() {
         {/* Basic Info Section */}
         <Card className="border-none shadow-sm bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
             <CardHeader>
-                <CardTitle className="text-xl">Personal Information</CardTitle>
-                <CardDescription>Update your core identity details.</CardDescription>
+                <CardTitle className="text-xl">{t('profile.personalInfoTitle')}</CardTitle>
+                <CardDescription>{t('profile.personalInfoDescription')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -186,7 +204,7 @@ export function ProfileForm() {
                 
                 <div className="space-y-2">
                     <Label htmlFor="headline">Headline</Label>
-                    <Input id="headline" {...register("headline")} placeholder="e.g. Software Engineer" className="bg-white/50 dark:bg-gray-900/50" aria-invalid={!!errors.headline} />
+                    <Input id="headline" {...register("headline")} placeholder={t('profile.headlinePlaceholder')} className="bg-white/50 dark:bg-gray-900/50" aria-invalid={!!errors.headline} />
                     {errors.headline && <p role="alert" className="text-red-500 text-xs mt-1">{errors.headline.message}</p>}
                 </div>
 
@@ -225,22 +243,22 @@ export function ProfileForm() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                         <Label htmlFor="social-website" className="flex items-center gap-2"><FiLink aria-hidden="true" /> Website / Portfolio</Label>
-                        <Input id="social-website" {...register("socialLinks.website")} placeholder="https://..." className="bg-white/50 dark:bg-gray-900/50" />
+                        <Input id="social-website" {...register("socialLinks.website")} placeholder={t('profile.websitePlaceholder')} className="bg-white/50 dark:bg-gray-900/50" />
                         {errors.socialLinks?.website && <p role="alert" className="text-red-500 text-xs">{errors.socialLinks.website.message}</p>}
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="social-github" className="flex items-center gap-2"><FiGithub aria-hidden="true" /> GitHub</Label>
-                        <Input id="social-github" {...register("socialLinks.github")} placeholder="https://github.com/..." className="bg-white/50 dark:bg-gray-900/50" />
+                        <Input id="social-github" {...register("socialLinks.github")} placeholder={t('profile.githubPlaceholder')} className="bg-white/50 dark:bg-gray-900/50" />
                         {errors.socialLinks?.github && <p role="alert" className="text-red-500 text-xs">{errors.socialLinks.github.message}</p>}
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="social-twitter" className="flex items-center gap-2"><FiTwitter aria-hidden="true" /> Twitter / X</Label>
-                        <Input id="social-twitter" {...register("socialLinks.twitter")} placeholder="https://twitter.com/..." className="bg-white/50 dark:bg-gray-900/50" />
+                        <Input id="social-twitter" {...register("socialLinks.twitter")} placeholder={t('profile.twitterPlaceholder')} className="bg-white/50 dark:bg-gray-900/50" />
                         {errors.socialLinks?.twitter && <p role="alert" className="text-red-500 text-xs">{errors.socialLinks.twitter.message}</p>}
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="social-linkedin" className="flex items-center gap-2"><FiLinkedin aria-hidden="true" /> LinkedIn</Label>
-                        <Input id="social-linkedin" {...register("socialLinks.linkedin")} placeholder="https://linkedin.com/in/..." className="bg-white/50 dark:bg-gray-900/50" />
+                        <Input id="social-linkedin" {...register("socialLinks.linkedin")} placeholder={t('profile.linkedinPlaceholder')} className="bg-white/50 dark:bg-gray-900/50" />
                         {errors.socialLinks?.linkedin && <p role="alert" className="text-red-500 text-xs">{errors.socialLinks.linkedin.message}</p>}
                     </div>
                 </div>
@@ -261,10 +279,10 @@ export function ProfileForm() {
                         value={newSkill}
                         onChange={(e) => setNewSkill(e.target.value)}
                         onKeyDown={handleAddSkill}
-                        placeholder="Type a skill and press Enter..."
+                        placeholder={t('profile.skillInputPlaceholder')}
                         className="bg-white/50 dark:bg-gray-900/50"
                         aria-labelledby="skills-title"
-                        aria-label="Add a new skill"
+                        aria-label={t('profile.addSkillAria')}
                     />
                     <div className="flex flex-wrap gap-2 min-h-[100px] content-start" role="list" aria-label="Skills list">
                         {currentSkills.map((skill) => (
@@ -273,7 +291,7 @@ export function ProfileForm() {
                                 <button type="button" onClick={() => removeSkill(skill)} className="ml-2 hover:text-red-500" aria-label={`Remove skill ${skill}`}>×</button>
                             </Badge>
                         ))}
-                        {currentSkills.length === 0 && <span className="text-sm text-gray-400 italic">No skills added yet.</span>}
+                        {currentSkills.length === 0 && <span className="text-sm text-gray-400 italic">{t('profile.noSkillsYet')}</span>}
                     </div>
                 </CardContent>
             </Card>
@@ -297,7 +315,7 @@ export function ProfileForm() {
                                     {...register(`competencies.${index}.label`)} 
                                     className="h-8 border-none bg-transparent font-medium p-0 focus-visible:ring-0" 
                                     aria-label={`Competency name for item ${index + 1}`}
-                                    placeholder="Skill Name"
+                                    placeholder={t('profile.skillNamePlaceholder')}
                                 />
                                 <button type="button" onClick={() => removeCompetency(index)} className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" aria-label={`Remove competency ${index + 1}`}>
                                     <FiTrash2 size={16} aria-hidden="true" />

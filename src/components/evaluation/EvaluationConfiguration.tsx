@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { 
   CompetencyDimension, 
   RatingScale, 
@@ -78,6 +79,7 @@ const EvaluationConfigurationComponent: React.FC<EvaluationConfigurationProps> =
       updatedAt: new Date().toISOString()
     }
   );
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'competencies' | 'rating' | 'requirements'>('competencies');
   const [isEditing, setIsEditing] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -309,43 +311,43 @@ const EvaluationConfigurationComponent: React.FC<EvaluationConfigurationProps> =
           >
             {/* Add Competency Form */}
             <div className="bg-gray-50 rounded-lg p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Add New Competency</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">{t('evaluation.config.addCompetencyTitle')}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Name *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('evaluation.config.nameLabel')}</label>
                   <input
                     type="text"
                     value={competencyForm.name}
                     onChange={(e) => setCompetencyForm(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder="e.g., Communication Skills"
+                    placeholder={t('evaluation.config.namePlaceholder')}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('evaluation.config.categoryLabel')}</label>
                   <select
                     value={competencyForm.category}
                     onChange={(e) => setCompetencyForm(prev => ({ ...prev, category: e.target.value as CompetencyFormData['category'] }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="">Select category...</option>
+                    <option value="">{t('evaluation.config.selectCategoryPlaceholder')}</option>
                     {competencyCategories.map(category => (
                       <option key={category} value={category}>{category}</option>
                     ))}
                   </select>
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('evaluation.config.descriptionLabel')}</label>
                   <textarea
                     value={competencyForm.description}
                     onChange={(e) => setCompetencyForm(prev => ({ ...prev, description: e.target.value }))}
-                    placeholder="Describe what this competency measures..."
+                    placeholder={t('evaluation.config.descriptionPlaceholder')}
                     rows={2}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Weight</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('evaluation.config.weightLabel')}</label>
                   <input
                     type="number"
                     min="0.1"
@@ -363,7 +365,7 @@ const EvaluationConfigurationComponent: React.FC<EvaluationConfigurationProps> =
                   disabled={!competencyForm.name || !competencyForm.category}
                   className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Add Competency
+                  {t('evaluation.config.addCompetencyButton')}
                 </button>
               </div>
             </div>
@@ -420,7 +422,7 @@ const EvaluationConfigurationComponent: React.FC<EvaluationConfigurationProps> =
 
             {/* Add Rating Option */}
             <div className="bg-gray-50 rounded-lg p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Add Rating Option</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">{t('evaluation.config.rating.addOptionTitle')}</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Value *</label>
@@ -433,22 +435,22 @@ const EvaluationConfigurationComponent: React.FC<EvaluationConfigurationProps> =
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Label *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('evaluation.config.rating.label')}</label>
                   <input
                     type="text"
                     value={ratingForm.label}
                     onChange={(e) => setRatingForm(prev => ({ ...prev, label: e.target.value }))}
-                    placeholder="e.g., Excellent"
+                    placeholder={t('evaluation.config.rating.labelPlaceholder')}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('evaluation.config.rating.description')}</label>
                   <input
                     type="text"
                     value={ratingForm.description}
                     onChange={(e) => setRatingForm(prev => ({ ...prev, description: e.target.value }))}
-                    placeholder="Optional description"
+                    placeholder={t('evaluation.config.rating.descriptionPlaceholder')}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
@@ -459,7 +461,7 @@ const EvaluationConfigurationComponent: React.FC<EvaluationConfigurationProps> =
                   disabled={!ratingForm.label}
                   className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Add Option
+                  {t('evaluation.config.rating.addOptionButton')}
                 </button>
               </div>
             </div>

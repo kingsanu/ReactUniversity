@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 import { Loader2, Upload, FileDown, CheckCircle, XCircle } from "lucide-react";
 import Papa from "papaparse";
+import { useTranslation } from "react-i18next";
 
 interface CoachData {
   fullName: string;
@@ -17,6 +18,7 @@ interface CoachData {
 }
 
 export function BulkInviteForm() {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [results, setResults] = useState<{ success: number; failed: number; errors: string[] } | null>(null);
@@ -67,7 +69,7 @@ export function BulkInviteForm() {
         const validData = results.data.filter(row => row.email && row.fullName);
         
         if (validData.length === 0) {
-            toast.error("No valid rows found in CSV");
+            toast.error(t('admin.invite.noValidRows'));
             setIsLoading(false);
             return;
         }
@@ -98,7 +100,7 @@ export function BulkInviteForm() {
             errors: errors
           });
 
-          toast.success(`Processed ${coachesToInvite.length} records.`);
+          toast.success(t('admin.invite.processedRecords', { count: coachesToInvite.length }));
           
           if (fileInputRef.current) {
             fileInputRef.current.value = "";
@@ -106,7 +108,7 @@ export function BulkInviteForm() {
           setFile(null);
 
         } catch (error: any) {
-          toast.error(error.message || "Failed to process bulk invite");
+          toast.error(error.message || t('admin.invite.bulkProcessFailed'));
         } finally {
           setIsLoading(false);
         }
@@ -123,30 +125,30 @@ export function BulkInviteForm() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Upload className="h-5 w-5" />
-          Bulk Invite Coaches
+          {t('admin.invite.bulkTitle')}
         </CardTitle>
         <CardDescription>
-          Upload a CSV file to invite multiple coaches at once.
+          {t('admin.invite.bulkDescription')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
           <div className="flex items-center justify-between p-4 border rounded-lg bg-muted/50">
             <div className="space-y-1">
-              <p className="text-sm font-medium">CSV Template</p>
+              <p className="text-sm font-medium">{t('admin.invite.csvTemplateTitle')}</p>
               <p className="text-xs text-muted-foreground">
-                Download the template to ensure correct format.
+                {t('admin.invite.csvTemplateDescription')}
               </p>
             </div>
             <Button variant="outline" size="sm" onClick={downloadTemplate}>
               <FileDown className="mr-2 h-4 w-4" />
-              Download Template
+              {t('admin.invite.downloadTemplate')}
             </Button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="csvFile">Upload CSV</Label>
+              <Label htmlFor="csvFile">{t('admin.invite.uploadCSV')}</Label>
               <Input
                 ref={fileInputRef}
                 id="csvFile"
@@ -156,36 +158,36 @@ export function BulkInviteForm() {
                 required
                 aria-describedby="csv-hint"
               />
-              <p id="csv-hint" className="text-xs text-muted-foreground">Accepted format: .csv</p>
+              <p id="csv-hint" className="text-xs text-muted-foreground">{t('admin.invite.csvAcceptedFormat')}</p>
             </div>
             <Button type="submit" disabled={isLoading || !file} className="w-full">
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
-                  Processing...
+                  {t('admin.invite.processing')}
                 </>
               ) : (
-                "Process Bulk Invite"
+                t('admin.invite.processBulkInvite')
               )}
             </Button>
           </form>
 
           {results && (
             <div className="space-y-2 pt-4 border-t">
-              <h4 className="text-sm font-medium">Results</h4>
+              <h4 className="text-sm font-medium">{t('admin.invite.resultsTitle')}</h4>
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center gap-2 text-green-600">
                   <CheckCircle className="h-4 w-4" />
-                  <span className="text-sm">{results.success} Successful</span>
+                  <span className="text-sm">{t('admin.invite.results.success', { count: results.success })}</span>
                 </div>
                 <div className="flex items-center gap-2 text-red-600">
                   <XCircle className="h-4 w-4" />
-                  <span className="text-sm">{results.failed} Failed</span>
+                  <span className="text-sm">{t('admin.invite.results.failed', { count: results.failed })}</span>
                 </div>
               </div>
               {results.errors.length > 0 && (
                 <div className="mt-2 p-2 bg-red-50 rounded text-xs text-red-600 max-h-32 overflow-y-auto">
-                  <p className="font-medium mb-1">Errors:</p>
+                  <p className="font-medium mb-1">{t('admin.invite.errorsTitle')}</p>
                   <ul className="list-disc pl-4 space-y-1">
                     {results.errors.map((err, i) => (
                       <li key={i}>{err}</li>

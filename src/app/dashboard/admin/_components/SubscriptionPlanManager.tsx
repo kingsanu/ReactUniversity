@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 
@@ -34,6 +35,7 @@ export function SubscriptionPlanManager() {
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingPlan, setEditingPlan] = useState<SubscriptionPlan | null>(null);
   const [formData, setFormData] = useState<CreatePlanData>({
@@ -321,7 +323,7 @@ export function SubscriptionPlanManager() {
     return (
       <div className="text-center py-12">
         <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-        <p className="text-gray-600">Loading subscription plans...</p>
+        <p className="text-gray-600">{t('admin.plans.loading')}</p>
       </div>
     );
   }
@@ -343,23 +345,18 @@ export function SubscriptionPlanManager() {
               d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <p className="text-lg font-semibold">
-            Failed to load subscription plans
-          </p>
+          <p className="text-lg font-semibold">{t('admin.plans.failedToLoad')}</p>
           <p className="text-sm text-gray-600 mt-2">{error}</p>
         </div>
 
         {error.includes("token") || error.includes("Authentication") ? (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4 text-left max-w-md mx-auto">
             <h4 className="font-medium text-yellow-800 mb-2">
-              🔑 Token Required
+              {t('admin.plans.tokenRequiredTitle')}
             </h4>
-            <p className="text-sm text-yellow-700 mb-2">
-              You need a real JWT token to access subscription plan APIs.
-            </p>
+            <p className="text-sm text-yellow-700 mb-2">{t('admin.plans.tokenRequiredMessage')}</p>
             <p className="text-sm text-yellow-700">
-              Go to <strong>Settings</strong> →{" "}
-              <strong>Token Management</strong> to set a real token.
+              {t('admin.plans.goToSettingsPrefix')} <strong>{t('admin.plans.goToSettings')}</strong> {t('admin.plans.goToTokenManagement')}
             </p>
           </div>
         ) : null}
@@ -369,7 +366,7 @@ export function SubscriptionPlanManager() {
             onClick={fetchPlans}
             className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
-            Try Again
+            {t('common.tryAgain')}
           </button>
           {(error.includes("token") || error.includes("Authentication")) && (
             <button
@@ -378,7 +375,7 @@ export function SubscriptionPlanManager() {
               }
               className="bg-yellow-600 text-white px-6 py-2 rounded-lg hover:bg-yellow-700 transition-colors"
             >
-              Go to Settings
+              {t('admin.plans.goToSettings')}
             </button>
           )}
         </div>
@@ -404,14 +401,8 @@ export function SubscriptionPlanManager() {
               />
             </svg>
             <div>
-              <h4 className="font-medium text-orange-800 mb-1">
-                Mock Data Displayed
-              </h4>
-              <p className="text-sm text-orange-700">
-                The plans shown below are mock data because no real subscription
-                plans exist in the database yet. Create your first real plan to
-                start managing actual subscription data.
-              </p>
+              <h4 className="font-medium text-orange-800 mb-1">{t('admin.plans.mockDataTitle')}</h4>
+              <p className="text-sm text-orange-700">{t('admin.plans.mockDataDescription')}</p>
             </div>
           </div>
         </div>
@@ -420,13 +411,8 @@ export function SubscriptionPlanManager() {
       {/* Header with Create Button */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">
-            Subscription Plans
-          </h2>
-          <p className="text-gray-600 text-sm">
-            Manage your subscription plans (max 3 real plans: one-time, monthly,
-            yearly)
-          </p>
+          <h2 className="text-xl font-bold text-gray-900">{t('admin.plans.header')}</h2>
+          <p className="text-gray-600 text-sm">{t('admin.plans.description')}</p>
         </div>
         <div className="flex space-x-2">
           <button
@@ -436,7 +422,7 @@ export function SubscriptionPlanManager() {
             }}
             className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
           >
-            Refresh
+            {t('admin.plans.refresh')}
           </button>
           {plans.some((p) => p.isMockData) && (
             <button
@@ -445,14 +431,14 @@ export function SubscriptionPlanManager() {
               }}
               className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm"
             >
-              Hide Mock Data
+              {t('admin.plans.hideMock')}
             </button>
           )}
           <button
             onClick={() => {
               const realPlansCount = plans.filter((p) => !p.isMockData).length;
               if (realPlansCount >= 3) {
-                alert("Maximum of 3 subscription plans allowed");
+                alert(t('admin.plans.maxPlansAlert'));
                 return;
               }
               setShowCreateModal(true);
@@ -467,7 +453,7 @@ export function SubscriptionPlanManager() {
                 : "bg-blue-600 text-white hover:bg-blue-700"
             )}
           >
-            Create Plan ({plans.filter((p) => !p.isMockData).length}/3)
+            {t('admin.plans.createPlanCount', { count: plans.filter((p) => !p.isMockData).length })}
           </button>
         </div>
       </div>
@@ -509,11 +495,11 @@ export function SubscriptionPlanManager() {
                       : "bg-red-100 text-red-800"
                   )}
                 >
-                  {plan.isActive ? "Active" : "Inactive"}
+                  {plan.isActive ? t('admin.plans.active') : t('admin.plans.inactive')}
                 </div>
                 {plan.isMockData && (
                   <div className="px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                    Mock
+                    {t('admin.plans.mockLabel')}
                   </div>
                 )}
               </div>
@@ -531,9 +517,7 @@ export function SubscriptionPlanManager() {
 
             {/* Features */}
             <div className="mb-6">
-              <h4 className="text-sm font-medium text-gray-900 mb-2">
-                Features:
-              </h4>
+              <h4 className="text-sm font-medium text-gray-900 mb-2">{t('admin.plans.featuresHeading')}</h4>
               <ul className="space-y-1">
                 {plan.features.map((feature, featureIndex) => (
                   <li
@@ -570,9 +554,7 @@ export function SubscriptionPlanManager() {
           >
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {editingPlan ? "Edit Plan" : "Create New Plan"}
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-900">{editingPlan ? t('admin.plans.editTitle') : t('admin.plans.createTitle')}</h3>
                 <button
                   onClick={() => {
                     setShowCreateModal(false);
@@ -600,9 +582,7 @@ export function SubscriptionPlanManager() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Plan Name */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Plan Name *
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.plans.planNameLabel')}</label>
                   <input
                     type="text"
                     value={formData.name}
@@ -610,16 +590,14 @@ export function SubscriptionPlanManager() {
                       setFormData((prev) => ({ ...prev, name: e.target.value }))
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="e.g., Basic Plan"
+                    placeholder={t('admin.plans.planNamePlaceholder')}
                     required
                   />
                 </div>
 
                 {/* Price */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Price (USD) *
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.plans.priceLabel')}</label>
                   <input
                     type="number"
                     min="0"
@@ -632,7 +610,29 @@ export function SubscriptionPlanManager() {
                       }))
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="29.99"
+                    placeholder={t('admin.plans.pricePlaceholder')}
+                    required
+                  />
+                </div>
+
+
+
+                {/* Price */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.plans.priceLabel')}</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={formData.price}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        price: parseFloat(e.target.value) || 0,
+                      }))
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder={t('admin.plans.pricePlaceholder')}
                     required
                   />
                 </div>
@@ -664,8 +664,8 @@ export function SubscriptionPlanManager() {
                           value={interval.value}
                           disabled={isDisabled}
                         >
-                          {interval.label} - {interval.description}
-                          {isDisabled ? " (Already exists)" : ""}
+                          {t(`admin.plans.intervals.${interval.value}.label`)} - {t(`admin.plans.intervals.${interval.value}.description`)}
+                          {isDisabled ? ` (${t('admin.plans.alreadyExists')})` : ""}
                         </option>
                       );
                     })}
@@ -674,9 +674,7 @@ export function SubscriptionPlanManager() {
 
                 {/* Features */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Features *
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.plans.featuresLabel')}</label>
                   <div className="space-y-2">
                     {formData.features.map((feature, index) => (
                       <div key={index} className="flex items-center space-x-2">
@@ -685,7 +683,7 @@ export function SubscriptionPlanManager() {
                           value={feature}
                           onChange={(e) => updateFeature(index, e.target.value)}
                           className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="e.g., Unlimited projects"
+                          placeholder={t('admin.plans.featurePlaceholder')}
                           required
                         />
                         {formData.features.length > 1 && (
@@ -716,7 +714,7 @@ export function SubscriptionPlanManager() {
                       onClick={addFeature}
                       className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                     >
-                      + Add Feature
+                      {t('admin.plans.addFeature')}
                     </button>
                   </div>
                 </div>
@@ -732,13 +730,13 @@ export function SubscriptionPlanManager() {
                     }}
                     className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                   >
-                    Cancel
+                    {t('common.cancel')}
                   </button>
                   <button
                     type="submit"
                     className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                   >
-                    {editingPlan ? "Update Plan" : "Create Plan"}
+                    {editingPlan ? t('admin.plans.updateButton') : t('admin.plans.createButton')}
                   </button>
                 </div>
               </form>

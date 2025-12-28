@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useTranslation } from 'react-i18next';
 import { motion } from "framer-motion";
 import {
   EnvelopeIcon,
@@ -18,6 +19,7 @@ import {
   resendInvitationLink,
   sendBulkEmailInvitations,
 } from "@/services/evaluationService";
+import i18n from '@/lib/i18n';
 
 interface EvaluationInvitationsProps {
   sessionId: string;
@@ -77,6 +79,7 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
   sessionId,
   onBack,
 }) => {
+  const { t } = useTranslation();
   const { loadSession, sendInvitations } = useEvaluationData();
   const [session, setSession] = useState<EvaluationSession | null>(null);
   const [evaluators, setEvaluators] = useState<Evaluator[]>([]);
@@ -178,17 +181,17 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
   const getStatusText = (status: string) => {
     switch (status) {
       case "pending":
-        return "Not Sent";
+        return i18n.t('evaluation.status.notSent');
       case "sent":
-        return "Sent";
+        return i18n.t('evaluation.status.sent');
       case "opened":
-        return "Opened";
+        return i18n.t('evaluation.status.opened');
       case "completed":
-        return "Completed";
+        return i18n.t('evaluation.status.completed');
       case "expired":
-        return "Expired";
+        return i18n.t('evaluation.status.expired');
       default:
-        return "Unknown";
+        return i18n.t('evaluation.status.unknown');
     }
   };
 
@@ -452,7 +455,7 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <h3 className="text-sm font-medium text-gray-500">
-            Total Evaluators
+            {t('evaluation.totalEvaluators')}
           </h3>
           <p className="text-3xl font-bold text-blue-600 mt-2">
             {evaluators.length}
@@ -460,12 +463,12 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
         </div>
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <h3 className="text-sm font-medium text-gray-500">
-            Invitations Sent
+            {t('evaluation.invitationsSent')}
           </h3>
           <p className="text-3xl font-bold text-green-600 mt-2">{sentCount}</p>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <h3 className="text-sm font-medium text-gray-500">Completed</h3>
+          <h3 className="text-sm font-medium text-gray-500">{t('evaluation.completed')}</h3>
           <p className="text-3xl font-bold text-purple-600 mt-2">
             {completedCount}
           </p>
@@ -491,11 +494,11 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
               onChange={(e) => setSelectedGroup(e.target.value)}
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <option value="all">All Groups</option>
-              <option value="self">Self</option>
-              <option value="parent">Parents</option>
-              <option value="teacher">Teachers</option>
-              <option value="peer">Peers</option>
+              <option value="all">{t('evaluation.groups.all')}</option>
+              <option value="self">{t('evaluation.groups.self')}</option>
+              <option value="parent">{t('evaluation.groups.parents')}</option>
+              <option value="teacher">{t('evaluation.groups.teachers')}</option>
+              <option value="peer">{t('evaluation.groups.peers')}</option>
             </select>
 
             {/* Selection Controls */}
@@ -504,13 +507,13 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
                 onClick={selectAllFiltered}
                 className="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
               >
-                Select All
+                {t('common.selectAll')}
               </button>
               <button
                 onClick={clearSelection}
                 className="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
               >
-                Clear
+                {t('common.clear')}
               </button>
             </div>
           </div>
@@ -532,7 +535,7 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
               disabled={sending || selectedEvaluators.length === 0}
               className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {sending ? "Sending..." : "Send Reminders"}
+              {sending ? t('common.sending') : t('evaluation.sendReminders')}
             </button>
 
             <button
@@ -541,7 +544,7 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
             >
               <EnvelopeIcon className="w-4 h-4" />
-              <span>{sendingBulk ? "Sending..." : "Send All via Email"}</span>
+              <span>{sendingBulk ? t('common.sending') : t('evaluation.sendAllByEmail')}</span>
             </button>
 
             <button
@@ -550,7 +553,7 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
             >
               <PaperAirplaneIcon className="w-4 h-4" />
-              <span>{sending ? "Sending..." : "Send Selected"}</span>
+              <span>{sending ? t('common.sending') : t('evaluation.sendSelected')}</span>
             </button>
           </div>
         </div>
@@ -564,11 +567,11 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
           exit={{ opacity: 0, height: 0 }}
           className="bg-white p-6 rounded-lg shadow-sm border mb-8"
         >
-          <h3 className="text-lg font-semibold mb-4">Email Template</h3>
+          <h3 className="text-lg font-semibold mb-4">{t('evaluation.emailTemplate')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Subject Line
+                {t('evaluation.template.subject')}
               </label>
               <input
                 type="text"
@@ -584,7 +587,7 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Reminder Days
+                {t('evaluation.template.reminderDays')}
               </label>
               <input
                 type="number"
@@ -631,7 +634,7 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
               <span className="ml-2 text-sm text-gray-700">
-                Include instructions
+                {t('evaluation.template.includeInstructions')}
               </span>
             </label>
             <label className="flex items-center">
@@ -647,7 +650,7 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
               <span className="ml-2 text-sm text-gray-700">
-                Enable reminders
+                {t('evaluation.template.enableReminders')}
               </span>
             </label>
           </div>
@@ -658,7 +661,7 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
       <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
         <div className="px-6 py-4 border-b">
           <h3 className="text-lg font-semibold">
-            Evaluators ({filteredEvaluators.length})
+            {t('evaluation.evaluators', { count: filteredEvaluators.length })}
           </h3>
         </div>
         <div className="overflow-x-auto">
@@ -851,7 +854,7 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
             onClick={() => setEmailResults(null)}
             className="mt-4 px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
           >
-            Close Results
+            {t('evaluation.closeResults')}
           </button>
         </div>
       )}

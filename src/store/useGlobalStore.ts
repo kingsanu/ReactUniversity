@@ -2,6 +2,8 @@ import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import { generateDummyContent } from "@/app/dashboard/resume-builder/_components/dummyContentGenerator";
 import { updateResume, getResumeById } from "@/services/resumeService";
+import { telemetry } from "@/services/telemetryService";
+import { isTokenExpired } from "@/utils/tokenUtils";
 
 // Resume Builder Types
 interface PersonalInfo {
@@ -222,6 +224,8 @@ export const useGlobalStore = create<GlobalState>()(
             user: { ...state.user, ...userData, isAuthenticated: true },
           })),
         logout: () => {
+          // Track logout event
+          telemetry.trackAuth("logout");
           // Clear localStorage token
           if (typeof window !== "undefined") {
             localStorage.removeItem("token");
@@ -246,17 +250,52 @@ export const useGlobalStore = create<GlobalState>()(
             const token = localStorage.getItem("token");
             const currentUser = get().user;
 
-            if (token && currentUser.email) {
-              // We have both token and persisted user data, restore authenticated state
-              set((state) => ({
-                user: { ...state.user, isAuthenticated: true },
-              }));
-            } else {
-              // No token or no user data, ensure we're in unauthenticated state
-              if (token && !currentUser.email) {
-                // Token exists but no user data, clear the token
+            // Check if token exists and is not expired
+            if (token) {
+              const tokenExpired = isTokenExpired(token);
+              
+              if (tokenExpired === true) {
+                // Token is expired - clear it and reset state
+                console.log("[Auth] Token expired, clearing session");
                 localStorage.removeItem("token");
+                set({
+                  user: {
+                    id: null,
+                    email: null,
+                    name: null,
+                    role: null,
+                    image: null,
+                    avatar: null,
+                    isAuthenticated: false,
+                  },
+                });
+                return;
               }
+              
+              // Token is valid and we have user data, restore session
+              if (currentUser.email) {
+                set((state) => ({
+                  user: { ...state.user, isAuthenticated: true },
+                }));
+                // Track login event
+                telemetry.trackAuth("login", "session_restore");
+              } else {
+                // Token exists but no user data - clear the token
+                localStorage.removeItem("token");
+                set({
+                  user: {
+                    id: null,
+                    email: null,
+                    name: null,
+                    role: null,
+                    image: null,
+                    avatar: null,
+                    isAuthenticated: false,
+                  },
+                });
+              }
+            } else {
+              // No token, ensure we're in unauthenticated state
               set({
                 user: {
                   id: null,

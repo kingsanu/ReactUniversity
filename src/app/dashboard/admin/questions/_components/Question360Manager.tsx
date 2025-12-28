@@ -482,7 +482,7 @@ export function Question360Manager() {
                 onClick={fetchQuestions}
                 className="text-red-800 hover:text-red-900 mt-2 h-auto p-0"
               >
-                Try Again
+                {t('common.tryAgain')}
               </Button>
             </div>
           </div>
@@ -492,7 +492,7 @@ export function Question360Manager() {
       {/* Questions List */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Questions</h3>
+          <h3 className="text-lg font-semibold text-gray-900">{t('admin.questions.title')}</h3>
         </div>
 
         {filteredQuestions.length === 0 ? (
@@ -500,20 +500,20 @@ export function Question360Manager() {
             <div className="text-gray-400 text-4xl mb-4">📝</div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">
               {Array.isArray(questions) && questions.length === 0
-                ? "No questions yet"
-                : "No matching questions"}
+                ? t('admin.questions.noQuestions')
+                : t('admin.questions.noMatch')}
             </h3>
             <p className="text-gray-600 mb-4">
               {Array.isArray(questions) && questions.length === 0
-                ? "Create your first 360° evaluation question to get started."
-                : "Try adjusting your filters to see more questions."}
+                ? t('admin.questions.noQuestionsDescription')
+                : t('admin.questions.tryAdjustFilters')}
             </p>
             {Array.isArray(questions) && questions.length === 0 && (
               <Button
                 onClick={() => setShowCreateModal(true)}
                 className="bg-red-600 hover:bg-red-700"
               >
-                Create First Question
+                {t('admin.questions.createFirst')}
               </Button>
             )}
           </div>

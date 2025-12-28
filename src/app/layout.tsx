@@ -6,6 +6,8 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { QueryProvider } from "@/components/QueryProvider";
 import { AssessmentCacheProvider } from "@/contexts/AssessmentCacheContext";
 import { I18nProvider } from "@/components/I18nProvider";
+import { TelemetryProvider } from "@/components/TelemetryProvider";
+import { SkipToMain } from "@/components/ui/accessibility";
 import { Toaster } from "sonner";
 
 const geistSans = Geist({
@@ -75,11 +77,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <SkipToMain mainId="main-content" />
         <ErrorBoundary>
           <QueryProvider>
             <AssessmentCacheProvider>
               <I18nProvider>
-                <AuthWrapper>{children}</AuthWrapper>
+                <TelemetryProvider>
+                  <AuthWrapper>{children}</AuthWrapper>
+                </TelemetryProvider>
               </I18nProvider>
             </AssessmentCacheProvider>
           </QueryProvider>

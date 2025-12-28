@@ -89,6 +89,32 @@ export async function getUserActivity(): Promise<UserActivity[]> {
   return json.data || json;
 }
 
+// Session Analytics Interface and API
+export interface SessionAnalytics {
+  totalSessions: number;
+  completedSessions: number;
+  cancelledSessions: number;
+  upcomingSessions: number;
+  averageRating: number;
+  totalDuration: number; // in minutes
+  topCoaches: Array<{ coachId: string; name: string; sessions: number }>;
+  monthlyTrend: Array<{ month: string; sessions: number }>;
+}
+
+/**
+ * Get user's personal session statistics and analytics.
+ * Includes total sessions, ratings, top coaches, and monthly trends.
+ */
+export async function getSessionAnalytics(): Promise<SessionAnalytics> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/user/sessions/analytics`, {
+    headers: getHeaders(),
+  });
+
+  if (!response.ok) throw new Error("Failed to fetch session analytics");
+  const json = await response.json();
+  return json.data || json;
+}
+
 export async function updateUserSettings(
   settings: Partial<UserSettings>
 ): Promise<UserSettings> {

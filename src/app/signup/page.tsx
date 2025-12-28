@@ -356,7 +356,7 @@ export default function SignupPage() {
                               id="firstName"
                               type="text"
                               {...field}
-                              placeholder="John"
+                              placeholder={t('auth.signup.firstNamePlaceholder')}
                               className={cn(
                                 "h-11 text-base bg-white/50 backdrop-blur-sm border-gray-200/50 focus:border-purple-500 focus:ring-purple-500/20",
                                 errors.firstName &&
@@ -384,7 +384,7 @@ export default function SignupPage() {
                               id="lastName"
                               type="text"
                               {...field}
-                              placeholder="Doe"
+                              placeholder={t('auth.signup.lastNamePlaceholder')}
                               className={cn(
                                 "h-11 text-base bg-white/50 backdrop-blur-sm border-gray-200/50 focus:border-purple-500 focus:ring-purple-500/20",
                                 errors.lastName &&
@@ -415,7 +415,7 @@ export default function SignupPage() {
                             id="email"
                             type="email"
                             {...field}
-                            placeholder="john@example.com"
+                            placeholder={t('auth.signup.emailPlaceholder')}
                             className={cn(
                               "h-11 text-base bg-white/50 backdrop-blur-sm border-gray-200/50 focus:border-purple-500 focus:ring-purple-500/20",
                               errors.email &&

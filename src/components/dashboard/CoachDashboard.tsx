@@ -352,20 +352,18 @@ export function CoachDashboard() {
             </div>
             <div className="flex-1">
               <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight mb-1.5">
-                Good{" "}
                 {new Date().getHours() < 12
-                  ? "Morning"
+                  ? t('coach.greeting.morning')
                   : new Date().getHours() < 18
-                  ? "Afternoon"
-                  : "Evening"}
-                ,{" "}
+                  ? t('coach.greeting.afternoon')
+                  : t('coach.greeting.evening')}, {" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-                  {user.name?.split(" ")[0] || "Coach"}
+                  {user.name?.split(" ")[0] || t('coach.defaultName')}
                 </span>
               </h1>
               <p className="text-gray-500 font-medium text-base sm:text-lg flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                You have {upcomingSessions.length} upcoming sessions
+                {t('coach.upcomingSessions', { count: upcomingSessions.length })}
               </p>
             </div>
           </div>
@@ -381,14 +379,14 @@ export function CoachDashboard() {
                     className="w-5 h-5 text-gray-300"
                     aria-label="Calendar Icon"
                   />{" "}
-                  <span>Manage Availability</span>
+                  <span>{t('coach.manageAvailability')}</span>
                 </div>
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-3xl h-[85vh] sm:h-[80vh] flex flex-col p-0 gap-0 rounded-3xl overflow-hidden border-0">
               <DialogHeader className="px-6 py-5 border-b bg-white input-border-color shrink-0">
                 <DialogTitle className="text-xl font-bold">
-                  Edit Availability
+                  {t('coach.editAvailability')}
                 </DialogTitle>
               </DialogHeader>
               <div className="flex-1 overflow-y-auto px-6 py-6 bg-gray-50/50">
@@ -406,34 +404,43 @@ export function CoachDashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {[
             {
-              label: "Total Sessions",
+              label: t('coach.stats.totalSessions'),
               value: upcomingSessions.length + pastSessions.length,
-              sub: "sessions",
+              sub: t('coach.stats.sessions'),
               icon: Users,
               color: "text-blue-600",
               bg: "bg-blue-50/50",
               gradient: "from-blue-50 to-blue-100/50",
             },
             {
-              label: "Active Students",
+              label: t('coach.stats.activeStudents'),
               value: students.length,
-              sub: "students",
+              sub: t('coach.stats.students'),
               icon: Users,
               color: "text-green-600",
               bg: "bg-green-50/50",
               gradient: "from-green-50 to-green-100/50",
             },
             {
-              label: "Upcoming",
+              label: t('coach.sessions.upcoming'),
               value: upcomingSessions.length,
               sub:
                 upcomingSessions.length > 0
-                  ? "next session soon"
-                  : "no sessions",
+                  ? t('coach.sessions.nextSession')
+                  : t('coach.sessions.noSessions'),
               icon: CalendarIcon,
               color: "text-purple-600",
               bg: "bg-purple-50/50",
               gradient: "from-purple-50 to-purple-100/50",
+            },
+            {
+              label: t('coach.sessions.completed'),
+              value: pastSessions.length,
+              sub: t('coach.sessions.lifetime'),
+              icon: Star,
+              color: "text-yellow-600",
+              bg: "bg-yellow-50/50",
+              gradient: "from-yellow-50 to-yellow-100/50",
             },
             {
               label: "Completed",
@@ -498,10 +505,10 @@ export function CoachDashboard() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 sm:mb-10 gap-6">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
-                  Your Sessions
+                  {t('coach.sessions.title')}
                 </h2>
                 <p className="text-gray-500 mt-1 font-medium">
-                  Manage your coaching schedule
+                  {t('coach.sessions.description')}
                 </p>
               </div>
               <TabsList className="bg-gray-100/80 p-1.5 rounded-2xl self-start sm:self-auto w-full sm:w-auto grid grid-cols-2 sm:flex h-auto">
@@ -547,7 +554,7 @@ export function CoachDashboard() {
                           </Avatar>
                           <div
                             className="absolute -bottom-1 -right-1 bg-green-500 h-5 w-5 sm:h-6 sm:w-6 rounded-full border-[3px] border-white ring-1 ring-black/5"
-                            title="Confirmed"
+                            title={t('coach.sessions.confirmed')}
                           ></div>
                         </div>
                         <div className="flex-1 min-w-0">
@@ -568,7 +575,7 @@ export function CoachDashboard() {
                       <div className="flex flex-col sm:flex-row lg:flex-row gap-4 sm:gap-6 w-full lg:w-auto justify-end items-stretch sm:items-center border-t lg:border-t-0 pt-6 lg:pt-0 border-gray-50">
                         <div className="flex flex-row sm:flex-col gap-2 sm:gap-1 text-right min-w-[120px] justify-between sm:justify-center bg-gray-50/50 lg:bg-transparent p-4 lg:p-0 rounded-2xl lg:rounded-none">
                           <span className="text-sm font-medium text-gray-500">
-                            Date
+                            {t('coach.sessions.date')}
                           </span>
                           <span className="font-bold text-gray-900 flex items-center gap-2 sm:justify-end">
                             <CalendarIcon className="w-4 h-4 text-blue-500 sm:hidden" />
@@ -578,7 +585,7 @@ export function CoachDashboard() {
                         <div className="hidden sm:block w-px h-10 bg-gray-100"></div>
                         <div className="flex flex-row sm:flex-col gap-2 sm:gap-1 text-right min-w-[100px] justify-between sm:justify-center bg-gray-50/50 lg:bg-transparent p-4 lg:p-0 rounded-2xl lg:rounded-none">
                           <span className="text-sm font-medium text-gray-500">
-                            Time
+                            {t('coach.sessions.time')}
                           </span>
                           <span className="font-bold text-gray-900 flex items-center gap-2 sm:justify-end">
                             <Clock className="w-4 h-4 text-purple-500 sm:hidden" />
@@ -593,7 +600,7 @@ export function CoachDashboard() {
                           className="flex-1 sm:flex-none border-gray-200 hover:bg-gray-50 hover:text-gray-900 h-12 sm:h-11 px-6 rounded-xl font-semibold bg-white"
                           onClick={() => handleRescheduleClick(session)}
                         >
-                          Reschedule
+                          {t('coach.actions.reschedule')}
                         </Button>
                         <Button
                           className="flex-1 sm:flex-none bg-black text-white hover:bg-gray-800 shadow-xl shadow-gray-900/10 h-12 sm:h-11 px-6 rounded-xl font-semibold transition-all hover:scale-105 active:scale-95"
@@ -604,7 +611,7 @@ export function CoachDashboard() {
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            <Video className="h-4 w-4 mr-2" /> Join Call
+                            <Video className="h-4 w-4 mr-2" /> {t('coach.actions.joinCall')}
                           </a>
                         </Button>
                       </div>
@@ -620,12 +627,13 @@ export function CoachDashboard() {
                     />
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                    No upcoming sessions
+                    {t('coach.sessions.noUpcomingTitle')}
                   </h3>
                   <p className="text-gray-500 max-w-sm mx-auto text-lg leading-relaxed">
-                    You don&apos;t have any scheduled sessions yet. <br />
+                    {t('coach.sessions.noScheduled')}
+                    <br />
                     <span className="text-blue-600 font-medium">
-                      Time to take a break!
+                      {t('coach.sessions.takeABreak')}
                     </span>
                   </p>
                 </div>
@@ -663,7 +671,7 @@ export function CoachDashboard() {
                           >
                             {session.topic?.replace(/-/g, " ").toUpperCase()}
                           </Badge>
-                          <span className="text-sm text-gray-500 font-medium bg-gray-100 px-2.5 py-0.5 rounded-full text-xs">
+                          <span className="text-gray-500 font-medium bg-gray-100 px-2.5 py-0.5 rounded-full text-xs">
                             {session.status}
                           </span>
                         </div>
@@ -685,7 +693,7 @@ export function CoachDashboard() {
                         size="sm"
                         className="text-gray-500 hover:text-gray-900 h-10 px-4 rounded-xl hover:bg-gray-100"
                       >
-                        <FileText className="h-4 w-4 mr-2" /> View Notes
+                        <FileText className="h-4 w-4 mr-2" /> {t('coach.actions.viewNotes')}
                       </Button>
                     </div>
                   </motion.div>
@@ -693,10 +701,10 @@ export function CoachDashboard() {
               ) : (
                 <div className="text-center py-20 rounded-3xl bg-gray-50/30 border border-gray-100">
                   <h3 className="text-lg font-medium text-gray-900 mb-1">
-                    No past sessions
+                    {t('coach.sessions.noPastTitle')}
                   </h3>
                   <p className="text-gray-400">
-                    Your history will appear here.
+                    {t('coach.sessions.historyPlaceholder')}
                   </p>
                 </div>
               )}
@@ -712,11 +720,10 @@ export function CoachDashboard() {
               <div className="flex-1 p-6 sm:p-8 border-r border-gray-100 flex flex-col bg-white">
                 <div className="mb-6">
                   <h2 className="text-xl font-bold text-gray-900 mb-1">
-                    Reschedule Session
+                    {t('coach.sessions.rescheduleTitle')}
                   </h2>
                   <p className="text-gray-500 text-sm">
-                    Select a new date and time for{" "}
-                    {selectedSession?.studentName}
+                    {t('coach.sessions.rescheduleDescription', { name: selectedSession?.studentName })}
                   </p>
                 </div>
 
@@ -794,7 +801,7 @@ export function CoachDashboard() {
               {/* Column 2: Time Slots */}
               <div className="flex-1 p-6 sm:p-8 bg-gray-50/50 flex flex-col">
                 <h3 className="font-semibold text-gray-900 mb-4">
-                  Available Times
+                  {t('coach.sessions.availableTimes')}
                 </h3>
 
                 {isLoadingSlots ? (
@@ -820,7 +827,7 @@ export function CoachDashboard() {
                   </div>
                 ) : (
                   <div className="flex-1 flex items-center justify-center text-gray-400 text-sm">
-                    No available slots for this date
+                    {t('coach.sessions.noAvailableSlots')}
                   </div>
                 )}
 
@@ -829,7 +836,7 @@ export function CoachDashboard() {
                   onClick={confirmReschedule}
                   disabled={!selectedTime}
                 >
-                  Confirm Reschedule
+                  {t('coach.actions.confirmReschedule')}
                 </Button>
               </div>
             </div>

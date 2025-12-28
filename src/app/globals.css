@@ -119,6 +119,25 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Enhanced focus styles for keyboard accessibility */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-indigo-500;
+  }
+  
+  /* Skip to main link styles */
+  [href="#main-content"]:focus {
+    @apply not-sr-only fixed top-4 left-4 z-[9999] px-4 py-2 bg-indigo-600 text-white rounded-md;
+  }
+  
+  /* Reduced motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }
 
 /* Custom scrollbar styles for better UX */

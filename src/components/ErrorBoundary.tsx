@@ -11,6 +11,8 @@ interface ErrorBoundaryProps {
   fallback?: React.ComponentType<{ error?: Error; resetError: () => void }>;
 }
 
+import i18n from "@/lib/i18n";
+
 export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
@@ -44,15 +46,15 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Something went wrong</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">{i18n.t("error.somethingWentWrong")}</h2>
             <p className="text-gray-600 mb-6">
-              We encountered an unexpected error. Please try refreshing the page or contact support if the problem persists.
+              {i18n.t("error.unexpectedError")}
             </p>
             <button
               onClick={this.resetError}
               className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
             >
-              Try Again
+              {i18n.t("error.tryAgain")}
             </button>
           </div>
         </div>
@@ -61,4 +63,4 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
 
     return this.props.children;
   }
-}
+} 

@@ -36,9 +36,11 @@ import {
   Clock,
   ArrowUpRight,
   ArrowDownRight,
+  MousePointer,
 } from "lucide-react";
 import { useAdminAnalytics } from "@/hooks/useAdminAnalytics";
 import { useTranslation } from "react-i18next";
+import { TelemetryDashboard } from "../_components/TelemetryDashboard";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8"];
 
@@ -160,6 +162,18 @@ export default function AnalyticsPage() {
           </SelectContent>
         </Select>
       </div>
+
+      {/* Tabs for different analytics views */}
+      <Tabs defaultValue="overview" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="overview">Platform Overview</TabsTrigger>
+          <TabsTrigger value="behavior" className="flex items-center gap-2">
+            <MousePointer className="h-4 w-4" />
+            User Behavior
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-6">
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -463,7 +477,13 @@ export default function AnalyticsPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
+        </div>
+        </TabsContent>
+
+        <TabsContent value="behavior">
+          <TelemetryDashboard period={period} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

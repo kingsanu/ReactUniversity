@@ -479,6 +479,33 @@ export async function submitReview(
 
 // --- Admin APIs ---
 
+// Coach Statistics Interface and API
+export interface CoachStats {
+  totalCoaches: number;
+  activeNow: number;
+  pendingInvites: number;
+  expiringContracts: number;
+  statusBreakdown: {
+    active: number;
+    invited: number;
+    pending: number;
+    inactive: number;
+  };
+}
+
+/**
+ * Get aggregated statistics for all coaches in the system.
+ * This endpoint is optimized for the admin dashboard, aggregating data at the database level.
+ */
+export async function getCoachStats(): Promise<CoachStats> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/admin/coaches/stats`, {
+    headers: getHeaders(),
+  });
+  if (!response.ok) throw new Error("Failed to fetch coach stats");
+  const json = await response.json();
+  return json.data || json;
+}
+
 export async function getAllCoachesAdmin(
   params: { page?: number; limit?: number; search?: string } = {}
 ): Promise<CoachesResponse> {

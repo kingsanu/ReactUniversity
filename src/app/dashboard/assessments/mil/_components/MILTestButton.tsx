@@ -1,20 +1,22 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { clearAllMILTestData, populateMILTestData } from "@/utils/milTestUtils";
 
 export default function MILTestButton() {
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
 
   const handleClearData = async () => {
     setLoading(true);
     try {
       clearAllMILTestData();
-      alert("MIL test data cleared!");
+      alert(t('dev.mil.cleared'));
       window.location.reload();
     } catch (error) {
       console.error("Error clearing MIL data:", error);
-      alert("Error clearing MIL data");
+      alert(t('dev.mil.clearFailed'));
     } finally {
       setLoading(false);
     }
@@ -24,11 +26,11 @@ export default function MILTestButton() {
     setLoading(true);
     try {
       populateMILTestData();
-      alert("MIL test data populated!");
+      alert(t('dev.mil.populated'));
       window.location.reload();
     } catch (error) {
       console.error("Error populating MIL data:", error);
-      alert("Error populating MIL data");
+      alert(t('dev.mil.populateFailed'));
     } finally {
       setLoading(false);
     }
@@ -54,27 +56,23 @@ export default function MILTestButton() {
             d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
           />
         </svg>
-        <h3 className="text-sm font-medium text-yellow-800">
-          Development Tools - MIL Assessment
-        </h3>
+        <h3 className="text-sm font-medium text-yellow-800">{t('dev.mil.title')}</h3>
       </div>
-      <p className="text-sm text-yellow-700 mb-3">
-        Test utilities for MIL assessment development and debugging.
-      </p>
+      <p className="text-sm text-yellow-700 mb-3">{t('dev.mil.description')}</p>
       <div className="flex space-x-3">
         <button
           onClick={handlePopulateData}
           disabled={loading}
           className="bg-blue-600 text-white px-3 py-1.5 rounded text-sm hover:bg-blue-700 transition-colors disabled:opacity-50"
         >
-          {loading ? "Loading..." : "Populate Test Data"}
+          {loading ? t('common.loading') : t('dev.mil.populateButton')}
         </button>
         <button
           onClick={handleClearData}
           disabled={loading}
           className="bg-red-600 text-white px-3 py-1.5 rounded text-sm hover:bg-red-700 transition-colors disabled:opacity-50"
         >
-          {loading ? "Loading..." : "Clear All Data"}
+          {loading ? t('common.loading') : t('dev.mil.clearButton')}
         </button>
       </div>
       <div className="mt-3 text-xs text-yellow-600">

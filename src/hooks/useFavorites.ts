@@ -7,6 +7,7 @@ import {
   removeFavorite,
 } from "@/services/careerService";
 import { useGlobalStore } from "@/store/useGlobalStore";
+import { telemetry } from "@/services/telemetryService";
 
 export function useFavorites() {
   const { user } = useGlobalStore();
@@ -38,10 +39,14 @@ export function useFavorites() {
     if (favorites.includes(careerId)) {
       await removeFavorite(user.id, careerId);
       setFavorites((s) => s.filter((x) => x !== careerId));
+      // Track favorite removal
+      telemetry.trackFavorite("remove", careerId, "career");
       return false;
     }
     await addFavorite(user.id, careerId);
     setFavorites((s) => [...s, careerId]);
+    // Track favorite addition
+    telemetry.trackFavorite("add", careerId, "career");
     return true;
   };
 

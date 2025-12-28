@@ -10,6 +10,7 @@ import { Coach } from "@/types/coach";
 // Local interface removed in favor of shared type
 
 import { useTranslation } from "react-i18next";
+import { telemetry } from "@/services/telemetryService";
 
 interface CoachCardProps {
   coach: Coach;
@@ -73,12 +74,20 @@ export function CoachCard({ coach, onBook }: CoachCardProps) {
           {/* Price removed */}
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" asChild>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => telemetry.trackCoachView(coach.id, coach.name, "view_details")}
+            asChild
+          >
             <Link href={`/dashboard/coaching/schedule/${coach.id}`}>
               {t("coaching.viewDetails")}
             </Link>
           </Button>
-          <Button size="sm" onClick={() => onBook(coach)}>
+          <Button size="sm" onClick={() => {
+            telemetry.trackCoachView(coach.id, coach.name, "book_now");
+            onBook(coach);
+          }}>
             {t("coaching.bookNow")}
           </Button>
         </div>

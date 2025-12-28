@@ -1,13 +1,15 @@
 import { motion } from 'motion/react';
+import { useTranslation } from 'react-i18next';
 
 export function MilestonesSection() {
+  const { t } = useTranslation();
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="bg-white p-6 rounded-lg shadow-sm border"
     >
-      <h3 className="text-lg font-semibold text-gray-900 mb-6">Milestones</h3>
+      <h3 className="text-lg font-semibold text-gray-900 mb-6">{t("dashboard.milestones")}</h3>
       
       <div className="flex items-center justify-center">
         <div 

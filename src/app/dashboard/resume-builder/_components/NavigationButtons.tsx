@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { validateAllSteps } from "./validation";
 import { ChevronLeft, ChevronRight, AlertTriangle } from "lucide-react";
+import { telemetry } from "@/services/telemetryService";
 
 export function NavigationButtons() {
   const { resumeBuilder, setResumeStep } = useGlobalStore();
@@ -27,6 +28,9 @@ export function NavigationButtons() {
 
   const handleNext = () => {
     if (!isLastStep) {
+      // Track step completion before moving to next
+      const stepName = resumeSteps[currentStep - 1]?.title || `Step ${currentStep}`;
+      telemetry.trackResumeStep(currentStep, stepName);
       setResumeStep(currentStep + 1);
     }
   };

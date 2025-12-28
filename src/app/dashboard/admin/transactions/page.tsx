@@ -32,7 +32,7 @@ export default function AdminTransactionsPage() {
   const { t } = useTranslation();
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("");
   const [page, setPage] = useState(1);
 
   // Use the new hook for data fetching
@@ -114,7 +114,7 @@ export default function AdminTransactionsPage() {
                 />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">
+                <SelectItem value="">
                   {t("admin.transactions.status.all")}
                 </SelectItem>
                 <SelectItem value="completed">

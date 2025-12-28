@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -85,6 +86,7 @@ import { getCoachAvailableSlots, bookSession } from "@/services/coachService";
 import { CoachSlotsResponse } from "@/types/coach";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { redirectToStripeCheckout } from "@/services/paymentService";
+import { telemetry } from "@/services/telemetryService";
 
 export function BookingModal({
   coach,
@@ -111,6 +113,7 @@ export function BookingModal({
     Intl.DateTimeFormat().resolvedOptions().timeZone
   );
   const { user } = useGlobalStore();
+  const { t } = useTranslation();
 
   // Fetch slots from API
   useEffect(() => {
@@ -222,6 +225,9 @@ export function BookingModal({
           end: endDate.toISOString(),
         });
         toast.success("Session rescheduled successfully");
+        // Track session reschedule (treated as cancel + book)
+        telemetry.trackSession("cancel", bookingId, undefined, undefined, undefined, "rescheduled");
+        telemetry.trackSession("book", response.id, coach.id, topic);
         onRescheduleSuccess?.();
       } else {
         response = await bookSession({
@@ -233,6 +239,8 @@ export function BookingModal({
           topic,
           notes: notes,
         });
+        // Track session booking
+        telemetry.trackSession("book", response.id, coach.id, topic);
       }
 
       // 2. Check for Payment (only for new bookings)
@@ -553,34 +561,24 @@ export function BookingModal({
             ) : (
               // Details Step
               <div className="flex-1 p-10 animate-in fade-in slide-in-from-right-4 duration-300">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">
-                  Enter Details
-                </h2>
+                <h2 className="text-xl font-bold text-gray-900 mb-6">{t('booking.enterDetailsTitle')}</h2>
                 <div className="max-w-md space-y-6">
                   <div className="grid gap-2">
                     <Label
                       htmlFor="topic"
                       className="text-gray-700 font-medium"
                     >
-                      What would you like to discuss?
+                      {t('booking.topicLabel')}
                     </Label>
                     <Select onValueChange={setTopic} value={topic}>
                       <SelectTrigger className="h-11 border-gray-300 focus:ring-black focus:ring-offset-0">
-                        <SelectValue placeholder="Select a topic" />
+                        <SelectValue placeholder={t('booking.selectTopic')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="career-guidance">
-                          Career Guidance
-                        </SelectItem>
-                        <SelectItem value="interview-prep">
-                          Interview Prep
-                        </SelectItem>
-                        <SelectItem value="resume-review">
-                          Resume Review
-                        </SelectItem>
-                        <SelectItem value="skill-development">
-                          Skill Development
-                        </SelectItem>
+                        <SelectItem value="career-guidance">{t('booking.topics.careerGuidance')}</SelectItem>
+                        <SelectItem value="interview-prep">{t('booking.topics.interviewPrep')}</SelectItem>
+                        <SelectItem value="resume-review">{t('booking.topics.resumeReview')}</SelectItem>
+                        <SelectItem value="skill-development">{t('booking.topics.skillDevelopment')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -590,14 +588,14 @@ export function BookingModal({
                       htmlFor="notes"
                       className="text-gray-700 font-medium"
                     >
-                      Additional Notes (Optional)
+                      {t('booking.notesLabel')}
                     </Label>
                     <textarea
                       id="notes"
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
                       className="flex min-h-[120px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
-                      placeholder="Share anything that will help prepare for our meeting..."
+                      placeholder={t('booking.prepNotesPlaceholder')}
                     />
                   </div>
 
@@ -607,7 +605,7 @@ export function BookingModal({
                       onClick={() => setStep("date-time")}
                       className="h-11 px-6 border-gray-300 text-gray-700 hover:bg-gray-50"
                     >
-                      Cancel
+                      {t('common.cancel')}
                     </Button>
                     <Button
                       className="h-11 px-8 bg-black text-white hover:bg-gray-800"
@@ -617,14 +615,14 @@ export function BookingModal({
                       {isBooking ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
-                          Processing...
+                          {t('booking.processing')}
                         </>
                       ) : mode === "reschedule" ? (
-                        "Reschedule Session"
+                        t('booking.rescheduleSession')
                       ) : slotsData?.price && slotsData.price.amount > 0 ? (
-                        "Book & Pay"
+                        t('booking.bookAndPay')
                       ) : (
-                        "Schedule Event"
+                        t('booking.scheduleEvent')
                       )}
                     </Button>
                   </div>

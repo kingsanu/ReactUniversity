@@ -1,6 +1,8 @@
 import { motion } from 'motion/react';
+import { useTranslation } from 'react-i18next';
 
 export function BenchmarksSection() {
+  const { t } = useTranslation();
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -8,8 +10,8 @@ export function BenchmarksSection() {
       className="bg-white p-6 rounded-lg shadow-sm border"
     >
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-gray-900">Benchmarks</h3>
-        <span className="text-sm text-gray-500">Today</span>
+        <h3 className="text-lg font-semibold text-gray-900">{t("dashboard.benchmarksLabel")}</h3>
+        <span className="text-sm text-gray-500">{t("common.today")}</span>
       </div>
       
       <div className="space-y-4">

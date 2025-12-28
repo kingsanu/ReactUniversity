@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';import { useTranslation } from "react-i18next";import { 
   EvaluationSession, 
   EvaluationResponse, 
   CompetencyDimension, 
@@ -10,6 +9,8 @@ import {
   EvaluatorGroup 
 } from '@/services/evaluationService';
 import { ValidationErrorMessage } from '@/components/ui/error-message';
+import { useFormAutosave } from '@/hooks/useFormAutosave';
+import { telemetry } from '@/services/telemetryService';
 
 interface EvaluationFormProps {
   session: EvaluationSession;
@@ -41,6 +42,21 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [progress, setProgress] = useState(0);
+  const startTimeRef = useRef<number>(Date.now());
+  const { t } = useTranslation();
+
+  // Autosave hook for evaluation responses
+  const formId = `evaluation_${session.id}`;
+  const autosave = useFormAutosave(formId, {
+    debounceMs: 3000,
+    onRestoreSuccess: (data) => {
+      const restored = data as { responses: FormResponse[]; section: number };
+      if (restored.responses) {
+        setResponses(restored.responses);
+        setCurrentSection(restored.section || 0);
+      }
+    },
+  });
 
   // Group competencies by category
   const competencyCategories = session.competencyDimensions.reduce((acc, comp) => {
@@ -71,7 +87,10 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({
       });
     });
     setResponses(initialResponses);
-  }, [session.competencyDimensions]);
+    // Track assessment start
+    telemetry.trackAssessment('start', 'evaluation');
+    startTimeRef.current = Date.now();
+  }, [session.competencyDimensions, session.id]);
 
   // Calculate progress
   useEffect(() => {
@@ -81,11 +100,16 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({
   }, [responses]);
 
   const updateResponse = (questionId: string, field: 'rating' | 'feedback', value: number | string) => {
-    setResponses(prev => prev.map(r => 
-      r.questionId === questionId 
-        ? { ...r, [field]: value }
-        : r
-    ));
+    setResponses(prev => {
+      const updated = prev.map(r => 
+        r.questionId === questionId 
+          ? { ...r, [field]: value }
+          : r
+      );
+      // Trigger autosave
+      autosave.debouncedSave({ responses: updated, section: currentSection });
+      return updated;
+    });
     // Clear validation errors when user makes changes
     setValidationErrors([]);
   };
@@ -164,6 +188,11 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({
     try {
       const evaluationResponses = convertToEvaluationResponses();
       await onSubmit(evaluationResponses);
+      // Clear autosave draft on successful submit
+      await autosave.clearDraft();
+      // Track assessment completion
+      const duration = Date.now() - startTimeRef.current;
+      telemetry.trackAssessment('complete', 'evaluation', Math.round(progress), duration);
     } catch (error) {
       console.error('Error submitting evaluation:', error);
     } finally {
@@ -354,13 +383,11 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({
 
                 {/* Feedback Field */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Additional comments or specific examples (optional)
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('evaluation.form.additionalCommentsLabel')}</label>
                   <textarea
                     value={feedbackResponse?.feedback || ''}
                     onChange={(e) => updateResponse(`${competency.id}_feedback`, 'feedback', e.target.value)}
-                    placeholder="Share specific examples, observations, or additional context..."
+                    placeholder={t('evaluation.form.additionalCommentsPlaceholder')}
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                   />
@@ -378,7 +405,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({
           disabled={currentSection === 0}
           className="px-6 py-2 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          ← Previous
+          ← {t('common.previous')}
         </button>
 
         <div className="flex gap-3">
@@ -388,7 +415,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({
               disabled={isSaving}
               className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50"
             >
-              {isSaving ? 'Saving...' : 'Save Draft'}
+              {isSaving ? t('evaluation.saving') : t('evaluation.saveDraft')}
             </button>
           )}
 

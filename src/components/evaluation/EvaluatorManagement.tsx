@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Evaluator,
@@ -47,6 +48,7 @@ export default function EvaluatorManagement({
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedEvaluators, setSelectedEvaluators] = useState<string[]>([]);
+  const { t } = useTranslation();
 
   useEffect(() => {
     // Validate evaluators whenever they change
@@ -56,7 +58,7 @@ export default function EvaluatorManagement({
 
   const handleAddEvaluator = async () => {
     if (!formData.name || !formData.email || !formData.relationship) {
-      alert('Please fill in all required fields');
+      alert(t('evaluation.evaluatorManagement.fillRequired'));
       return;
     }
 
@@ -85,7 +87,7 @@ export default function EvaluatorManagement({
       setShowAddForm(false);
     } catch (error) {
       console.error('Error adding evaluator:', error);
-      alert('Failed to add evaluator. Please try again.');
+      alert(t('evaluation.evaluatorManagement.failedAdd'));
     } finally {
       setLoading(false);
     }
@@ -98,7 +100,7 @@ export default function EvaluatorManagement({
 
   const handleSendInvitations = () => {
     if (selectedEvaluators.length === 0) {
-      alert('Please select evaluators to send invitations to.');
+      alert(t('evaluation.evaluatorManagement.selectEvaluatorsMessage'));
       return;
     }
     
@@ -125,17 +127,17 @@ export default function EvaluatorManagement({
     if (count < group.minRequired) {
       return {
         status: 'insufficient',
-        message: `Need ${group.minRequired - count} more evaluator(s)`
+        message: t('evaluation.evaluatorManagement.needMore', { count: group.minRequired - count })
       };
     } else if (count > group.maxAllowed) {
       return {
         status: 'exceeded',
-        message: `${count - group.maxAllowed} evaluator(s) over limit`
+        message: t('evaluation.evaluatorManagement.overLimit', { count: count - group.maxAllowed })
       };
     } else {
       return {
         status: 'valid',
-        message: `${count}/${group.maxAllowed} evaluators`
+        message: t('evaluation.evaluatorManagement.countOfMax', { count, max: group.maxAllowed })
       };
     }
   };
@@ -151,11 +153,11 @@ export default function EvaluatorManagement({
 
   const getRelationshipPlaceholder = (groupType: EvaluatorGroup['type']) => {
     switch (groupType) {
-      case 'parent': return 'e.g., Mother, Father, Guardian';
-      case 'teacher': return 'e.g., Math Teacher, Counselor, Principal';
-      case 'sibling_friend': return 'e.g., Sister, Best Friend, Classmate';
-      case 'self': return 'Self-evaluation';
-      default: return 'Relationship';
+      case 'parent': return t('evaluation.evaluatorManagement.relationships.parent');
+      case 'teacher': return t('evaluation.evaluatorManagement.relationships.teacher');
+      case 'sibling_friend': return t('evaluation.evaluatorManagement.relationships.siblingFriend');
+      case 'self': return t('evaluation.evaluatorManagement.relationships.self');
+      default: return t('evaluation.evaluatorManagement.relationships.default');
     }
   };
 
@@ -164,14 +166,14 @@ export default function EvaluatorManagement({
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">Evaluator Management</h3>
-          <p className="text-sm text-gray-600">Add and manage evaluators for this 360-degree assessment</p>
+          <h3 className="text-lg font-semibold text-gray-900">{t('evaluation.evaluatorManagement.title')}</h3>
+          <p className="text-sm text-gray-600">{t('evaluation.evaluatorManagement.description')}</p>
         </div>
         <button
           onClick={() => setShowAddForm(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
         >
-          Add Evaluator
+          {t('evaluation.evaluatorManagement.addEvaluator')}
         </button>
       </div>
 

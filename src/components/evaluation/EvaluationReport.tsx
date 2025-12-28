@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import {
   DocumentArrowDownIcon,
@@ -349,16 +350,17 @@ const EvaluationReport: React.FC<EvaluationReportProps> = ({
     );
   }
 
+  const { t } = useTranslation();
   if (!session || !reportSummary) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-600">Report data not available</p>
+        <p className="text-gray-600">{t('evaluation.noReportData')}</p>
         {onBack && (
           <button
             onClick={onBack}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
-            Go Back
+            {t('common.back')}
           </button>
         )}
       </div>
@@ -370,9 +372,9 @@ const EvaluationReport: React.FC<EvaluationReportProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between mb-8 print:mb-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 print:text-2xl">360° Evaluation Report</h1>
+          <h1 className="text-3xl font-bold text-gray-900 print:text-2xl">{t('evaluation.reportTitle')}</h1>
           <p className="text-gray-600 mt-2">
-            Comprehensive assessment for {session.evaluatedPersonName}
+            {t('evaluation.reportDescription', { name: session.evaluatedPersonName })}
           </p>
         </div>
         <div className="flex items-center space-x-3 print:hidden">
@@ -381,7 +383,7 @@ const EvaluationReport: React.FC<EvaluationReportProps> = ({
               onClick={onBack}
               className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
             >
-              ← Back
+              ← {t('common.back')}
             </button>
           )}
           <button
@@ -389,14 +391,14 @@ const EvaluationReport: React.FC<EvaluationReportProps> = ({
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
           >
             <ShareIcon className="w-4 h-4" />
-            <span>Share</span>
+            <span>{t('common.share')}</span>
           </button>
           <button
             onClick={printReport}
             className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2"
           >
             <PrinterIcon className="w-4 h-4" />
-            <span>Print</span>
+            <span>{t('common.print')}</span>
           </button>
           <button
             onClick={generatePDFReport}
@@ -404,7 +406,7 @@ const EvaluationReport: React.FC<EvaluationReportProps> = ({
             className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 transition-colors flex items-center space-x-2"
           >
             <DocumentArrowDownIcon className="w-4 h-4" />
-            <span>{generating ? 'Generating...' : 'Download'}</span>
+            <span>{generating ? t('common.generating') : t('common.download')}</span>
           </button>
         </div>
       </div>
@@ -413,25 +415,25 @@ const EvaluationReport: React.FC<EvaluationReportProps> = ({
       <div className="bg-white p-6 rounded-lg shadow-sm border mb-8 print:shadow-none print:border-gray-300">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div>
-            <h3 className="text-sm font-medium text-gray-500">Evaluation Period</h3>
+            <h3 className="text-sm font-medium text-gray-500">{t('evaluation.evaluationPeriod')}</h3>
             <p className="text-lg font-semibold text-gray-900">
               {new Date(session.startDate).toLocaleDateString()} - {new Date(session.endDate).toLocaleDateString()}
             </p>
           </div>
           <div>
-            <h3 className="text-sm font-medium text-gray-500">Response Rate</h3>
+            <h3 className="text-sm font-medium text-gray-500">{t('evaluation.responseRate')}</h3>
             <p className="text-lg font-semibold text-green-600">
               {reportSummary.responseRate.toFixed(1)}%
             </p>
           </div>
           <div>
-            <h3 className="text-sm font-medium text-gray-500">Overall Score</h3>
+            <h3 className="text-sm font-medium text-gray-500">{t('evaluation.overallScore')}</h3>
             <p className="text-lg font-semibold text-blue-600">
               {reportSummary.overallScore.toFixed(1)}/5.0
             </p>
           </div>
           <div>
-            <h3 className="text-sm font-medium text-gray-500">Report Generated</h3>
+            <h3 className="text-sm font-medium text-gray-500">{t('evaluation.reportGenerated')}</h3>
             <p className="text-lg font-semibold text-gray-900">
               {reportSummary.completionDate.toLocaleDateString()}
             </p>

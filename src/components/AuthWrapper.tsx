@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { LoadingSpinner } from "./LoadingSpinner";
+import { useTokenMonitor } from "@/hooks/useTokenMonitor";
 
 interface AuthWrapperProps {
   children: React.ReactNode;
@@ -16,6 +17,9 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [isInitializing, setIsInitializing] = useState(true);
+  
+  // Monitor token expiry in background - auto-logout when expired
+  useTokenMonitor(5); // Warn 5 minutes before expiry
 
   useEffect(() => {
     // Initialize authentication state from localStorage
