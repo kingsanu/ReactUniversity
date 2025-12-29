@@ -1793,6 +1793,50 @@
       }
     }
   },
+  "coach": {
+    "greeting": {
+      "morning": "Good Morning",
+      "afternoon": "Good Afternoon",
+      "evening": "Good Evening"
+    },
+    "defaultName": "Coach",
+    "upcomingSessions": "You have {{count}} upcoming sessions",
+    "manageAvailability": "Manage Availability",
+    "editAvailability": "Edit Availability",
+    "stats": {
+      "totalSessions": "Total Sessions",
+      "activeStudents": "Active Students",
+      "sessions": "sessions",
+      "students": "students"
+    },
+    "sessions": {
+      "title": "Your Sessions",
+      "description": "Manage your coaching schedule",
+      "upcoming": "Upcoming",
+      "nextSession": "next session soon",
+      "noSessions": "no sessions",
+      "completed": "Completed",
+      "lifetime": "lifetime",
+      "date": "Date",
+      "time": "Time",
+      "noUpcomingTitle": "No upcoming sessions",
+      "noScheduled": "You don't have any scheduled sessions yet.",
+      "takeABreak": "Time to take a break!",
+      "noPastTitle": "No past sessions",
+      "historyPlaceholder": "Your history will appear here.",
+      "availableTimes": "Available Times",
+      "noAvailableSlots": "No available slots for this date",
+      "rescheduleTitle": "Reschedule Session",
+      "rescheduleDescription": "Select a new date and time for {{name}}",
+      "confirmed": "Confirmed"
+    },
+    "actions": {
+      "reschedule": "Reschedule",
+      "joinCall": "Join Call",
+      "viewNotes": "View Notes",
+      "confirmReschedule": "Confirm Reschedule"
+    }
+  },
   "language": {
     "english": "English",
     "spanish": "Spanish",

@@ -11,6 +11,7 @@ import {
   StudentSummary,
   StudentDetails,
   Payout,
+  PayoutStatus,
   BankAccount,
   Notification,
   CoachSlotsResponse,
@@ -224,12 +225,64 @@ export async function getCoachStudentById(
   return response.json();
 }
 
-export async function getCoachPayouts(): Promise<{ data: Payout[] }> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/coach/me/payouts`, {
+export interface CoachPayoutsSummary {
+  completedCount?: number;
+  pendingCount?: number;
+  processingCount?: number;
+  failedCount?: number;
+  completedAmount?: number;
+  pendingAmount?: number;
+  processingAmount?: number;
+}
+
+export interface CoachPayoutsResponse {
+  items: Payout[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages?: number;
+  totalPayouts?: number;
+  pendingPayouts?: number;
+  summary?: CoachPayoutsSummary;
+}
+
+export async function getCoachPayouts(params?: {
+  page?: number;
+  limit?: number;
+  status?: PayoutStatus;
+}): Promise<CoachPayoutsResponse> {
+  const query = new URLSearchParams();
+  if (params?.page) query.append("page", params.page.toString());
+  if (params?.limit) query.append("limit", params.limit.toString());
+  if (params?.status) query.append("status", params.status);
+
+  const requestUrl = `${API_BASE_URL}/api/v1/coach/me/payouts${
+    query.toString() ? `?${query.toString()}` : ""
+  }`;
+  const response = await fetch(requestUrl, {
     headers: getHeaders(),
   });
   if (!response.ok) throw new Error("Failed to fetch payouts");
-  return response.json();
+
+  const json = await response.json();
+  const payload = json?.data ?? json;
+  const items = Array.isArray(payload)
+    ? payload
+    : payload?.items || payload?.data || payload?.payouts || [];
+
+  return {
+    items: Array.isArray(items) ? items : [],
+    total:
+      payload?.total ??
+      payload?.totalCount ??
+      (Array.isArray(items) ? items.length : 0),
+    page: payload?.page ?? params?.page ?? 1,
+    limit: payload?.limit ?? params?.limit ?? 20,
+    totalPages: payload?.totalPages,
+    totalPayouts: payload?.totalPayouts,
+    pendingPayouts: payload?.pendingPayouts,
+    summary: payload?.summary,
+  };
 }
 
 export async function getCoachBankAccount(): Promise<{ data: BankAccount }> {
@@ -671,6 +724,11 @@ export interface EarningsHistoryItem {
 export interface PayoutSettings {
   frequency: "biweekly" | "monthly";
   method: "stripe" | "bank_transfer";
+  bankAccountNumber?: string;
+  bankRoutingNumber?: string;
+  bankName?: string;
+  accountHolderName?: string;
+  last4?: string;
 }
 
 export async function getCoachEarnings(): Promise<CoachEarningsStats> {
@@ -714,12 +772,21 @@ export async function getCoachPayoutSettings(): Promise<PayoutSettings> {
 export async function updateCoachPayoutSettings(
   settings: Partial<PayoutSettings>
 ): Promise<PayoutSettings> {
+  // Map UI field names to API field names
+  const requestBody: any = {};
+  if (settings.frequency) requestBody.frequency = settings.frequency;
+  if (settings.method) requestBody.method = settings.method;
+  if (settings.bankAccountNumber) requestBody.bankAccountNumber = settings.bankAccountNumber;
+  if (settings.bankRoutingNumber) requestBody.bankRoutingNumber = settings.bankRoutingNumber;
+  if (settings.bankName) requestBody.bankName = settings.bankName;
+  if (settings.accountHolderName) requestBody.accountHolderName = settings.accountHolderName;
+
   const response = await fetch(
     `${API_BASE_URL}/api/v1/coach/me/payout-settings`,
     {
       method: "PUT",
       headers: getHeaders(),
-      body: JSON.stringify(settings),
+      body: JSON.stringify(requestBody),
     }
   );
 

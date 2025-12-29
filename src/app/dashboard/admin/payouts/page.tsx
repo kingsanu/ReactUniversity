@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Table,
   TableBody,
@@ -12,59 +12,109 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle, XCircle, DollarSign, Filter, Search } from "lucide-react";
+import { CheckCircle, XCircle, Search, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import {
+  getAdminPayouts,
+  approveAdminPayout,
+  rejectAdminPayout,
+  AdminPayout,
+} from "@/services/adminPayoutService";
+import { PayoutStatus } from "@/types/coach";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-// Mock Data for Pending Payouts
-const MOCK_PAYOUTS = [
-  {
-    id: "PAY-5001",
-    coachId: "C-101",
-    coachName: "Dr. Emily Smith",
-    amount: 1450.0,
-    periodStart: "2024-03-01",
-    periodEnd: "2024-03-15",
-    status: "pending",
-  },
-  {
-    id: "PAY-5002",
-    coachId: "C-102",
-    coachName: "Michael Johnson",
-    amount: 850.5,
-    periodStart: "2024-03-01",
-    periodEnd: "2024-03-15",
-    status: "pending",
-  },
-  {
-    id: "PAY-5003",
-    coachId: "C-105",
-    coachName: "Sarah Connor",
-    amount: 2100.0,
-    periodStart: "2024-02-01",
-    periodEnd: "2024-02-29",
-    status: "pending",
-  },
-];
+const statusBadgeClasses: Record<PayoutStatus, string> = {
+  pending: "bg-yellow-50 text-yellow-700 border-yellow-200",
+  processing: "bg-blue-50 text-blue-700 border-blue-200",
+  completed: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  failed: "bg-red-50 text-red-700 border-red-200",
+};
+
+const formatCurrency = (value?: number, currency = "USD") =>
+  new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency,
+    maximumFractionDigits: 2,
+  }).format(value ?? 0);
 
 export default function AdminPayoutsPage() {
   const { t } = useTranslation();
-  const [payouts, setPayouts] = useState(MOCK_PAYOUTS);
+  const [payouts, setPayouts] = useState<AdminPayout[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<PayoutStatus>("pending");
+  const [isLoading, setIsLoading] = useState(false);
+  const [actioningId, setActioningId] = useState<string | null>(null);
 
-  const handleApprove = (id: string) => {
-    // In real app, call API to approve
-    setPayouts(payouts.filter((p) => p.id !== id));
-    console.log(`Approved payout ${id}`);
+  const filteredPayouts = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+    return payouts.filter((p) => {
+      if (!term) return true;
+      const haystack = `${p.coachName || ""} ${p.coachEmail || ""} ${p.coachId || ""}`.toLowerCase();
+      return haystack.includes(term);
+    });
+  }, [payouts, searchTerm]);
+
+  const totalPending = filteredPayouts.reduce((acc, curr) => {
+    const amount = curr.netAmount ?? curr.amount ?? 0;
+    return acc + amount;
+  }, 0);
+
+  const loadPayouts = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const response = await getAdminPayouts({ status: statusFilter });
+      setPayouts(response.items || []);
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to load payouts");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [statusFilter]);
+
+  useEffect(() => {
+    loadPayouts();
+  }, [loadPayouts]);
+
+  const handleApprove = async (id: string) => {
+    setActioningId(id);
+    try {
+      await approveAdminPayout(id);
+      toast.success(t("admin.payouts.toast.approved", { defaultValue: "Payout approved" }));
+      await loadPayouts();
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to approve payout");
+    } finally {
+      setActioningId(null);
+    }
   };
 
-  const handleReject = (id: string) => {
-    // In real app, open modal for reason
-    setPayouts(payouts.filter((p) => p.id !== id));
-    console.log(`Rejected payout ${id}`);
-  };
+  const handleReject = async (id: string) => {
+    const reason = prompt(
+      t("admin.payouts.prompt.reason", {
+        defaultValue: "Enter a reason for rejection",
+      })
+    );
+    if (!reason) return;
 
-  const totalPending = payouts.reduce((acc, curr) => acc + curr.amount, 0);
+    setActioningId(id);
+    try {
+      await rejectAdminPayout(id, reason);
+      toast.success(t("admin.payouts.toast.rejected", { defaultValue: "Payout rejected" }));
+      await loadPayouts();
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to reject payout");
+    } finally {
+      setActioningId(null);
+    }
+  };
 
   return (
     <div className="p-6 sm:p-10 space-y-8 max-w-[1600px] mx-auto">
@@ -77,7 +127,6 @@ export default function AdminPayoutsPage() {
         </p>
       </div>
 
-      {/* Stats Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="bg-gray-900 text-white border-0">
           <CardHeader className="pb-2">
@@ -87,13 +136,14 @@ export default function AdminPayoutsPage() {
           </CardHeader>
           <CardContent>
             <span className="text-4xl font-bold">
-              ${totalPending.toLocaleString()}
+              {formatCurrency(totalPending)}
             </span>
             <p className="text-gray-400 text-sm mt-1">
-              {t("admin.payouts.requestsAwaiting", { count: payouts.length })}
+              {t("admin.payouts.requestsAwaiting", { count: filteredPayouts.length })}
             </p>
           </CardContent>
         </Card>
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-gray-500 uppercase">
@@ -101,7 +151,7 @@ export default function AdminPayoutsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <span className="text-4xl font-bold text-gray-900">$12,450</span>
+            <span className="text-4xl font-bold text-gray-900">—</span>
             <p className="text-green-600 text-sm mt-1 font-medium">
               {t("admin.payouts.allSettlementsCleared")}
             </p>
@@ -109,7 +159,6 @@ export default function AdminPayoutsPage() {
         </Card>
       </div>
 
-      {/* Main Content */}
       <Card className="border-gray-100 shadow-sm">
         <CardHeader className="bg-gray-50/50 border-b border-gray-100 p-4">
           <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
@@ -122,10 +171,29 @@ export default function AdminPayoutsPage() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Button variant="outline" className="gap-2">
-              <Filter className="w-4 h-4" />
-              {t("admin.payouts.filterStatus")}
-            </Button>
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              <Select
+                value={statusFilter}
+                onValueChange={(value: PayoutStatus) => setStatusFilter(value)}
+              >
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder={t("admin.payouts.filterStatus") ?? "Status"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="processing">Processing</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="failed">Failed</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button variant="outline" onClick={loadPayouts} disabled={isLoading}>
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  t("admin.payouts.refresh", { defaultValue: "Refresh" })
+                )}
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <Table>
@@ -144,66 +212,78 @@ export default function AdminPayoutsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {payouts
-              .filter(
-                (p) =>
-                  !searchTerm ||
-                  p.coachName.toLowerCase().includes(searchTerm.toLowerCase())
-              )
-              .map((payout) => (
-                <TableRow key={payout.id}>
-                  <TableCell className="font-medium">{payout.id}</TableCell>
-                  <TableCell>
-                    <div>
-                      <p className="font-medium text-gray-900">
-                        {payout.coachName}
-                      </p>
-                      <p className="text-xs text-gray-500">{payout.coachId}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-gray-500">
-                    {payout.periodStart} - {payout.periodEnd}
-                  </TableCell>
-                  <TableCell className="text-right font-bold text-gray-900">
-                    ${payout.amount.toLocaleString()}
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant="outline"
-                      className="bg-yellow-50 text-yellow-700 border-yellow-200"
-                    >
-                      {payout.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                        onClick={() => handleReject(payout.id)}
-                      >
-                        <XCircle className="w-4 h-4 mr-1" />
-                        {t("admin.payouts.actions.reject")}
-                      </Button>
-                      <Button
-                        size="sm"
-                        className="bg-green-600 hover:bg-green-700 text-white"
-                        onClick={() => handleApprove(payout.id)}
-                      >
-                        <CheckCircle className="w-4 h-4 mr-1" />
-                        {t("admin.payouts.actions.approve")}
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            {payouts.length === 0 && (
+            {isLoading && (
               <TableRow>
-                <TableCell
-                  colSpan={6}
-                  className="h-24 text-center text-gray-500"
-                >
+                <TableCell colSpan={6} className="h-24 text-center text-gray-500">
+                  <div className="flex items-center justify-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {t("admin.payouts.loading", { defaultValue: "Loading payouts..." })}
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
+
+            {!isLoading &&
+              filteredPayouts.map((payout) => {
+                const payoutId = (payout.id || payout.payoutId || "").toString();
+                return (
+                  <TableRow key={payoutId || payout.coachId}>
+                    <TableCell className="font-medium">{payoutId || "—"}</TableCell>
+                    <TableCell>
+                      <div>
+                        <p className="font-medium text-gray-900">
+                          {payout.coachName || "—"}
+                        </p>
+                        <p className="text-xs text-gray-500">{payout.coachId}</p>
+                        {payout.coachEmail && (
+                          <p className="text-xs text-gray-500">{payout.coachEmail}</p>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-gray-500">
+                      {payout.periodStart || "—"} {payout.periodEnd ? `- ${payout.periodEnd}` : ""}
+                    </TableCell>
+                    <TableCell className="text-right font-bold text-gray-900">
+                      {formatCurrency(payout.netAmount ?? payout.amount, payout.currency)}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant="outline"
+                        className={statusBadgeClasses[payout.status] || ""}
+                      >
+                        {payout.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                          disabled={!payoutId || actioningId === payoutId}
+                          onClick={() => payoutId && handleReject(payoutId)}
+                        >
+                          <XCircle className="w-4 h-4 mr-1" />
+                          {t("admin.payouts.actions.reject")}
+                        </Button>
+                        <Button
+                          size="sm"
+                          className="bg-green-600 hover:bg-green-700 text-white"
+                          disabled={!payoutId || actioningId === payoutId}
+                          onClick={() => payoutId && handleApprove(payoutId)}
+                        >
+                          <CheckCircle className="w-4 h-4 mr-1" />
+                          {t("admin.payouts.actions.approve")}
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+
+            {!isLoading && filteredPayouts.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={6} className="h-24 text-center text-gray-500">
                   {t("admin.payouts.noPending")}
                 </TableCell>
               </TableRow>

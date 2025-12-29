@@ -108,6 +108,28 @@ export default function SessionsPage() {
           ? sessionsData
           : [];
 
+        const resolveStartTs = (s: any): number | undefined => {
+          const candidates = [
+            s.startTime,
+            s.slot?.start,
+            s.start,
+            s.start_date,
+            s.startDate,
+            s.sessionStart,
+            s.sessionDate,
+            s.session_date,
+            s.date,
+            s.datetime,
+            s.start_time,
+          ].filter(Boolean);
+
+          for (const value of candidates) {
+            const ts = Date.parse(value as string);
+            if (!Number.isNaN(ts)) return ts;
+          }
+          return undefined;
+        };
+
         const formattedSessions = rawSessions
           .map((session: any) => {
             // Safety check for session object
@@ -115,6 +137,7 @@ export default function SessionsPage() {
 
             const startTime = session.startTime || session.slot?.start;
             const endTime = session.endTime || session.slot?.end;
+            const startTimestamp = resolveStartTs(session);
 
             let date = "TBD";
             let time = "TBD";
@@ -145,6 +168,27 @@ export default function SessionsPage() {
 
             const student = session.student || session.user || {};
 
+            // Derive a safer status: completed if the start time is in the past and not already marked completed/cancelled
+            let derivedStatus = session.status || "upcoming";
+            if (
+              typeof startTimestamp === "number" &&
+              derivedStatus !== "completed" &&
+              derivedStatus !== "cancelled"
+            ) {
+              const now = Date.now();
+              if (startTimestamp < now) {
+                derivedStatus = "completed";
+              }
+            }
+
+            const bucket = (() => {
+              if (derivedStatus === "cancelled") return "cancelled";
+              if (typeof startTimestamp === "number") {
+                return startTimestamp < Date.now() ? "past" : "upcoming";
+              }
+              return "upcoming";
+            })();
+
             return {
               ...session,
               date,
@@ -167,12 +211,15 @@ export default function SessionsPage() {
                 student.id ||
                 student._id, // Ensure we have student ID
               topic: session.topic || "General Coaching",
-              status: session.status || "upcoming",
+              status: derivedStatus,
+              startTimestamp,
+              bucket,
               notes: session.notes || "No notes available for this session.",
             };
           })
           .filter(Boolean); // Remove nulls
 
+        console.log("Formatted sessions with status:", formattedSessions.map(s => ({ id: s.id, status: s.status, startTime: s.startTime })));
         setSessions(formattedSessions);
       } catch (error) {
         console.error("Failed to fetch sessions:", error);
@@ -290,6 +337,31 @@ export default function SessionsPage() {
   // --- End Reschedule Logic ---
 
   // Filter logic
+  const nowTs = Date.now();
+
+  const resolveStartTs = (s: any): number | undefined => {
+    if (typeof s.startTimestamp === "number") return s.startTimestamp;
+    const candidates = [
+      s.startTime,
+      s.slot?.start,
+      s.start,
+      s.start_date,
+      s.startDate,
+      s.sessionStart,
+      s.sessionDate,
+      s.session_date,
+      s.date,
+      s.datetime,
+      s.start_time,
+    ].filter(Boolean);
+
+    for (const value of candidates) {
+      const ts = Date.parse(value as string);
+      if (!Number.isNaN(ts)) return ts;
+    }
+    return undefined;
+  };
+
   const filteredSessions = sessions.filter((session) => {
     const matchesSearch =
       session.studentName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -297,15 +369,25 @@ export default function SessionsPage() {
 
     if (!matchesSearch) return false;
 
+    const startTs = resolveStartTs(session);
+    const isPast = typeof startTs === "number" && startTs < nowTs;
+    const isFuture = typeof startTs === "number" && startTs >= nowTs;
+    const bucket = session.bucket || (isPast ? "past" : "upcoming");
+
+    // Never show cancelled in upcoming/past, only in cancelled tab
+    if (session.status === "cancelled") {
+      return activeTab === "cancelled" || activeTab === "all";
+    }
+
     if (activeTab === "all") {
       // also apply statusFilter if provided
       if (statusFilter) return session.status === statusFilter;
       return true;
     }
     if (activeTab === "upcoming")
-      return session.status === "confirmed" || session.status === "rescheduled";
-    if (activeTab === "past") return session.status === "completed";
-    if (activeTab === "cancelled") return session.status === "cancelled";
+      return isFuture && session.status !== "cancelled";
+    if (activeTab === "past") return isPast || session.status === "completed";
+    if (activeTab === "cancelled") return false; // already handled above
 
     return true;
   });
@@ -346,10 +428,16 @@ export default function SessionsPage() {
 
   const counts = {
     all: sessions.length,
-    upcoming: sessions.filter(
-      (s) => s.status === "confirmed" || s.status === "rescheduled"
-    ).length,
-    past: sessions.filter((s) => s.status === "completed").length,
+    upcoming: sessions.filter((s) => {
+      const startTs = resolveStartTs(s);
+      const isFuture = typeof startTs === "number" && startTs >= nowTs;
+      return isFuture && s.status !== "cancelled";
+    }).length,
+    past: sessions.filter((s) => {
+      const startTs = resolveStartTs(s);
+      const isPast = typeof startTs === "number" && startTs < nowTs;
+      return isPast || s.status === "completed";
+    }).length,
     cancelled: sessions.filter((s) => s.status === "cancelled").length,
   };
 

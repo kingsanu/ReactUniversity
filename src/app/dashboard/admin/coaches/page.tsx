@@ -5,7 +5,7 @@ import { SingleInviteForm } from "@/components/admin/SingleInviteForm";
 import { BulkInviteForm } from "@/components/admin/BulkInviteForm";
 import { CoachesTable } from "@/components/admin/CoachesTable";
 import { Button } from "@/components/ui/button";
-import { Plus, Users, UserCheck, UserPlus, Clock } from "lucide-react";
+import { Plus, Users, UserCheck, UserPlus, Clock, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   Dialog,
@@ -16,7 +16,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
+import { Coach } from "@/types/coach";
 
 interface CoachStats {
   totalCoaches: number;
@@ -41,9 +41,42 @@ export default function CoachesPage() {
     const fetchCoachStats = async () => {
       setIsLoadingStats(true);
       try {
-        const { getCoachStats } = await import("@/services/coachService");
-        const statsData = await getCoachStats();
-        setStats(statsData);
+        const { getAllCoachesAdmin } = await import("@/services/coachService");
+        const response = await getAllCoachesAdmin({ page: 1, limit: 500 });
+
+        const anyResponse = response as any;
+        let coaches: Coach[] = [];
+
+        if (Array.isArray(anyResponse)) {
+          coaches = anyResponse;
+        } else if (anyResponse?.data && Array.isArray(anyResponse.data)) {
+          coaches = anyResponse.data;
+        } else if (
+          anyResponse?.data?.data &&
+          Array.isArray(anyResponse.data.data)
+        ) {
+          coaches = anyResponse.data.data;
+        }
+
+        const today = new Date();
+        const thirtyDaysFromNow = new Date(
+          today.getTime() + 30 * 24 * 60 * 60 * 1000
+        );
+
+        const calculatedStats: CoachStats = {
+          totalCoaches: coaches.length,
+          activeNow: coaches.filter((c) => c.status === "active").length,
+          pendingInvites: coaches.filter(
+            (c) => c.status === "invited" || c.status === "pending"
+          ).length,
+          expiringContracts: coaches.filter((c) => {
+            if (!c.contractEnd) return false;
+            const endDate = new Date(c.contractEnd);
+            return endDate >= today && endDate <= thirtyDaysFromNow;
+          }).length,
+        };
+
+        setStats(calculatedStats);
       } catch (error) {
         console.error("Failed to fetch coach stats:", error);
       } finally {

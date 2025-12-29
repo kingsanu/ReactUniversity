@@ -46,9 +46,12 @@ interface TelemetryConfig {
   enabled: boolean;
 }
 
+// Get API base URL from environment
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+
 // Default configuration
 const defaultConfig: TelemetryConfig = {
-  apiEndpoint: "/api/v1/telemetry/events",
+  apiEndpoint: `${API_BASE_URL}/api/v1/telemetry/events`,
   batchSize: 10,
   flushInterval: 5000, // 5 seconds
   enabled: true,

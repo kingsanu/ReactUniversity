@@ -13,16 +13,34 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   const { language, setLanguage } = useGlobalStore();
 
   useEffect(() => {
-    // Sync global store language with i18n on initial load
+    // Ensure i18n is initialized before rendering children to avoid showing raw keys
     const storedLanguage = language;
     const i18nLanguage = storedLanguage === "spanish" ? "es" : "en";
 
-    if (i18n.language !== i18nLanguage) {
-      i18n.changeLanguage(i18nLanguage);
-    }
+    const ensureInit = () => {
+      try {
+        if (i18n.language !== i18nLanguage) {
+          i18n.changeLanguage(i18nLanguage);
+        }
+      } catch (err) {
+        // ignore
+      }
+      setIsLoaded(true);
+    };
 
-    setIsLoaded(true);
-  }, []);
+    if (i18n.isInitialized) {
+      ensureInit();
+    } else {
+      const onInit = () => ensureInit();
+      i18n.on("initialized", onInit);
+      // Fallback: if initialization doesn't fire for some reason, mark loaded after short timeout
+      const t = setTimeout(() => ensureInit(), 1500);
+      return () => {
+        i18n.off("initialized", onInit);
+        clearTimeout(t);
+      };
+    }
+  }, [i18n, language]);
 
   // Listen for i18n language changes and sync to global store
   useEffect(() => {

@@ -168,13 +168,19 @@ export function CoachDashboard() {
           };
         });
 
-        // Filter sessions
-        const upcoming = sessions.filter(
-          (s: any) => s.status === "confirmed" || s.status === "rescheduled"
-        );
-        const past = sessions.filter(
-          (s: any) => s.status === "completed" || s.status === "cancelled"
-        );
+        // Filter sessions with time-based classification
+        const nowTs = Date.now();
+        const upcoming = sessions.filter((s: any) => {
+          if (s.status === "cancelled") return false;
+          const startTs = Date.parse(s.startTime || s.slot?.start || "");
+          const isFuture = !Number.isNaN(startTs) && startTs >= nowTs;
+          return isFuture && (s.status === "confirmed" || s.status === "rescheduled");
+        });
+        const past = sessions.filter((s: any) => {
+          const startTs = Date.parse(s.startTime || s.slot?.start || "");
+          const isPast = !Number.isNaN(startTs) && startTs < nowTs;
+          return s.status === "completed" || s.status === "cancelled" || isPast;
+        });
 
         setUpcomingSessions(upcoming);
         setPastSessions(past);
@@ -437,15 +443,6 @@ export function CoachDashboard() {
               label: t('coach.sessions.completed'),
               value: pastSessions.length,
               sub: t('coach.sessions.lifetime'),
-              icon: Star,
-              color: "text-yellow-600",
-              bg: "bg-yellow-50/50",
-              gradient: "from-yellow-50 to-yellow-100/50",
-            },
-            {
-              label: "Completed",
-              value: pastSessions.length,
-              sub: "lifetime",
               icon: Star,
               color: "text-yellow-600",
               bg: "bg-yellow-50/50",

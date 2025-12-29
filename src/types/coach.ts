@@ -157,12 +157,27 @@ export interface CoachAnalytics {
   recentActivity: RecentActivityItem[];
 }
 
+export type PayoutStatus = "pending" | "processing" | "completed" | "failed";
+
 export interface Payout {
   id: string;
   amount: number;
+  platformFeeAmount?: number;
+  netAmount?: number;
+  platformFeePercentage?: number;
   currency: string;
-  date: string;
-  status: string; // e.g., paid, pending
+  status: PayoutStatus;
+  requestedAt?: string;
+  processedAt?: string;
+  approvedAt?: string;
+  periodStart?: string;
+  periodEnd?: string;
+  transactionId?: string;
+  notes?: string;
+  failureReason?: string;
+  coachId?: string;
+  coachName?: string;
+  coachEmail?: string;
 }
 
 export interface BankAccount {

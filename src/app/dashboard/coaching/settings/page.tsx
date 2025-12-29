@@ -45,7 +45,13 @@ export default function CoachSettingsPage() {
         setCoachDetails((detailsRes as any) || null);
         setAvailability((availabilityRes as any) || null);
         setBankAccount((bankRes as any)?.data || (bankRes as any) || null);
-        setPayouts((payoutsRes as any)?.data || (payoutsRes as any) || []);
+
+        const payoutItems =
+          (payoutsRes as any)?.items ||
+          (payoutsRes as any)?.data ||
+          (payoutsRes as any) ||
+          [];
+        setPayouts(Array.isArray(payoutItems) ? payoutItems : []);
       } catch (e) {
         console.error("Failed to preload settings data:", e);
       } finally {
