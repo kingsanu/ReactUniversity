@@ -597,6 +597,173 @@ The following sections provide **exhaustive analysis** for HR decision-makers, m
     "riskFactors": ["Analysis paralysis in ambiguous situations", "Resistance to rapid, unstructured change"],
     "nextAssessmentDate": "July 2026",
     "methodology": "This assessment utilizes the TIMCARE Cognitive Battery (TCB-v4), comprised of adaptive subtests normalized against a global cohort of 50,000+ professionals. Reliability coefficient: 0.92. Validity coefficient: 0.88. Results should be interpreted as one data point among multiple hiring factors."
+  },
+
+  "personalityInferences": {
+    "cognitiveStyle": "Analytical Thinker with strong systematic tendencies. Alex approaches problems through logical decomposition and evidence gathering. Thrives when given complex puzzles with clear success criteria. May struggle with purely creative tasks lacking defined parameters.",
+    "workingPace": "Marathon with Sprinter capability. Prefers steady, consistent output but can shift into high-intensity mode for deadlines. Best not to rely on sprint mode frequently to avoid quality degradation.",
+    "riskTolerance": "Calculated Risk-Taker. Will take measured risks when data supports the decision. Unlikely to make bold bets without evidence. Good for roles requiring careful judgment, less suited for pure innovation roles.",
+    "detailOrientation": "Trees-first, forest-aware. Naturally focuses on details but can pull back to see bigger picture when prompted. May need reminders to communicate the 'so what' to stakeholders.",
+    "socialEnergy": "Moderate introvert. Prefers focused solo work but functions well in small team settings. May need recovery time after large meetings. Schedule deep work in mornings.",
+    "perfectionismLevel": "Moderate-high. Prioritizes accuracy over speed. In time-constrained situations, may need explicit permission to deliver 'good enough' rather than perfect."
+  },
+
+  "managerGuidance": {
+    "feedbackStyle": "Data-backed and specific. Alex responds best to feedback that includes concrete examples and metrics. Avoid vague praise like 'good job' - instead say 'your analysis caught the billing discrepancy that saved $50K'. Written feedback preferred for complex topics.",
+    "motivationTriggers": [
+      "Technical mastery and skill-building opportunities drive engagement",
+      "Clear metrics showing measurable impact of their work",
+      "Autonomy to choose HOW to solve problems (not just WHAT to solve)",
+      "Recognition for thoroughness and accuracy, especially from peers",
+      "Exposure to complex, novel problems that stretch capabilities"
+    ],
+    "demotivationWarnings": [
+      "Micromanagement of their analytical process kills motivation",
+      "Frequent context-switching prevents deep work and causes frustration",
+      "Lack of clear success criteria makes them anxious and hesitant",
+      "Being rushed to deliver before they feel work is complete"
+    ],
+    "meetingPreference": "Prefers fewer, more structured meetings with clear agendas. Benefits from 1:1s for complex discussions. Group meetings work when focused on information-sharing, not ideation. Send pre-reads 24 hours ahead.",
+    "conflictResolution": "Data-driven diplomat. In conflicts, Alex will gather facts before taking a position. May appear slow to respond but this is processing time. De-escalate by asking 'what data would help us resolve this?' rather than forcing immediate resolution.",
+    "recognitionStyle": "Private acknowledgment preferred over public praise. Specific recognition of craft quality resonates more than general accolades. Consider peer-to-peer recognition channels. Tangible rewards (learning budget) valued over titles."
+  },
+
+  "onboarding": {
+    "learningCurveEstimate": "Expect full productivity in 60-75 days for analytical roles. Alex will self-accelerate by seeking documentation and patterns. May take longer (90+ days) if role requires heavy stakeholder relationship-building.",
+    "structureLevel": "Moderate-high structure recommended. Provide clear 30-60-90 day plan with defined milestones. Alex will appreciate checklists but also wants room to explore systems independently. Avoid 'sink or swim' approaches.",
+    "buddyMatching": "Pair with a complementary profile: Someone stronger in communication/influence who respects analytical depth. Avoid pairing with another deep analyst (insufficient cultural context). Ideal: Senior with 2+ years tenure who can explain unwritten rules.",
+    "firstWeekPriorities": [
+      "Day 1-2: Complete system access and tool setup (immediate frustration reducer)",
+      "Day 3: Review historical data/reports to understand context before meetings",
+      "Day 4-5: Shadow 2-3 key meetings to observe team dynamics and norms",
+      "End of Week: Small quick-win task to build confidence and demonstrate value"
+    ],
+    "potentialChallenges": [
+      "May over-prepare before speaking up, causing silent first weeks - actively invite input",
+      "Could get lost in system exploration - provide guided tours instead of open access",
+      "Might not ask for help early - schedule proactive check-ins every 2-3 days initially"
+    ]
+  },
+
+  "retention": {
+    "riskLevel": "Medium",
+    "riskFactors": [
+      "Limited advancement visibility may cause exit at 18-24 month mark",
+      "If forced into highly ambiguous or chaotic environment without support",
+      "Compensation below market for specialized skills (data science, quantitative analysis)",
+      "Manager mismatch with micromanagement style"
+    ],
+    "retentionStrategies": [
+      "Provide clear 12-month development roadmap with skill milestones",
+      "Offer stretch assignments that challenge technically without overwhelming",
+      "Connect to mentor network of senior analytical professionals",
+      "Ensure competitive total compensation especially in quantitative skills market",
+      "Give visibility to senior leaders through project presentations"
+    ],
+    "flightIndicators": [
+      "Reduced initiative on improvement suggestions - may signal disengagement",
+      "Visible upskilling in areas outside current role (e.g., new certifications)",
+      "Declining optional meetings and team social events",
+      "Increased focus on documentation (preparing for transition)"
+    ],
+    "loyaltyDrivers": [
+      "Career path clarity with defined checkpoints ranked #1",
+      "Quality of technical challenges and learning opportunities",
+      "Respect and recognition from peers for expertise",
+      "Work-life predictability (no surprise fire drills)",
+      "Trust and autonomy from management"
+    ]
+  },
+
+  "interviewQuestions": {
+    "probeWeaknesses": [
+      "Tell me about a time you had to make a decision with incomplete data. How did you handle the ambiguity? (Watch for: discomfort, overthinking, or clear coping strategies)",
+      "Describe a situation where you had to convince a skeptical audience of your analysis. What approach did you take? (Watch for: storytelling ability, frustration with 'non-believers')",
+      "When have you had to deliver work before you felt it was ready? What was the outcome? (Watch for: perfectionism acknowledgment, recovery ability)"
+    ],
+    "validateStrengths": [
+      "Walk me through your most complex analytical project. What made it challenging? (Watch for: depth of explanation, structured thinking, pride in rigor)",
+      "How do you ensure accuracy when working under time pressure? (Watch for: specific techniques, not just 'I double-check')",
+      "Give an example of a pattern or anomaly you spotted that others missed. (Watch for: specific examples with measurable impact)"
+    ],
+    "cultureFit": [
+      "How do you prefer to receive feedback on your work? (Red flag: defensiveness about any critique approach)",
+      "Describe your ideal work environment. (Red flag: only describes solo work, no collaboration mentioned)"
+    ],
+    "careerAspirations": [
+      "Where do you see yourself in 3 years? (Check alignment with available paths)",
+      "What skills are you actively trying to develop right now? (Check growth mindset and self-awareness)"
+    ]
+  },
+
+  "teamCompatibility": {
+    "bestPairings": [
+      {
+        "profileType": "Creative Communicator",
+        "reason": "Complements Alex's analytical depth with storytelling ability. Alex provides rigor, partner provides narrative - together they create compelling, accurate outputs."
+      },
+      {
+        "profileType": "Action-Oriented Executor",
+        "reason": "Alex's thorough analysis benefits from someone who can push for timely decisions. Prevents analysis paralysis while maintaining quality standards."
+      },
+      {
+        "profileType": "Strategic Networker",
+        "reason": "Can open doors and build relationships that Alex's technical work deserves but may not self-promote. Mutual benefit: credibility + visibility."
+      }
+    ],
+    "potentialFriction": [
+      {
+        "profileType": "Rapid Intuitive",
+        "reason": "May clash over pace and evidence requirements. Intuitive wants fast decisions; Alex wants complete data.",
+        "mitigation": "Establish explicit decision frameworks upfront. Define 'minimum viable evidence' thresholds."
+      },
+      {
+        "profileType": "High-Chaos Creative",
+        "reason": "Thrives in ambiguity that frustrates Alex. May see Alex as 'too slow' while Alex views them as 'reckless'.",
+        "mitigation": "Separate ideation (creative leads) from validation (Alex leads) phases explicitly."
+      }
+    ],
+    "idealTeamRole": "The Validator / Quality Anchor. Alex excels at pressure-testing ideas, catching errors, and ensuring deliverables meet rigorous standards. Best positioned after initial ideation, before final delivery. Should not be the 'idea generator' in brainstorms but invaluable in feasibility assessment.",
+    "collaborationTips": [
+      "Send detailed briefs in writing before meetings for Alex to process in advance",
+      "Allow 'think time' before expecting responses on complex questions",
+      "Frame requests with clear success criteria and relevant constraints",
+      "Respect focus time - batch non-urgent questions rather than frequent interruptions"
+    ]
+  },
+
+  "trajectory": {
+    "oneYearOutlook": "With proper support, Alex could become the team's go-to technical expert in their analytical domain. Expected to own increasingly complex individual contributor projects. May begin informal mentoring of junior analysts. Key milestone: lead one high-visibility analysis that reaches senior leadership.",
+    "threeYearOutlook": "Two divergent paths possible: (1) Deep Specialist track - recognized subject matter expert consulted across teams; or (2) Technical Lead track - managing 2-3 junior analysts while maintaining hands-on work. Leadership track requires deliberate soft-skill investment starting now.",
+    "ceilingFactors": [
+      "Communication and influence skills - current blocker for executive visibility",
+      "Comfort with ambiguity - limits suitability for exploratory/innovation roles",
+      "Delegation trust - may struggle to let others complete work 'their way'"
+    ],
+    "accelerators": [
+      "Executive communication coaching - highest leverage investment",
+      "Cross-functional project exposure - builds stakeholder relationships",
+      "Structured mentorship from senior leader who made similar transition"
+    ],
+    "alternativePaths": [
+      "If management doesn't appeal: Principal/Staff-level IC track with advisory responsibilities",
+      "If current domain saturates: Lateral to data engineering or ML ops leveraging quantitative foundation",
+      "If seeking variety: Internal consulting/CoE role providing expertise across business units"
+    ]
+  },
+
+  "warnings": {
+    "behavioralFlags": [
+      "No significant flags observed. Session completed within normal parameters."
+    ],
+    "roleUnsuitability": [
+      "Avoid: High-chaos startup environments with constantly shifting priorities and no documentation",
+      "Avoid: Pure creative/ideation roles with no analytical component (copywriting, brand strategy)",
+      "Avoid: Customer-facing crisis roles requiring rapid improvisation under emotional pressure"
+    ],
+    "burnoutRisk": "Moderate. Perfectionism combined with high workload could lead to unsustainable effort. Watch for: working late consistently, reluctance to mark work 'complete', stress over minor errors. Prevention: Explicit 'good enough' permission, realistic deadlines, quality-over-quantity messaging.",
+    "overconfidenceCheck": "Calibration appears accurate. Self-assessment generally aligned with objective performance. No significant overestimation of abilities observed. Likely to accurately assess own limitations.",
+    "ethicalConsiderations": "No red flags for integrity roles. Completed all questions without shortcuts or pattern-guessing. Demonstrated rule-following behavior throughout assessment. Suitable for roles requiring precision and compliance (finance, audit, security)."
   }
 }
 ```

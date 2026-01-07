@@ -53,6 +53,16 @@ import { useAdminCourseList } from "@/hooks/useAdminCourseQueries";
 import { useAdminAccess } from "@/hooks/useAdminAccess";
 import { useAdminAnalytics } from "@/hooks/useAdminAnalytics";
 
+// Course type interface
+interface Course {
+  id: string;
+  title: string;
+  instructor?: string;
+  students?: number;
+  status?: string;
+  lastUpdated?: string;
+}
+
 export default function CoursesPage() {
   const router = useRouter();
   const { isAdmin, loading: authLoading } = useAdminAccess();
@@ -354,7 +364,7 @@ export default function CoursesPage() {
                         </TableCell>
                     </TableRow>
                 ) : (
-                    courses.map((course) => (
+                    courses.map((course: Course) => (
                     <TableRow key={course.id} className="border-gray-50 hover:bg-gray-50/50 transition-colors">
                         <TableCell className="font-medium text-gray-900 pl-6 py-4">
                         <div className="flex items-center group">
