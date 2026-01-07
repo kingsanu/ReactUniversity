@@ -818,3 +818,69 @@ export async function updateCoachPayoutSettings(
   const json = await response.json();
   return json.data || json;
 }
+
+// --- Billing APIs ---
+
+export interface CoachBillingResponse {
+  currentPeriod: {
+    period: string;
+    totalRevenue: number;
+    totalBookings: number;
+    platformFeeAmount: number;
+    dueDate: string;
+    status: "pending" | "paid" | "overdue";
+  } | null;
+  billingHistory: {
+    items: Array<{
+      id: string;
+      period: string;
+      totalRevenue: number;
+      platformFeeAmount: number;
+      status: "paid" | "pending" | "overdue";
+    }>;
+    page: number;
+    totalPages: number;
+  };
+}
+
+export async function getCoachBilling(params?: {
+  page?: number;
+  limit?: number;
+}): Promise<CoachBillingResponse> {
+  const query = new URLSearchParams();
+  if (params?.page) query.append("page", params.page.toString());
+  if (params?.limit) query.append("limit", params.limit.toString());
+
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/coach/me/billing${query.toString() ? `?${query.toString()}` : ""}`,
+    {
+      headers: getHeaders(),
+    }
+  );
+
+  if (!response.ok) throw new Error("Failed to fetch billing data");
+  const json = await response.json();
+  return json.data || json;
+}
+
+export async function downloadInvoice(billingId: string): Promise<void> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/coach/me/billing/${billingId}/invoice`,
+    {
+      headers: getHeaders(),
+    }
+  );
+
+  if (!response.ok) throw new Error("Failed to download invoice");
+
+  // Handle file download
+  const blob = await response.blob();
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `invoice-${billingId}.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  window.URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+}

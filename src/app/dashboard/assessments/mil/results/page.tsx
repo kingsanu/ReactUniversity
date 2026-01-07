@@ -217,7 +217,7 @@ export default function MILResultsPage() {
                 label={t("dashboard.downloadPDFReport") || "Download Report"}
                 variant="outline"
                 className="h-10 gap-2 rounded-xl bg-indigo-600 text-white border-transparent hover:bg-indigo-700 shadow-sm shadow-indigo-200"
-                size="default"
+                size="md"
               />
           </div>
         </div>

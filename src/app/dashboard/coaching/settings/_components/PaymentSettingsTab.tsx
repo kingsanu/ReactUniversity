@@ -145,7 +145,7 @@ export function PaymentSettingsTab({
       if (earningsHistoryData.status === 'rejected') console.warn('Earnings history fetch failed:', earningsHistoryData.reason);
 
       // Handle both {data: {...}} and direct response formats
-      const account = bankResult?.data?.data ?? bankResult?.data ?? bankResult;
+      const account = (bankResult as any)?.data?.data ?? (bankResult as any)?.data ?? bankResult;
       console.log('Parsed account data:', account);
       
       const payoutItems: Payout[] = Array.isArray(payoutsResult?.items)
@@ -229,7 +229,7 @@ export function PaymentSettingsTab({
         console.log('⚠️ NOT setting bankAccountForm - no account data');
       }
 
-      setEarningsSummary(earningsResult?.data || earningsResult || null);
+      setEarningsSummary((earningsResult as any)?.data || earningsResult || null);
       const earningsHistoryItems =
         (earningsHistoryResult as any)?.data || (earningsHistoryResult as any) || [];
       setEarningsHistory(Array.isArray(earningsHistoryItems) ? earningsHistoryItems : []);

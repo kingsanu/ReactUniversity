@@ -219,7 +219,7 @@ export default function SessionsPage() {
           })
           .filter(Boolean); // Remove nulls
 
-        console.log("Formatted sessions with status:", formattedSessions.map(s => ({ id: s.id, status: s.status, startTime: s.startTime })));
+        console.log("Formatted sessions with status:", formattedSessions.map((s: any) => ({ id: s.id, status: s.status, startTime: s.startTime })));
         setSessions(formattedSessions);
       } catch (error) {
         console.error("Failed to fetch sessions:", error);
