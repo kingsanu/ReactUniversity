@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { useTranslation } from "react-i18next";
 import { useGlobalStore } from "@/store/useGlobalStore";
@@ -11,13 +11,16 @@ import {
   JCA_CODES,
   JCA_CODES_ENGLISH,
 } from "@/services/pcaService";
-import PCAResultsPanel from "../_components/PCAResultsPanel";
+  import PCAResultsPanel from "../_components/PCAResultsPanel";
+import { useSearchParams } from "next/navigation";
 
 export default function PCAAssessmentPage() {
   const { user } = useGlobalStore();
   const { t } = useTranslation();
   const { pcaData, loading, error, refreshPCAData, hasPCA, isCompleted } =
     usePCAData();
+  
+  const searchParams = useSearchParams();
 
   const [selectedLanguage, setSelectedLanguage] = useState<
     "spanish" | "english"
@@ -26,6 +29,13 @@ export default function PCAAssessmentPage() {
   const [isCreating, setIsCreating] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [assessmentUrl, setAssessmentUrl] = useState<string | null>(null);
+
+  // Auto-show results if query param is present and data is loaded
+  useEffect(() => {
+    if (searchParams.get("showResults") === "true" && hasPCA && isCompleted && pcaData?.pcaCod) {
+      setShowResults(true);
+    }
+  }, [searchParams, hasPCA, isCompleted, pcaData]);
 
   const handleStartAssessment = async () => {
     if (!user?.id || !user?.name || !user?.email) {

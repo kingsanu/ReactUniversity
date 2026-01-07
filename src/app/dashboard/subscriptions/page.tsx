@@ -62,15 +62,15 @@ export default function SubscriptionsPage() {
   }, [searchParams]);
 
   return (
-    <div className="bg-gray-50">
-      <main className="flex-1 overflow-y-auto p-4 md:p-6">
+    <div className="min-h-screen bg-gray-50/50 p-6 md:p-8 font-sans text-gray-900">
+      <div className="max-w-7xl mx-auto space-y-8">
         {/* Success Message */}
         {showSuccessMessage && (
-          <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="mb-6 bg-emerald-50 border border-emerald-200 rounded-xl p-4 shadow-sm animate-in fade-in slide-in-from-top-4 duration-500">
             <div className="flex items-center space-x-3">
               <div className="flex-shrink-0">
                 <svg
-                  className="w-6 h-6 text-green-600"
+                  className="w-6 h-6 text-emerald-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -84,17 +84,17 @@ export default function SubscriptionsPage() {
                 </svg>
               </div>
               <div>
-                <h3 className="text-sm font-medium text-green-800">
+                <h3 className="text-sm font-medium text-emerald-800">
                   Payment Successful!
                 </h3>
-                <p className="text-sm text-green-700 mt-1">
+                <p className="text-sm text-emerald-700 mt-1">
                   Your subscription has been activated. You now have access to
                   all premium features.
                 </p>
               </div>
               <button
                 onClick={() => setShowSuccessMessage(false)}
-                className="flex-shrink-0 text-green-400 hover:text-green-600"
+                className="flex-shrink-0 text-emerald-400 hover:text-emerald-600 ml-auto"
               >
                 <svg
                   className="w-5 h-5"
@@ -115,22 +115,22 @@ export default function SubscriptionsPage() {
         )}
 
         {/* Header */}
-        <div className="mb-6 md:mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-                {t("subscriptions.title")}
-              </h1>
-              <p className="text-gray-600 text-sm md:text-base">
-                {t("subscriptions.subtitle")}
-              </p>
-            </div>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div className="space-y-1">
+            <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
+              {t("subscriptions.title")}
+            </h1>
+            <p className="text-lg text-gray-500 font-medium">
+              {t("subscriptions.subtitle")}
+            </p>
           </div>
         </div>
 
         {/* Subscription Plans */}
-        <SubscriptionPlans />
-      </main>
+        <div className="bg-white/50 backdrop-blur-sm rounded-3xl p-1 md:p-2 border border-blue-100/50 shadow-sm">
+             <SubscriptionPlans />
+        </div>
+      </div>
     </div>
   );
 }

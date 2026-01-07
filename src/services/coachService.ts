@@ -756,6 +756,30 @@ export async function getCoachEarningsHistory(): Promise<
   return json.data || json;
 }
 
+export async function exportCoachEarnings(
+  format: "csv" | "pdf" = "csv"
+): Promise<void> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/coach/me/earnings/export?format=${format}`,
+    {
+      headers: getHeaders(),
+    }
+  );
+
+  if (!response.ok) throw new Error("Failed to export earnings");
+
+  // Handle file download
+  const blob = await response.blob();
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `earnings-report-${new Date().toISOString().split("T")[0]}.${format}`;
+  document.body.appendChild(a);
+  a.click();
+  window.URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+}
+
 export async function getCoachPayoutSettings(): Promise<PayoutSettings> {
   const response = await fetch(
     `${API_BASE_URL}/api/v1/coach/me/payout-settings`,

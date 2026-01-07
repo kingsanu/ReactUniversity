@@ -9,15 +9,14 @@ import {
 } from "@/services/coachService";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card } from "@/components/ui/card";
-import { DollarSign, Calendar, CreditCard, FileText } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { PricingSettingsTab } from "./_components/PricingSettingsTab";
 import { AvailabilitySettingsTab } from "./_components/AvailabilitySettingsTab";
 import { PaymentSettingsTab } from "./_components/PaymentSettingsTab";
 import { BillingSettingsTab } from "./_components/BillingSettingsTab";
+import { useTranslation } from "react-i18next";
 
 export default function CoachSettingsPage() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("pricing");
   const [coachDetails, setCoachDetails] = useState<any | null>(null);
   const [availability, setAvailability] = useState<any | null>(null);
@@ -63,60 +62,55 @@ export default function CoachSettingsPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] relative overflow-hidden">
-      {/* Background Decor */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-100/40 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-100/40 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2" />
-      </div>
-
-      <div className="container max-w-5xl mx-auto py-12 px-4 sm:px-6 relative z-10">
-        <div className="mb-10">
-          <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-2">Settings</h1>
-          <p className="text-lg text-gray-500 font-medium">
-            Manage your coaching profile, pricing, availability, and payments.
-          </p>
+    <div className="min-h-screen bg-gray-50/50 p-6 md:p-8 font-sans text-gray-900">
+      <div className="max-w-7xl mx-auto space-y-8">
+        
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div className="space-y-1">
+            <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
+              Settings
+            </h1>
+            <p className="text-lg text-gray-500 font-medium">
+              Manage your coaching profile, pricing, availability, and payments.
+            </p>
+          </div>
         </div>
 
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab}
-          className="space-y-8"
+          className="space-y-6"
         >
-          <div className="bg-white/60 backdrop-blur-xl p-1.5 rounded-2xl shadow-sm border border-white/50 inline-flex">
-            <TabsList className="bg-transparent h-auto p-0 gap-1">
+          <div className="border-b border-gray-200">
+            <TabsList className="bg-transparent h-auto p-0 gap-8">
               <TabsTrigger 
                 value="pricing" 
-                className="rounded-xl px-5 py-2.5 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm font-semibold text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2"
+                className="rounded-none border-b-2 border-transparent px-2 py-3 data-[state=active]:border-gray-900 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:shadow-none font-medium text-gray-500 hover:text-gray-700 transition-all"
               >
-                <DollarSign className="h-4 w-4" />
-                <span className="hidden sm:inline">Pricing</span>
+                Pricing
               </TabsTrigger>
               <TabsTrigger 
                 value="availability" 
-                className="rounded-xl px-5 py-2.5 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm font-semibold text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2"
+                className="rounded-none border-b-2 border-transparent px-2 py-3 data-[state=active]:border-gray-900 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:shadow-none font-medium text-gray-500 hover:text-gray-700 transition-all"
               >
-                <Calendar className="h-4 w-4" />
-                <span className="hidden sm:inline">Availability</span>
+                Availability
               </TabsTrigger>
               <TabsTrigger 
                 value="payments" 
-                className="rounded-xl px-5 py-2.5 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm font-semibold text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2"
+                className="rounded-none border-b-2 border-transparent px-2 py-3 data-[state=active]:border-gray-900 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:shadow-none font-medium text-gray-500 hover:text-gray-700 transition-all"
               >
-                <CreditCard className="h-4 w-4" />
-                <span className="hidden sm:inline">Payments</span>
+                Payments
               </TabsTrigger>
               <TabsTrigger 
                 value="billing" 
-                className="rounded-xl px-5 py-2.5 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm font-semibold text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2"
+                className="rounded-none border-b-2 border-transparent px-2 py-3 data-[state=active]:border-gray-900 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:shadow-none font-medium text-gray-500 hover:text-gray-700 transition-all"
               >
-                <FileText className="h-4 w-4" />
-                <span className="hidden sm:inline">Billing</span>
+                Billing
               </TabsTrigger>
             </TabsList>
           </div>
 
-          <div className="bg-white/70 backdrop-blur-2xl rounded-3xl border border-white/60 shadow-xl overflow-hidden min-h-[400px] p-1">
             <TabsContent value="pricing" className="m-0 focus-visible:ring-0 focus-visible:outline-none">
               <PricingSettingsTab
                 coachDetails={coachDetails}
@@ -154,7 +148,6 @@ export default function CoachSettingsPage() {
                 isLoading={isLoading}
               />
             </TabsContent>
-          </div>
         </Tabs>
       </div>
     </div>

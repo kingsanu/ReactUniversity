@@ -3,10 +3,6 @@
 import { useState, useEffect } from "react";
 import {
   Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -35,6 +31,7 @@ import {
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
 
 export default function EarningsPage() {
   const { t } = useTranslation();
@@ -48,6 +45,10 @@ export default function EarningsPage() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState("all");
 
+  // Pagination State
+  const [page, setPage] = useState(1);
+  const limit = 10;
+
   useEffect(() => {
     fetchEarningsData();
   }, []);
@@ -59,7 +60,6 @@ export default function EarningsPage() {
         getCoachEarningsHistory(),
       ]);
       setEarningsStats(statsResponse);
-      // Handle different response structures - might be array or {data: [...]}
       const historyData = Array.isArray(historyResponse) 
         ? historyResponse 
         : Array.isArray((historyResponse as any)?.data) 
@@ -79,7 +79,6 @@ export default function EarningsPage() {
   };
 
   const calculateNet = (gross: number) => {
-    // Assuming 20% commission rate, this should come from API
     return gross * 0.8;
   };
 
@@ -87,30 +86,55 @@ export default function EarningsPage() {
     return gross * 0.2;
   };
 
+  // Modern Stats Cards Data
+  const statsCards = [
+    {
+      label: "Total Earnings (Net)",
+      value: `$${earningsStats?.totalEarnings?.toLocaleString() || "0"}`,
+      icon: TrendingUp,
+      color: "text-emerald-600",
+      bg: "bg-emerald-50",
+      border: "border-emerald-100",
+      blobColor: "bg-emerald-500",
+      subtext: "+12% from last month",
+      subtextColor: "text-emerald-600"
+    },
+    {
+      label: "Pending Payout",
+      value: `$${earningsStats?.pendingPayout?.toLocaleString() || "0"}`,
+      icon: Clock,
+      color: "text-amber-600",
+      bg: "bg-amber-50",
+      border: "border-amber-100",
+      blobColor: "bg-amber-500",
+      subtext: "Next payout: Apr 1st",
+      subtextColor: "text-amber-600"
+    },
+    {
+      label: "Last Payout",
+      value: `$${earningsStats?.lastPayoutAmount?.toLocaleString() || "0"}`,
+      icon: DollarSign,
+      color: "text-blue-600",
+      bg: "bg-blue-50",
+      border: "border-blue-100",
+      blobColor: "bg-blue-500",
+      subtext: `Paid on ${earningsStats?.lastPayoutDate || "N/A"}`,
+      subtextColor: "text-blue-600"
+    },
+  ];
+
   if (isLoading) {
-    return (
-      <div className="p-6 sm:p-10 space-y-8 max-w-7xl mx-auto">
-        <div className="animate-pulse space-y-8">
-          <div className="h-8 bg-gray-200 rounded w-1/3"></div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="h-32 bg-gray-200 rounded-2xl"></div>
-            <div className="h-32 bg-gray-200 rounded-2xl"></div>
-            <div className="h-32 bg-gray-200 rounded-2xl"></div>
-          </div>
-          <div className="h-96 bg-gray-200 rounded-2xl"></div>
-        </div>
-      </div>
-    );
+    return <LoadingState />;
   }
 
-  if (error) {
+  if (error || !earningsStats) {
     return (
-      <div className="p-6 sm:p-10 space-y-8 max-w-7xl mx-auto">
+      <div className="min-h-screen bg-gray-50/50 p-6 md:p-8 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900">
             Error loading earnings data
           </h1>
-          <p className="text-gray-500 mt-2">{error}</p>
+          <p className="text-gray-500 mt-2">{error || "Please try again later"}</p>
           <Button onClick={() => window.location.reload()} className="mt-4">
             Try Again
           </Button>
@@ -118,175 +142,215 @@ export default function EarningsPage() {
       </div>
     );
   }
+  
+  // Pagination Logic
+  const totalPages = Math.ceil(earningsHistory.length / limit);
+  const paginatedHistory = earningsHistory.slice((page - 1) * limit, page * limit);
 
-  if (!earningsStats) {
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExport = async () => {
+    try {
+      setIsExporting(true);
+      const { exportCoachEarnings } = await import("@/services/coachService");
+      await exportCoachEarnings("csv");
+      toast.success("Earnings report exported successfully");
+    } catch (error) {
+      console.error("Export failed:", error);
+      toast.error("Failed to export earnings report");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50/50 p-6 md:p-8 font-sans text-gray-900">
+      <div className="max-w-7xl mx-auto space-y-8">
+        
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div className="space-y-1">
+            <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
+              {t("coaching.earnings.title")}
+            </h1>
+            <p className="text-lg text-gray-500 font-medium">
+              {t("coaching.earnings.subtitle")}
+            </p>
+          </div>
+          <Button 
+            variant="outline" 
+            className="h-10 gap-2 rounded-xl bg-white border-gray-200 shadow-sm"
+            onClick={handleExport}
+            disabled={isExporting}
+          >
+            <Download className="w-4 h-4" />
+            {isExporting ? "Exporting..." : "Export Report"}
+          </Button>
+        </div>
+
+        {/* Premium Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {statsCards.map((stat, index) => (
+            <div
+              key={index}
+              className={`group relative overflow-hidden rounded-2xl border ${stat.border} bg-white p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1`}
+            >
+              <div
+                className={`absolute right-0 top-0 h-24 w-24 translate-x-8 translate-y--8 rounded-full ${stat.blobColor} opacity-5 blur-2xl transition-transform duration-500 group-hover:scale-150`}
+              />
+              
+              <div className="relative flex items-start justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">{stat.label}</p>
+                  <h3 className="mt-2 text-3xl font-bold tracking-tight text-gray-900">
+                    {stat.value}
+                  </h3>
+                   <p className={`text-sm mt-3 font-medium ${stat.subtextColor} flex items-center gap-1.5`}>
+                      {stat.icon === TrendingUp && <TrendingUp className="w-3.5 h-3.5" />}
+                      {stat.subtext}
+                   </p>
+                </div>
+                <div className={`rounded-xl ${stat.bg} p-3 ${stat.color} bg-opacity-50`}>
+                  <stat.icon className="h-6 w-6" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Breakdown Section */}
+        <div className="space-y-6">
+           <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-900">Transaction History</h2>
+               <div className="flex gap-2">
+                 {/* Tabs could go here if needed, keeping it clean for now */}
+              </div>
+           </div>
+
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-all duration-300">
+             {/* Header with Filter */}
+            <div className="p-4 border-b border-gray-100 bg-gray-50/30 flex justify-between items-center">
+                 <div className="relative w-full max-w-sm">
+                   {/* Search placeholder if needed */}
+                 </div>
+                 <Button variant="outline" size="sm" className="h-8 gap-2 rounded-lg bg-white">
+                  <Filter className="w-3.5 h-3.5" />
+                  Filter
+                </Button>
+            </div>
+
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader className="bg-gray-50/50">
+                  <TableRow className="border-gray-50 hover:bg-gray-50/50">
+                    <TableHead className="py-4 font-semibold text-gray-600 pl-6 w-[140px]">Date</TableHead>
+                    <TableHead className="py-4 font-semibold text-gray-600">Description</TableHead>
+                    <TableHead className="py-4 font-semibold text-gray-600 text-right">Gross Amount</TableHead>
+                    <TableHead className="py-4 font-semibold text-gray-600 text-right">Platform Fee</TableHead>
+                    <TableHead className="py-4 font-semibold text-emerald-600 text-right">Net Earning</TableHead>
+                    <TableHead className="py-4 font-semibold text-gray-600 pr-6 w-[120px]">Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paginatedHistory.length === 0 ? (
+                       <TableRow>
+                        <TableCell colSpan={6} className="h-48 text-center text-gray-500">
+                          No transactions found.
+                        </TableCell>
+                      </TableRow>
+                  ) : (
+                  paginatedHistory.map((item, index) => (
+                    <TableRow
+                      key={index}
+                      className="group hover:bg-gray-50/50 border-gray-50 transition-colors"
+                    >
+                      <TableCell className="font-medium text-gray-900 pl-6 py-4">
+                        {item.date}
+                      </TableCell>
+                      <TableCell className="text-gray-600 font-medium py-4">
+                        {item.description}
+                      </TableCell>
+                      <TableCell className="text-right font-medium text-gray-900 py-4">
+                        ${item.amountGross?.toFixed(2) || "0.00"}
+                      </TableCell>
+                      <TableCell className="text-right text-red-500 font-medium py-4">
+                        -${calculateFee(item.amountGross || 0).toFixed(2)}
+                      </TableCell>
+                      <TableCell className="text-right font-bold text-emerald-600 py-4">
+                        ${calculateNet(item.amountGross || 0).toFixed(2)}
+                      </TableCell>
+                      <TableCell className="pr-6 py-4">
+                        <Badge
+                          variant="secondary"
+                          className={cn(
+                             "font-medium shadow-none border-0",
+                            item.status === "completed"
+                              ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                              : item.status === "pending"
+                              ? "bg-amber-50 text-amber-700 hover:bg-amber-100"
+                              : "bg-red-50 text-red-700 hover:bg-red-100"
+                          )}
+                        >
+                          {item.status === "completed"
+                            ? "Paid"
+                            : item.status === "pending"
+                            ? "Pending"
+                            : "Cancelled"}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  )))}
+                </TableBody>
+              </Table>
+            </div>
+            
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+                <div className="flex items-center justify-between border-t border-gray-100 p-4 bg-gray-50/30">
+                <p className="text-sm text-gray-500">
+                    Showing page <span className="font-semibold text-gray-900">{page}</span> of <span className="font-semibold text-gray-900">{totalPages || 1}</span>
+                </p>
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPage((p) => Math.max(1, p - 1))}
+                        disabled={page === 1}
+                        className="rounded-lg border-gray-200 hover:bg-white hover:text-gray-900 text-gray-500 h-8"
+                    >
+                        Previous
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                        disabled={page === totalPages}
+                        className="rounded-lg border-gray-200 hover:bg-white hover:text-gray-900 text-gray-500 h-8"
+                    >
+                        Next
+                    </Button>
+                </div>
+                </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LoadingState() {
     return (
-      <div className="p-6 sm:p-10 space-y-8 max-w-7xl mx-auto">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900">
-            Unable to load earnings data
-          </h1>
-          <p className="text-gray-500 mt-2">Please try again later</p>
+      <div className="min-h-screen bg-gray-50/50 p-6 md:p-8">
+        <div className="max-w-7xl mx-auto space-y-8 animate-pulse">
+            <div className="h-10 bg-gray-200 rounded-xl w-1/3"></div>
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-40 bg-gray-200 rounded-3xl"></div>
+                ))}
+            </div>
+            <div className="h-96 bg-gray-200 rounded-3xl"></div>
         </div>
       </div>
     );
-  }
-
-  return (
-    <div className="p-6 sm:p-10 space-y-8 max-w-7xl mx-auto">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-            {t("coaching.earnings.title")}
-          </h1>
-          <p className="text-gray-500 font-medium mt-1">
-            {t("coaching.earnings.subtitle")}
-          </p>
-        </div>
-        <Button variant="outline" className="gap-2">
-          <Download className="w-4 h-4" />
-          Export Report
-        </Button>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="bg-gradient-to-br from-indigo-500 to-blue-600 text-white border-0 shadow-lg shadow-blue-500/20">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-blue-100 uppercase tracking-wider">
-              Total Earnings (Net)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-bold">
-                ${earningsStats?.totalEarnings?.toLocaleString() || "0"}
-              </span>
-            </div>
-            <p className="text-blue-100 text-sm mt-1 flex items-center gap-1">
-              <TrendingUp className="w-4 h-4" />
-              +12% from last month
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500 uppercase tracking-wider">
-              Pending Payout
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-bold text-gray-900">
-                ${earningsStats?.pendingPayout?.toLocaleString() || "0"}
-              </span>
-            </div>
-            <p className="text-gray-500 text-sm mt-1 flex items-center gap-1">
-              <Clock className="w-4 h-4" />
-              Next payout: Apr 1st
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500 uppercase tracking-wider">
-              Last Payout
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-bold text-gray-900">
-                ${earningsStats?.lastPayoutAmount?.toLocaleString() || "0"}
-              </span>
-            </div>
-            <p className="text-green-600 text-sm mt-1 flex items-center gap-1">
-              Paid on {earningsStats?.lastPayoutDate || "N/A"}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Breakdown Section */}
-      <Card className="overflow-hidden border-gray-100 shadow-sm">
-        <CardHeader className="bg-gray-50/50 border-b border-gray-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Transaction History</CardTitle>
-              <CardDescription>
-                Detailed breakdown of your sessions and fees.
-              </CardDescription>
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="h-8 gap-2">
-                <Filter className="w-3.5 h-3.5" />
-                Filter
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="w-[120px]">Date</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead className="text-right">Gross Amount</TableHead>
-                <TableHead className="text-right text-red-500">
-                  Platform Fee (20%)
-                </TableHead>
-                <TableHead className="text-right font-bold text-emerald-600">
-                  Net Earning
-                </TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {earningsHistory?.map((item, index) => (
-                <TableRow
-                  key={index}
-                  className="hover:bg-gray-50/50 transition-colors"
-                >
-                  <TableCell className="font-medium text-gray-900">
-                    {item.date}
-                  </TableCell>
-                  <TableCell className="text-gray-600">
-                    {item.description}
-                  </TableCell>
-                  <TableCell className="text-right font-medium">
-                    ${item.amountGross?.toFixed(2) || "0.00"}
-                  </TableCell>
-                  <TableCell className="text-right text-red-500">
-                    -${calculateFee(item.amountGross || 0).toFixed(2)}
-                  </TableCell>
-                  <TableCell className="text-right font-bold text-emerald-600">
-                    ${calculateNet(item.amountGross || 0).toFixed(2)}
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant="secondary"
-                      className={
-                        item.status === "completed"
-                          ? "bg-green-50 text-green-700"
-                          : item.status === "pending"
-                          ? "bg-yellow-50 text-yellow-700"
-                          : "bg-red-50 text-red-700"
-                      }
-                    >
-                      {item.status === "completed"
-                        ? "Paid"
-                        : item.status === "pending"
-                        ? "Pending"
-                        : "Cancelled"}
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-              )) || []}
-            </TableBody>
-          </Table>
-        </div>
-      </Card>
-    </div>
-  );
 }

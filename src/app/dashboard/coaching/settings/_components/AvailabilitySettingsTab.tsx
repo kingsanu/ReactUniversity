@@ -1,13 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -18,9 +11,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Clock, Plus, Trash2 } from "lucide-react";
+import { Clock, Plus, Trash2, Globe } from "lucide-react";
 import { toast } from "sonner";
 import { useGlobalStore } from "@/store/useGlobalStore";
+import { Badge } from "@/components/ui/badge";
 
 interface TimeSlot {
   start: string;
@@ -107,7 +101,6 @@ export function AvailabilitySettingsTab({
         }
       } catch (error) {
         console.error("Failed to fetch availability:", error);
-        // Don't show error toast on initial load if it's just empty
       } finally {
         setIsLoading(false);
       }
@@ -168,156 +161,127 @@ export function AvailabilitySettingsTab({
   };
 
   if (parentLoading || isLoading) {
-    return <div className="p-8 text-center">Loading availability...</div>;
+    return <div className="p-12 text-center text-gray-500">Loading availability...</div>;
   }
 
   return (
-    <div className="p-6 sm:p-10 space-y-8">
-      <div>
-        <h2 className="text-xl font-bold text-gray-900">Availability Settings</h2>
-        <p className="text-gray-500 font-medium mt-1">
-          Set your weekly schedule and timezone for coaching sessions.
-        </p>
+    <div className="space-y-6 pt-2">
+      <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+        <div>
+          <h2 className="text-xl font-semibold text-gray-900">Weekly Schedule</h2>
+          <p className="text-gray-500 text-sm mt-1">
+            Define when you are available for sessions.
+          </p>
+        </div>
+        
+        {/* Timezone Selector - Improved */}
+        <div className="flex items-center gap-3 bg-white p-2 rounded-xl border border-gray-200 shadow-sm">
+             <Globe className="w-4 h-4 text-gray-500 ml-2" />
+             <Select value={timezone} onValueChange={setTimezone}>
+              <SelectTrigger className="w-[280px] h-9 border-0 bg-transparent focus:ring-0 shadow-none text-sm font-medium">
+                <SelectValue placeholder="Select timezone" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="UTC">UTC (Universal Time)</SelectItem>
+                <SelectItem value="America/New_York">Eastern Time (ET)</SelectItem>
+                <SelectItem value="America/Chicago">Central Time (CT)</SelectItem>
+                <SelectItem value="America/Denver">Mountain Time (MT)</SelectItem>
+                <SelectItem value="America/Los_Angeles">Pacific Time (PT)</SelectItem>
+                <SelectItem value="Europe/London">London (GMT)</SelectItem>
+                <SelectItem value="Europe/Paris">Paris (CET)</SelectItem>
+                <SelectItem value="Europe/Berlin">Berlin (CET)</SelectItem>
+                <SelectItem value="Asia/Dubai">Dubai (GST)</SelectItem>
+                <SelectItem value="Asia/Calcutta">India (IST)</SelectItem>
+                <SelectItem value="Asia/Singapore">Singapore (SGT)</SelectItem>
+                <SelectItem value="Asia/Tokyo">Tokyo (JST)</SelectItem>
+                <SelectItem value="Australia/Sydney">Sydney (AEDT)</SelectItem>
+              </SelectContent>
+            </Select>
+        </div>
       </div>
 
-      <div className="space-y-8">
-        {/* Timezone Selection */}
-        <div className="bg-blue-50/50 border border-blue-100 p-6 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <Label className="text-base font-bold text-gray-900">Timezone</Label>
-            <p className="text-sm text-gray-500 mt-1">
-              Your availability will be shown to students in their local time.
-            </p>
-          </div>
-          <Select value={timezone} onValueChange={setTimezone}>
-            <SelectTrigger className="w-[300px] h-11 rounded-xl bg-white border-gray-200">
-              <Clock className="w-4 h-4 mr-2 text-gray-400" />
-              <SelectValue placeholder="Select timezone" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="UTC">UTC (Universal Time)</SelectItem>
-              <SelectItem value="America/New_York">
-                Eastern Time (US & Canada)
-              </SelectItem>
-              <SelectItem value="America/Chicago">
-                Central Time (US & Canada)
-              </SelectItem>
-              <SelectItem value="America/Denver">
-                Mountain Time (US & Canada)
-              </SelectItem>
-              <SelectItem value="America/Los_Angeles">
-                Pacific Time (US & Canada)
-              </SelectItem>
-              <SelectItem value="Europe/London">London</SelectItem>
-              <SelectItem value="Europe/Paris">Paris</SelectItem>
-              <SelectItem value="Europe/Berlin">Berlin</SelectItem>
-              <SelectItem value="Asia/Dubai">Dubai</SelectItem>
-              <SelectItem value="Asia/Calcutta">
-                India Standard Time (Kolkata)
-              </SelectItem>
-              <SelectItem value="Asia/Singapore">Singapore</SelectItem>
-              <SelectItem value="Asia/Tokyo">Tokyo</SelectItem>
-              <SelectItem value="Australia/Sydney">Sydney</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Weekly Schedule */}
-        <div className="space-y-4">
-          <Label className="text-base font-bold text-gray-900">Weekly Schedule</Label>
-          <div className="space-y-3">
-            {schedule.map((day, dayIndex) => (
-              <div
-                key={day.day}
-                className={`flex flex-col sm:flex-row gap-6 p-5 rounded-2xl transition-all duration-200 ${
-                  day.enabled 
-                    ? "bg-white border border-gray-100 shadow-sm" 
-                    : "bg-gray-50 border border-transparent opacity-75"
-                }`}
-              >
-                <div className="flex items-center justify-between sm:w-44 pt-1">
-                  <div className={`font-semibold ${day.enabled ? "text-gray-900" : "text-gray-400"}`}>{day.day}</div>
-                  <Switch
-                    checked={day.enabled}
-                    onCheckedChange={() => handleDayToggle(dayIndex)}
-                    className="data-[state=checked]:bg-blue-600"
-                  />
-                </div>
-
-                {day.enabled ? (
-                  <div className="flex-1 space-y-3">
-                    {day.timeSlots.map((slot, slotIndex) => (
-                      <div key={slotIndex} className="flex items-center gap-3">
-                        <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-1 border border-gray-100 hover:border-blue-200 transition-colors">
-                          <input
-                            type="time"
-                            value={slot.start}
-                            onChange={(e) =>
-                              handleTimeChange(
-                                dayIndex,
-                                slotIndex,
-                                "start",
-                                e.target.value
-                              )
-                            }
-                            className="bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 p-1 w-24 text-center cursor-pointer outline-none"
-                          />
-                          <span className="text-gray-300 font-light px-1">|</span>
-                          <input
-                            type="time"
-                            value={slot.end}
-                            onChange={(e) =>
-                              handleTimeChange(
-                                dayIndex,
-                                slotIndex,
-                                "end",
-                                e.target.value
-                              )
-                            }
-                            className="bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 p-1 w-24 text-center cursor-pointer outline-none"
-                          />
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() =>
-                            handleRemoveTimeSlot(dayIndex, slotIndex)
-                          }
-                          className="h-9 w-9 rounded-full text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleAddTimeSlot(dayIndex)}
-                      className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 font-medium pl-2"
-                    >
-                      <Plus className="h-4 w-4 mr-1.5" />
-                      Add Interval
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="flex items-center text-gray-400 text-sm font-medium italic h-10">
-                    Unavailable
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex justify-end pt-6 border-t border-gray-100">
-          <Button
-            onClick={handleSave}
-            disabled={isSaving}
-            className="bg-gray-900 text-white hover:bg-black h-12 px-8 rounded-xl font-bold shadow-lg shadow-gray-900/10"
+      <div className="space-y-4 border rounded-2xl border-gray-200 bg-white overflow-hidden shadow-sm">
+        {schedule.map((day, dayIndex) => (
+          <div
+            key={day.day}
+            className={`flex flex-col sm:flex-row gap-4 p-4 transition-colors border-b border-gray-50 last:border-0 items-center ${
+              day.enabled ? "bg-white" : "bg-gray-50/30"
+            }`}
           >
-            {isSaving ? "Saving..." : "Save Changes"}
-          </Button>
-        </div>
+            <div className="flex items-center justify-between w-full sm:w-48">
+              <div className={`font-semibold text-sm ${day.enabled ? "text-gray-900" : "text-gray-400"}`}>
+                {day.day}
+              </div>
+              <Switch
+                checked={day.enabled}
+                onCheckedChange={() => handleDayToggle(dayIndex)}
+                className="scale-90"
+              />
+            </div>
+
+            {day.enabled ? (
+              <div className="flex-1 w-full sm:w-auto space-y-2">
+                {day.timeSlots.map((slot, slotIndex) => (
+                  <div key={slotIndex} className="flex items-center gap-3 animate-in fade-in duration-300">
+                    <div className="flex items-center gap-2 bg-gray-50 rounded-md p-1 border border-gray-200 hover:border-gray-300 transition-colors">
+                      <input
+                        type="time"
+                        value={slot.start}
+                        onChange={(e) =>
+                          handleTimeChange(dayIndex, slotIndex, "start", e.target.value)
+                        }
+                        className="bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 p-0 w-20 text-center cursor-pointer outline-none h-8"
+                      />
+                      <span className="text-gray-300 text-xs px-1">|</span>
+                      <input
+                        type="time"
+                        value={slot.end}
+                        onChange={(e) =>
+                          handleTimeChange(dayIndex, slotIndex, "end", e.target.value)
+                        }
+                        className="bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 p-0 w-20 text-center cursor-pointer outline-none h-8"
+                      />
+                    </div>
+                    {day.timeSlots.length > 1 && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleRemoveTimeSlot(dayIndex, slotIndex)}
+                        className="h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+                
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleAddTimeSlot(dayIndex)}
+                    className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 font-medium text-xs h-8 px-2"
+                >
+                    <Plus className="h-3 w-3 mr-1.5" />
+                    Add Interval
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center h-10">
+                 <Badge variant="outline" className="text-gray-400 border-gray-100 font-normal bg-transparent">Unavailable</Badge>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="flex justify-end pt-4">
+        <Button
+          onClick={handleSave}
+          disabled={isSaving}
+          className="w-full sm:w-auto h-11 px-8 rounded-xl font-semibold bg-gray-900 text-white hover:bg-gray-800 shadow-sm"
+        >
+           {isSaving ? "Saving..." : "Save Changes"}
+        </Button>
       </div>
     </div>
   );

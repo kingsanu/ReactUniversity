@@ -49,7 +49,7 @@ export interface TelemetryAnalytics {
   };
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
 /**
  * Fetch telemetry analytics from the backend
@@ -77,7 +77,10 @@ async function getTelemetryAnalytics(
     throw new Error(`Failed to fetch telemetry analytics: ${response.status}`);
   }
 
-  return response.json();
+  const json = await response.json();
+  // API returns { data: { period, metrics }, success, message }
+  // Extract the inner data object
+  return json.data || json;
 }
 
 /**

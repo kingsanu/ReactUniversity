@@ -9,10 +9,19 @@ import StripeCheckout from "@/components/StripeCheckout";
 import * as subscriptionService from "@/services/subscriptionService";
 import { useSubscriptionStatus } from "@/hooks/useSubscription";
 import type {
-  SubscriptionPlan,
-  FeatureComparison,
   SubscriptionData,
 } from "@/services/subscriptionService";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Check, Loader2, Sparkles } from "lucide-react";
 
 interface SubscriptionPlansProps {
   className?: string;
@@ -86,17 +95,12 @@ export function SubscriptionPlans({ className }: SubscriptionPlansProps) {
           </p>
           <p className="text-sm text-gray-600 mt-2">{error}</p>
         </div>
-        <button
-          onClick={() => window.location.reload()}
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Try Again
-        </button>
+        <Button onClick={() => window.location.reload()}>Try Again</Button>
       </div>
     );
   }
 
-  const { subscription, billingOptions, features } = subscriptionData;
+  const { subscription, billingOptions } = subscriptionData;
 
   const hasActiveSubscription = subscriptionStatus?.hasActiveSubscription;
 
@@ -109,41 +113,44 @@ export function SubscriptionPlans({ className }: SubscriptionPlansProps) {
       : null;
 
   return (
-    <div className={cn("space-y-8", className)}>
+    <div className={cn("space-y-12", className)}>
       {/* Current Subscription Status */}
       {hasActiveSubscription && currentPlan && (
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-green-50 border border-green-200 rounded-2xl p-6 mb-8"
         >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <div>
-                <h3 className="font-semibold text-green-900">
-                  Active Subscription
-                </h3>
-                <p className="text-green-700 text-sm">
-                  You're currently subscribed to {currentPlan.name}
-                  {subscriptionStatus?.expiryDate && (
-                    <span>
-                      {" "}
-                      - Expires{" "}
-                      {new Date(
-                        subscriptionStatus.expiryDate
-                      ).toLocaleDateString()}
-                    </span>
-                  )}
-                </p>
+          <Card className="bg-emerald-50/50 border-emerald-200 shadow-sm">
+            <CardContent className="p-6 flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="h-10 w-10 bg-emerald-100 rounded-full flex items-center justify-center">
+                  <Check className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-emerald-900 text-lg">
+                    Active Subscription
+                  </h3>
+                  <p className="text-emerald-700 text-sm">
+                    You are currently on the <span className="font-medium">{currentPlan.name}</span> plan.
+                    {subscriptionStatus?.expiryDate && (
+                      <span className="opacity-90">
+                        {" "}
+                        Renews on{" "}
+                        {new Date(
+                          subscriptionStatus.expiryDate
+                        ).toLocaleDateString()}
+                      </span>
+                    )}
+                  </p>
+                </div>
               </div>
-            </div>
-            <div className="text-right">
-              <p className="font-semibold text-green-900">
-                ${currentPlan.price}/{currentPlan.period}
-              </p>
-            </div>
-          </div>
+              <div className="text-right">
+                <Badge variant="outline" className="text-emerald-700 border-emerald-200 bg-emerald-100/50 px-3 py-1">
+                  Active
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
         </motion.div>
       )}
 
@@ -151,262 +158,140 @@ export function SubscriptionPlans({ className }: SubscriptionPlansProps) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-12"
+        className="text-center space-y-4"
       >
-        <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
-          <span className="text-4xl">{subscription.icon}</span>
-        </div>
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        <Badge variant="secondary" className="px-4 py-1.5 text-sm font-medium bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-100">
+           Upgrade Your Experience
+        </Badge>
+        <h2 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight">
           {subscription.name}
         </h2>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+        <p className="text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed">
           {subscription.description}
         </p>
       </motion.div>
 
       {/* Billing Options Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
         {billingOptions.map((option, index) => (
           <motion.div
             key={option.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className={cn(
-              "relative bg-white rounded-2xl border-2 p-6 md:p-8 shadow-lg hover:shadow-xl transition-all duration-300",
-              option.popular
-                ? "border-blue-500 scale-105"
-                : "border-gray-200 hover:border-blue-300"
-            )}
+            className="flex"
           >
-            {/* Popular Badge */}
-            {option.popular && (
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <span className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-medium px-4 py-2 rounded-full shadow-lg">
-                  Most Popular
-                </span>
-              </div>
-            )}
+            <Card
+              className={cn(
+                "flex flex-col w-full relative transition-all duration-300 hover:shadow-xl hover:-translate-y-1",
+                option.popular
+                  ? "border-blue-500 shadow-md scale-105 z-10"
+                  : "border-gray-200 hover:border-gray-300"
+              )}
+            >
+              {option.popular && (
+                 <div className="absolute -top-4 left-0 right-0 flex justify-center">
+                   <Badge className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg border-0 px-4 py-1 h-auto text-sm gap-1.5">
+                     <Sparkles className="w-3.5 h-3.5 fill-current" />
+                     Most Popular
+                   </Badge>
+                 </div>
+              )}
 
-            {/* Option Header */}
-            <div className="text-center mb-6 md:mb-8">
-              <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">
-                {option.name}
-              </h3>
-              <p className="text-gray-600 mb-4 md:mb-6 text-sm md:text-base">
-                {option.description}
-              </p>
+              <CardHeader className="text-center pb-8 pt-8">
+                <CardTitle className="text-2xl font-bold text-gray-900">
+                  {option.name}
+                </CardTitle>
+                <CardDescription className="text-base mt-2">
+                  {option.description}
+                </CardDescription>
+              </CardHeader>
 
-              {/* Pricing */}
-              <div className="mb-4 md:mb-6">
-                <div className="flex items-baseline justify-center">
-                  <span className="text-3xl md:text-5xl font-bold text-gray-900">
+              <CardContent className="flex-1 flex flex-col items-center">
+                <div className="mb-8 flex items-baseline justify-center">
+                   <span className="text-5xl font-bold tracking-tight text-gray-900">
                     ${option.price}
                   </span>
-                  <span className="text-gray-600 ml-2 text-sm md:text-base">
-                    /{option.period}
-                  </span>
+                  <span className="text-gray-500 ml-2 font-medium">/{option.period}</span>
                 </div>
-                {option.originalPrice && (
-                  <div className="flex items-center justify-center mt-2">
-                    <span className="text-sm text-gray-500 line-through mr-2">
-                      ${option.originalPrice}
-                    </span>
-                    {option.discount && (
-                      <span className="text-sm text-green-600 font-medium">
-                        Save {option.discount}%
+                
+                 {option.originalPrice && (
+                    <div className="mb-6 -mt-4 text-center">
+                         <span className="text-sm text-gray-400 line-through mr-2">
+                            ${option.originalPrice}
+                          </span>
+                           {option.discount && (
+                            <Badge variant="outline" className="text-emerald-600 border-emerald-200 bg-emerald-50 text-xs">
+                              Save {option.discount}%
+                            </Badge>
+                          )}
+                    </div>
+                 )}
+
+                <div className="w-full space-y-4">
+                  {option.features.map((feature, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <div className="mt-1 bg-blue-50 rounded-full p-1">
+                          <Check className="w-3.5 h-3.5 text-blue-600" />
+                      </div>
+                      <span className="text-gray-600 text-sm leading-relaxed">
+                        {feature}
                       </span>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
 
-            {/* Features */}
-            <div className="space-y-3 md:space-y-4 mb-6 md:mb-8">
-              {option.features.map((feature, featureIndex) => (
-                <motion.div
-                  key={featureIndex}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 + featureIndex * 0.05 }}
-                  className="flex items-start"
-                >
-                  <div className="flex-shrink-0 w-5 h-5 bg-green-100 rounded-full flex items-center justify-center mt-0.5">
-                    <svg
-                      className="w-3 h-3 text-green-600"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
+              <CardFooter className="pt-8 pb-8">
+                 {hasActiveSubscription && currentPlan?.id === option.id ? (
+                   <Button disabled variant="secondary" className="w-full h-12 text-base rounded-xl font-medium">
+                     Current Plan
+                   </Button>
+                 ) : (
+                    <StripeCheckout
+                      amount={option.price * 100}
+                      userId={userId}
+                      productName={`${option.name} - ${option.description}`}
+                       onStart={() => setProcessingPayment(option.id)}
+                       onSuccess={() => {
+                          window.location.reload();
+                       }}
+                       onError={(error: string) => {
+                          console.error("Payment failed:", error);
+                          alert(`Payment failed: ${error}`);
+                          setProcessingPayment(null);
+                        }}
+                      disabled={processingPayment !== null}
+                      className="w-full"
                     >
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                  <span className="ml-3 text-gray-700 text-sm md:text-base">
-                    {feature}
-                  </span>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* CTA Button */}
-            {hasActiveSubscription && currentPlan?.id === option.id ? (
-              <button
-                disabled
-                className="w-full py-3 md:py-4 px-4 md:px-6 rounded-xl font-semibold text-base md:text-lg bg-gray-100 text-gray-500 cursor-not-allowed"
-              >
-                Current Plan
-              </button>
-            ) : (
-              <StripeCheckout
-                amount={option.price * 100} // Convert to cents
-                userId={userId}
-                productName={`${option.name} - ${option.description}`}
-                onStart={() => {
-                  setProcessingPayment(option.id);
-                }}
-                onSuccess={() => {
-                  console.log("Payment successful for", option.name);
-                  // Refresh subscription data
-                  window.location.reload();
-                }}
-                onError={(error: string) => {
-                  console.error("Payment failed:", error);
-                  alert(`Payment failed: ${error}`);
-                  setProcessingPayment(null);
-                }}
-                disabled={processingPayment !== null}
-                className={cn(
-                  "w-full py-3 md:py-4 px-4 md:px-6 rounded-xl font-semibold text-base md:text-lg transition-all duration-200 flex items-center justify-center space-x-2",
-                  processingPayment !== null
-                    ? "bg-gray-400 text-white cursor-not-allowed"
-                    : cn(
-                        "transform hover:scale-105 active:scale-95",
-                        option.popular
-                          ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg hover:shadow-xl"
-                          : "bg-gray-900 text-white hover:bg-gray-800"
-                      )
-                )}
-              >
-                {processingPayment === option.id ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Redirecting to Stripe...</span>
-                  </>
-                ) : (
-                  <span>{option.ctaText}</span>
-                )}
-              </StripeCheckout>
-            )}
-
-            {/* Additional Info */}
-            {option.additionalInfo && (
-              <p className="text-center text-sm text-gray-500 mt-4">
-                {option.additionalInfo}
-              </p>
-            )}
+                      <Button 
+                         className={cn(
+                           "w-full h-12 text-base rounded-xl font-medium shadow-sm transition-all",
+                            option.popular 
+                              ? "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-200" 
+                              : "bg-gray-900 hover:bg-gray-800 text-white"
+                         )}
+                         disabled={processingPayment !== null}
+                      >
+                         {processingPayment === option.id ? (
+                           <>
+                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                             Processing...
+                           </>
+                         ) : (
+                           option.ctaText
+                         )}
+                      </Button>
+                    </StripeCheckout>
+                 )}
+              </CardFooter>
+            </Card>
           </motion.div>
         ))}
       </div>
 
-      {/* Features Comparison - Hidden for now */}
-      {false && (
-        <div className="mt-12 md:mt-16">
-          <h2 className="text-xl md:text-2xl font-bold text-gray-900 text-center mb-6 md:mb-8">
-            Compare Features
-          </h2>
-          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-lg">
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[600px]">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 md:px-6 py-3 md:py-4 text-left text-sm font-semibold text-gray-900">
-                      Features
-                    </th>
-                    {billingOptions.map((option: SubscriptionPlan) => (
-                      <th
-                        key={option.id}
-                        className="px-4 md:px-6 py-3 md:py-4 text-center text-sm font-semibold text-gray-900"
-                      >
-                        {option.name}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {features.map((feature: FeatureComparison, index: number) => (
-                    <motion.tr
-                      key={feature.name}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="hover:bg-gray-50"
-                    >
-                      <td className="px-4 md:px-6 py-3 md:py-4 text-sm text-gray-900 font-medium">
-                        {feature.name}
-                      </td>
-                      {billingOptions.map((option: SubscriptionPlan) => (
-                        <td
-                          key={option.id}
-                          className="px-4 md:px-6 py-3 md:py-4 text-center"
-                        >
-                          {feature.availability[
-                            option.id as keyof typeof feature.availability
-                          ] === true ? (
-                            <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                              <svg
-                                className="w-3 h-3 text-green-600"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                            </div>
-                          ) : feature.availability[
-                              option.id as keyof typeof feature.availability
-                            ] === false ? (
-                            <div className="w-5 h-5 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
-                              <svg
-                                className="w-3 h-3 text-gray-400"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                            </div>
-                          ) : (
-                            <span className="text-sm text-gray-600">
-                              {
-                                feature.availability[
-                                  option.id as keyof typeof feature.availability
-                                ]
-                              }
-                            </span>
-                          )}
-                        </td>
-                      ))}
-                    </motion.tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* FAQ Section */}
-      <FAQ className="mt-16 md:mt-24" />
+       {/* FAQ Section */}
+      <FAQ className="mt-16 max-w-4xl mx-auto" />
     </div>
   );
 }

@@ -358,19 +358,17 @@ export function PaymentSettingsTab({
     }
   };
 
-  const handleMethodSave = async () => {
+  const handleMethodSave = async (forcedMethod: string = "bank_transfer") => {
     // Validate bank transfer fields
-    if (payoutMethod === "bank_transfer") {
-      if (!bankName || !accountHolderName || !bankAccountNumber || !bankRoutingNumber) {
+    if (!bankName || !accountHolderName || !bankAccountNumber || !bankRoutingNumber) {
         toast.error("Please fill in all bank details");
         return;
-      }
     }
 
     setIsSavingMethod(true);
     try {
       const updated = await updateCoachPayoutSettings({
-        method: (payoutMethod as PayoutSettings["method"]) || "stripe",
+        method: (forcedMethod as PayoutSettings["method"]),
         bankName: bankName || undefined,
         accountHolderName: accountHolderName || undefined,
         bankAccountNumber: bankAccountNumber || undefined,
@@ -681,84 +679,63 @@ export function PaymentSettingsTab({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-4">
                 <div className="space-y-2">
-                  <p className="font-medium text-gray-900">Payout Method</p>
-                  <Select
-                    value={payoutMethod}
-                    onValueChange={(value) => setPayoutMethod(value as any)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select method" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="stripe">Stripe</SelectItem>
-                      <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <p className="text-sm text-gray-500">
-                    Stripe uses your connected account. Bank transfer requires your bank details.
+                  <div className="flex items-center justify-between">
+                     <p className="font-medium text-gray-900">Bank Details <span className="text-red-500">*</span></p>
+                     <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-200">Bank Transfer</Badge>
+                  </div>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Your earnings will be transferred to this bank account.
                   </p>
-                </div>
 
-                {payoutMethod === "bank_transfer" && (
-                  <div className="space-y-2">
-                    <p className="font-medium text-gray-900">Bank Details <span className="text-red-500">*</span></p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <Input
-                        placeholder="Bank name *"
-                        value={bankName}
-                        onChange={(e) => setBankName(e.target.value)}
-                        required
-                      />
-                      <Input
-                        placeholder="Account holder name *"
-                        value={accountHolderName}
-                        onChange={(e) => setAccountHolderName(e.target.value)}
-                        required
-                      />
-                      <Input
-                        placeholder="Account number *"
-                        value={bankAccountNumber}
-                        onChange={(e) => setBankAccountNumber(e.target.value)}
-                        required
-                      />
-                      <Input
-                        placeholder="Routing number *"
-                        value={bankRoutingNumber}
-                        onChange={(e) => setBankRoutingNumber(e.target.value)}
-                        required
-                      />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                       <label className="text-xs font-medium text-gray-500 uppercase">Bank Name</label>
+                       <Input
+                         placeholder="Bank name"
+                         value={bankName}
+                         onChange={(e) => setBankName(e.target.value)}
+                         required
+                       />
                     </div>
-                    <div className="flex justify-end">
-                      <Button
-                        size="sm"
-                        onClick={handleMethodSave}
-                        disabled={
-                          isSavingMethod ||
-                          (payoutMethod === "bank_transfer" &&
-                            (!bankName || !accountHolderName || !bankAccountNumber || !bankRoutingNumber))
-                        }
-                      >
-                        {isSavingMethod ? (
-                          <>
-                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                            Saving...
-                          </>
-                        ) : (
-                          "Save bank details"
-                        )}
-                      </Button>
+                    <div className="space-y-1">
+                       <label className="text-xs font-medium text-gray-500 uppercase">Account Holder</label>
+                       <Input
+                         placeholder="Account holder name"
+                         value={accountHolderName}
+                         onChange={(e) => setAccountHolderName(e.target.value)}
+                         required
+                       />
+                    </div>
+                    <div className="space-y-1">
+                       <label className="text-xs font-medium text-gray-500 uppercase">Account Number</label>
+                       <Input
+                         placeholder="Account number"
+                         value={bankAccountNumber}
+                         onChange={(e) => setBankAccountNumber(e.target.value)}
+                         required
+                       />
+                    </div>
+                    <div className="space-y-1">
+                       <label className="text-xs font-medium text-gray-500 uppercase">Routing Number</label>
+                       <Input
+                         placeholder="Routing number"
+                         value={bankRoutingNumber}
+                         onChange={(e) => setBankRoutingNumber(e.target.value)}
+                         required
+                       />
                     </div>
                   </div>
-                )}
-
-                {payoutMethod === "stripe" && (
-                  <div className="flex justify-end mt-2">
+                  <div className="flex justify-end pt-2">
                     <Button
                       size="sm"
-                      onClick={handleMethodSave}
-                      disabled={isSavingMethod}
+                      onClick={() => handleMethodSave("bank_transfer")}
+                      disabled={
+                        isSavingMethod ||
+                        !bankName || !accountHolderName || !bankAccountNumber || !bankRoutingNumber
+                      }
+                      className="bg-gray-900 text-white hover:bg-gray-800"
                     >
                       {isSavingMethod ? (
                         <>
@@ -766,11 +743,11 @@ export function PaymentSettingsTab({
                           Saving...
                         </>
                       ) : (
-                        "Save method"
+                        "Save Bank Details"
                       )}
                     </Button>
                   </div>
-                )}
+                </div>
               </div>
             </div>
 

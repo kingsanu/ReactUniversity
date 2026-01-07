@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { useTranslation } from "react-i18next";
 import { Sidebar as DashboardSidebar } from "./_components/Sidebar";
@@ -35,6 +35,14 @@ export default function DashboardLayout({
 
   // Check if user is a coach (case-insensitive)
   const isCoach = user.role && user.role.toLowerCase() === "coach";
+
+  // Check if current path is resume builder
+  const pathname = usePathname();
+  const isResumeBuilder = pathname?.startsWith("/dashboard/resume-builder");
+
+  if (isResumeBuilder) {
+    return <>{children}</>;
+  }
 
   if (isCoach) {
     return (

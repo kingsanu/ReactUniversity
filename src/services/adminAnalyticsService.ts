@@ -43,7 +43,8 @@ export interface TopCourse {
 export interface RecentActivity {
   type: "user" | "transaction" | "course" | "session";
   message: string;
-  timestamp: string;
+  timestamp?: string;
+  date?: string;
 }
 
 export interface AnalyticsData {

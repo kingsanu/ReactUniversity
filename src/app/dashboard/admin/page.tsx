@@ -2,7 +2,6 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAdminAccess } from "@/hooks/useAdminAccess";
-import { SubscriptionPlanManager } from "./_components/SubscriptionPlanManager";
 import { DashboardStats } from "./_components/DashboardStats";
 import {
   Users,
@@ -10,6 +9,7 @@ import {
   Settings,
   FileText,
   ArrowRight,
+  CreditCard,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -74,6 +74,16 @@ export default function AdminPage() {
       href: "/dashboard/admin/questions",
       color: "text-orange-600",
       bg: "bg-orange-50",
+    },
+    {
+      titleKey: "admin.quickActions.plans.title",
+      descriptionKey: "admin.quickActions.plans.description",
+      title: "Subscription Plans",
+      description: "Manage pricing tiers and billing.",
+      icon: CreditCard,
+      href: "/dashboard/admin/plans",
+      color: "text-emerald-600",
+      bg: "bg-emerald-50",
     },
     {
       titleKey: "admin.quickActions.settings.title",
@@ -141,21 +151,6 @@ export default function AdminPage() {
                 </div>
               </Link>
             ))}
-          </div>
-        </div>
-
-        {/* Subscription Manager */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-gray-100 bg-gray-50/30">
-            <h2 className="text-xl font-bold text-gray-900">
-              Subscription Plans
-            </h2>
-            <p className="text-sm text-gray-500 mt-1">
-              Manage your pricing tiers and features
-            </p>
-          </div>
-          <div className="p-6">
-            <SubscriptionPlanManager />
           </div>
         </div>
       </div>

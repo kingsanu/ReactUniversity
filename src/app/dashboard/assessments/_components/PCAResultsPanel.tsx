@@ -1,6 +1,4 @@
-"use client";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
   getPCAResult,
@@ -9,6 +7,13 @@ import {
   JCA_CODES,
   JCACode,
 } from "@/services/pcaService";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Loader2 } from "lucide-react";
 
 interface PCAResultsPanelProps {
   pcaCod: string;
@@ -28,6 +33,20 @@ export default function PCAResultsPanel({
   const [activeTab, setActiveTab] = useState<
     "results" | "competences" | "analysis"
   >("results");
+
+  useEffect(() => {
+    switch (activeTab) {
+      case "results":
+        if (!results && !loading) loadResults();
+        break;
+      case "competences":
+        if (!competences && !loading) loadCompetences();
+        break;
+      case "analysis":
+        if (!analysis && !loading) loadAnalysis();
+        break;
+    }
+  }, [activeTab]);
 
   const loadResults = async () => {
     setLoading(true);
@@ -56,8 +75,8 @@ export default function PCAResultsPanel({
   const loadAnalysis = async () => {
     setLoading(true);
     try {
-      const data = await getPCAVsJCAAnalysis(pcaCod, selectedJCA, "g");
-      setAnalysis(data);
+      const analysisData = await getPCAVsJCAAnalysis(pcaCod, selectedJCA, "g");
+      setAnalysis(analysisData);
     } catch (error) {
       console.error("Failed to load PCA analysis:", error);
     } finally {
@@ -65,52 +84,36 @@ export default function PCAResultsPanel({
     }
   };
 
-  const handleTabChange = (tab: "results" | "competences" | "analysis") => {
-    setActiveTab(tab);
+  // Helper to safely access data properties handling case and structure variations
+  const getVal = (obj: any, key: string) => {
+    if (!obj) return null;
+    const data = obj.data || obj;
+    // Try explicit key, then PascalCase, then lowercase
+    const exact = data[key];
+    if (exact !== undefined) return exact;
+    const pascal = data[key.charAt(0).toUpperCase() + key.slice(1)];
+    if (pascal !== undefined) return pascal;
+    const lower = data[key.toLowerCase()];
+    if (lower !== undefined) return lower;
+    return null;
+  };
 
-    switch (tab) {
-      case "results":
-        if (!results) loadResults();
-        break;
-      case "competences":
-        if (!competences) loadCompetences();
-        break;
-      case "analysis":
-        if (!analysis) loadAnalysis();
-        break;
-    }
+  const getPercentage = (obj: any, key: string) => {
+    const val = getVal(obj, key);
+    return typeof val === 'number' ? val : 0;
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-xl font-semibold text-gray-900">
+    <Dialog open={true} onOpenChange={() => onClose()}>
+      <DialogContent className="max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0">
+        <DialogHeader className="p-6 border-b shrink-0">
+          <DialogTitle className="text-xl font-bold">
             PCA Results - {pcaCod.slice(0, 8)}...
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
+          </DialogTitle>
+        </DialogHeader>
 
         {/* Tabs */}
-        <div className="border-b">
+        <div className="border-b shrink-0 bg-white z-10">
           <nav className="flex space-x-8 px-6">
             {[
               { id: "results", label: t("dashboard.results") },
@@ -133,10 +136,10 @@ export default function PCAResultsPanel({
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto max-h-[60vh]">
+        <div className="p-6 overflow-y-auto flex-1 bg-gray-50/50">
           {loading && (
             <div className="flex items-center justify-center py-12">
-              <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+              <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
               <span className="ml-3 text-gray-600">Loading...</span>
             </div>
           )}
@@ -147,274 +150,140 @@ export default function PCAResultsPanel({
               {results ? (
                 <div className="space-y-6">
                   {/* Personal Information */}
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                  <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
                       Personal Information
                     </h3>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="font-medium text-gray-700">Name:</span>
-                        <span className="ml-2 text-gray-900">
-                          {results.data?.perNom} {results.data?.perApe}
+                    <div className="grid grid-cols-2 gap-y-4 gap-x-8 text-sm">
+                      <div className="flex justify-between border-b border-gray-50 pb-2">
+                        <span className="text-gray-500">Name:</span>
+                        <span className="font-medium text-gray-900">
+                          {getVal(results, "perNom")} {getVal(results, "perApe")}
                         </span>
                       </div>
-                      <div>
-                        <span className="font-medium text-gray-700">ID:</span>
-                        <span className="ml-2 text-gray-900">
-                          {results.data?.perNumIde}
+                      <div className="flex justify-between border-b border-gray-50 pb-2">
+                        <span className="text-gray-500">ID:</span>
+                        <span className="font-medium text-gray-900">
+                          {getVal(results, "perNumIde")}
                         </span>
                       </div>
-                      <div>
-                        <span className="font-medium text-gray-700">
-                          Gender:
-                        </span>
-                        <span className="ml-2 text-gray-900">
-                          {results.data?.perGen === "M" ? "Male" : "Female"}
+                      <div className="flex justify-between border-b border-gray-50 pb-2">
+                        <span className="text-gray-500">Gender:</span>
+                        <span className="font-medium text-gray-900">
+                          {getVal(results, "perGen") === "M" ? "Male" : "Female"}
                         </span>
                       </div>
-                      <div>
-                        <span className="font-medium text-gray-700">
-                          Email:
-                        </span>
-                        <span className="ml-2 text-gray-900">
-                          {results.data?.perMail}
+                      <div className="flex justify-between border-b border-gray-50 pb-2">
+                        <span className="text-gray-500">Email:</span>
+                        <span className="font-medium text-gray-900">
+                          {getVal(results, "perMail") || getVal(results, "perEmail")}
                         </span>
                       </div>
                     </div>
                   </div>
 
                   {/* DISC Profile Scores */}
-                  <div className="bg-white border rounded-lg p-4">
+                  <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">
                       DISC Profile Scores
                     </h3>
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       {/* Primary Scores */}
                       <div>
-                        <h4 className="font-medium text-gray-700 mb-3">
+                        <h4 className="font-medium text-gray-700 mb-4 border-b pb-2">
                           Primary Dimensions
                         </h4>
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-blue-600">
-                              Dominance (D)
-                            </span>
-                            <span className="text-sm font-bold">
-                              {results.data?.pcaD1 || 0}%
-                            </span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div
-                              className="bg-blue-600 h-2 rounded-full transition-all duration-500"
-                              style={{ width: `${results.data?.pcaD1 || 0}%` }}
-                            ></div>
-                          </div>
-
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-green-600">
-                              Influence (I)
-                            </span>
-                            <span className="text-sm font-bold">
-                              {results.data?.pcaI1 || 0}%
-                            </span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div
-                              className="bg-green-600 h-2 rounded-full transition-all duration-500"
-                              style={{ width: `${results.data?.pcaI1 || 0}%` }}
-                            ></div>
-                          </div>
-
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-yellow-600">
-                              Steadiness (S)
-                            </span>
-                            <span className="text-sm font-bold">
-                              {results.data?.pcaS1 || 0}%
-                            </span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div
-                              className="bg-yellow-600 h-2 rounded-full transition-all duration-500"
-                              style={{ width: `${results.data?.pcaS1 || 0}%` }}
-                            ></div>
-                          </div>
-
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-red-600">
-                              Conscientiousness (C)
-                            </span>
-                            <span className="text-sm font-bold">
-                              {results.data?.pcaC1 || 0}%
-                            </span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div
-                              className="bg-red-600 h-2 rounded-full transition-all duration-500"
-                              style={{ width: `${results.data?.pcaC1 || 0}%` }}
-                            ></div>
-                          </div>
+                        <div className="space-y-4">
+                          {[
+                            { label: "Dominance (D)", val: getPercentage(results, "pcaD1"), color: "bg-red-500", text: "text-red-600" },
+                            { label: "Influence (I)", val: getPercentage(results, "pcaI1"), color: "bg-yellow-500", text: "text-yellow-600" },
+                            { label: "Steadiness (S)", val: getPercentage(results, "pcaS1"), color: "bg-green-500", text: "text-green-600" },
+                            { label: "Conscientiousness (C)", val: getPercentage(results, "pcaC1"), color: "bg-blue-500", text: "text-blue-600" }
+                          ].map((item, idx) => (
+                            <div key={idx} className="space-y-1">
+                              <div className="flex items-center justify-between text-sm">
+                                <span className={`font-medium ${item.text}`}>{item.label}</span>
+                                <span className="font-bold">{item.val}%</span>
+                              </div>
+                              <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                                <div
+                                  className={`h-2.5 rounded-full transition-all duration-1000 ease-out ${item.color}`}
+                                  style={{ width: `${item.val}%` }}
+                                />
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
 
                       {/* Secondary Scores */}
                       <div>
-                        <h4 className="font-medium text-gray-700 mb-3">
+                        <h4 className="font-medium text-gray-700 mb-4 border-b pb-2">
                           Secondary Dimensions
                         </h4>
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-blue-400">
-                              Dominance 2 (D2)
-                            </span>
-                            <span className="text-sm font-bold">
-                              {results.data?.pcaD2 || 0}%
-                            </span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div
-                              className="bg-blue-400 h-2 rounded-full transition-all duration-500"
-                              style={{ width: `${results.data?.pcaD2 || 0}%` }}
-                            ></div>
-                          </div>
-
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-green-400">
-                              Influence 2 (I2)
-                            </span>
-                            <span className="text-sm font-bold">
-                              {results.data?.pcaI2 || 0}%
-                            </span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div
-                              className="bg-green-400 h-2 rounded-full transition-all duration-500"
-                              style={{ width: `${results.data?.pcaI2 || 0}%` }}
-                            ></div>
-                          </div>
-
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-yellow-400">
-                              Steadiness 2 (S2)
-                            </span>
-                            <span className="text-sm font-bold">
-                              {results.data?.pcaS2 || 0}%
-                            </span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div
-                              className="bg-yellow-400 h-2 rounded-full transition-all duration-500"
-                              style={{ width: `${results.data?.pcaS2 || 0}%` }}
-                            ></div>
-                          </div>
-
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-red-400">
-                              Conscientiousness 2 (C2)
-                            </span>
-                            <span className="text-sm font-bold">
-                              {results.data?.pcaC2 || 0}%
-                            </span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div
-                              className="bg-red-400 h-2 rounded-full transition-all duration-500"
-                              style={{ width: `${results.data?.pcaC2 || 0}%` }}
-                            ></div>
-                          </div>
+                        <div className="space-y-4">
+                          {[
+                            { label: "Dominance 2 (D2)", val: getPercentage(results, "pcaD2"), color: "bg-red-400/80", text: "text-red-500" },
+                            { label: "Influence 2 (I2)", val: getPercentage(results, "pcaI2"), color: "bg-yellow-400/80", text: "text-yellow-500" },
+                            { label: "Steadiness 2 (S2)", val: getPercentage(results, "pcaS2"), color: "bg-green-400/80", text: "text-green-500" },
+                            { label: "Conscientiousness 2 (C2)", val: getPercentage(results, "pcaC2"), color: "bg-blue-400/80", text: "text-blue-500" }
+                          ].map((item, idx) => (
+                            <div key={idx} className="space-y-1">
+                              <div className="flex items-center justify-between text-sm">
+                                <span className={`font-medium ${item.text}`}>{item.label}</span>
+                                <span className="font-bold">{item.val}%</span>
+                              </div>
+                              <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                                <div
+                                  className={`h-2.5 rounded-full transition-all duration-1000 ease-out ${item.color}`}
+                                  style={{ width: `${item.val}%` }}
+                                />
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     </div>
                   </div>
 
                   {/* Assessment Details */}
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                      Assessment Details
+                  <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                      Report Links
                     </h3>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="font-medium text-gray-700">
-                          PCA Code:
-                        </span>
-                        <span className="ml-2 text-gray-900 font-mono">
-                          {results.data?.pcaCod}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="font-medium text-gray-700">Date:</span>
-                        <span className="ml-2 text-gray-900">
-                          {results.data?.pcaFec}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="font-medium text-gray-700">Time:</span>
-                        <span className="ml-2 text-gray-900">
-                          {results.data?.pcaHor}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="font-medium text-gray-700">
-                          Report Link:
-                        </span>
-                        <a
-                          href={results.data?.pcaLink}
+                    <div className="flex flex-col sm:flex-row gap-4">
+                       <a
+                          href={getVal(results, "pcaLink")}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="ml-2 text-blue-600 hover:text-blue-800 underline"
+                          className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-100 transition-colors font-medium border border-blue-100"
                         >
-                          View Full Report
+                          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                          Full PDF Report
                         </a>
-                      </div>
+
+                        {getVal(results, "pcaImg") && (
+                          <a
+                            href={getVal(results, "pcaImg")}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-purple-50 text-purple-700 rounded-xl hover:bg-purple-100 transition-colors font-medium border border-purple-100"
+                          >
+                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            Visual Report Image
+                          </a>
+                        )}
                     </div>
                   </div>
-
-                  {/* Image Report */}
-                  {results.data?.pcaImg && (
-                    <div className="bg-white border rounded-lg p-4">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                        Visual Report
-                      </h3>
-                      <div className="text-center">
-                        <a
-                          href={results.data.pcaImg}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                        >
-                          <svg
-                            className="w-5 h-5 mr-2"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                            />
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                            />
-                          </svg>
-                          View Visual Report
-                        </a>
-                      </div>
-                    </div>
-                  )}
                 </div>
               ) : (
-                <div className="text-center py-8">
-                  <button
-                    onClick={loadResults}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    Load Results
-                  </button>
+                <div className="text-center py-12">
+                   <Loader2 className="h-8 w-8 animate-spin text-gray-300 mx-auto mb-4" />
+                   <p className="text-gray-500">Initializing results data...</p>
                 </div>
               )}
             </div>
@@ -424,17 +293,12 @@ export default function PCAResultsPanel({
           {activeTab === "competences" && !loading && (
             <div>
               {competences ? (
-                <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto text-sm">
+                <pre className="bg-gray-900 text-gray-100 p-4 rounded-xl overflow-x-auto text-xs font-mono">
                   {JSON.stringify(competences, null, 2)}
                 </pre>
               ) : (
-                <div className="text-center py-8">
-                  <button
-                    onClick={loadCompetences}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    Load Competences
-                  </button>
+                <div className="text-center py-12">
+                   <p className="text-gray-500">No competence data available.</p>
                 </div>
               )}
             </div>
@@ -443,9 +307,9 @@ export default function PCAResultsPanel({
           {/* Analysis Tab */}
           {activeTab === "analysis" && !loading && (
             <div>
-              <div className="mb-4">
+              <div className="mb-6 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select JCA for Analysis:
+                  Compared against Job Competency Analysis (JCA):
                 </label>
                 <select
                   value={selectedJCA}
@@ -453,7 +317,7 @@ export default function PCAResultsPanel({
                     setSelectedJCA(e.target.value as JCACode);
                     setAnalysis(null); // Reset analysis when JCA changes
                   }}
-                  className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                 >
                   {Object.entries(JCA_CODES).map(([code, name]) => (
                     <option key={code} value={code}>
@@ -464,23 +328,19 @@ export default function PCAResultsPanel({
               </div>
 
               {analysis ? (
-                <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto text-sm">
+                <pre className="bg-gray-900 text-gray-100 p-4 rounded-xl overflow-x-auto text-xs font-mono">
                   {JSON.stringify(analysis, null, 2)}
                 </pre>
               ) : (
-                <div className="text-center py-8">
-                  <button
-                    onClick={loadAnalysis}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    Load Analysis for {JCA_CODES[selectedJCA]}
-                  </button>
+                <div className="text-center py-12">
+                   <Loader2 className="h-8 w-8 animate-spin text-gray-300 mx-auto mb-4" />
+                   <p className="text-gray-500">Analysing data against JCA...</p>
                 </div>
               )}
             </div>
           )}
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

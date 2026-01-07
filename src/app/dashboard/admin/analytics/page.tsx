@@ -1,6 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -19,30 +19,26 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell,
+  AreaChart,
+  Area,
 } from "recharts";
 import {
   Users,
   DollarSign,
   BookOpen,
   TrendingUp,
-  TrendingDown,
   Activity,
   Award,
   Clock,
   ArrowUpRight,
   ArrowDownRight,
   MousePointer,
+  Download,
+  Filter,
 } from "lucide-react";
 import { useAdminAnalytics } from "@/hooks/useAdminAnalytics";
 import { useTranslation } from "react-i18next";
 import { TelemetryDashboard } from "../_components/TelemetryDashboard";
-
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8"];
 
 export default function AnalyticsPage() {
   const { t } = useTranslation();
@@ -55,6 +51,7 @@ export default function AnalyticsPage() {
       style: "currency",
       currency: "USD",
       minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }).format(value);
   };
 
@@ -68,31 +65,41 @@ export default function AnalyticsPage() {
     return `${Math.floor(hours / 24)}d ago`;
   };
 
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white border border-gray-100 px-3 py-2 rounded-lg  z-50">
+          <p className="font-medium text-sm mb-1 text-gray-900">{label}</p>
+          {payload.map((entry: any, index: number) => (
+            <div key={index} className="flex items-center gap-2 text-sm">
+              <div 
+                className="w-2 h-2 rounded-full" 
+                style={{ backgroundColor: entry.color }}
+              />
+              <span className="text-gray-500 capitalize">
+                {entry.name}:
+              </span>
+              <span className="font-medium text-gray-900">
+                {entry.name.toLowerCase().includes('revenue') || entry.name.toLowerCase().includes('earnings')
+                  ? formatCurrency(entry.value) 
+                  : entry.value.toLocaleString()}
+              </span>
+            </div>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
   if (isLoading) {
     return (
-      <div className="p-6 md:p-8 space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">
-              {t("admin.analytics.title")}
-            </h1>
-            <p className="text-muted-foreground">
-              {t("admin.analytics.loading")}
-            </p>
-          </div>
-        </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {[1, 2, 3, 4].map((i) => (
-            <Card key={i} className="animate-pulse">
-              <CardHeader className="pb-2">
-                <div className="h-4 bg-muted rounded w-24" />
-              </CardHeader>
-              <CardContent>
-                <div className="h-8 bg-muted rounded w-32 mb-2" />
-                <div className="h-3 bg-muted rounded w-20" />
-              </CardContent>
-            </Card>
-          ))}
+      <div className="min-h-screen bg-gray-50/50 p-6 md:p-8 space-y-10 font-sans">
+        <div className="max-w-7xl mx-auto space-y-8 animate-pulse">
+            <div className="h-10 w-48 bg-gray-200 rounded-lg" />
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+               {[1,2,3,4].map(i => <div key={i} className="h-40 bg-gray-200 rounded-2xl" />)}
+            </div>
         </div>
       </div>
     );
@@ -100,390 +107,351 @@ export default function AnalyticsPage() {
 
   if (error || !analytics) {
     return (
-      <div className="p-6 md:p-8 space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">
-              {t("admin.analytics.title")}
-            </h1>
-            <p className="text-muted-foreground">
-              Platform analytics overview
-            </p>
-          </div>
-        </div>
-        <Card className="border-red-200 bg-red-50/50">
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mb-4">
+      <div className="min-h-screen bg-gray-50/50 p-6 md:p-8 flex flex-col items-center justify-center">
+        <div className="bg-white p-8 rounded-2xl  text-center max-w-md w-full border border-red-100">
+           <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
               <Activity className="h-8 w-8 text-red-500" />
-            </div>
-            <h3 className="text-xl font-semibold text-red-700 mb-2">Server Error</h3>
-            <p className="text-red-600 text-center max-w-md mb-4">
-              Unable to load analytics data. The server may be temporarily unavailable or there was a network issue.
-            </p>
-            <Button 
-              variant="outline" 
-              onClick={() => refetch()}
-              className="border-red-300 text-red-700 hover:bg-red-100"
-            >
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
+           </div>
+           <h2 className="text-xl font-bold text-gray-900 mb-2">Analytics Unavailable</h2>
+           <p className="text-gray-500 mb-6">We couldn't load the dashboard data at this time.</p>
+           <Button onClick={() => refetch()} variant="outline" className="w-full">Try Again</Button>
+        </div>
       </div>
     );
   }
 
+  const statsCards = [
+    {
+      label: "Total Users",
+      value: analytics.stats.totalUsers.toLocaleString(),
+      growth: analytics.stats.monthlyGrowth.users,
+      icon: Users,
+      color: "text-blue-600",
+      bg: "bg-blue-50",
+      border: "border-blue-100",
+      blobColor: "bg-blue-500"
+    },
+    {
+      label: "Total Revenue",
+      value: formatCurrency(analytics.stats.totalRevenue),
+      growth: analytics.stats.monthlyGrowth.revenue,
+      icon: DollarSign,
+      color: "text-emerald-600",
+      bg: "bg-emerald-50",
+      border: "border-emerald-100",
+      blobColor: "bg-emerald-500"
+    },
+    {
+      label: "Active Courses",
+      value: analytics.stats.activeCourses.toLocaleString(),
+      growth: analytics.stats.monthlyGrowth.courses,
+      icon: BookOpen,
+      color: "text-violet-600",
+      bg: "bg-violet-50",
+      border: "border-violet-100",
+      blobColor: "bg-violet-500"
+    },
+    {
+      label: "Platform Growth",
+      value: `+${analytics.stats.growthRate}%`,
+      growth: analytics.stats.growthRate,
+      icon: TrendingUp,
+      color: "text-amber-600",
+      bg: "bg-amber-50",
+      border: "border-amber-100",
+      blobColor: "bg-amber-500"
+    },
+  ];
+
   return (
-    <div className="p-6 md:p-8 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            {t("admin.analytics.title")}
-          </h1>
-          <p className="text-muted-foreground">
-            {t("admin.analytics.subtitle")}
-          </p>
+    <div className="min-h-screen bg-gray-50/50 p-6 md:p-8 font-sans text-gray-900">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div className="space-y-1">
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+              {t("admin.analytics.title")}
+            </h1>
+            <p className="text-base text-gray-500 font-medium">
+              Overview of your platform limits and performance
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+             <div className="flex items-center gap-2 bg-white p-1 rounded-full border border-gray-200 shadow-sm">
+                <Select value={period} onValueChange={(v: any) => setPeriod(v)}>
+                    <SelectTrigger className="w-[140px] border-none shadow-none rounded-full bg-transparent hover:bg-gray-50 font-medium h-9 text-sm focus:ring-0">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="week">Last 7 Days</SelectItem>
+                      <SelectItem value="month">Last 30 Days</SelectItem>
+                      <SelectItem value="year">Last 12 Months</SelectItem>
+                    </SelectContent>
+                </Select>
+             </div>
+             
+             <Button 
+                variant="outline" 
+                size="icon" 
+                className="rounded-full w-10 h-10 bg-white border-gray-200 shadow-sm hover:bg-gray-50 hover:text-gray-900"
+                title="Download CSV report"
+              >
+                <Download className="w-4 h-4" />
+             </Button>
+          </div>
         </div>
-        <Select value={period} onValueChange={(v: any) => setPeriod(v)}>
-          <SelectTrigger className="w-[150px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="week">
-              {t("admin.analytics.period.week")}
-            </SelectItem>
-            <SelectItem value="month">
-              {t("admin.analytics.period.month")}
-            </SelectItem>
-            <SelectItem value="year">
-              {t("admin.analytics.period.year")}
-            </SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
 
-      {/* Tabs for different analytics views */}
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="overview">Platform Overview</TabsTrigger>
-          <TabsTrigger value="behavior" className="flex items-center gap-2">
-            <MousePointer className="h-4 w-4" />
-            User Behavior
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-6">
-
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              {t("admin.analytics.totalUsers")}
-            </CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {analytics.stats.totalUsers.toLocaleString()}
+        <Tabs defaultValue="overview" className="space-y-8">
+            <div className="flex items-center">
+                <TabsList className="bg-white border border-gray-200 rounded-full p-1 h-auto gap-1 ">
+                    <TabsTrigger 
+                        value="overview" 
+                        className="rounded-full px-5 py-2.5 text-sm font-medium data-[state=active]:bg-gray-900 data-[state=active]:text-white transition-all data-[state=active]:shadow-md"
+                    >
+                        Platform Overview
+                    </TabsTrigger>
+                    <TabsTrigger 
+                        value="behavior" 
+                        className="rounded-full px-5 py-2.5 text-sm font-medium data-[state=active]:bg-gray-900 data-[state=active]:text-white transition-all data-[state=active]:shadow-md flex items-center gap-2"
+                    >
+                        User Behavior
+                    </TabsTrigger>
+                </TabsList>
             </div>
-            <p className="text-xs text-muted-foreground flex items-center gap-1">
-              {analytics.stats.monthlyGrowth.users >= 0 ? (
-                <>
-                  <ArrowUpRight className="h-3 w-3 text-green-600" /> +
-                  {analytics.stats.monthlyGrowth.users}%
-                </>
-              ) : (
-                <>
-                  <ArrowDownRight className="h-3 w-3 text-red-600" />{" "}
-                  {analytics.stats.monthlyGrowth.users}%
-                </>
-              )}
-              <span className="text-muted-foreground">
-                {t("admin.analytics.fromLastPeriod")}
-              </span>
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              {t("admin.analytics.totalRevenue")}
-            </CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {formatCurrency(analytics.stats.totalRevenue)}
-            </div>
-            <p className="text-xs text-muted-foreground flex items-center gap-1">
-              {analytics.stats.monthlyGrowth.revenue >= 0 ? (
-                <>
-                  <ArrowUpRight className="h-3 w-3 text-green-600" /> +
-                  {analytics.stats.monthlyGrowth.revenue}%
-                </>
-              ) : (
-                <>
-                  <ArrowDownRight className="h-3 w-3 text-red-600" />{" "}
-                  {analytics.stats.monthlyGrowth.revenue}%
-                </>
-              )}
-              <span className="text-muted-foreground">
-                {t("admin.analytics.fromLastPeriod")}
-              </span>
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              {t("admin.analytics.activeCourses")}
-            </CardTitle>
-            <BookOpen className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {analytics.stats.activeCourses}
-            </div>
-            <p className="text-xs text-muted-foreground flex items-center gap-1">
-              {analytics.stats.monthlyGrowth.courses >= 0 ? (
-                <>
-                  <ArrowUpRight className="h-3 w-3 text-green-600" /> +
-                  {analytics.stats.monthlyGrowth.courses}%
-                </>
-              ) : (
-                <>
-                  <ArrowDownRight className="h-3 w-3 text-red-600" />{" "}
-                  {analytics.stats.monthlyGrowth.courses}%
-                </>
-              )}
-              <span className="text-muted-foreground">
-                {t("admin.analytics.fromLastPeriod")}
-              </span>
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              {t("admin.analytics.growthRate")}
-            </CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              +{analytics.stats.growthRate}%
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {t("admin.analytics.overallPlatformGrowth")}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
 
-      {/* Charts */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle>
-              {t("admin.analytics.cards.revenueTransactions")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pl-2">
-            <ResponsiveContainer width="100%" height={350}>
-              <BarChart data={analytics.revenueData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="month"
-                  stroke="#888888"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis
-                  stroke="#888888"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(value) => `$${value}`}
-                />
-                <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                <Bar dataKey="revenue" fill="#adfa1d" radius={[4, 4, 0, 0]} />
-                <Bar
-                  dataKey="transactions"
-                  fill="#60a5fa"
-                  radius={[4, 4, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle>{t("admin.analytics.charts.userGrowthTrend")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={350}>
-              <LineChart data={analytics.userGrowthData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="month"
-                  stroke="#888888"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis
-                  stroke="#888888"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <Tooltip />
-                <Line
-                  type="monotone"
-                  dataKey="users"
-                  stroke="#8884d8"
-                  strokeWidth={2}
-                  name={t("admin.analytics.chartNames.totalUsers")}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="newUsers"
-                  stroke="#82ca9d"
-                  strokeWidth={2}
-                  name={t("admin.analytics.chartNames.newUsers")}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Top Performers and Activity */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        {/* Top Coaches */}
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Award className="h-5 w-5 text-yellow-500" />
-              {t("admin.analytics.cards.topCoaches")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {analytics.topCoaches.map((coach, index) => (
-                <div
-                  key={coach.id}
-                  className="flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold">
-                      {index + 1}
+            <TabsContent value="overview" className="space-y-8 animate-in fade-in-50 duration-500 slide-in-from-bottom-2">
+                {/* Stats Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {statsCards.map((stat, index) => (
+                    <div
+                      key={index}
+                      className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+                    >
+                      <div
+                        className={`absolute right-0 top-0 h-24 w-24 translate-x-8 translate-y--8 rounded-full ${stat.blobColor} opacity-5 blur-2xl transition-transform duration-500 group-hover:scale-150`}
+                      />
+                      <div className="relative flex flex-col gap-4">
+                        <div className="flex justify-between items-start">
+                             <div
+                                className={`w-12 h-12 rounded-xl ${stat.bg} flex items-center justify-center`}
+                                >
+                                <stat.icon className={`h-6 w-6 ${stat.color}`} />
+                            </div>
+                            <Badge variant="outline" className={`${stat.growth >= 0 ? 'bg-green-50 text-green-700 border-green-100' : 'bg-red-50 text-red-700 border-red-100'} font-medium`}>
+                                {stat.growth >= 0 ? '+' : ''}{stat.growth}%
+                            </Badge>
+                        </div>
+                        
+                        <div>
+                          <p className="text-3xl font-bold text-gray-900 tracking-tight">
+                            {stat.value}
+                          </p>
+                          <p className="text-sm font-medium text-gray-500 mt-1">
+                            {stat.label}
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium">{coach.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {coach.sessions} sessions • ⭐ {coach.rating}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold">
-                      {formatCurrency(coach.earnings)}
-                    </p>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
 
-        {/* Top Courses */}
-        <Card className="col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5 text-blue-500" />
-              {t("admin.analytics.cards.topCourses")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {analytics.topCourses.map((course, index) => (
-                <div key={course.id} className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <p className="font-medium text-sm truncate flex-1">
-                      {course.title}
-                    </p>
-                    <Badge variant="secondary">{course.enrollments}</Badge>
-                  </div>
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>⭐ {course.rating}</span>
-                    <span className="font-semibold">
-                      {formatCurrency(course.revenue)}
-                    </span>
-                  </div>
+                {/* Charts Section */}
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
+                    {/* Revenue Chart */}
+                    <Card className="col-span-4 rounded-2xl border-gray-100  shadow-none overflow-hidden hover:shadow-md transition-shadow">
+                        <CardHeader className="border-b border-gray-50 bg-gray-50/30 py-5">
+                            <CardTitle className="text-lg font-semibold text-gray-800">Revenue Analysis</CardTitle>
+                            <CardDescription>Monthly revenue vs transaction volume</CardDescription>
+                        </CardHeader>
+                        <CardContent className="p-6">
+                            <ResponsiveContainer width="100%" height={350}>
+                            <BarChart data={analytics.revenueData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                <XAxis 
+                                dataKey="month" 
+                                stroke="#94a3b8"
+                                fontSize={12}
+                                tickLine={false}
+                                axisLine={false}
+                                dy={10}
+                                />
+                                <YAxis 
+                                stroke="#94a3b8"
+                                fontSize={12}
+                                tickLine={false}
+                                axisLine={false}
+                                tickFormatter={(value) => `$${value/1000}k`}
+                                dx={-10}
+                                />
+                                <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} />
+                                <Bar 
+                                dataKey="revenue" 
+                                name="Revenue" 
+                                fill="#2563eb" 
+                                radius={[6, 6, 0, 0]} 
+                                barSize={28}
+                                />
+                                <Bar 
+                                dataKey="transactions" 
+                                name="Transactions" 
+                                fill="#cbd5e1" 
+                                radius={[6, 6, 0, 0]} 
+                                barSize={28}
+                                />
+                            </BarChart>
+                            </ResponsiveContainer>
+                        </CardContent>
+                    </Card>
+
+                    {/* User Growth */}
+                    <Card className="col-span-3 rounded-2xl border-gray-100 shadow-none overflow-hidden hover:shadow-md transition-shadow">
+                         <CardHeader className="border-b border-gray-50 bg-gray-50/30 py-5">
+                            <CardTitle className="text-lg font-bold text-gray-900">User GrowthTrend</CardTitle>
+                            <CardDescription>New user acquisition over time</CardDescription>
+                        </CardHeader>
+                         <CardContent className="p-6">
+                            <ResponsiveContainer width="100%" height={350}>
+                            <AreaChart data={analytics.userGrowthData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+                                <defs>
+                                <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.1}/>
+                                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                                </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                <XAxis 
+                                dataKey="period" 
+                                stroke="#94a3b8"
+                                fontSize={12}
+                                tickLine={false}
+                                axisLine={false}
+                                dy={10}
+                                />
+                                <YAxis 
+                                stroke="#94a3b8"
+                                fontSize={12}
+                                tickLine={false}
+                                axisLine={false}
+                                dx={-10}
+                                />
+                                <Tooltip content={<CustomTooltip />} />
+                                <Area 
+                                type="monotone" 
+                                dataKey="users" 
+                                name="Total Users"
+                                stroke="#8b5cf6" 
+                                strokeWidth={3}
+                                fill="url(#colorUsers)" 
+                                />
+                            </AreaChart>
+                            </ResponsiveContainer>
+                        </CardContent>
+                    </Card>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
 
-        {/* Recent Activity */}
-        <Card className="col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5 text-green-500" />
-              {t("admin.analytics.cards.recentActivity")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {analytics.recentActivity.map((activity, index) => (
-                <div key={index} className="flex items-start gap-3">
-                  <div
-                    className={`mt-0.5 rounded-full p-1.5 ${
-                      activity.type === "user"
-                        ? "bg-blue-500/10"
-                        : activity.type === "transaction"
-                        ? "bg-green-500/10"
-                        : activity.type === "course"
-                        ? "bg-purple-500/10"
-                        : "bg-orange-500/10"
-                    }`}
-                  >
-                    {activity.type === "user" && (
-                      <Users className="h-3 w-3 text-blue-500" />
-                    )}
-                    {activity.type === "transaction" && (
-                      <DollarSign className="h-3 w-3 text-green-500" />
-                    )}
-                    {activity.type === "course" && (
-                      <BookOpen className="h-3 w-3 text-purple-500" />
-                    )}
-                    {activity.type === "session" && (
-                      <Clock className="h-3 w-3 text-orange-500" />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm truncate">{activity.message}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {formatTimeAgo(activity.timestamp)}
-                    </p>
-                  </div>
+                 {/* Bottom Grid */}
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
+                    {/* Top Coaches Table */}
+                     <Card className="col-span-4 rounded-2xl border-gray-100 shadow-none overflow-hidden hover:shadow-md transition-shadow">
+                        <CardHeader className="border-b border-gray-50 bg-gray-50/30 py-5 flex flex-row items-center justify-between">
+                            <div>
+                                <CardTitle className="text-lg font-semibold text-gray-800 flex items-center gap-1.5">
+                                    <Award className="h-5 w-5 text-amber-500" />
+                                    Top Coaches
+                                </CardTitle>
+                                <CardDescription>Top performers by revenue & rating</CardDescription>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="p-0">
+                            <div className="divide-y divide-gray-50">
+                            {analytics.topCoaches.map((coach, index) => (
+                                <div
+                                key={coach.id}
+                                className="flex items-center justify-between p-5 hover:bg-gray-50 transition-colors"
+                                >
+                                <div className="flex items-center gap-4">
+                                    <div className={`
+                                    flex items-center justify-center w-10 h-10 rounded-full font-bold text-sm border
+                                    ${index === 0 ? "bg-amber-50 text-amber-700 border-amber-100" : 
+                                        index === 1 ? "bg-slate-100 text-slate-700 border-slate-200" :
+                                        index === 2 ? "bg-orange-50 text-orange-800 border-orange-100" :
+                                        "bg-white text-gray-500 border-gray-100"}
+                                    `}>
+                                    {index + 1}
+                                    </div>
+                                    <div>
+                                    <p className="font-semibold text-gray-900 text-sm">
+                                        {coach.name}
+                                    </p>
+                                    <span className="flex items-center gap-1 text-xs text-gray-500 mt-0.5">
+                                        {coach.sessions} sessions
+                                    </span>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <p className="font-bold text-gray-900 text-sm">
+                                    {formatCurrency(coach.earnings)}
+                                    </p>
+                                    <span className="flex items-center justify-end gap-1 text-xs text-amber-600 font-medium">
+                                        ★ {coach.rating}
+                                    </span>
+                                </div>
+                                </div>
+                            ))}
+                            </div>
+                        </CardContent>
+                     </Card>
+
+                     {/* Recent Activity */}
+                     <Card className="col-span-3 rounded-2xl border-gray-100 shadow-none overflow-hidden hover:shadow-md transition-shadow">
+                        <CardHeader className="border-b border-gray-50 bg-gray-50/30 py-5">
+                            <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                <Clock className="h-5 w-5 text-gray-500" />
+                                Recent Activity
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-6">
+                            <div className="relative space-y-0 pl-3">
+                                <div className="absolute left-[28px] top-2 bottom-6 w-px bg-gray-100" />
+                                {analytics.recentActivity.map((activity, index) => (
+                                    <div key={index} className="relative flex gap-5 pb-8 last:pb-0">
+                                    <div
+                                        className={`
+                                        relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border bg-white shadow-sm ring-4 ring-white
+                                        ${activity.type === "user" ? "border-blue-100 text-blue-600" : 
+                                            activity.type === "transaction" ? "border-emerald-100 text-emerald-600" : 
+                                            activity.type === "course" ? "border-violet-100 text-violet-600" : 
+                                            "border-amber-100 text-amber-600"}
+                                        `}
+                                    >
+                                        {activity.type === "user" && <Users className="h-3.5 w-3.5" />}
+                                        {activity.type === "transaction" && <DollarSign className="h-3.5 w-3.5" />}
+                                        {activity.type === "course" && <BookOpen className="h-3.5 w-3.5" />}
+                                        {activity.type === "session" && <Clock className="h-3.5 w-3.5" />}
+                                    </div>
+                                    <div className="flex-1 min-w-0 pt-1">
+                                        <p className="text-sm font-medium text-gray-900">
+                                        {activity.message}
+                                        </p>
+                                        <p className="text-xs text-gray-400 mt-1 font-medium">
+                                        {formatTimeAgo(activity.date || activity.timestamp || '')}
+                                        </p>
+                                    </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                     </Card>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-        </div>
-        </TabsContent>
 
-        <TabsContent value="behavior">
-          <TelemetryDashboard period={period} />
-        </TabsContent>
-      </Tabs>
+            </TabsContent>
+            
+            <TabsContent value="behavior" className="animate-in fade-in-50 duration-500">
+                <TelemetryDashboard period={period} />
+            </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 }

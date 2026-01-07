@@ -88,7 +88,26 @@
     "securityNotice": "Your payment information is secure and encrypted",
     "initializing": "Initializing...",
     "payWithCard": "Pay with Card",
-    "cardElementNotFound": "Card element not found"
+    "cardElementNotFound": "Card element not found",
+    "verifying": "Verifying Payment...",
+    "pleaseWait": "Please wait while we confirm your payment.",
+    "successTitle": "Payment Successful! 🎉",
+    "successSubscription": "Thank you for your payment. Your subscription is now active.",
+    "successSession": "Thank you for your payment. Your coaching session has been booked.",
+    "details": "Payment Details",
+    "amount": "Amount:",
+    "description": "Description:",
+    "date": "Date:",
+    "continueToDashboard": "Continue to Dashboard",
+    "viewMySessions": "View My Sessions",
+    "failedTitle": "Payment Failed",
+    "failedText": "There was an issue with your payment. Please try again.",
+    "tryAgain": "Try Again",
+    "backToDashboard": "Back to Dashboard",
+    "cancelledTitle": "Payment Cancelled",
+    "cancelledText": "Your payment was cancelled. No charges were made to your account. You can try again anytime.",
+    "errorTitle": "Verification Error",
+    "errorText": "Unable to verify payment status. Please contact support if you were charged."
   },
   "evaluation": {
     "noReportData": "Report data not available",
@@ -146,95 +165,65 @@
       "additionalCommentsPlaceholder": "Share specific examples, observations, or additional context...",
       "saveDraft": "Save Draft",
       "saving": "Saving..."
-    }
-  },
-  "admin": {
-    "coaches": {
-      "filterByContract": "Filter by contract",
-      "filters": {
-        "allContracts": "All Contracts",
-        "all": "All Contracts",
-        "active": "Active (30+ days)",
-        "expiring": "Expiring Soon",
-        "expired": "Expired"
-      },
-      "searchPlaceholder": "Search coaches...",
-      "loading": "Loading coaches...",
-      "noCoaches": "No coaches found",
-      "tryAdjustingFilters": "Try adjusting your search or filters",
-      "table": {
-        "coach": "Coach",
-        "status": "Status",
-        "specialization": "Specialization",
-        "contractPeriod": "Contract Period",
-        "contractStatus": "Contract Status",
-        "students": "Students",
-        "actions": "Actions"
-      },
-      "studentsActive": "active",
-      "actions": {
-        "copyEmail": "Copy Email",
-        "viewDetails": "View Details",
-        "editCoach": "Edit Coach",
-        "resendInvite": "Resend Invite",
-        "deactivate": "Deactivate"
-      },
-      "toast": {
-        "emailCopied": "Email copied",
-        "invitationResent": "Invitation resent",
-        "failedToResend": "Failed to resend"
-      }
     },
-    "users": {
-      "title": "Users",
-      "subtitle": "Manage users and accounts",
-      "searchPlaceholder": "Search users...",
-      "rolePlaceholder": "Select role",
-      "statusPlaceholder": "Select status",
-      "roles": {
-        "all": "All",
-        "student": "Student",
-        "coach": "Coach",
-        "admin": "Admin"
-      },
-      "status": {
-        "all": "All",
-        "active": "Active",
-        "inactive": "Inactive"
-      },
-      "addUser": "Add User",
-      "dialogTitle": "Add New User",
-      "dialogDescription": "Create a new user account. They will receive their login credentials.",
+    "toast": {
+      "emailSent": "Email invitation sent successfully!",
+      "emailFailed": "Error sending email invitation. Please try again.",
+      "emailPartial": "Some invitations may not have been sent. Please check the results.",
+      "evalRemoved": "Evaluator removed successfully!",
+      "evalRemoveFailed": "Error removing evaluator. Please try again.",
+      "resendSuccess": "Invitation link resent successfully!",
+      "resendError": "Error resending invitation link. Please try again.",
+      "groupsIncomplete": "Please complete all evaluator groups before sending invitations. Each group must have at least the minimum required evaluators.",
+      "noPhoneNumbers": "No evaluators have phone numbers available for SMS invitations.",
+      "smsComingSoon": "SMS functionality coming soon!"
+    },
+    "evaluatorManagement": {
+      "title": "Evaluator Management",
+      "description": "Add and manage evaluators for this 360-degree assessment",
+      "addEvaluator": "Add Evaluator",
       "nameLabel": "Full Name *",
       "namePlaceholder": "Enter full name",
+      "emailLabel": "Email Address *",
       "emailPlaceholder": "Enter email address",
-      "passwordLabel": "Password *",
-      "passwordPlaceholder": "Enter password",
-      "passwordHint": "Password must be at least 6 characters with uppercase, lowercase, and number.",
-      "creating": "Creating...",
-      "createUser": "Create User",
+      "phoneLabel": "Phone Number (Optional)",
+      "phonePlaceholder": "Enter phone number",
+      "relationshipLabel": "Relationship *",
+      "validationHeading": "Evaluator Requirements Not Met",
+      "relationships": {
+        "parent": "e.g., Mother, Father, Guardian",
+        "teacher": "e.g., Math Teacher, Counselor, Principal",
+        "siblingFriend": "e.g., Sister, Best Friend, Classmate",
+        "self": "Self-evaluation",
+        "default": "Relationship"
+      },
+      "needMore": "Need {{count}} more evaluator(s)",
+      "overLimit": "{{count}} evaluator(s) over limit",
+      "countOfMax": "{{count}}/{{max}} evaluators",
       "fillRequired": "Please fill in all required fields",
-      "success": "User created successfully!",
-      "error": "Failed to create user",
-      "noUsersFound": "No users found",
-      "table": {
-        "name": "Name",
-        "email": "Email",
-        "role": "Role",
-        "status": "Status",
-        "subscription": "Subscription",
-        "joined": "Joined",
-        "actions": "Actions"
-      },
-      "dropdown": {
-        "actions": "Actions",
-        "copyEmail": "Copy Email",
-        "viewProfile": "View Profile",
-        "editDetails": "Edit Details",
-        "deactivateUser": "Deactivate User"
-      },
-      "emailCopied": "Email copied",
-      "openMenu": "Open menu"
+      "failedAdd": "Failed to add evaluator. Please try again.",
+      "selectEvaluatorsMessage": "Please select evaluators to send invitations to."
+    },
+    "config": {
+      "addCompetencyTitle": "Add New Competency",
+      "nameLabel": "Name *",
+      "namePlaceholder": "e.g., Communication Skills",
+      "categoryLabel": "Category *",
+      "selectCategoryPlaceholder": "Select category...",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Describe what this competency measures...",
+      "weightLabel": "Weight",
+      "addCompetencyButton": "Add Competency",
+      "currentCompetencies": "Current Competencies",
+      "noCompetencies": "No competencies configured yet.",
+      "rating": {
+        "addOptionTitle": "Add Rating Option",
+        "label": "Label *",
+        "labelPlaceholder": "e.g., Excellent",
+        "description": "Description",
+        "descriptionPlaceholder": "Optional description",
+        "addOptionButton": "Add Option"
+      }
     }
   },
   "dashboard": {
@@ -476,6 +465,10 @@
     "processingSpeedDesc": "Efficient cognitive processing under time pressure",
     "returnToDashboard": "Return to Dashboard",
     "printResults": "Print Results",
+    "downloadPDFReport": "Download PDF Report",
+    "liaResultsTitle": "LIA Assessment Results",
+    "liaResultsComplete": "All subtests completed! Your comprehensive results are ready.",
+    "liaResultsInProgress": "Assessment in progress. Complete all subtests to see your full results.",
     "inviteEvaluators": "Invite Evaluators",
     "loadingResults": "Loading results...",
     "backToConfiguration": "Back to Configuration",
@@ -642,6 +635,17 @@
     "nextExample": "Next Example"
   },
   "benchmarks": {
+    "header": {
+      "title": "Overview"
+    },
+    "compensationTitle": "Compensation",
+    "market": "Market Trends",
+    "skills": {
+      "title": "Skills Analysis"
+    },
+    "demographics": {
+      "title": "Demographics"
+    },
     "marketDemand": "Market Demand",
     "high": "High",
     "topGrowth": "Top 10% Growth",
@@ -706,27 +710,6 @@
       "creating": "Creating account..."
     }
   },
-  "payments": {
-    "verifying": "Verifying Payment...",
-    "pleaseWait": "Please wait while we confirm your payment.",
-    "successTitle": "Payment Successful! 🎉",
-    "successSubscription": "Thank you for your payment. Your subscription is now active.",
-    "successSession": "Thank you for your payment. Your coaching session has been booked.",
-    "details": "Payment Details",
-    "amount": "Amount:",
-    "description": "Description:",
-    "date": "Date:",
-    "continueToDashboard": "Continue to Dashboard",
-    "viewMySessions": "View My Sessions",
-    "failedTitle": "Payment Failed",
-    "failedText": "There was an issue with your payment. Please try again.",
-    "tryAgain": "Try Again",
-    "backToDashboard": "Back to Dashboard",
-    "cancelledTitle": "Payment Cancelled",
-    "cancelledText": "Your payment was cancelled. No charges were made to your account. You can try again anytime.",
-    "errorTitle": "Verification Error",
-    "errorText": "Unable to verify payment status. Please contact support if you were charged."
-  },
   "transactions": {
     "fetchFailed": "Failed to load transactions",
     "noExport": "No transactions to export",
@@ -758,24 +741,7 @@
     "redirecting": "Redirecting to Admin Panel...",
     "accessRequired": "Administrator access required",
     "accessDenied": "Access denied. This area is for administrators only.",
-    "layout": {
-      "panelTitle": "Admin Panel",
-      "headerTitle": "Admin Dashboard",
-      "userDashboard": "User Dashboard",
-      "logout": "Logout",
-      "superAdmin": "Super Admin",
-      "nav": {
-        "dashboard": "Dashboard",
-        "plans": "Plans",
-        "users": "Users",
-        "coaches": "Coaches",
-        "courses": "Courses",
-        "careers": "Careers",
-        "questions": "Questions",
-        "analytics": "Analytics",
-        "settings": "Settings"
-      }
-    },
+
     "verifying": "Verifying admin access...",
     "title": "Admin Dashboard",
     "subtitle": "Overview of your platform's performance",
@@ -864,21 +830,7 @@
         "verifyDeployment": "Verify your deployment URL is accessible"
       }
     },
-    "plans": {
-      "editTitle": "Edit Plan",
-      "createTitle": "Create New Plan",
-      "planNameLabel": "Plan Name *",
-      "planNamePlaceholder": "e.g., Basic Plan",
-      "priceLabel": "Price (USD) *",
-      "pricePlaceholder": "29.99",
-      "intervalLabel": "Billing Interval *",
-      "featuresLabel": "Features *",
-      "featurePlaceholder": "e.g., Unlimited projects",
-      "addFeature": "+ Add Feature",
-      "createButton": "Create Plan",
-      "updateButton": "Update Plan",
-      "alreadyExists": "Already exists"
-    },
+
     "analytics": {
       "title": "Analytics",
       "loading": "Loading platform analytics...",
@@ -897,7 +849,8 @@
       "cards": {
         "topCoaches": "Top Performing Coaches",
         "topCourses": "Top Courses",
-        "recentActivity": "Recent Activity"
+        "recentActivity": "Recent Activity",
+        "revenueTransactions": "Revenue & Transactions"
       },
       "charts": {
         "userGrowthTrend": "User Growth Trend"
@@ -936,20 +889,33 @@
       "subtitle": "Manage user accounts and permissions",
       "failedToLoad": "Failed to load users",
       "searchPlaceholder": "Search users...",
-      "rolePlaceholder": "Role",
-      "statusPlaceholder": "Status",
+      "rolePlaceholder": "Select role",
+      "statusPlaceholder": "Select status",
       "roles": {
-        "all": "All Roles",
+        "all": "All",
         "student": "Student",
         "coach": "Coach",
         "admin": "Admin"
       },
       "status": {
-        "all": "All Status",
+        "all": "All",
         "active": "Active",
         "inactive": "Inactive"
       },
       "addUser": "Add User",
+      "dialogTitle": "Add New User",
+      "dialogDescription": "Create a new user account. They will receive their login credentials.",
+      "nameLabel": "Full Name *",
+      "namePlaceholder": "Enter full name",
+      "emailPlaceholder": "Enter email address",
+      "passwordLabel": "Password *",
+      "passwordPlaceholder": "Enter password",
+      "passwordHint": "Password must be at least 6 characters with uppercase, lowercase, and number.",
+      "creating": "Creating...",
+      "createUser": "Create User",
+      "fillRequired": "Please fill in all required fields",
+      "success": "User created successfully!",
+      "error": "Failed to create user",
       "table": {
         "name": "Name",
         "email": "Email",
@@ -960,14 +926,69 @@
         "actions": "Actions"
       },
       "loadingText": "Loading users...",
-      "noUsersFound": "No users found matching your criteria.",
-      "emailCopied": "Email copied to clipboard",
+      "noUsersFound": "No users found",
+      "emailCopied": "Email copied",
+      "openMenu": "Open menu",
       "dropdown": {
         "actions": "Actions",
         "copyEmail": "Copy Email",
         "viewProfile": "View Profile",
         "editDetails": "Edit Details",
         "deactivateUser": "Deactivate User"
+      }
+    },
+    "plans": {
+      "header": "Subscription Plans",
+      "description": "Manage your subscription plans and pricing",
+      "loading": "Loading plans...",
+      "failedToLoad": "Failed to load plans",
+      "refresh": "Refresh",
+      "createTitle": "Create Plan",
+      "createAll": "Create {{count}} Plans",
+      "createThisPlan": "Create This Plan",
+      "creating": "Creating...",
+      "creationResultsTitle": "Creation Results:",
+      "previewTitle": "Plans to Create:",
+      "moreFeatures": "... and {{count}} more",
+      "editTitle": "Edit Plan",
+      "updateButton": "Update Plan",
+      "createButton": "Create Plan",
+      "planNameLabel": "Plan Name",
+      "planNamePlaceholder": "e.g. Monthly Subscription",
+      "priceLabel": "Price",
+      "pricePlaceholder": "e.g. 29.99",
+      "intervalLabel": "Billing Interval",
+      "featuresLabel": "Features",
+      "featuresHeading": "Plan Features",
+      "featurePlaceholder": "e.g. Full access to all courses",
+      "addFeature": "Add Feature",
+      "active": "Active",
+      "inactive": "Inactive",
+      "mockLabel": "Mock Data",
+      "mockDataTitle": "Using Mock Data",
+      "mockDataDescription": "You are currently viewing mock data. Connect to a backend to see real plans.",
+      "hideMock": "Hide Mock Data",
+      "maxPlansAlert": "You can only have 3 active plans at a time.",
+      "createPlanCount": "Create Plan ({{count}}/3)",
+      "tokenRequiredTitle": "Authentication Required",
+      "tokenRequiredMessage": "You need to be logged in as an admin to manage plans.",
+      "goToSettingsPrefix": "Go to",
+      "goToSettings": "Settings",
+      "goToTokenManagement": "to manage your tokens",
+      "alreadyExists": "Already exists",
+      "intervals": {
+        "month": {
+          "label": "Monthly",
+          "description": "Billed every month"
+        },
+        "year": {
+          "label": "Yearly",
+          "description": "Billed every year"
+        },
+        "one_time": {
+          "label": "One-Time",
+          "description": "One time payment"
+        }
       }
     },
     "transactions": {
@@ -980,9 +1001,12 @@
         "completed": "Completed",
         "pending": "Pending",
         "failed": "Failed",
-        "refunded": "Refunded"
+        "refunded": "Refunded",
+        "requires_payment_method": "Requires Payment Method",
+        "succeeded": "Succeeded"
       },
       "exportReport": "Export Report",
+      "exportFailed": "Failed to export report",
       "noTransactions": "No transactions found.",
       "table": {
         "id": "Transaction ID",
@@ -1329,68 +1353,6 @@
     "success": "Import job started. Check status in a moment.",
     "started": "Import job started ({{jobId}}). Check status in a moment.",
     "failure": "Failed to start import. Please try again."
-  },
-
-  "evaluation": {
-    "toast": {
-      "emailSent": "Email invitation sent successfully!",
-      "emailFailed": "Error sending email invitation. Please try again.",
-      "emailPartial": "Some invitations may not have been sent. Please check the results.",
-      "evalRemoved": "Evaluator removed successfully!",
-      "evalRemoveFailed": "Error removing evaluator. Please try again.",
-      "resendSuccess": "Invitation link resent successfully!",
-      "resendError": "Error resending invitation link. Please try again.",
-      "groupsIncomplete": "Please complete all evaluator groups before sending invitations. Each group must have at least the minimum required evaluators.",
-      "noPhoneNumbers": "No evaluators have phone numbers available for SMS invitations.",
-      "smsComingSoon": "SMS functionality coming soon!"
-    },
-    "evaluatorManagement": {
-      "title": "Evaluator Management",
-      "description": "Add and manage evaluators for this 360-degree assessment",
-      "addEvaluator": "Add Evaluator",
-      "nameLabel": "Full Name *",
-      "namePlaceholder": "Enter full name",
-      "emailLabel": "Email Address *",
-      "emailPlaceholder": "Enter email address",
-      "phoneLabel": "Phone Number (Optional)",
-      "phonePlaceholder": "Enter phone number",
-      "relationshipLabel": "Relationship *",
-      "validationHeading": "Evaluator Requirements Not Met",
-      "relationships": {
-        "parent": "e.g., Mother, Father, Guardian",
-        "teacher": "e.g., Math Teacher, Counselor, Principal",
-        "siblingFriend": "e.g., Sister, Best Friend, Classmate",
-        "self": "Self-evaluation",
-        "default": "Relationship"
-      },
-      "needMore": "Need {{count}} more evaluator(s)",
-      "overLimit": "{{count}} evaluator(s) over limit",
-      "countOfMax": "{{count}}/{{max}} evaluators",
-      "fillRequired": "Please fill in all required fields",
-      "failedAdd": "Failed to add evaluator. Please try again.",
-      "selectEvaluatorsMessage": "Please select evaluators to send invitations to."
-    },
-    "config": {
-      "addCompetencyTitle": "Add New Competency",
-      "nameLabel": "Name *",
-      "namePlaceholder": "e.g., Communication Skills",
-      "categoryLabel": "Category *",
-      "selectCategoryPlaceholder": "Select category...",
-      "descriptionLabel": "Description",
-      "descriptionPlaceholder": "Describe what this competency measures...",
-      "weightLabel": "Weight",
-      "addCompetencyButton": "Add Competency",
-      "currentCompetencies": "Current Competencies",
-      "noCompetencies": "No competencies configured yet.",
-      "rating": {
-        "addOptionTitle": "Add Rating Option",
-        "label": "Label *",
-        "labelPlaceholder": "e.g., Excellent",
-        "description": "Description",
-        "descriptionPlaceholder": "Optional description",
-        "addOptionButton": "Add Option"
-      }
-    }
   },
   "profile": {
     "personalInfoTitle": "Personal Information",

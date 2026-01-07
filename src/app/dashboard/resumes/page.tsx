@@ -14,7 +14,14 @@ import {
 import { useRouter } from "next/navigation";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { cn } from "@/lib/utils";
-import { getAllResumes, deleteResume, Resume } from "@/services/resumeService";
+import {
+  getAllResumes,
+  deleteResume,
+  createResume,
+  getDefaultResume,
+  Resume,
+  CreateResumePayload
+} from "@/services/resumeService";
 import { useTranslation } from "react-i18next";
 
 /**
@@ -67,21 +74,15 @@ export default function MyResumesPage() {
   /**
    * Create new resume
    */
-  const handleCreateResume = () => {
-    // Resume Builder step is disabled. Open the 'New Flow' to create resumes.
-    alert(
-      "Resume Builder is disabled in this product flow. Please use the new creation flow from the 'New Flow' menu."
-    );
+  const handleCreateResume = async () => {
+     router.push("/dashboard/resume-builder/new");
   };
 
   /**
    * Edit existing resume
    */
   const handleEditResume = (resumeId: string) => {
-    // Editing via resume builder is deprecated in this product flow
-    alert(
-      "Editing resumes via the builder is disabled. Use the new resume flow to edit."
-    );
+    router.push(`/resume-builder/${resumeId}`);
   };
 
   /**

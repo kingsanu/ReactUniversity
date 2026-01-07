@@ -88,7 +88,26 @@
     "securityNotice": "Su información de pago está segura y cifrada",
     "initializing": "Inicializando...",
     "payWithCard": "Pagar con Tarjeta",
-    "cardElementNotFound": "Elemento de tarjeta no encontrado"
+    "cardElementNotFound": "Elemento de tarjeta no encontrado",
+    "verifying": "Verificando pago...",
+    "pleaseWait": "Por favor espera mientras confirmamos tu pago.",
+    "successTitle": "¡Pago exitoso! 🎉",
+    "successSubscription": "Gracias por tu pago. Tu suscripción está activa.",
+    "successSession": "Gracias por tu pago. Tu sesión de coaching ha sido reservada.",
+    "details": "Detalles del pago",
+    "amount": "Monto:",
+    "description": "Descripción:",
+    "date": "Fecha:",
+    "continueToDashboard": "Continuar al panel",
+    "viewMySessions": "Ver mis sesiones",
+    "failedTitle": "Pago fallido",
+    "failedText": "Hubo un problema con tu pago. Por favor inténtalo de nuevo.",
+    "tryAgain": "Intentar de nuevo",
+    "backToDashboard": "Volver al panel",
+    "cancelledTitle": "Pago cancelado",
+    "cancelledText": "Tu pago fue cancelado. No se realizaron cargos a tu cuenta. Puedes intentarlo de nuevo en cualquier momento.",
+    "errorTitle": "Error de verificación",
+    "errorText": "No se pudo verificar el estado del pago. Por favor contacta soporte si fuiste cobrado."
   },
   "evaluation": {
     "noReportData": "Datos del informe no disponibles",
@@ -146,95 +165,65 @@
       "additionalCommentsPlaceholder": "Comparte ejemplos específicos, observaciones o contexto adicional...",
       "saveDraft": "Guardar borrador",
       "saving": "Guardando..."
-    }
-  },
-  "admin": {
-    "coaches": {
-      "filterByContract": "Filtrar por contrato",
-      "filters": {
-        "allContracts": "Todos los Contratos",
-        "all": "Todos los Contratos",
-        "active": "Activo (30+ días)",
-        "expiring": "Próximo a Expirar",
-        "expired": "Expirado"
-      },
-      "searchPlaceholder": "Buscar coaches...",
-      "loading": "Cargando coaches...",
-      "noCoaches": "No se encontraron coaches",
-      "tryAdjustingFilters": "Intenta ajustar tu búsqueda o filtros",
-      "table": {
-        "coach": "Coach",
-        "status": "Estado",
-        "specialization": "Especialización",
-        "contractPeriod": "Periodo de Contrato",
-        "contractStatus": "Estado del Contrato",
-        "students": "Estudiantes",
-        "actions": "Acciones"
-      },
-      "studentsActive": "activo",
-      "actions": {
-        "copyEmail": "Copiar Email",
-        "viewDetails": "Ver Detalles",
-        "editCoach": "Editar Coach",
-        "resendInvite": "Reenviar Invitación",
-        "deactivate": "Desactivar"
-      },
-      "toast": {
-        "emailCopied": "Email copiado",
-        "invitationResent": "Invitación reenviada",
-        "failedToResend": "Error al reenviar"
-      }
     },
-    "users": {
-      "title": "Usuarios",
-      "subtitle": "Gestiona usuarios y cuentas",
-      "searchPlaceholder": "Buscar usuarios...",
-      "rolePlaceholder": "Seleccionar rol",
-      "statusPlaceholder": "Seleccionar estado",
-      "roles": {
-        "all": "Todos",
-        "student": "Estudiante",
-        "coach": "Coach",
-        "admin": "Administrador"
-      },
-      "status": {
-        "all": "Todos",
-        "active": "Activo",
-        "inactive": "Inactivo"
-      },
-      "addUser": "Agregar usuario",
-      "dialogTitle": "Agregar nuevo usuario",
-      "dialogDescription": "Crea una cuenta nueva de usuario. Recibirán sus credenciales de acceso.",
+    "toast": {
+      "emailSent": "¡Correo de invitación enviado con éxito!",
+      "emailFailed": "Error al enviar invitación por correo. Intenta de nuevo.",
+      "emailPartial": "Algunas invitaciones pueden no haberse enviado. Verifica los resultados.",
+      "evalRemoved": "¡Evaluador eliminado con éxito!",
+      "evalRemoveFailed": "Error al eliminar al evaluador. Intenta de nuevo.",
+      "resendSuccess": "¡Enlace de invitación reenviado con éxito!",
+      "resendError": "Error al reenviar el enlace de invitación. Intenta de nuevo.",
+      "groupsIncomplete": "Por favor completa todos los grupos de evaluadores antes de enviar las invitaciones. Cada grupo debe tener al menos el número mínimo requerido de evaluadores.",
+      "noPhoneNumbers": "Ningún evaluador tiene número de teléfono disponible para invitaciones SMS.",
+      "smsComingSoon": "La funcionalidad de SMS estará disponible pronto."
+    },
+    "evaluatorManagement": {
+      "title": "Gestión de evaluadores",
+      "description": "Agrega y administra evaluadores para esta evaluación 360°",
+      "addEvaluator": "Agregar evaluador",
       "nameLabel": "Nombre completo *",
       "namePlaceholder": "Ingresa nombre completo",
+      "emailLabel": "Correo electrónico *",
       "emailPlaceholder": "Ingresa correo electrónico",
-      "passwordLabel": "Contraseña *",
-      "passwordPlaceholder": "Ingresa contraseña",
-      "passwordHint": "La contraseña debe tener al menos 6 caracteres con mayúsculas, minúsculas y número.",
-      "creating": "Creando...",
-      "createUser": "Crear usuario",
-      "fillRequired": "Por favor completa todos los campos obligatorios",
-      "success": "¡Usuario creado con éxito!",
-      "error": "Error al crear el usuario",
-      "noUsersFound": "No se encontraron usuarios",
-      "table": {
-        "name": "Nombre",
-        "email": "Correo",
-        "role": "Rol",
-        "status": "Estado",
-        "subscription": "Suscripción",
-        "joined": "Fecha de registro",
-        "actions": "Acciones"
+      "phoneLabel": "Número de teléfono (Opcional)",
+      "phonePlaceholder": "Ingresa número de teléfono",
+      "relationshipLabel": "Relación *",
+      "validationHeading": "Requisitos de evaluador no cumplidos",
+      "relationships": {
+        "parent": "p. ej., Madre, Padre, Tutor",
+        "teacher": "p. ej., Profesor de matemáticas, Consejero, Director",
+        "siblingFriend": "p. ej., Hermana, Mejor amigo, Compañero de clase",
+        "self": "Autoevaluación",
+        "default": "Relación"
       },
-      "dropdown": {
-        "actions": "Acciones",
-        "copyEmail": "Copiar correo",
-        "viewProfile": "Ver perfil",
-        "editDetails": "Editar detalles",
-        "deactivateUser": "Desactivar usuario"
-      },
-      "emailCopied": "Correo copiado",
-      "openMenu": "Abrir menú"
+      "needMore": "Necesitas {{count}} evaluador(es) más",
+      "overLimit": "{{count}} evaluador(es) por encima del límite",
+      "countOfMax": "{{count}}/{{max}} evaluadores",
+      "fillRequired": "Por favor completa todos los campos requeridos",
+      "failedAdd": "Error al agregar evaluador. Por favor intenta de nuevo.",
+      "selectEvaluatorsMessage": "Por favor selecciona evaluadores para enviar invitaciones."
+    },
+    "config": {
+      "addCompetencyTitle": "Agregar nueva competencia",
+      "nameLabel": "Nombre *",
+      "namePlaceholder": "p. ej., Habilidades de comunicación",
+      "categoryLabel": "Categoría *",
+      "selectCategoryPlaceholder": "Selecciona categoría...",
+      "descriptionLabel": "Descripción",
+      "descriptionPlaceholder": "Describe lo que mide esta competencia...",
+      "weightLabel": "Peso",
+      "addCompetencyButton": "Agregar competencia",
+      "currentCompetencies": "Competencias actuales",
+      "noCompetencies": "No hay competencias configuradas todavía.",
+      "rating": {
+        "addOptionTitle": "Agregar opción de calificación",
+        "label": "Etiqueta *",
+        "labelPlaceholder": "p. ej., Excelente",
+        "description": "Descripción",
+        "descriptionPlaceholder": "Descripción opcional",
+        "addOptionButton": "Agregar opción"
+      }
     }
   },
   "dashboard": {
@@ -477,6 +466,10 @@
     "processingSpeedDesc": "Procesamiento cognitivo eficiente bajo presión de tiempo",
     "returnToDashboard": "Volver al Panel",
     "printResults": "Imprimir Resultados",
+    "downloadPDFReport": "Descargar Informe PDF",
+    "liaResultsTitle": "Resultados de Evaluación LIA",
+    "liaResultsComplete": "¡Todas las subpruebas completadas! Tus resultados completos están listos.",
+    "liaResultsInProgress": "Evaluación en progreso. Completa todas las subpruebas para ver tus resultados completos.",
     "inviteEvaluators": "Invitar Evaluadores",
     "loadingResults": "Cargando resultados...",
     "backToConfiguration": "Volver a Configuración",
@@ -643,6 +636,17 @@
     "nextExample": "Siguiente Ejemplo"
   },
   "benchmarks": {
+    "header": {
+      "title": "Resumen"
+    },
+    "compensationTitle": "Compensación",
+    "market": "Tendencias del Mercado",
+    "skills": {
+      "title": "Análisis de Habilidades"
+    },
+    "demographics": {
+      "title": "Demografía"
+    },
     "marketDemand": "Demanda del Mercado",
     "high": "Alta",
     "topGrowth": "Top 10% de Crecimiento",
@@ -706,27 +710,6 @@
       "submit": "Crear cuenta",
       "creating": "Creando cuenta..."
     }
-  },
-  "payments": {
-    "verifying": "Verificando pago...",
-    "pleaseWait": "Por favor espera mientras confirmamos tu pago.",
-    "successTitle": "¡Pago exitoso! 🎉",
-    "successSubscription": "Gracias por tu pago. Tu suscripción está activa.",
-    "successSession": "Gracias por tu pago. Tu sesión de coaching ha sido reservada.",
-    "details": "Detalles del pago",
-    "amount": "Monto:",
-    "description": "Descripción:",
-    "date": "Fecha:",
-    "continueToDashboard": "Continuar al panel",
-    "viewMySessions": "Ver mis sesiones",
-    "failedTitle": "Pago fallido",
-    "failedText": "Hubo un problema con tu pago. Por favor inténtalo de nuevo.",
-    "tryAgain": "Intentar de nuevo",
-    "backToDashboard": "Volver al panel",
-    "cancelledTitle": "Pago cancelado",
-    "cancelledText": "Tu pago fue cancelado. No se realizaron cargos a tu cuenta. Puedes intentarlo de nuevo en cualquier momento.",
-    "errorTitle": "Error de verificación",
-    "errorText": "No se pudo verificar el estado del pago. Por favor contacta soporte si fuiste cobrado."
   },
   "transactions": {
     "fetchFailed": "Error al cargar las transacciones",
@@ -845,21 +828,7 @@
       "cancelUrlLabel": "URL de cancelación",
       "baseUrlLabel": "URL base"
     },
-    "plans": {
-      "editTitle": "Editar plan",
-      "createTitle": "Crear nuevo plan",
-      "planNameLabel": "Nombre del plan *",
-      "planNamePlaceholder": "p. ej., Plan Básico",
-      "priceLabel": "Precio (USD) *",
-      "pricePlaceholder": "29.99",
-      "intervalLabel": "Intervalo de facturación *",
-      "featuresLabel": "Características *",
-      "featurePlaceholder": "p. ej., Proyectos ilimitados",
-      "addFeature": "+ Agregar característica",
-      "createButton": "Crear plan",
-      "updateButton": "Actualizar plan",
-      "alreadyExists": "Ya existe"
-    },
+
     "analytics": {
       "title": "Analítica",
       "loading": "Cargando analítica de la plataforma...",
@@ -878,7 +847,8 @@
       "cards": {
         "topCoaches": "Coaches con mejor desempeño",
         "topCourses": "Cursos principales",
-        "recentActivity": "Actividad reciente"
+        "recentActivity": "Actividad reciente",
+        "revenueTransactions": "Ingresos y Transacciones"
       },
       "charts": {
         "userGrowthTrend": "Tendencia de crecimiento de usuarios"
@@ -1051,6 +1021,34 @@
         "deactivateUser": "Desactivar usuario"
       }
     },
+    "transactions": {
+      "title": "Transacciones",
+      "subtitle": "Supervise todas las transacciones y pagos del sistema",
+      "searchPlaceholder": "Buscar transacciones...",
+      "statusPlaceholder": "Estado",
+      "status": {
+        "all": "Todos los estados",
+        "completed": "Completado",
+        "pending": "Pendiente",
+        "failed": "Fallido",
+        "refunded": "Reembolsado",
+        "requires_payment_method": "Requiere Método de Pago",
+        "succeeded": "Exitoso"
+      },
+      "exportReport": "Exportar informe",
+      "exportFailed": "Error al exportar el reporte",
+      "noTransactions": "No se encontraron transacciones.",
+      "table": {
+        "id": "ID",
+        "user": "Usuario",
+        "description": "Descripción",
+        "amount": "Monto",
+        "status": "Estado",
+        "date": "Fecha",
+        "method": "Método"
+      },
+      "userId": "ID: {{id}}"
+    },
     "careers": {
       "title": "Carreras",
       "header": {
@@ -1066,42 +1064,63 @@
       "loading": "Cargando...",
       "accessDenied": "Acceso denegado"
     },
-    "subscriptionPlans": {
-      "createTitle": "Crear planes de suscripción",
-      "creating": "Creando...",
+    "plans": {
+      "header": "Planes de suscripción",
+      "description": "Gestiona tus planes de suscripción y precios",
+      "loading": "Cargando planes...",
+      "failedToLoad": "Error al cargar planes",
+      "refresh": "Actualizar",
+      "createTitle": "Crear plan",
       "createAll": "Crear {{count}} planes",
       "createThisPlan": "Crear este plan",
+      "creating": "Creando...",
       "creationResultsTitle": "Resultados de creación:",
       "previewTitle": "Planes a crear:",
       "moreFeatures": "... y {{count}} más",
+      "editTitle": "Editar plan",
+      "updateButton": "Actualizar plan",
+      "createButton": "Crear plan",
+      "planNameLabel": "Nombre del plan",
+      "planNamePlaceholder": "p. ej. Suscripción Mensual",
+      "priceLabel": "Precio",
+      "pricePlaceholder": "p. ej. 29.99",
+      "intervalLabel": "Intervalo de facturación",
+      "featuresLabel": "Características",
+      "featuresHeading": "Características del plan",
+      "featurePlaceholder": "p. ej. Acceso completo a todos los cursos",
+      "addFeature": "Agregar característica",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "mockLabel": "Datos de prueba",
+      "mockDataTitle": "Usando datos de prueba",
+      "mockDataDescription": "Estás viendo datos de prueba. Conéctate a un backend para ver planes reales.",
+      "hideMock": "Ocultar datos de prueba",
+      "maxPlansAlert": "Solo puedes tener 3 planes activos a la vez.",
+      "createPlanCount": "Crear plan ({{count}}/3)",
+      "tokenRequiredTitle": "Autenticación requerida",
+      "tokenRequiredMessage": "Necesitas iniciar sesión como administrador para gestionar planes.",
+      "goToSettingsPrefix": "Ir a",
+      "goToSettings": "Configuración",
+      "goToTokenManagement": "para gestionar tus tokens",
+      "alreadyExists": "Ya existe",
+      "createPlanSuccess": "Plan creado",
       "unknownError": "Error desconocido",
-      "createPlanSuccess": "Plan creado"
+      "intervals": {
+        "month": {
+          "label": "Mensual",
+          "description": "Facturado cada mes"
+        },
+        "year": {
+          "label": "Anual",
+          "description": "Facturado cada año"
+        },
+        "one_time": {
+          "label": "Pago único",
+          "description": "Pago único"
+        }
+      }
     },
-    "transactions": {
-      "title": "Transacciones",
-      "subtitle": "Monitorea todas las transacciones y pagos del sistema",
-      "searchPlaceholder": "Buscar transacciones...",
-      "statusPlaceholder": "Estado",
-      "status": {
-        "all": "Todos los Estados",
-        "completed": "Completado",
-        "pending": "Pendiente",
-        "failed": "Fallido",
-        "refunded": "Reembolsado"
-      },
-      "exportReport": "Exportar Informe",
-      "noTransactions": "No se encontraron transacciones.",
-      "table": {
-        "id": "ID de Transacción",
-        "user": "Usuario",
-        "description": "Descripción",
-        "amount": "Monto",
-        "status": "Estado",
-        "date": "Fecha",
-        "method": "Método"
-      },
-      "userId": "ID: {{id}}"
-    },
+
     "questions": {
       "title": "Banco de preguntas",
       "subtitle": "Gestiona preguntas y categorías para evaluaciones",
@@ -1311,70 +1330,6 @@
     "success": "Trabajo de importación iniciado. Verifica el estado en breve.",
     "failure": "No se pudo iniciar la importación. Intenta de nuevo."
   },
-
-  "evaluation": {
-    "toast": {
-      "emailSent": "¡Correo de invitación enviado con éxito!",
-      "emailFailed": "Error al enviar invitación por correo. Intenta de nuevo.",
-      "emailPartial": "Algunas invitaciones pueden no haberse enviado. Verifica los resultados.",
-      "evalRemoved": "¡Evaluador eliminado con éxito!",
-      "evalRemoveFailed": "Error al eliminar al evaluador. Intenta de nuevo.",
-      "resendSuccess": "¡Enlace de invitación reenviado con éxito!",
-      "resendError": "Error al reenviar el enlace de invitación. Intenta de nuevo.",
-      "groupsIncomplete": "Por favor completa todos los grupos de evaluadores antes de enviar las invitaciones. Cada grupo debe tener al menos el número mínimo requerido de evaluadores.",
-      "noPhoneNumbers": "Ningún evaluador tiene número de teléfono disponible para invitaciones SMS.",
-      "smsComingSoon": "La funcionalidad de SMS estará disponible pronto."
-    },
-    "evaluatorManagement": {
-      "title": "Gestión de evaluadores",
-      "description": "Agrega y administra evaluadores para esta evaluación 360°",
-      "addEvaluator": "Agregar evaluador",
-      "nameLabel": "Nombre completo *",
-      "namePlaceholder": "Ingresa nombre completo",
-      "emailLabel": "Correo electrónico *",
-      "emailPlaceholder": "Ingresa correo electrónico",
-      "phoneLabel": "Número de teléfono (Opcional)",
-      "phonePlaceholder": "Ingresa número de teléfono",
-      "relationshipLabel": "Relación *",
-      "validationHeading": "Requisitos de evaluador no cumplidos",
-      "relationships": {
-        "parent": "p. ej., Madre, Padre, Tutor",
-        "teacher": "p. ej., Profesor de matemáticas, Consejero, Director",
-        "siblingFriend": "p. ej., Hermana, Mejor amigo, Compañero de clase",
-        "self": "Autoevaluación",
-        "default": "Relación"
-      },
-      "needMore": "Necesitas {{count}} evaluador(es) más",
-      "overLimit": "{{count}} evaluador(es) por encima del límite",
-      "countOfMax": "{{count}}/{{max}} evaluadores",
-      "fillRequired": "Por favor completa todos los campos requeridos",
-      "failedAdd": "Error al agregar evaluador. Por favor intenta de nuevo.",
-      "selectEvaluatorsMessage": "Por favor selecciona evaluadores para enviar invitaciones."
-    },
-    "config": {
-      "addCompetencyTitle": "Agregar nueva competencia",
-      "nameLabel": "Nombre *",
-      "namePlaceholder": "p. ej., Habilidades de comunicación",
-      "categoryLabel": "Categoría *",
-      "selectCategoryPlaceholder": "Selecciona categoría...",
-      "descriptionLabel": "Descripción",
-      "descriptionPlaceholder": "Describe lo que mide esta competencia...",
-      "weightLabel": "Peso",
-      "addCompetencyButton": "Agregar competencia",
-      "currentCompetencies": "Competencias actuales",
-      "noCompetencies": "No hay competencias configuradas todavía.",
-      "rating": {
-        "addOptionTitle": "Agregar opción de calificación",
-        "label": "Etiqueta *",
-        "labelPlaceholder": "p. ej., Excelente",
-        "description": "Descripción",
-        "descriptionPlaceholder": "Descripción opcional",
-        "addOptionButton": "Agregar opción"
-      }
-    }
-  },
-
-
   "profile": {
     "personalInfoTitle": "Información personal",
     "personalInfoDescription": "Actualiza tus datos principales.",

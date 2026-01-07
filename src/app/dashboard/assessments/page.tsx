@@ -247,7 +247,7 @@ export default function AssessmentsPage() {
                 ) : null}
 
                 <a
-                  href="/dashboard/assessments/pca"
+                  href={pcaStatus === "completed" ? "/dashboard/assessments/pca?showResults=true" : "/dashboard/assessments/pca"}
                   className={cn(
                     "w-full py-3 px-4 rounded-xl flex items-center justify-center gap-2 font-medium transition-all duration-200",
                     pcaStatus === "completed"

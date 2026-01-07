@@ -7,7 +7,6 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -19,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DollarSign, Info } from "lucide-react";
+import { DollarSign, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { useGlobalStore } from "@/store/useGlobalStore";
 
@@ -110,94 +109,118 @@ export function PricingSettingsTab({
   const yourEarnings = hourlyRate - feeAmount;
 
   if (isParentLoading || isLoading) {
-    return <div className="p-8 text-center">Loading pricing...</div>;
+    return (
+      <div className="p-12 text-center text-gray-500">
+        Loading pricing settings...
+      </div>
+    );
   }
 
   return (
-    <div className="p-6 sm:p-10 space-y-8">
-      <div>
-        <h2 className="text-xl font-bold text-gray-900">Pricing Settings</h2>
-        <p className="text-gray-500 font-medium mt-1">
-          Set your hourly rate and currency for coaching sessions.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="space-y-3">
-          <Label htmlFor="currency" className="text-sm font-semibold text-gray-700">Currency</Label>
-          <Select value="USD" disabled>
-            <SelectTrigger className="h-12 rounded-xl bg-white border-gray-200">
-              <SelectValue placeholder="Select currency" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="USD">USD ($)</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-3">
-          <Label htmlFor="rate" className="text-sm font-semibold text-gray-700">Hourly Rate</Label>
-          <div className="relative">
-            <DollarSign className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <Input
-              id="rate"
-              type="number"
-              min="0"
-              step="0.01"
-              className="pl-12 h-12 rounded-xl bg-white border-gray-200 text-lg font-medium"
-              value={hourlyRate}
-              onChange={(e) => setHourlyRate(parseFloat(e.target.value) || 0)}
-            />
-          </div>
-          <p className="text-xs text-blue-600 font-medium">
-            This is what clients will see when booking.
-          </p>
-        </div>
-      </div>
-
-      <div className="rounded-2xl border border-blue-100 bg-blue-50/50 p-6 sm:p-8">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-            <Info className="h-5 w-5 text-blue-600" />
-          </div>
-          <div>
-             <h3 className="font-bold text-gray-900">Earnings Breakdown</h3>
-             <p className="text-sm text-gray-500 font-medium">Platform fee: {platformFee}%</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
-          <div className="p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Client Pays</p>
-            <p className="text-2xl font-extrabold text-gray-900">
-              {currency === "USD" ? "$" : currency} {hourlyRate.toFixed(2)}
+    <div className="space-y-8 p-1">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        {/* Left Column: Inputs */}
+        <div className="space-y-6">
+          <div className="space-y-1">
+            <h2 className="text-xl font-semibold text-gray-900">Session Pricing</h2>
+            <p className="text-sm text-gray-500">
+              Set your hourly rate for 1:1 coaching sessions.
             </p>
           </div>
-          <div className="p-4 bg-white rounded-xl border border-gray-100 shadow-sm relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-1 h-full bg-red-400" />
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Platform Fee</p>
-            <p className="text-2xl font-bold text-red-500">
-              - {currency === "USD" ? "$" : currency} {feeAmount.toFixed(2)}
-            </p>
-          </div>
-          <div className="p-4 bg-green-50 rounded-xl border border-green-100 shadow-sm relative overflow-hidden">
-             <div className="absolute top-0 right-0 w-16 h-16 bg-green-100/50 rounded-full -mr-8 -mt-8" />
-             <p className="text-xs font-bold text-green-700 uppercase tracking-widest mb-1">You Earn</p>
-             <p className="text-3xl font-extrabold text-green-700">
-              {currency === "USD" ? "$" : currency} {yourEarnings.toFixed(2)}
-            </p>
-          </div>
-        </div>
-      </div>
 
-      <div className="flex justify-end pt-4 border-t border-gray-100">
-        <Button
-          onClick={handleSave}
-          disabled={isSaving}
-          className="bg-gray-900 text-white hover:bg-black h-12 px-8 rounded-xl font-bold shadow-lg shadow-gray-900/10"
-        >
-          {isSaving ? "Saving..." : "Save Changes"}
-        </Button>
+          <Card className="border-gray-200 shadow-sm bg-white">
+            <CardContent className="p-6 space-y-6">
+              <div className="space-y-3">
+                <Label htmlFor="currency" className="text-sm font-medium text-gray-700">Currency</Label>
+                <Select value="USD" disabled>
+                  <SelectTrigger className="h-11 rounded-lg bg-gray-50/50 border-gray-200">
+                    <SelectValue placeholder="Select currency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="USD">USD ($)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-3">
+                <Label htmlFor="rate" className="text-sm font-medium text-gray-700">Hourly Rate</Label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <span className="text-gray-500 sm:text-sm">$</span>
+                  </div>
+                  <Input
+                    id="rate"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    className="pl-7 h-11 rounded-lg bg-white border-gray-200 text-lg font-medium"
+                    placeholder="0.00"
+                    value={hourlyRate}
+                    onChange={(e) => setHourlyRate(parseFloat(e.target.value) || 0)}
+                  />
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                    <span className="text-gray-500 sm:text-sm">/ hr</span>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500">
+                  Clients will see this price when booking sessions.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Button
+            onClick={handleSave}
+            disabled={isSaving}
+            className="w-full sm:w-auto h-11 px-8 rounded-xl font-semibold bg-gray-900 text-white hover:bg-gray-800 shadow-sm"
+          >
+            {isSaving ? "Saving..." : "Save Changes"}
+          </Button>
+        </div>
+
+        {/* Right Column: Preview/Breakdown */}
+        <div className="space-y-6">
+          <div className="space-y-1">
+             <h2 className="text-xl font-semibold text-gray-900">Earnings Breakdown</h2>
+             <p className="text-sm text-gray-500">
+               Breakdown of what you earn per session after fees.
+             </p>
+          </div>
+
+          <Card className="border-0 shadow-none bg-gray-50/80">
+            <CardContent className="p-6 space-y-6">
+               <div className="flex items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Client Pays</p>
+                    <p className="text-2xl font-bold text-gray-900">${hourlyRate.toFixed(2)}</p>
+                  </div>
+                  <div className="h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center">
+                    <DollarSign className="w-5 h-5 text-gray-600" />
+                  </div>
+               </div>
+
+               <div className="relative pl-6 space-y-4 border-l-2 border-dashed border-gray-200 ml-6 pb-2">
+                  <div className="flex justify-between items-center text-sm">
+                     <span className="text-gray-500">Platform Fee ({platformFee}%)</span>
+                     <span className="font-medium text-red-500">-${feeAmount.toFixed(2)}</span>
+                  </div>
+               </div>
+               
+               <div className="flex items-center justify-between p-5 bg-emerald-600 text-white rounded-xl shadow-md shadow-emerald-200">
+                   <div>
+                    <p className="text-sm font-medium text-emerald-100 mb-1">Your Net Earnings</p>
+                    <p className="text-3xl font-bold">${yourEarnings.toFixed(2)}</p>
+                   </div>
+                   <div className="h-12 w-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                      <Wallet className="w-6 h-6 text-white" />
+                   </div>
+               </div>
+               <p className="text-xs text-center text-gray-400">
+                  Net earnings are transferred to your payout account.
+               </p>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
