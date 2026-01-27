@@ -105,7 +105,8 @@ export function PricingSettingsTab({
   };
 
   // Earnings Breakdown
-  const feeAmount = (hourlyRate * platformFee) / 100;
+  const effectiveFee = coachDetails?.platformCommission !== undefined ? coachDetails.platformCommission : platformFee;
+  const feeAmount = (hourlyRate * effectiveFee) / 100;
   const yourEarnings = hourlyRate - feeAmount;
 
   if (isParentLoading || isLoading) {
@@ -181,43 +182,43 @@ export function PricingSettingsTab({
         {/* Right Column: Preview/Breakdown */}
         <div className="space-y-6">
           <div className="space-y-1">
-             <h2 className="text-xl font-semibold text-gray-900">Earnings Breakdown</h2>
-             <p className="text-sm text-gray-500">
-               Breakdown of what you earn per session after fees.
-             </p>
+            <h2 className="text-xl font-semibold text-gray-900">Earnings Breakdown</h2>
+            <p className="text-sm text-gray-500">
+              Breakdown of what you earn per session after fees.
+            </p>
           </div>
 
           <Card className="border-0 shadow-none bg-gray-50/80">
             <CardContent className="p-6 space-y-6">
-               <div className="flex items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Client Pays</p>
-                    <p className="text-2xl font-bold text-gray-900">${hourlyRate.toFixed(2)}</p>
-                  </div>
-                  <div className="h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center">
-                    <DollarSign className="w-5 h-5 text-gray-600" />
-                  </div>
-               </div>
+              <div className="flex items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Client Pays</p>
+                  <p className="text-2xl font-bold text-gray-900">${hourlyRate.toFixed(2)}</p>
+                </div>
+                <div className="h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center">
+                  <DollarSign className="w-5 h-5 text-gray-600" />
+                </div>
+              </div>
 
-               <div className="relative pl-6 space-y-4 border-l-2 border-dashed border-gray-200 ml-6 pb-2">
-                  <div className="flex justify-between items-center text-sm">
-                     <span className="text-gray-500">Platform Fee ({platformFee}%)</span>
-                     <span className="font-medium text-red-500">-${feeAmount.toFixed(2)}</span>
-                  </div>
-               </div>
-               
-               <div className="flex items-center justify-between p-5 bg-emerald-600 text-white rounded-xl shadow-md shadow-emerald-200">
-                   <div>
-                    <p className="text-sm font-medium text-emerald-100 mb-1">Your Net Earnings</p>
-                    <p className="text-3xl font-bold">${yourEarnings.toFixed(2)}</p>
-                   </div>
-                   <div className="h-12 w-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                      <Wallet className="w-6 h-6 text-white" />
-                   </div>
-               </div>
-               <p className="text-xs text-center text-gray-400">
-                  Net earnings are transferred to your payout account.
-               </p>
+              <div className="relative pl-6 space-y-4 border-l-2 border-dashed border-gray-200 ml-6 pb-2">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-500">Platform Fee ({effectiveFee}%)</span>
+                  <span className="font-medium text-red-500">-${feeAmount.toFixed(2)}</span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between p-5 bg-emerald-600 text-white rounded-xl shadow-md shadow-emerald-200">
+                <div>
+                  <p className="text-sm font-medium text-emerald-100 mb-1">Your Net Earnings</p>
+                  <p className="text-3xl font-bold">${yourEarnings.toFixed(2)}</p>
+                </div>
+                <div className="h-12 w-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                  <Wallet className="w-6 h-6 text-white" />
+                </div>
+              </div>
+              <p className="text-xs text-center text-gray-400">
+                Net earnings are transferred to your payout account.
+              </p>
             </CardContent>
           </Card>
         </div>

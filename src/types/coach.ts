@@ -24,6 +24,7 @@ export interface Coach {
   website?: string;
   linkedin?: string;
   twitter?: string;
+  platformCommission?: number; // Coach-specific platform fee percentage (0-100)
 }
 
 export interface OnboardingStatus {
@@ -95,11 +96,11 @@ export interface Booking {
   endTime?: string;
   slot?: BookingSlot;
   status:
-    | "confirmed"
-    | "rescheduled"
-    | "cancelled"
-    | "completed"
-    | "pending_payment";
+  | "confirmed"
+  | "rescheduled"
+  | "cancelled"
+  | "completed"
+  | "pending_payment";
   meetingLink?: string;
 }
 

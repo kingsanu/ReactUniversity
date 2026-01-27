@@ -65,13 +65,14 @@ export async function submitOnboardingData(
 
 export async function getCalendarAuthUrl(
   provider: "google" | "outlook",
-  email?: string
+  email?: string,
+  redirectUrl?: string
 ): Promise<{ url: string }> {
   const query = new URLSearchParams();
   if (email) query.append("email", email);
-  const requestUrl = `${API_BASE_URL}/api/v1/auth/${provider}/url${
-    query.toString() ? `?${query.toString()}` : ""
-  }`;
+  if (redirectUrl) query.append("redirectUrl", redirectUrl);
+  const requestUrl = `${API_BASE_URL}/api/v1/auth/${provider}/url${query.toString() ? `?${query.toString()}` : ""
+    }`;
 
   console.log(`[getCalendarAuthUrl] Requesting: ${requestUrl}`);
 
@@ -102,7 +103,7 @@ export async function getCalendarAuthUrl(
   return { url };
 }
 
-export async function checkGoogleAuthStatus(email: string): Promise<{
+export async function checkCalendarAuthStatus(provider: "google" | "outlook", email?: string): Promise<{
   isAuthenticated: boolean;
   email: string;
   userId: string;
@@ -113,18 +114,27 @@ export async function checkGoogleAuthStatus(email: string): Promise<{
     isTokenValid: boolean;
     isTokenExpired: boolean;
     tokenStatus: string;
+    provider: "google" | "outlook";
   };
 }> {
+  const query = new URLSearchParams();
+  if (email) query.append("email", email);
+
   const response = await fetch(
-    `${API_BASE_URL}/api/v1/auth/google/status?email=${email}`,
+    `${API_BASE_URL}/api/v1/auth/${provider}/status?${query.toString()}`,
     {
       headers: getHeaders(),
     }
   );
 
-  if (!response.ok) throw new Error("Failed to check Google auth status");
+  if (!response.ok) throw new Error(`Failed to check ${provider} auth status`);
   const json = await response.json();
   return json.data || json;
+}
+
+// Deprecated alias for backward compatibility if needed, using the new function
+export async function checkGoogleAuthStatus(email: string) {
+  return checkCalendarAuthStatus("google", email);
 }
 
 // --- User Side APIs ---
@@ -256,9 +266,8 @@ export async function getCoachPayouts(params?: {
   if (params?.limit) query.append("limit", params.limit.toString());
   if (params?.status) query.append("status", params.status);
 
-  const requestUrl = `${API_BASE_URL}/api/v1/coach/me/payouts${
-    query.toString() ? `?${query.toString()}` : ""
-  }`;
+  const requestUrl = `${API_BASE_URL}/api/v1/coach/me/payouts${query.toString() ? `?${query.toString()}` : ""
+    }`;
   const response = await fetch(requestUrl, {
     headers: getHeaders(),
   });
@@ -483,6 +492,15 @@ export async function updateAvailability(
   return json.data;
 }
 
+export async function getCoachProfile(): Promise<Coach> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/coach/me`, {
+    headers: getHeaders(),
+  });
+  if (!response.ok) throw new Error("Failed to fetch profile");
+  const json = await response.json();
+  return json.data || json;
+}
+
 export async function updateCoachProfile(data: Partial<Coach>): Promise<Coach> {
   const response = await fetch(`${API_BASE_URL}/api/v1/coach/me`, {
     method: "PUT",
@@ -583,6 +601,7 @@ export async function inviteCoach(data: {
   name?: string;
   contractStart?: string;
   contractEnd?: string;
+  platformCommission?: number;
 }): Promise<{ message: string; invitationId: string }> {
   const response = await fetch(`${API_BASE_URL}/authapi/invite-coach`, {
     method: "POST",
@@ -605,11 +624,41 @@ export async function inviteCoachBulk(file: File): Promise<any[]> {
   });
 
   if (!response.ok) throw new Error("Failed to bulk invite coaches");
+  if (!response.ok) throw new Error("Failed to bulk invite coaches");
+  return response.json();
+}
+
+export async function updateCoach(coachId: string, data: Partial<Coach>): Promise<{ success: boolean; message: string }> {
+  const response = await fetch(`${API_BASE_URL}/authapi/coaches/${coachId}`, {
+    method: "PUT",
+    headers: getHeaders(),
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || "Failed to update coach");
+  }
+
+  return response.json();
+}
+
+export async function deactivateCoach(coachId: string): Promise<{ success: boolean; message: string }> {
+  const response = await fetch(`${API_BASE_URL}/authapi/coaches/${coachId}/deactivate`, {
+    method: "POST",
+    headers: getHeaders(),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || "Failed to deactivate coach");
+  }
+
   return response.json();
 }
 
 export async function signupCoachBulk(
-  coaches: { fullName: string; email: string; password?: string }[]
+  coaches: { fullName: string; email: string; password?: string; platformCommission?: number }[]
 ): Promise<any[]> {
   const response = await fetch(`${API_BASE_URL}/authapi/signup-coach-bulk`, {
     method: "POST",

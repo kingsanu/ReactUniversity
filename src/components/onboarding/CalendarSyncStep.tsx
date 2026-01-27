@@ -24,7 +24,7 @@ export function CalendarSyncStep({
   const handleConnect = async (provider: "google" | "outlook") => {
     try {
       const { getCalendarAuthUrl } = await import("@/services/coachService");
-      const { url } = await getCalendarAuthUrl(provider, email);
+      const { url } = await getCalendarAuthUrl(provider, email, window.location.href);
       console.log(`Calendar auth URL for ${provider}:`, url);
       // Parse and inspect redirect_uri param if present
       try {
@@ -159,6 +159,7 @@ export function CalendarSyncStep({
           </div>
           <Button
             size="lg"
+            disabled={integrations.outlook}
             variant={integrations.google ? "outline" : "default"}
             onClick={() => handleConnect("google")}
             className={cn(
@@ -185,7 +186,8 @@ export function CalendarSyncStep({
             "relative group p-6 border rounded-2xl transition-all duration-300 flex items-center justify-between",
             integrations.outlook
               ? "border-blue-200 bg-blue-50/30 shadow-sm"
-              : "border-gray-200 hover:border-gray-300 hover:shadow-md bg-white"
+              : "border-gray-200 hover:border-gray-300 hover:shadow-md bg-white",
+            integrations.google && "opacity-50 pointer-events-none"
           )}
         >
           <div className="flex items-center gap-5">
@@ -204,6 +206,7 @@ export function CalendarSyncStep({
           <Button
             size="lg"
             variant={integrations.outlook ? "outline" : "default"}
+            disabled={integrations.google}
             onClick={() => handleConnect("outlook")}
             className={cn(
               "min-w-[120px] transition-all",

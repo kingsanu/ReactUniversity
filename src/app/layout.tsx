@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { montserrat, roboto, geistSans, geistMono, antonio } from "./fonts";
 import "./globals.css";
 import { AuthWrapper } from "@/components/AuthWrapper";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -9,18 +9,6 @@ import { I18nProvider } from "@/components/I18nProvider";
 import { TelemetryProvider } from "@/components/TelemetryProvider";
 import { SkipToMain } from "@/components/ui/accessibility";
 import { Toaster } from "sonner";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-  display: "swap", // Optimize font loading
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-  display: "swap", // Optimize font loading
-});
 
 export const metadata: Metadata = {
   title: {
@@ -75,7 +63,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} ${antonio.variable} ${roboto.variable} antialiased`}
       >
         <SkipToMain mainId="main-content" />
         <ErrorBoundary>

@@ -36,47 +36,29 @@ export default function CoachesPage() {
   });
   const [isLoadingStats, setIsLoadingStats] = useState(true);
 
+  // Edit State
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editingCoach, setEditingCoach] = useState<Coach | undefined>(undefined);
+
+  const handleEdit = (coach: Coach) => {
+    setEditingCoach(coach);
+    setIsEditOpen(true);
+  };
+
+  const handleEditSuccess = () => {
+    setIsEditOpen(false);
+    setEditingCoach(undefined);
+    window.location.reload();
+  };
+
   // Fetch coach stats from API
   useEffect(() => {
     const fetchCoachStats = async () => {
       setIsLoadingStats(true);
       try {
-        const { getAllCoachesAdmin } = await import("@/services/coachService");
-        const response = await getAllCoachesAdmin({ page: 1, limit: 500 });
-
-        const anyResponse = response as any;
-        let coaches: Coach[] = [];
-
-        if (Array.isArray(anyResponse)) {
-          coaches = anyResponse;
-        } else if (anyResponse?.data && Array.isArray(anyResponse.data)) {
-          coaches = anyResponse.data;
-        } else if (
-          anyResponse?.data?.data &&
-          Array.isArray(anyResponse.data.data)
-        ) {
-          coaches = anyResponse.data.data;
-        }
-
-        const today = new Date();
-        const thirtyDaysFromNow = new Date(
-          today.getTime() + 30 * 24 * 60 * 60 * 1000
-        );
-
-        const calculatedStats: CoachStats = {
-          totalCoaches: coaches.length,
-          activeNow: coaches.filter((c) => c.status === "active").length,
-          pendingInvites: coaches.filter(
-            (c) => c.status === "invited" || c.status === "pending"
-          ).length,
-          expiringContracts: coaches.filter((c) => {
-            if (!c.contractEnd) return false;
-            const endDate = new Date(c.contractEnd);
-            return endDate >= today && endDate <= thirtyDaysFromNow;
-          }).length,
-        };
-
-        setStats(calculatedStats);
+        const { getCoachStats } = await import("@/services/coachService");
+        const data = await getCoachStats();
+        setStats(data);
       } catch (error) {
         console.error("Failed to fetch coach stats:", error);
       } finally {
@@ -173,7 +155,7 @@ export default function CoachesPage() {
                     </TabsTrigger>
                   </TabsList>
                   <TabsContent value="single" className="mt-0">
-                    <SingleInviteForm />
+                    <SingleInviteForm onSuccess={() => setIsInviteOpen(false)} />
                   </TabsContent>
                   <TabsContent value="bulk" className="mt-0">
                     <BulkInviteForm />
@@ -182,6 +164,24 @@ export default function CoachesPage() {
               </div>
             </DialogContent>
           </Dialog>
+
+          {/* Edit Dialog */}
+          <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+            <DialogContent className="sm:max-w-xl rounded-2xl p-0 overflow-hidden gap-0">
+              <DialogHeader className="p-6 bg-gray-50/50 border-b border-gray-100">
+                <DialogTitle className="text-xl">
+                  {t("admin.coaches.editTitle", "Edit Coach")}
+                </DialogTitle>
+                <DialogDescription className="text-base pt-1">
+                  {t("admin.coaches.editDescription", "Update coach details.")}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="p-6">
+                <SingleInviteForm initialData={editingCoach} onSuccess={handleEditSuccess} />
+              </div>
+            </DialogContent>
+          </Dialog>
+
         </div>
 
         {/* Bento Stats Grid */}
@@ -216,7 +216,7 @@ export default function CoachesPage() {
 
       {/* Main Content Area */}
       <div className="max-w-7xl mx-auto">
-        <CoachesTable />
+        <CoachesTable onEdit={handleEdit} />
       </div>
     </div>
   );

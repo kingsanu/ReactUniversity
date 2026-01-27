@@ -21,6 +21,7 @@
     "earnings": "Earnings",
     "users": "Users",
     "coaches": "Coaches",
+    "schools": "Schools",
     "courses": "Courses",
     "careers": "Careers",
     "questions": "Questions",
@@ -72,7 +73,8 @@
     "sending": "Sending...",
     "successful": "Successful",
     "failed": "Failed",
-    "today": "Today"
+    "today": "Today",
+    "to": "to"
   },
   "error": {
     "somethingWentWrong": "Something went wrong",
@@ -226,6 +228,7 @@
       }
     }
   },
+
   "dashboard": {
     "title": "Dashboard",
     "welcome": "Welcome to your dashboard",
@@ -256,7 +259,7 @@
     },
     "assessmentJourney": "Assessment Journey",
     "assessmentSubtitle": "Your professional growth path",
-    "professionalCertified": "Professional Certified", 
+    "professionalCertified": "Professional Certified",
     "courseCatalog": "Course Catalog",
     "coach": {
       "greeting": {
@@ -465,10 +468,6 @@
     "processingSpeedDesc": "Efficient cognitive processing under time pressure",
     "returnToDashboard": "Return to Dashboard",
     "printResults": "Print Results",
-    "downloadPDFReport": "Download PDF Report",
-    "liaResultsTitle": "LIA Assessment Results",
-    "liaResultsComplete": "All subtests completed! Your comprehensive results are ready.",
-    "liaResultsInProgress": "Assessment in progress. Complete all subtests to see your full results.",
     "inviteEvaluators": "Invite Evaluators",
     "loadingResults": "Loading results...",
     "backToConfiguration": "Back to Configuration",
@@ -635,17 +634,6 @@
     "nextExample": "Next Example"
   },
   "benchmarks": {
-    "header": {
-      "title": "Overview"
-    },
-    "compensationTitle": "Compensation",
-    "market": "Market Trends",
-    "skills": {
-      "title": "Skills Analysis"
-    },
-    "demographics": {
-      "title": "Demographics"
-    },
     "marketDemand": "Market Demand",
     "high": "High",
     "topGrowth": "Top 10% Growth",
@@ -710,6 +698,7 @@
       "creating": "Creating account..."
     }
   },
+
   "transactions": {
     "fetchFailed": "Failed to load transactions",
     "noExport": "No transactions to export",
@@ -741,7 +730,24 @@
     "redirecting": "Redirecting to Admin Panel...",
     "accessRequired": "Administrator access required",
     "accessDenied": "Access denied. This area is for administrators only.",
-
+    "layout": {
+      "panelTitle": "Admin Panel",
+      "headerTitle": "Administrator Dashboard",
+      "userDashboard": "User Dashboard",
+      "logout": "Logout",
+      "superAdmin": "Super Admin",
+      "nav": {
+        "dashboard": "Dashboard",
+        "plans": "Subscription Plans",
+        "users": "Users",
+        "coaches": "Coaches",
+        "courses": "Courses",
+        "careers": "Careers",
+        "questions": "360° Questions",
+        "analytics": "Analytics",
+        "settings": "Settings"
+      }
+    },
     "verifying": "Verifying admin access...",
     "title": "Admin Dashboard",
     "subtitle": "Overview of your platform's performance",
@@ -766,6 +772,10 @@
         "createFirst": "Create First Question",
         "activate": "Activate",
         "deactivate": "Deactivate"
+      },
+      "plans": {
+        "title": "Subscription Plans",
+        "description": "Manage pricing tiers and billing."
       },
       "settings": {
         "title": "System Settings",
@@ -830,7 +840,21 @@
         "verifyDeployment": "Verify your deployment URL is accessible"
       }
     },
-
+    "plans": {
+      "editTitle": "Edit Plan",
+      "createTitle": "Create New Plan",
+      "planNameLabel": "Plan Name *",
+      "planNamePlaceholder": "e.g., Basic Plan",
+      "priceLabel": "Price (USD) *",
+      "pricePlaceholder": "29.99",
+      "intervalLabel": "Billing Interval *",
+      "featuresLabel": "Features *",
+      "featurePlaceholder": "e.g., Unlimited projects",
+      "addFeature": "+ Add Feature",
+      "createButton": "Create Plan",
+      "updateButton": "Update Plan",
+      "alreadyExists": "Already exists"
+    },
     "analytics": {
       "title": "Analytics",
       "loading": "Loading platform analytics...",
@@ -849,8 +873,7 @@
       "cards": {
         "topCoaches": "Top Performing Coaches",
         "topCourses": "Top Courses",
-        "recentActivity": "Recent Activity",
-        "revenueTransactions": "Revenue & Transactions"
+        "recentActivity": "Recent Activity"
       },
       "charts": {
         "userGrowthTrend": "User Growth Trend"
@@ -884,38 +907,50 @@
       },
       "noPending": "No pending payouts found."
     },
+    "schools": {
+      "title": "Schools Management",
+      "subtitle": "Manage school partnerships and student access.",
+      "totalSchools": "Total Schools",
+      "active": "Active Schools",
+      "pending": "Pending Invites",
+      "totalStudents": "Total Students",
+      "inviteButton": "Invite School",
+      "inviteTitle": "Invite School",
+      "inviteDescription": "Send an invitation to a school administrator.",
+      "inviteSuccess": "Invitation sent to {{name}}",
+      "inviteError": "Failed to send invitation. Please try again.",
+      "name": "School Name",
+      "namePlaceholder": "e.g. Springfield High",
+      "email": "Admin Email",
+      "emailPlaceholder": "admin@school.com",
+      "maxStudents": "Max Students",
+      "details": "Details / Contract Info",
+      "detailsPlaceholder": "Enter contract info or other details...",
+      "sendInvite": "Send Invitation",
+      "editTitle": "Edit School",
+      "editDescription": "Update school details.",
+      "updateSuccess": "School updated successfully",
+      "updateError": "Failed to update school"
+    },
     "users": {
       "title": "Users",
       "subtitle": "Manage user accounts and permissions",
       "failedToLoad": "Failed to load users",
       "searchPlaceholder": "Search users...",
-      "rolePlaceholder": "Select role",
-      "statusPlaceholder": "Select status",
+      "rolePlaceholder": "Role",
+      "statusPlaceholder": "Status",
       "roles": {
-        "all": "All",
+        "all": "All Roles",
         "student": "Student",
         "coach": "Coach",
         "admin": "Admin"
       },
       "status": {
-        "all": "All",
+        "all": "All Status",
         "active": "Active",
         "inactive": "Inactive"
       },
       "addUser": "Add User",
-      "dialogTitle": "Add New User",
-      "dialogDescription": "Create a new user account. They will receive their login credentials.",
-      "nameLabel": "Full Name *",
-      "namePlaceholder": "Enter full name",
-      "emailPlaceholder": "Enter email address",
-      "passwordLabel": "Password *",
-      "passwordPlaceholder": "Enter password",
-      "passwordHint": "Password must be at least 6 characters with uppercase, lowercase, and number.",
-      "creating": "Creating...",
-      "createUser": "Create User",
-      "fillRequired": "Please fill in all required fields",
-      "success": "User created successfully!",
-      "error": "Failed to create user",
       "table": {
         "name": "Name",
         "email": "Email",
@@ -926,69 +961,14 @@
         "actions": "Actions"
       },
       "loadingText": "Loading users...",
-      "noUsersFound": "No users found",
-      "emailCopied": "Email copied",
-      "openMenu": "Open menu",
+      "noUsersFound": "No users found matching your criteria.",
+      "emailCopied": "Email copied to clipboard",
       "dropdown": {
         "actions": "Actions",
         "copyEmail": "Copy Email",
         "viewProfile": "View Profile",
         "editDetails": "Edit Details",
         "deactivateUser": "Deactivate User"
-      }
-    },
-    "plans": {
-      "header": "Subscription Plans",
-      "description": "Manage your subscription plans and pricing",
-      "loading": "Loading plans...",
-      "failedToLoad": "Failed to load plans",
-      "refresh": "Refresh",
-      "createTitle": "Create Plan",
-      "createAll": "Create {{count}} Plans",
-      "createThisPlan": "Create This Plan",
-      "creating": "Creating...",
-      "creationResultsTitle": "Creation Results:",
-      "previewTitle": "Plans to Create:",
-      "moreFeatures": "... and {{count}} more",
-      "editTitle": "Edit Plan",
-      "updateButton": "Update Plan",
-      "createButton": "Create Plan",
-      "planNameLabel": "Plan Name",
-      "planNamePlaceholder": "e.g. Monthly Subscription",
-      "priceLabel": "Price",
-      "pricePlaceholder": "e.g. 29.99",
-      "intervalLabel": "Billing Interval",
-      "featuresLabel": "Features",
-      "featuresHeading": "Plan Features",
-      "featurePlaceholder": "e.g. Full access to all courses",
-      "addFeature": "Add Feature",
-      "active": "Active",
-      "inactive": "Inactive",
-      "mockLabel": "Mock Data",
-      "mockDataTitle": "Using Mock Data",
-      "mockDataDescription": "You are currently viewing mock data. Connect to a backend to see real plans.",
-      "hideMock": "Hide Mock Data",
-      "maxPlansAlert": "You can only have 3 active plans at a time.",
-      "createPlanCount": "Create Plan ({{count}}/3)",
-      "tokenRequiredTitle": "Authentication Required",
-      "tokenRequiredMessage": "You need to be logged in as an admin to manage plans.",
-      "goToSettingsPrefix": "Go to",
-      "goToSettings": "Settings",
-      "goToTokenManagement": "to manage your tokens",
-      "alreadyExists": "Already exists",
-      "intervals": {
-        "month": {
-          "label": "Monthly",
-          "description": "Billed every month"
-        },
-        "year": {
-          "label": "Yearly",
-          "description": "Billed every year"
-        },
-        "one_time": {
-          "label": "One-Time",
-          "description": "One time payment"
-        }
       }
     },
     "transactions": {
@@ -1001,12 +981,9 @@
         "completed": "Completed",
         "pending": "Pending",
         "failed": "Failed",
-        "refunded": "Refunded",
-        "requires_payment_method": "Requires Payment Method",
-        "succeeded": "Succeeded"
+        "refunded": "Refunded"
       },
       "exportReport": "Export Report",
-      "exportFailed": "Failed to export report",
       "noTransactions": "No transactions found.",
       "table": {
         "id": "Transaction ID",
@@ -1060,23 +1037,7 @@
         "questionNumberLabel": "Question Number"
       }
     },
-    "layout": {
-      "panelTitle": "Admin Panel",
-      "headerTitle": "Administrator Dashboard",
-      "userDashboard": "User Dashboard",
-      "logout": "Logout",
-      "nav": {
-        "dashboard": "Dashboard",
-        "plans": "Subscription Plans",
-        "users": "Users",
-        "coaches": "Coaches",
-        "courses": "Courses",
-        "careers": "Careers",
-        "questions": "360° Questions",
-        "analytics": "Analytics",
-        "settings": "Settings"
-      }
-    },
+
     "coaches": {
       "title": "Coaches",
       "subtitle": "Manage your coaching team and invitations",
@@ -1107,6 +1068,7 @@
         "specialization": "Specialization",
         "contractPeriod": "Contract Period",
         "contractStatus": "Contract Status",
+        "platformFee": "Platform Fee",
         "students": "Students",
         "actions": "Actions"
       },
@@ -1354,6 +1316,7 @@
     "started": "Import job started ({{jobId}}). Check status in a moment.",
     "failure": "Failed to start import. Please try again."
   },
+
   "profile": {
     "personalInfoTitle": "Personal Information",
     "personalInfoDescription": "Update your core identity details.",

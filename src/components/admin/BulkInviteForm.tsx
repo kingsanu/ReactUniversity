@@ -15,6 +15,7 @@ interface CoachData {
   email: string;
   contractStart?: string;
   contractEnd?: string;
+  platformCommission?: string | number;
 }
 
 export function BulkInviteForm() {
@@ -32,7 +33,7 @@ export function BulkInviteForm() {
   };
 
   const downloadTemplate = () => {
-    const csvContent = "fullName,email,contractStart,contractEnd\nJohn Doe,john@example.com,2024-01-01,2024-12-31\nJane Smith,jane@example.com,2024-02-01,2025-01-31";
+    const csvContent = "fullName,email,contractStart,contractEnd,platformCommission\nJohn Doe,john@example.com,2024-01-01,2024-12-31,15\nJane Smith,jane@example.com,2024-02-01,2025-01-31,20";
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     if (link.download !== undefined) {
@@ -67,11 +68,11 @@ export function BulkInviteForm() {
       skipEmptyLines: true,
       complete: async (results) => {
         const validData = results.data.filter(row => row.email && row.fullName);
-        
+
         if (validData.length === 0) {
-            toast.error(t('admin.invite.noValidRows'));
-            setIsLoading(false);
-            return;
+          toast.error(t('admin.invite.noValidRows'));
+          setIsLoading(false);
+          return;
         }
 
         try {
@@ -83,13 +84,14 @@ export function BulkInviteForm() {
             password: generatePassword(),
             contractStart: row.contractStart,
             contractEnd: row.contractEnd,
+            platformCommission: row.platformCommission ? Number(row.platformCommission) : undefined,
           }));
 
           const response = await signupCoachBulk(coachesToInvite);
-          
+
           // Assuming response contains results
-          const data = response; 
-          
+          const data = response;
+
           const successCount = Array.isArray(data) ? data.filter((r: any) => r.success).length : coachesToInvite.length;
           const failedCount = Array.isArray(data) ? data.filter((r: any) => !r.success).length : 0;
           const errors = Array.isArray(data) ? data.filter((r: any) => !r.success).map((r: any) => r.error || "Unknown error") : [];
@@ -101,7 +103,7 @@ export function BulkInviteForm() {
           });
 
           toast.success(t('admin.invite.processedRecords', { count: coachesToInvite.length }));
-          
+
           if (fileInputRef.current) {
             fileInputRef.current.value = "";
           }

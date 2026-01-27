@@ -565,22 +565,52 @@
               "name": "Get Outlook Calendar Auth URL",
               "request": {
                 "method": "GET",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "Bearer {{token}}",
-                    "type": "text"
-                  }
-                ],
+                "header": [],
                 "url": {
-                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/auth/outlook/url",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/auth/outlook/url?email={{email}}&invitationToken={{invitationToken}}",
                   "protocol": "https",
                   "host": [
                     "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
                   ],
-                  "path": ["api", "v1", "auth", "outlook", "url"]
+                  "path": ["api", "v1", "auth", "outlook", "url"],
+                  "query": [
+                    {
+                      "key": "email",
+                      "value": "{{email}}",
+                      "description": "User email address (required)"
+                    },
+                    {
+                      "key": "invitationToken",
+                      "value": "{{invitationToken}}",
+                      "description": "Invitation token for coach onboarding (optional). If provided, callback will redirect back to invitation URL.",
+                      "disabled": true
+                    }
+                  ]
                 },
-                "description": "Get Outlook Calendar OAuth consent URL for calendar integration."
+                "description": "Get Outlook Calendar OAuth consent URL for calendar integration. No authentication required. Passes user email as query parameter to identify the user.\n\n**Query Parameters:**\n- email: User's email address (required)\n- invitationToken: Optional - Invitation token from coach invitation email. If provided, the OAuth callback will redirect back to the invitation URL instead of the default frontend path.\n\n**Returns:**\n- OAuth URL that can be used to redirect user to Microsoft consent screen\n- User ID and invitationToken (if provided) are encoded in the state parameter for callback identification\n\n**Use Cases:**\n- During onboarding: Include invitationToken to redirect back to onboarding page after Outlook auth\n- Regular use: Omit invitationToken for default redirect behavior"
+              }
+            },
+            {
+              "name": "Check Outlook Auth Status",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/auth/outlook/status?email={{email}}",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "auth", "outlook", "status"],
+                  "query": [
+                    {
+                      "key": "email",
+                      "value": "{{email}}",
+                      "description": "User email address (required)"
+                    }
+                  ]
+                },
+                "description": "Check Outlook Calendar authentication status for a user by email. Returns true/false with detailed authentication information.\n\n**Query Parameters:**\n- email: Required - User's email address\n\n**Returns:**\n- isAuthenticated: Boolean indicating if user is authenticated\n- email: User's email\n- userId: User ID\n- coachId: Coach profile ID (if exists)\n- authDetails: Detailed authentication information including:\n  - connected: Whether Outlook Calendar is connected\n  - hasAccessToken: Whether access token exists\n  - hasRefreshToken: Whether refresh token exists\n  - isTokenValid: Whether token is valid (verified with Microsoft Graph API)\n  - isTokenExpired: Whether token is expired\n  - tokenExpiresAt: Token expiration timestamp\n  - tokenStatus: Token status (valid, expired, invalid, not_connected)\n- message: Status message\n\n**Features:**\n- Validates email format\n- Finds user and coach profile\n- Checks Outlook Calendar connection status\n- Verifies token validity with Microsoft Graph API\n- Provides detailed authentication status"
               }
             },
             {
@@ -1527,6 +1557,50 @@
                 },
                 "description": "Update payout frequency and payment method. All fields are optional - only provided fields will be updated.\n\n**Request Body:**\n- frequency: Optional - 'biweekly' or 'monthly'\n- method: Optional - 'stripe' or 'bank_transfer'\n- bankAccountNumber: Optional - Bank account number (for bank_transfer)\n- bankRoutingNumber: Optional - Bank routing number (for bank_transfer)\n- bankName: Optional - Name of bank (for bank_transfer)\n- accountHolderName: Optional - Account holder name (for bank_transfer)\n\n**Validation:**\n- frequency must be 'biweekly' or 'monthly'\n- method must be 'stripe' or 'bank_transfer'"
               }
+            },
+            {
+              "name": "Get Billing Data",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/billing",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "coach", "billing"]
+                },
+                "description": "Get coach billing data including current period summary and history.\n\n**Returns:**\n- currentPeriod: Summary for current billing period\n  - periodStart, periodEnd\n  - totalEarnings, platformFee, netEarnings\n  - completedSessions, pendingSessions\n- billingHistory: List of past billing periods\n  - periodId, periodStart, periodEnd\n  - totalEarnings, platformFee, netEarnings\n  - status (pending, paid, processing)\n  - invoiceId (if available)\n\n**Note:** Requires coach authentication"
+              }
+            },
+            {
+              "name": "Download Invoice PDF",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/billing/{{periodId}}/download",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "coach", "billing", "{{periodId}}", "download"]
+                },
+                "description": "Download invoice PDF for a specific billing period.\n\n**Path Parameters:**\n- periodId: Billing period ID\n\n**Returns:**\n- PDF file download\n- Invoice includes: period details, earnings breakdown, platform fees, net earnings, session details\n\n**Note:** Requires coach authentication. PDF generation may take a few seconds."
+              }
             }
           ]
         },
@@ -1982,6 +2056,50 @@
                 },
                 "description": "Export transactions in CSV or PDF format. Returns a downloadable file.\n\n**Query Parameters:**\n- format: Export format - 'csv' or 'pdf' (default: csv)\n- startDate: Optional - Filter transactions from this date\n- endDate: Optional - Filter transactions until this date\n\n**Returns:**\n- CSV file with columns: Date, Amount, Currency, Status, Description, Payment Method ID, Receipt URL\n- File name format: transactions_YYYY-MM-DD.csv\n\n**Note:**\n- PDF export is not yet implemented\n- Requires authentication\n- Only exports transactions for the authenticated user"
               }
+            },
+            {
+              "name": "Get Payment Methods",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/user/payment-methods",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "user", "payment-methods"]
+                },
+                "description": "Get user's saved payment methods from recent successful transactions.\n\n**Returns:**\n- List of payment methods\n- Each method includes: id, type, brand, last4, expiryMonth, expiryYear, isDefault\n- Total count\n\n**Note:**\n- Only includes payment methods from successful transactions\n- Maximum 10 payment methods returned\n- First method is marked as default"
+              }
+            },
+            {
+              "name": "Delete Payment Method",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/user/payment-methods/{{paymentMethodId}}",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "user", "payment-methods", "{{paymentMethodId}}"]
+                },
+                "description": "Delete a saved payment method. Detaches it from Stripe customer.\n\n**Returns:**\n- Success message with payment method ID\n\n**Note:**\n- Verifies payment method belongs to user\n- Detaches from Stripe if attached"
+              }
             }
           ]
         },
@@ -2105,6 +2223,28 @@
                   "path": ["api", "v1", "admin", "payouts", "{{payoutId}}", "approve"]
                 },
                 "description": "Approve and process a payout. Automatically processes the payout using Stripe Connect (preferred) or marks it for manual bank transfer processing.\n\n**Processing Methods:**\n1. **Stripe Connect (Primary)**: If coach has a linked Stripe Connect account, the payout is automatically transferred via Stripe Transfer API. Status becomes 'completed'.\n2. **Manual Bank Transfer (Fallback)**: If Stripe Connect is unavailable but bank details exist in PayoutSettings, payout is marked as 'processing' for manual admin processing.\n\n**Success Response (200 OK):**\n- payoutId: Payout ID\n- status: 'completed' (Stripe transfer successful) or 'processing' (manual processing required)\n- transactionId: Stripe transfer ID (if Stripe Connect used, null for manual)\n- approvedBy: Admin user ID who approved\n- approvedAt: Approval timestamp\n- processedAt: Processing timestamp (when payout was processed)\n- message: Success message indicating processing status\n\n**Error Response (400 Bad Request):**\n- If payout processing fails (e.g., Stripe account not ready, missing bank details)\n- Returns error message with failure reason\n\n**Note:**\n- Only pending payouts can be approved\n- Requires admin role (currently allows any authenticated user - TODO: add role check)\n- Payout processing is automatic - no manual intervention needed for Stripe Connect accounts\n- For manual bank transfers, admin must process externally using logged bank details"
+              }
+            },
+            {
+              "name": "Generate Payouts",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/admin/payouts/generate",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "admin", "payouts", "generate"]
+                },
+                "description": "Manually trigger automatic payout generation for all due coaches. This endpoint checks all active coaches and creates payout records for those who are due based on their payout frequency settings (biweekly or monthly).\n\n**How It Works:**\n1. Checks all active coaches with completed onboarding\n2. For each coach, checks their payout settings (frequency: biweekly/monthly)\n3. Determines if coach is due for payout:\n   - Biweekly: 14+ days since last payout\n   - Monthly: 30+ days since last payout\n4. Calculates earnings from completed bookings in the period\n5. Creates payout record with status 'pending' if earnings > 0\n6. Prevents duplicate payouts for the same period\n\n**Returns:**\n- payoutsCreated: Number of payouts created\n- message: Success message\n\n**Note:**\n- This endpoint manually triggers the same logic that runs automatically daily via background service\n- Useful for testing or immediate payout generation\n- Requires admin role (currently allows any authenticated user - TODO: add role check)\n- Created payouts will have status 'pending' and need admin approval before processing"
               }
             },
             {
@@ -2409,6 +2549,196 @@
                 },
                 "description": "Get aggregated analytics summary based on telemetry events. Optimized for admin dashboard.\n\n**Query Parameters:**\n- period: Time period - 'day', 'week', 'month', 'year' (default: week)\n- startDate: Optional - Custom start date (ISO 8601)\n- endDate: Optional - Custom end date (ISO 8601)\n\n**Response:**\n- period: Selected time period\n- metrics:\n  - totalPageViews: Total page views\n  - uniqueVisitors: Unique visitor count\n  - avgSessionDuration: Average session duration (milliseconds)\n  - dau: Daily Active Users\n  - wau: Weekly Active Users\n  - mau: Monthly Active Users\n  - bounceRate: Bounce rate (0-1)\n  - newUsers: New user count\n  - returningUsers: Returning user count\n  - retentionRate: Retention rate (0-1)\n  - sessionsPerUser: Average sessions per user\n  - pagesPerSession: Average pages per session\n  - topPages: Top pages by views\n  - eventBreakdown: Event counts by type\n  - completionRates: Form completion rates\n    - resumeBuilder: Resume builder completion rate\n    - assessments: Assessment completion rate\n    - coachOnboarding: Coach onboarding completion rate\n    - profileSetup: Profile setup completion rate\n  - dailyActiveUsersTrend: Daily active users trend\n\n**Data Source:** Telemetry events (90-day retention)\n\n**Note:** Requires admin role (currently allows any authenticated user - TODO: add role check)"
               }
+            },
+            {
+              "name": "Export Analytics CSV",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/admin/analytics/export?period=month&format=csv",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "admin", "analytics", "export"],
+                  "query": [
+                    {
+                      "key": "period",
+                      "value": "month",
+                      "description": "Time period: week, month, or year (default: month)"
+                    },
+                    {
+                      "key": "format",
+                      "value": "csv",
+                      "description": "Export format (default: csv)"
+                    }
+                  ]
+                },
+                "description": "Export analytics data as CSV file for download.\n\n**Query Parameters:**\n- period: Time period - 'week', 'month', or 'year' (default: month)\n- format: Export format - 'csv' (default)\n\n**Returns:**\n- CSV file with analytics data including:\n  - Total Users, Revenue, Active Courses\n  - Revenue Data (Period, Revenue, Transactions)\n  - User Growth Data (Period, Users, New Users)\n  - Top Coaches (Name, Earnings, Sessions, Rating)\n  - Top Courses (Title, Enrollments, Revenue, Rating)\n\n**Note:** Requires admin role"
+              }
+            },
+            {
+              "name": "Update User",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Updated Name\",\n  \"email\": \"updated@example.com\",\n  \"roleId\": \"{{roleId}}\"\n}"
+                },
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/admin/users/{{userId}}",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "admin", "users", "{{userId}}"]
+                },
+                "description": "Update user details (name, email, role).\n\n**Request Body:**\n- name: Optional - New name\n- email: Optional - New email (must be unique)\n- roleId: Optional - New role ID\n\n**Returns:**\n- Updated user item with all details\n\n**Note:** Requires admin role"
+              }
+            },
+            {
+              "name": "Update User Status",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"isActive\": false\n}"
+                },
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/admin/users/{{userId}}/status",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "admin", "users", "{{userId}}", "status"]
+                },
+                "description": "Toggle user active/inactive status.\n\n**Request Body:**\n- isActive: Required - true to activate, false to deactivate\n\n**Returns:**\n- Updated user item\n\n**Note:** Requires admin role"
+              }
+            },
+            {
+              "name": "Delete User",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/admin/users/{{userId}}",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "admin", "users", "{{userId}}"]
+                },
+                "description": "Soft delete a user (sets IsActive to false).\n\n**Returns:**\n- Success message with user ID and name\n\n**Note:** Requires admin role. This is a soft delete - user data is preserved."
+              }
+            },
+            {
+              "name": "Get User Statistics",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/admin/users/stats",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "admin", "users", "stats"]
+                },
+                "description": "Get user statistics breakdown by role and status.\n\n**Returns:**\n- totalUsers: Total user count\n- byRole: Breakdown by role (role, count, active, inactive)\n- byStatus: Overall status breakdown (active, inactive)\n\n**Note:** Requires admin role"
+              }
+            },
+            {
+              "name": "Get Platform Settings",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/admin/settings",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "admin", "settings"]
+                },
+                "description": "Get current platform settings.\n\n**Returns:**\n- general: Site name, support email, maintenance mode\n- finance: Platform fee percent, currency, payout schedule\n- security: Session timeout minutes\n- system: Max upload size MB\n- legal: Privacy, terms, help URLs\n\n**Note:** Requires admin role"
+              }
+            },
+            {
+              "name": "Update Platform Settings",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"general\": {\n    \"siteName\": \"TimCare\",\n    \"supportEmail\": \"support@timcare.com\",\n    \"maintenanceMode\": false\n  },\n  \"finance\": {\n    \"platformFeePercent\": 15,\n    \"currency\": \"USD\",\n    \"payoutSchedule\": \"monthly\"\n  },\n  \"security\": {\n    \"sessionTimeoutMinutes\": 60\n  },\n  \"system\": {\n    \"maxUploadSizeMB\": 10\n  },\n  \"legal\": {\n    \"privacyUrl\": \"https://timcare.com/privacy\",\n    \"termsUrl\": \"https://timcare.com/terms\",\n    \"helpUrl\": \"https://help.timcare.com\"\n  }\n}"
+                },
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/admin/settings",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "admin", "settings"]
+                },
+                "description": "Update platform settings. All fields are optional - only provided fields will be updated.\n\n**Request Body:**\n- general: Optional - Site name, support email, maintenance mode\n- finance: Optional - Platform fee percent, currency, payout schedule\n- security: Optional - Session timeout minutes\n- system: Optional - Max upload size MB\n- legal: Optional - Privacy, terms, help URLs\n\n**Returns:**\n- Updated settings object\n\n**Note:** Requires admin role"
+              }
             }
           ]
         }
@@ -2610,6 +2940,28 @@
     {
       "name": "ResumeBuilder",
       "item": [
+        {
+          "name": "Get Default Resume Template",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "description": "JWT token from login"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/resume/default",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "resume", "default"]
+            },
+            "description": "Get default resume template structure to initialize the builder when starting from scratch.\n\n**Returns:**\n- personal: Default personal info structure (fullName, email, phone, location)\n- skills: Default skills structure\n- experience: Empty array\n- education: Empty array\n- summary: Empty string\n\n**Use Case:**\n- Initialize resume builder UI with default structure\n- Start building a new resume from scratch"
+          }
+        },
         {
           "name": "Create Resume",
           "event": [
@@ -3409,6 +3761,24 @@
     {
       "name": "UserSubscription",
       "item": [
+        {
+          "name": "Get User Subscription Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/user/subscription/status",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "user", "subscription", "status"]
+            },
+            "description": "Get subscription status for the authenticated user.\n\n**Returns:**\n- hasActiveSubscription: Boolean indicating if user has an active subscription\n- planId: ID of the subscription plan (null if no subscription)\n- status: Subscription status (\"active\", \"past_due\", \"canceled\", \"none\")\n- expiryDate: Next billing date or expiry date (null if no subscription)\n\n**Note:** Requires authentication. Returns the subscription status for the currently authenticated user."
+          }
+        },
         {
           "name": "Get All User Subscriptions",
           "request": {
@@ -6556,6 +6926,221 @@
               "path": ["api", "v1", "universities", "admin", "{{universityId}}", "toggle-active"]
             },
             "description": "Toggle the active status of a university (Admin only)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Report",
+      "item": [
+        {
+          "name": "Generate PDF from URL Template",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/report/print/{{template}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "report", "print", "{{template}}"],
+              "variable": [
+                {
+                  "key": "template",
+                  "value": "nexa",
+                  "description": "Template name (e.g., nexa)"
+                }
+              ]
+            },
+            "description": "Generates a PDF from a URL using PuppeteerSharp. Navigates to the specified URL and converts the rendered page to PDF.\n\n**Features:**\n- **URL Navigation**: Uses PuppeteerSharp to navigate to the URL\n- **PDF Generation**: Converts the rendered HTML page to PDF format\n- **Template Support**: Supports template-based URLs (e.g., nexa)\n- **Professional PDF Output**: High-quality PDF with proper formatting\n- **Error Handling**: Comprehensive error handling and logging\n\n**Path Parameters:**\n- template: Template name (e.g., \"nexa\") - constructs URL: https://university.foodyqueen.com/print/{template}\n\n**Returns:**\n- PDF file (application/pdf)\n- Filename: {template}_report.pdf\n\n**Use Case:**\n- Generate PDFs from existing HTML pages\n- Print-friendly document generation\n- Report generation from web templates\n- Document archiving\n\n**Technical Details:**\n- Method: GET\n- No authentication required\n- Uses PuppeteerSharp for browser automation\n- Waits for page to fully load before PDF generation\n- 60 second timeout for page loading\n- A4 format with margins\n\n**Example:**\n- GET /api/report/print/nexa\n- Generates PDF from: https://university.foodyqueen.com/print/nexa"
+          },
+          "response": []
+        },
+        {
+          "name": "Generate PDF from Custom URL",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://university.foodyqueen.com/print/nexa\",\n  \"fileName\": \"nexa_report.pdf\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/report/print/from-url",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "report", "print", "from-url"]
+            },
+            "description": "Generates a PDF from a custom URL using PuppeteerSharp. Accepts any valid URL and converts the rendered page to PDF.\n\n**Features:**\n- **Custom URL Support**: Accepts any valid HTTP/HTTPS URL\n- **URL Validation**: Validates URL format and domain whitelist\n- **PDF Generation**: Converts the rendered HTML page to PDF format\n- **Custom Filename**: Optional custom filename for the PDF\n- **Security**: Domain whitelist check for security\n- **Error Handling**: Comprehensive error handling and logging\n\n**Request Body:**\n```json\n{\n  \"url\": \"https://university.foodyqueen.com/print/nexa\",\n  \"fileName\": \"nexa_report.pdf\" // optional\n}\n```\n\n**Request Parameters:**\n- url (required): Full URL to generate PDF from (must be HTTP or HTTPS)\n- fileName (optional): Custom filename for the PDF (defaults to URL-based name)\n\n**Returns:**\n- PDF file (application/pdf)\n- Custom filename if provided\n\n**Use Case:**\n- Generate PDFs from any web page\n- Print-friendly document generation\n- Report generation from dynamic URLs\n- Document archiving from web sources\n\n**Technical Details:**\n- Method: POST\n- Content-Type: application/json\n- No authentication required\n- Uses PuppeteerSharp for browser automation\n- Waits for page to fully load before PDF generation\n- 60 second timeout for page loading\n- A4 format with margins\n- Domain whitelist: university.foodyqueen.com, foodyqueen.com\n\n**Security:**\n- URL format validation\n- Domain whitelist check\n- Only HTTP/HTTPS URLs allowed\n\n**Example:**\n```json\nPOST /api/report/print/from-url\n{\n  \"url\": \"https://university.foodyqueen.com/print/nexa\",\n  \"fileName\": \"custom_report.pdf\"\n}\n```"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Get LIA Assessment Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/reports/lia/{{userId}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "reports", "lia", "{{userId}}"]
+            },
+            "description": "Get LIA (Learning Intelligence Assessment) report data for PDF generation. Enhanced with comprehensive 8-page report data.\n\n**Path Parameters:**\n- userId: User ID\n\n**Returns:**\n- userInfo: User details\n- reportDate: Report generation date\n- overallScore: Overall score with percentage, percentile rank, and classification\n- subtests: List of subtest results with interpretations (20-35 words each)\n- cognitiveProfile: Cognitive profile breakdown (5 domains)\n- executiveSummary: Highlights, development areas, strategic implications (80-120 words)\n- cognitiveSynergy: Analysis of top 2 strengths interaction (60-100 words)\n- behavioralObservations: Speed-accuracy balance, stress response, attention pattern, problem-solving approach\n- workStyleAnalysis: Work preference, decision-making, communication style, leadership potential, team dynamics\n- environmentalFit: Ideal organizational environment recommendations (70-100 words)\n- careerRecommendations: Top 5 role matches, industries, skills gaps, motivators\n- learningDevelopment: Learning style, agility score, recommended courses, 30-60-90 day action plan\n- reportSummary: Key takeaways, success factors, risk factors, methodology\n- Optional Premium Sections: Personality inferences, manager guidance, onboarding recommendations, retention analysis, interview questions, team compatibility, trajectory prediction, warning signs\n\n**Note:** Requires authentication. All narrative content is AI-generated based on cognitive assessment results."
+          }
+        },
+        {
+          "name": "Get PCA Personality Profile Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/reports/pca/{{userId}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "reports", "pca", "{{userId}}"]
+            },
+            "description": "Get PCA (Personality Career Assessment) report data for PDF generation.\n\n**Path Parameters:**\n- userId: User ID\n\n**Returns:**\n- userInfo: User details\n- assessmentDate: Assessment completion date\n- discProfile: DISC personality profile\n- competencies: Competency breakdown\n- careerRecommendations: Career path recommendations\n\n**Note:** Requires authentication"
+          }
+        },
+        {
+          "name": "Get 360° Evaluation Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/reports/evaluation/{{sessionId}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "reports", "evaluation", "{{sessionId}}"]
+            },
+            "description": "Get 360° Evaluation report data for PDF generation.\n\n**Path Parameters:**\n- sessionId: Evaluation session ID\n\n**Returns:**\n- userInfo: Evaluated user details\n- sessionDate: Evaluation session date\n- evaluators: Breakdown by evaluator groups\n- competencies: Competency ratings and feedback\n- overallRating: Overall rating breakdown\n- feedbackSummary: Key feedback themes\n\n**Note:** Requires authentication"
+          }
+        },
+        {
+          "name": "Get Career Progress Timeline Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/reports/timeline/{{userId}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "reports", "timeline", "{{userId}}"]
+            },
+            "description": "Get Career Progress Timeline report data for PDF generation.\n\n**Path Parameters:**\n- userId: User ID\n\n**Returns:**\n- userInfo: User details\n- timelineStart: Timeline start date\n- assessments: Assessment history\n- milestones: Key milestones achieved\n- monthlyActivity: Monthly activity breakdown\n- recentEvents: Recent significant events\n\n**Note:** Requires authentication"
+          }
+        },
+        {
+          "name": "Get Coaching Session Summary Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/reports/coaching/{{userId}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "reports", "coaching", "{{userId}}"]
+            },
+            "description": "Get Coaching Session Summary report data for PDF generation.\n\n**Path Parameters:**\n- userId: User ID\n\n**Returns:**\n- userInfo: User details\n- reportPeriod: Report period (start/end dates)\n- coachSummary: Summary by coach\n- sessionDetails: Detailed session breakdown\n- goals: Goals and progress tracking\n- milestones: Milestones achieved\n\n**Note:** Requires authentication"
+          }
+        },
+        {
+          "name": "Get Benchmark Comparison Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/reports/benchmark?userId={{userId}}&position={{position}}&location={{location}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "reports", "benchmark"],
+              "query": [
+                {
+                  "key": "userId",
+                  "value": "{{userId}}",
+                  "description": "User ID"
+                },
+                {
+                  "key": "position",
+                  "value": "{{position}}",
+                  "description": "Job position/title"
+                },
+                {
+                  "key": "location",
+                  "value": "{{location}}",
+                  "description": "Location (city, state, country)"
+                }
+              ]
+            },
+            "description": "Get Benchmark Comparison report data for PDF generation.\n\n**Query Parameters:**\n- userId: Required - User ID\n- position: Required - Job position/title\n- location: Required - Location (city, state, country)\n\n**Returns:**\n- userInfo: User details\n- position: User's position\n- salaryBenchmarks: Salary benchmarks by level\n- skillGaps: Skill gap analysis\n- marketInsights: Market insights\n- roiProjection: ROI projections\n- certifications: Recommended certifications\n\n**Note:** Requires authentication"
           }
         }
       ]

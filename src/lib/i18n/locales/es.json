@@ -21,6 +21,7 @@
     "earnings": "Ganancias",
     "users": "Usuarios",
     "coaches": "Coaches",
+    "schools": "Escuelas",
     "courses": "Cursos",
     "careers": "Carreras",
     "questions": "Preguntas",
@@ -72,7 +73,8 @@
     "sending": "Enviando...",
     "successful": "Exitoso",
     "failed": "Fallido",
-    "today": "Hoy"
+    "today": "Hoy",
+    "to": "a"
   },
   "error": {
     "somethingWentWrong": "Algo salió mal",
@@ -88,26 +90,7 @@
     "securityNotice": "Su información de pago está segura y cifrada",
     "initializing": "Inicializando...",
     "payWithCard": "Pagar con Tarjeta",
-    "cardElementNotFound": "Elemento de tarjeta no encontrado",
-    "verifying": "Verificando pago...",
-    "pleaseWait": "Por favor espera mientras confirmamos tu pago.",
-    "successTitle": "¡Pago exitoso! 🎉",
-    "successSubscription": "Gracias por tu pago. Tu suscripción está activa.",
-    "successSession": "Gracias por tu pago. Tu sesión de coaching ha sido reservada.",
-    "details": "Detalles del pago",
-    "amount": "Monto:",
-    "description": "Descripción:",
-    "date": "Fecha:",
-    "continueToDashboard": "Continuar al panel",
-    "viewMySessions": "Ver mis sesiones",
-    "failedTitle": "Pago fallido",
-    "failedText": "Hubo un problema con tu pago. Por favor inténtalo de nuevo.",
-    "tryAgain": "Intentar de nuevo",
-    "backToDashboard": "Volver al panel",
-    "cancelledTitle": "Pago cancelado",
-    "cancelledText": "Tu pago fue cancelado. No se realizaron cargos a tu cuenta. Puedes intentarlo de nuevo en cualquier momento.",
-    "errorTitle": "Error de verificación",
-    "errorText": "No se pudo verificar el estado del pago. Por favor contacta soporte si fuiste cobrado."
+    "cardElementNotFound": "Elemento de tarjeta no encontrado"
   },
   "evaluation": {
     "noReportData": "Datos del informe no disponibles",
@@ -226,6 +209,7 @@
       }
     }
   },
+
   "dashboard": {
     "title": "Panel de Control",
     "welcome": "Bienvenido a tu panel de control",
@@ -256,7 +240,7 @@
     },
     "assessmentJourney": "Viaje de Evaluación",
     "assessmentSubtitle": "Tu trayectoria de crecimiento profesional",
-    "professionalCertified": "Profesional Certificado", 
+    "professionalCertified": "Profesional Certificado",
     "coach": {
       "greeting": {
         "morning": "Buenos Días",
@@ -466,10 +450,6 @@
     "processingSpeedDesc": "Procesamiento cognitivo eficiente bajo presión de tiempo",
     "returnToDashboard": "Volver al Panel",
     "printResults": "Imprimir Resultados",
-    "downloadPDFReport": "Descargar Informe PDF",
-    "liaResultsTitle": "Resultados de Evaluación LIA",
-    "liaResultsComplete": "¡Todas las subpruebas completadas! Tus resultados completos están listos.",
-    "liaResultsInProgress": "Evaluación en progreso. Completa todas las subpruebas para ver tus resultados completos.",
     "inviteEvaluators": "Invitar Evaluadores",
     "loadingResults": "Cargando resultados...",
     "backToConfiguration": "Volver a Configuración",
@@ -636,17 +616,6 @@
     "nextExample": "Siguiente Ejemplo"
   },
   "benchmarks": {
-    "header": {
-      "title": "Resumen"
-    },
-    "compensationTitle": "Compensación",
-    "market": "Tendencias del Mercado",
-    "skills": {
-      "title": "Análisis de Habilidades"
-    },
-    "demographics": {
-      "title": "Demografía"
-    },
     "marketDemand": "Demanda del Mercado",
     "high": "Alta",
     "topGrowth": "Top 10% de Crecimiento",
@@ -711,6 +680,7 @@
       "creating": "Creando cuenta..."
     }
   },
+
   "transactions": {
     "fetchFailed": "Error al cargar las transacciones",
     "noExport": "No hay transacciones para exportar",
@@ -766,6 +736,10 @@
         "createFirst": "Crear primera pregunta",
         "activate": "Activar",
         "deactivate": "Desactivar"
+      },
+      "plans": {
+        "title": "Planes de suscripción",
+        "description": "Administrar niveles de precios y facturación."
       },
       "settings": {
         "title": "Configuración del sistema",
@@ -828,7 +802,21 @@
       "cancelUrlLabel": "URL de cancelación",
       "baseUrlLabel": "URL base"
     },
-
+    "plans": {
+      "editTitle": "Editar plan",
+      "createTitle": "Crear nuevo plan",
+      "planNameLabel": "Nombre del plan *",
+      "planNamePlaceholder": "p. ej., Plan Básico",
+      "priceLabel": "Precio (USD) *",
+      "pricePlaceholder": "29.99",
+      "intervalLabel": "Intervalo de facturación *",
+      "featuresLabel": "Características *",
+      "featurePlaceholder": "p. ej., Proyectos ilimitados",
+      "addFeature": "+ Agregar característica",
+      "createButton": "Crear plan",
+      "updateButton": "Actualizar plan",
+      "alreadyExists": "Ya existe"
+    },
     "analytics": {
       "title": "Analítica",
       "loading": "Cargando analítica de la plataforma...",
@@ -847,8 +835,7 @@
       "cards": {
         "topCoaches": "Coaches con mejor desempeño",
         "topCourses": "Cursos principales",
-        "recentActivity": "Actividad reciente",
-        "revenueTransactions": "Ingresos y Transacciones"
+        "recentActivity": "Actividad reciente"
       },
       "charts": {
         "userGrowthTrend": "Tendencia de crecimiento de usuarios"
@@ -900,6 +887,31 @@
       },
       "noPending": "No se encontraron pagos pendientes."
     },
+    "schools": {
+      "title": "Gestión de Escuelas",
+      "subtitle": "Gestiona asociaciones escolares y acceso de estudiantes.",
+      "totalSchools": "Escuelas Totales",
+      "active": "Escuelas Activas",
+      "pending": "Invitaciones Pendientes",
+      "totalStudents": "Estudiantes Totales",
+      "inviteButton": "Invitar Escuela",
+      "inviteTitle": "Invitar Escuela",
+      "inviteDescription": "Enviar una invitación a un administrador escolar.",
+      "inviteSuccess": "Invitación enviada a {{name}}",
+      "inviteError": "Error al enviar la invitación. Inténtalo de nuevo.",
+      "name": "Nombre de la Escuela",
+      "namePlaceholder": "ej. Preparatoria Springfield",
+      "email": "Correo del Administrador",
+      "emailPlaceholder": "admin@escuela.com",
+      "maxStudents": "Máx Estudiantes",
+      "details": "Detalles / Info del Contrato",
+      "detailsPlaceholder": "Ingresa información del contrato u otros detalles...",
+      "sendInvite": "Enviar Invitación",
+      "editTitle": "Editar Escuela",
+      "editDescription": "Actualizar detalles de la escuela.",
+      "updateSuccess": "Escuela actualizada con éxito",
+      "updateError": "Error al actualizar la escuela"
+    },
     "coaches": {
       "title": "Coaches",
       "subtitle": "Gestiona tu equipo de coaches e invitaciones",
@@ -930,6 +942,7 @@
         "specialization": "Especialización",
         "contractPeriod": "Periodo de contrato",
         "contractStatus": "Estado del contrato",
+        "platformFee": "Comisión de Plataforma",
         "students": "Estudiantes",
         "actions": "Acciones"
       },
@@ -1021,34 +1034,6 @@
         "deactivateUser": "Desactivar usuario"
       }
     },
-    "transactions": {
-      "title": "Transacciones",
-      "subtitle": "Supervise todas las transacciones y pagos del sistema",
-      "searchPlaceholder": "Buscar transacciones...",
-      "statusPlaceholder": "Estado",
-      "status": {
-        "all": "Todos los estados",
-        "completed": "Completado",
-        "pending": "Pendiente",
-        "failed": "Fallido",
-        "refunded": "Reembolsado",
-        "requires_payment_method": "Requiere Método de Pago",
-        "succeeded": "Exitoso"
-      },
-      "exportReport": "Exportar informe",
-      "exportFailed": "Error al exportar el reporte",
-      "noTransactions": "No se encontraron transacciones.",
-      "table": {
-        "id": "ID",
-        "user": "Usuario",
-        "description": "Descripción",
-        "amount": "Monto",
-        "status": "Estado",
-        "date": "Fecha",
-        "method": "Método"
-      },
-      "userId": "ID: {{id}}"
-    },
     "careers": {
       "title": "Carreras",
       "header": {
@@ -1064,63 +1049,42 @@
       "loading": "Cargando...",
       "accessDenied": "Acceso denegado"
     },
-    "plans": {
-      "header": "Planes de suscripción",
-      "description": "Gestiona tus planes de suscripción y precios",
-      "loading": "Cargando planes...",
-      "failedToLoad": "Error al cargar planes",
-      "refresh": "Actualizar",
-      "createTitle": "Crear plan",
+    "subscriptionPlans": {
+      "createTitle": "Crear planes de suscripción",
+      "creating": "Creando...",
       "createAll": "Crear {{count}} planes",
       "createThisPlan": "Crear este plan",
-      "creating": "Creando...",
       "creationResultsTitle": "Resultados de creación:",
       "previewTitle": "Planes a crear:",
       "moreFeatures": "... y {{count}} más",
-      "editTitle": "Editar plan",
-      "updateButton": "Actualizar plan",
-      "createButton": "Crear plan",
-      "planNameLabel": "Nombre del plan",
-      "planNamePlaceholder": "p. ej. Suscripción Mensual",
-      "priceLabel": "Precio",
-      "pricePlaceholder": "p. ej. 29.99",
-      "intervalLabel": "Intervalo de facturación",
-      "featuresLabel": "Características",
-      "featuresHeading": "Características del plan",
-      "featurePlaceholder": "p. ej. Acceso completo a todos los cursos",
-      "addFeature": "Agregar característica",
-      "active": "Activo",
-      "inactive": "Inactivo",
-      "mockLabel": "Datos de prueba",
-      "mockDataTitle": "Usando datos de prueba",
-      "mockDataDescription": "Estás viendo datos de prueba. Conéctate a un backend para ver planes reales.",
-      "hideMock": "Ocultar datos de prueba",
-      "maxPlansAlert": "Solo puedes tener 3 planes activos a la vez.",
-      "createPlanCount": "Crear plan ({{count}}/3)",
-      "tokenRequiredTitle": "Autenticación requerida",
-      "tokenRequiredMessage": "Necesitas iniciar sesión como administrador para gestionar planes.",
-      "goToSettingsPrefix": "Ir a",
-      "goToSettings": "Configuración",
-      "goToTokenManagement": "para gestionar tus tokens",
-      "alreadyExists": "Ya existe",
-      "createPlanSuccess": "Plan creado",
       "unknownError": "Error desconocido",
-      "intervals": {
-        "month": {
-          "label": "Mensual",
-          "description": "Facturado cada mes"
-        },
-        "year": {
-          "label": "Anual",
-          "description": "Facturado cada año"
-        },
-        "one_time": {
-          "label": "Pago único",
-          "description": "Pago único"
-        }
-      }
+      "createPlanSuccess": "Plan creado"
     },
-
+    "transactions": {
+      "title": "Transacciones",
+      "subtitle": "Monitorea todas las transacciones y pagos del sistema",
+      "searchPlaceholder": "Buscar transacciones...",
+      "statusPlaceholder": "Estado",
+      "status": {
+        "all": "Todos los Estados",
+        "completed": "Completado",
+        "pending": "Pendiente",
+        "failed": "Fallido",
+        "refunded": "Reembolsado"
+      },
+      "exportReport": "Exportar Informe",
+      "noTransactions": "No se encontraron transacciones.",
+      "table": {
+        "id": "ID de Transacción",
+        "user": "Usuario",
+        "description": "Descripción",
+        "amount": "Monto",
+        "status": "Estado",
+        "date": "Fecha",
+        "method": "Método"
+      },
+      "userId": "ID: {{id}}"
+    },
     "questions": {
       "title": "Banco de preguntas",
       "subtitle": "Gestiona preguntas y categorías para evaluaciones",
@@ -1330,6 +1294,7 @@
     "success": "Trabajo de importación iniciado. Verifica el estado en breve.",
     "failure": "No se pudo iniciar la importación. Intenta de nuevo."
   },
+
   "profile": {
     "personalInfoTitle": "Información personal",
     "personalInfoDescription": "Actualiza tus datos principales.",

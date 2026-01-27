@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Card,
   CardContent,
@@ -12,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Loader2, Mail, Calendar as CalendarIcon, Edit } from "lucide-react";
+import { Loader2, Calendar as CalendarIcon, School } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
@@ -21,117 +22,97 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-
 import { useTranslation } from "react-i18next";
-import { Coach } from "@/types/coach";
 
-interface SingleInviteFormProps {
-  initialData?: Coach;
-  onSuccess?: () => void;
-}
-
-export function SingleInviteForm({ initialData, onSuccess }: SingleInviteFormProps) {
+export function SchoolInviteForm() {
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [adminEmail, setAdminEmail] = useState("");
+  const [maxStudents, setMaxStudents] = useState<number>(0);
+  const [details, setDetails] = useState("");
   const [contractStart, setContractStart] = useState<Date>();
   const [contractEnd, setContractEnd] = useState<Date>();
-  const [platformCommission, setPlatformCommission] = useState<number>(15); // Default 15%
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useTranslation();
 
-  const isEditing = !!initialData;
-
-  useEffect(() => {
-    if (initialData) {
-      setName(initialData.name || initialData.fullName || "");
-      setEmail(initialData.email || "");
-      if (initialData.contractStart) setContractStart(new Date(initialData.contractStart));
-      if (initialData.contractEnd) setContractEnd(new Date(initialData.contractEnd));
-      if (typeof initialData.platformCommission === 'number') setPlatformCommission(initialData.platformCommission);
-    }
-  }, [initialData]);
-
   const handleSubmit = async () => {
-    if (!email || !name) {
+    if (!adminEmail || !name || !maxStudents) {
       toast.error(t("admin.invite.fillRequired", "Please fill in all required fields"));
       return;
     }
 
     setIsLoading(true);
     try {
-      const { inviteCoach, updateCoach } = await import("@/services/coachService");
-
-      const payload = {
+      const { inviteSchool } = await import("@/services/schoolService");
+      await inviteSchool({
         name,
-        email,
+        adminEmail,
+        maxStudents,
+        details,
         contractStart: contractStart ? format(contractStart, "yyyy-MM-dd") : undefined,
         contractEnd: contractEnd ? format(contractEnd, "yyyy-MM-dd") : undefined,
-        platformCommission: Number(platformCommission),
-      };
+      });
 
-      if (isEditing && initialData) {
-        await updateCoach(initialData.id, payload);
-        toast.success(t("admin.coaches.updateSuccess", "Coach updated successfully"));
-      } else {
-        await inviteCoach(payload);
-        toast.success(t("admin.invite.success", { name, email, defaultValue: `An invitation has been sent to ${name} (${email})` }));
-      }
-
-      if (onSuccess) {
-        onSuccess();
-      } else {
-        // Reset only if not handling success externally (default behavior)
-        if (!isEditing) {
-          setName("");
-          setEmail("");
-          setContractStart(undefined);
-          setContractEnd(undefined);
-          setPlatformCommission(15);
-        }
-      }
+      toast.success(t("admin.schools.inviteSuccess", { name, adminEmail, defaultValue: `Invitation sent to ${name}` }));
+      setName("");
+      setAdminEmail("");
+      setMaxStudents(0);
+      setDetails("");
+      setContractStart(undefined);
+      setContractEnd(undefined);
     } catch (error) {
-      toast.error(isEditing ? t("admin.coaches.updateError", "Failed to update coach") : t("admin.invite.error", "Failed to send invitation. Please try again."));
+      toast.error(t("admin.schools.inviteError", "Failed to send invitation. Please try again."));
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Card className={cn(isEditing ? "border-0 shadow-none" : "py-4")}>
+    <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          {isEditing ? <Edit className="h-5 w-5" /> : <Mail className="h-5 w-5" aria-hidden="true" />}
-          {isEditing ? t("admin.coaches.editTitle", "Edit Coach") : t("admin.invite.singleTitle", "Invite Single Coach")}
+          <School className="h-5 w-5" aria-hidden="true" />
+          {t("admin.schools.inviteTitle", "Invite School")}
         </CardTitle>
         <CardDescription>
-          {isEditing ? t("admin.coaches.editDescription", "Update coach details.") : t("admin.invite.singleDescription", "Send an email invitation to a new coach.")}
+          {t("admin.schools.inviteDescription", "Send an invitation to a school administrator.")}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">{t("admin.invite.fullName", "Full Name")}</Label>
+            <Label htmlFor="name">{t("admin.schools.name", "School Name")}</Label>
             <Input
               id="name"
               type="text"
-              placeholder={t("admin.invite.namePlaceholder", "John Doe")}
+              placeholder={t("admin.schools.namePlaceholder", "e.g. Springfield High")}
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">{t("admin.invite.email", "Email Address")}</Label>
+            <Label htmlFor="adminEmail">{t("admin.schools.email", "Admin Email")}</Label>
             <Input
-              id="email"
+              id="adminEmail"
               type="email"
-              placeholder={t('admin.invite.emailPlaceholder')}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              placeholder={t("admin.schools.emailPlaceholder", "admin@school.com")}
+              value={adminEmail}
+              onChange={(e) => setAdminEmail(e.target.value)}
               required
-              disabled={isEditing}
             />
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="maxStudents">{t("admin.schools.maxStudents", "Max Students")}</Label>
+            <Input
+              id="maxStudents"
+              type="number"
+              placeholder="0"
+              value={maxStudents || ""}
+              onChange={(e) => setMaxStudents(parseInt(e.target.value))}
+              required
+            />
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2 flex flex-col">
               <Label>{t("admin.invite.contractStart", "Contract Start Date")}</Label>
@@ -192,18 +173,18 @@ export function SingleInviteForm({ initialData, onSuccess }: SingleInviteFormPro
               </Popover>
             </div>
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="commission">{t("admin.invite.platformCommission", "Platform Commission (%)")}</Label>
-            <Input
-              id="commission"
-              type="number"
-              min="0"
-              max="100"
-              placeholder="15"
-              value={platformCommission}
-              onChange={(e) => setPlatformCommission(Number(e.target.value))}
+            <Label htmlFor="details">{t("admin.schools.details", "Details / Contract Info")}</Label>
+            <Textarea
+              id="details"
+              placeholder={t("admin.schools.detailsPlaceholder", "Enter contract info or other details...")}
+              value={details}
+              onChange={(e) => setDetails(e.target.value)}
+              className="min-h-[100px]"
             />
           </div>
+
           <Button
             type="submit"
             disabled={isLoading}
@@ -212,10 +193,10 @@ export function SingleInviteForm({ initialData, onSuccess }: SingleInviteFormPro
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
-                {isEditing ? t("common.saving", "Saving...") : t("common.sending", "Sending...")}
+                {t("common.sending", "Sending...")}
               </>
             ) : (
-              isEditing ? t("common.save", "Save Changes") : t("admin.invite.sendButton", "Send Invitation")
+              t("admin.schools.sendInvite", "Send Invitation")
             )}
           </Button>
         </form>

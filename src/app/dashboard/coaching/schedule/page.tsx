@@ -7,7 +7,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, Video, User, MoreHorizontal } from "lucide-react";
+import { Calendar, Clock, Video, User, MoreHorizontal, LayoutList } from "lucide-react";
+import { CalendarView } from "./_components/CalendarView";
 import {
   Dialog,
   DialogContent,
@@ -21,6 +22,7 @@ import { toast } from "sonner";
 export default function CoachSessionsPage() {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("upcoming");
+  const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
   const [sessions, setSessions] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRescheduleOpen, setIsRescheduleOpen] = useState(false);
@@ -201,8 +203,8 @@ export default function CoachSessionsPage() {
                 session.status === "confirmed"
                   ? "default"
                   : session.status === "completed"
-                  ? "secondary"
-                  : "destructive"
+                    ? "secondary"
+                    : "destructive"
               }
             >
               {session.status}
@@ -252,79 +254,112 @@ export default function CoachSessionsPage() {
           <p className="text-gray-500 mt-1">Manage your coaching sessions</p>
         </div>
 
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger value="upcoming">
-              Upcoming ({upcomingSessions.length})
-            </TabsTrigger>
-            <TabsTrigger value="past">Past ({pastSessions.length})</TabsTrigger>
-          </TabsList>
+        {/* View Toggle */}
+        <div className="flex justify-end gap-2">
+          <Button
+            variant={viewMode === "list" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setViewMode("list")}
+            className="gap-2"
+          >
+            <LayoutList className="h-4 w-4" />
+            List
+          </Button>
+          <Button
+            variant={viewMode === "calendar" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setViewMode("calendar")}
+            className="gap-2"
+          >
+            <Calendar className="h-4 w-4" />
+            Calendar
+          </Button>
+        </div>
 
-          <TabsContent value="upcoming" className="space-y-4 mt-6">
-            {isLoading ? (
-              <div className="grid gap-4">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <Card key={i} className="animate-pulse">
-                    <CardContent className="p-6">
-                      <div className="h-4 bg-gray-200 rounded w-1/3 mb-3"></div>
-                      <div className="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
-                      <div className="h-3 bg-gray-200 rounded w-1/4"></div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : upcomingSessions.length > 0 ? (
-              upcomingSessions.map((session) => (
-                <SessionCard key={session.id} session={session} />
-              ))
-            ) : (
-              <Card>
-                <CardContent className="p-12 text-center">
-                  <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900">
-                    No upcoming sessions
-                  </h3>
-                  <p className="text-gray-500 mt-1">
-                    Your upcoming coaching sessions will appear here
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
+        {viewMode === "calendar" ? (
+          <CalendarView
+            sessions={sessions}
+            onSessionClick={(session) => {
+              // For now, open reschedule dialog as a "details" action or just select it
+              // Ideally we show a details dialog first.
+              handleRescheduleClick(session);
+            }}
+          />
+        ) : (
+          /* Tabs */
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="grid w-full max-w-md grid-cols-2">
+              <TabsTrigger value="upcoming">
+                Upcoming ({upcomingSessions.length})
+              </TabsTrigger>
+              <TabsTrigger value="past">Past ({pastSessions.length})</TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="past" className="space-y-4 mt-6">
-            {isLoading ? (
-              <div className="grid gap-4">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <Card key={i} className="animate-pulse">
-                    <CardContent className="p-6">
-                      <div className="h-4 bg-gray-200 rounded w-1/3 mb-3"></div>
-                      <div className="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
-                      <div className="h-3 bg-gray-200 rounded w-1/4"></div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : pastSessions.length > 0 ? (
-              pastSessions.map((session) => (
-                <SessionCard key={session.id} session={session} />
-              ))
-            ) : (
-              <Card>
-                <CardContent className="p-12 text-center">
-                  <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900">
-                    No past sessions
-                  </h3>
-                  <p className="text-gray-500 mt-1">
-                    Your completed sessions will appear here
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-        </Tabs>
+            <TabsContent value="upcoming" className="space-y-4 mt-6">
+              {isLoading ? (
+                <div className="grid gap-4">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <Card key={i} className="animate-pulse">
+                      <CardContent className="p-6">
+                        <div className="h-4 bg-gray-200 rounded w-1/3 mb-3"></div>
+                        <div className="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
+                        <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : upcomingSessions.length > 0 ? (
+                upcomingSessions.map((session) => (
+                  <SessionCard key={session.id} session={session} />
+                ))
+              ) : (
+                <Card>
+                  <CardContent className="p-12 text-center">
+                    <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900">
+                      No upcoming sessions
+                    </h3>
+                    <p className="text-gray-500 mt-1">
+                      Your upcoming coaching sessions will appear here
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
+
+            <TabsContent value="past" className="space-y-4 mt-6">
+              {isLoading ? (
+                <div className="grid gap-4">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <Card key={i} className="animate-pulse">
+                      <CardContent className="p-6">
+                        <div className="h-4 bg-gray-200 rounded w-1/3 mb-3"></div>
+                        <div className="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
+                        <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : pastSessions.length > 0 ? (
+                pastSessions.map((session) => (
+                  <SessionCard key={session.id} session={session} />
+                ))
+              ) : (
+                <Card>
+                  <CardContent className="p-12 text-center">
+                    <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900">
+                      No past sessions
+                    </h3>
+                    <p className="text-gray-500 mt-1">
+                      Your completed sessions will appear here
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
+          </Tabs>
+        )}
 
         {/* Reschedule Dialog */}
         <Dialog open={isRescheduleOpen} onOpenChange={setIsRescheduleOpen}>

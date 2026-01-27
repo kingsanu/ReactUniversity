@@ -118,7 +118,7 @@ export default function DashboardLayout({
           </div>
 
           <main id="main-content" tabIndex={-1} className="flex-1 overflow-y-auto bg-gray-50 focus:outline-none">
-             {children}
+            {children}
           </main>
         </div>
       </div>
@@ -131,10 +131,10 @@ export default function DashboardLayout({
       <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div className="flex-1 flex flex-col overflow-hidden lg:ml-0 transition-all duration-300">
-        <TopNav onMenuClick={() => setSidebarOpen(true)} />
+        {/* <TopNav onMenuClick={() => setSidebarOpen(true)} /> */}
 
         <main id="main-content" tabIndex={-1} className="flex-1 overflow-y-auto focus:outline-none">
-            {children}
+          {children}
         </main>
       </div>
     </div>

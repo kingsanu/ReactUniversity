@@ -73,35 +73,40 @@ export default function CoachOnboardingPage({
   }, [id]);
 
   // Handle googleConnected query param
-  // Handle googleConnected query param
+  // Handle calendar connection callbacks
   useEffect(() => {
     const googleConnected = searchParams.get("googleConnected");
-    
-    if (googleConnected === "true" && email) {
+    const outlookConnected = searchParams.get("outlookConnected");
+
+    // Determine which provider to verify
+    const provider = googleConnected === "true" ? "google" : outlookConnected === "true" ? "outlook" : null;
+
+    if (provider && email) {
       const verifyConnection = async () => {
         try {
           setIsLoading(true);
-          const { checkGoogleAuthStatus } = await import("@/services/coachService");
-          const status = await checkGoogleAuthStatus(email);
+          const { checkCalendarAuthStatus } = await import("@/services/coachService");
+          const status = await checkCalendarAuthStatus(provider, email);
 
           if (status.isAuthenticated && status.authDetails?.connected) {
             setData((prev) => ({
               ...prev,
               calendarIntegrations: {
                 ...prev.calendarIntegrations,
-                google: true,
+                google: provider === "google" ? true : false,
+                outlook: provider === "outlook" ? true : false,
               },
             }));
             setCurrentStep(5);
-            toast.success("Google Calendar connected successfully!");
+            toast.success(`${provider === 'google' ? 'Google' : 'Outlook'} Calendar connected successfully!`);
           } else {
-            console.error("Google Calendar connection verification failed", status);
-            toast.error("Failed to verify Google Calendar connection. Please try again.");
+            console.error(`${provider} Calendar connection verification failed`, status);
+            toast.error(`Failed to verify ${provider} Calendar connection. Please try again.`);
             setCurrentStep(4); // Ensure we are on the Calendar Sync step
           }
         } catch (error) {
-          console.error("Error verifying Google Calendar connection:", error);
-          toast.error("An error occurred while connecting Google Calendar.");
+          console.error(`Error verifying ${provider} Calendar connection:`, error);
+          toast.error(`An error occurred while connecting ${provider} Calendar.`);
           setCurrentStep(4);
         } finally {
           setIsLoading(false);
@@ -110,7 +115,7 @@ export default function CoachOnboardingPage({
 
       verifyConnection();
     }
-  }, [searchParams, email]); // Added email dependency to ensure we have it before checking
+  }, [searchParams, email]);
 
 
   // Save data to localStorage whenever it changes

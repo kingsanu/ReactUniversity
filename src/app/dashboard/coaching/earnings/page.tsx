@@ -25,6 +25,7 @@ import {
 import {
   getCoachEarnings,
   getCoachEarningsHistory,
+  getCoachProfile,
   CoachEarningsStats,
   EarningsHistoryItem,
 } from "@/services/coachService";
@@ -44,6 +45,7 @@ export default function EarningsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState("all");
+  const [commissionRate, setCommissionRate] = useState<number>(20); // Default 20% fallback
 
   // Pagination State
   const [page, setPage] = useState(1);
@@ -55,15 +57,19 @@ export default function EarningsPage() {
 
   const fetchEarningsData = async () => {
     try {
-      const [statsResponse, historyResponse] = await Promise.all([
+      const [statsResponse, historyResponse, profileResponse] = await Promise.all([
         getCoachEarnings(),
         getCoachEarningsHistory(),
+        getCoachProfile(),
       ]);
       setEarningsStats(statsResponse);
-      const historyData = Array.isArray(historyResponse) 
-        ? historyResponse 
-        : Array.isArray((historyResponse as any)?.data) 
-          ? (historyResponse as any).data 
+      if (profileResponse?.platformCommission !== undefined) {
+        setCommissionRate(profileResponse.platformCommission);
+      }
+      const historyData = Array.isArray(historyResponse)
+        ? historyResponse
+        : Array.isArray((historyResponse as any)?.data)
+          ? (historyResponse as any).data
           : [];
       setEarningsHistory(historyData);
       setError(null);
@@ -79,11 +85,11 @@ export default function EarningsPage() {
   };
 
   const calculateNet = (gross: number) => {
-    return gross * 0.8;
+    return gross * (1 - commissionRate / 100);
   };
 
   const calculateFee = (gross: number) => {
-    return gross * 0.2;
+    return gross * (commissionRate / 100);
   };
 
   // Modern Stats Cards Data
@@ -142,7 +148,7 @@ export default function EarningsPage() {
       </div>
     );
   }
-  
+
   // Pagination Logic
   const totalPages = Math.ceil(earningsHistory.length / limit);
   const paginatedHistory = earningsHistory.slice((page - 1) * limit, page * limit);
@@ -166,7 +172,7 @@ export default function EarningsPage() {
   return (
     <div className="min-h-screen bg-gray-50/50 p-6 md:p-8 font-sans text-gray-900">
       <div className="max-w-7xl mx-auto space-y-8">
-        
+
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div className="space-y-1">
@@ -176,9 +182,14 @@ export default function EarningsPage() {
             <p className="text-lg text-gray-500 font-medium">
               {t("coaching.earnings.subtitle")}
             </p>
+            <div className="flex items-center gap-2 mt-2">
+              <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200">
+                Platform Commission: {commissionRate}%
+              </Badge>
+            </div>
           </div>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             className="h-10 gap-2 rounded-xl bg-white border-gray-200 shadow-sm"
             onClick={handleExport}
             disabled={isExporting}
@@ -198,17 +209,17 @@ export default function EarningsPage() {
               <div
                 className={`absolute right-0 top-0 h-24 w-24 translate-x-8 translate-y--8 rounded-full ${stat.blobColor} opacity-5 blur-2xl transition-transform duration-500 group-hover:scale-150`}
               />
-              
+
               <div className="relative flex items-start justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-500">{stat.label}</p>
                   <h3 className="mt-2 text-3xl font-bold tracking-tight text-gray-900">
                     {stat.value}
                   </h3>
-                   <p className={`text-sm mt-3 font-medium ${stat.subtextColor} flex items-center gap-1.5`}>
-                      {stat.icon === TrendingUp && <TrendingUp className="w-3.5 h-3.5" />}
-                      {stat.subtext}
-                   </p>
+                  <p className={`text-sm mt-3 font-medium ${stat.subtextColor} flex items-center gap-1.5`}>
+                    {stat.icon === TrendingUp && <TrendingUp className="w-3.5 h-3.5" />}
+                    {stat.subtext}
+                  </p>
                 </div>
                 <div className={`rounded-xl ${stat.bg} p-3 ${stat.color} bg-opacity-50`}>
                   <stat.icon className="h-6 w-6" />
@@ -220,23 +231,23 @@ export default function EarningsPage() {
 
         {/* Breakdown Section */}
         <div className="space-y-6">
-           <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-gray-900">Transaction History</h2>
-               <div className="flex gap-2">
-                 {/* Tabs could go here if needed, keeping it clean for now */}
-              </div>
-           </div>
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold text-gray-900">Transaction History</h2>
+            <div className="flex gap-2">
+              {/* Tabs could go here if needed, keeping it clean for now */}
+            </div>
+          </div>
 
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-all duration-300">
-             {/* Header with Filter */}
+            {/* Header with Filter */}
             <div className="p-4 border-b border-gray-100 bg-gray-50/30 flex justify-between items-center">
-                 <div className="relative w-full max-w-sm">
-                   {/* Search placeholder if needed */}
-                 </div>
-                 <Button variant="outline" size="sm" className="h-8 gap-2 rounded-lg bg-white">
-                  <Filter className="w-3.5 h-3.5" />
-                  Filter
-                </Button>
+              <div className="relative w-full max-w-sm">
+                {/* Search placeholder if needed */}
+              </div>
+              <Button variant="outline" size="sm" className="h-8 gap-2 rounded-lg bg-white">
+                <Filter className="w-3.5 h-3.5" />
+                Filter
+              </Button>
             </div>
 
             <div className="overflow-x-auto">
@@ -253,84 +264,84 @@ export default function EarningsPage() {
                 </TableHeader>
                 <TableBody>
                   {paginatedHistory.length === 0 ? (
-                       <TableRow>
-                        <TableCell colSpan={6} className="h-48 text-center text-gray-500">
-                          No transactions found.
-                        </TableCell>
-                      </TableRow>
-                  ) : (
-                  paginatedHistory.map((item, index) => (
-                    <TableRow
-                      key={index}
-                      className="group hover:bg-gray-50/50 border-gray-50 transition-colors"
-                    >
-                      <TableCell className="font-medium text-gray-900 pl-6 py-4">
-                        {item.date}
-                      </TableCell>
-                      <TableCell className="text-gray-600 font-medium py-4">
-                        {item.description}
-                      </TableCell>
-                      <TableCell className="text-right font-medium text-gray-900 py-4">
-                        ${item.amountGross?.toFixed(2) || "0.00"}
-                      </TableCell>
-                      <TableCell className="text-right text-red-500 font-medium py-4">
-                        -${calculateFee(item.amountGross || 0).toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-bold text-emerald-600 py-4">
-                        ${calculateNet(item.amountGross || 0).toFixed(2)}
-                      </TableCell>
-                      <TableCell className="pr-6 py-4">
-                        <Badge
-                          variant="secondary"
-                          className={cn(
-                             "font-medium shadow-none border-0",
-                            item.status === "completed"
-                              ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                              : item.status === "pending"
-                              ? "bg-amber-50 text-amber-700 hover:bg-amber-100"
-                              : "bg-red-50 text-red-700 hover:bg-red-100"
-                          )}
-                        >
-                          {item.status === "completed"
-                            ? "Paid"
-                            : item.status === "pending"
-                            ? "Pending"
-                            : "Cancelled"}
-                        </Badge>
+                    <TableRow>
+                      <TableCell colSpan={6} className="h-48 text-center text-gray-500">
+                        No transactions found.
                       </TableCell>
                     </TableRow>
-                  )))}
+                  ) : (
+                    paginatedHistory.map((item, index) => (
+                      <TableRow
+                        key={index}
+                        className="group hover:bg-gray-50/50 border-gray-50 transition-colors"
+                      >
+                        <TableCell className="font-medium text-gray-900 pl-6 py-4">
+                          {item.date}
+                        </TableCell>
+                        <TableCell className="text-gray-600 font-medium py-4">
+                          {item.description}
+                        </TableCell>
+                        <TableCell className="text-right font-medium text-gray-900 py-4">
+                          ${item.amountGross?.toFixed(2) || "0.00"}
+                        </TableCell>
+                        <TableCell className="text-right text-red-500 font-medium py-4">
+                          -${calculateFee(item.amountGross || 0).toFixed(2)}
+                        </TableCell>
+                        <TableCell className="text-right font-bold text-emerald-600 py-4">
+                          ${calculateNet(item.amountGross || 0).toFixed(2)}
+                        </TableCell>
+                        <TableCell className="pr-6 py-4">
+                          <Badge
+                            variant="secondary"
+                            className={cn(
+                              "font-medium shadow-none border-0",
+                              item.status === "completed"
+                                ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                                : item.status === "pending"
+                                  ? "bg-amber-50 text-amber-700 hover:bg-amber-100"
+                                  : "bg-red-50 text-red-700 hover:bg-red-100"
+                            )}
+                          >
+                            {item.status === "completed"
+                              ? "Paid"
+                              : item.status === "pending"
+                                ? "Pending"
+                                : "Cancelled"}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    )))}
                 </TableBody>
               </Table>
             </div>
-            
+
             {/* Pagination Controls */}
             {totalPages > 1 && (
-                <div className="flex items-center justify-between border-t border-gray-100 p-4 bg-gray-50/30">
+              <div className="flex items-center justify-between border-t border-gray-100 p-4 bg-gray-50/30">
                 <p className="text-sm text-gray-500">
-                    Showing page <span className="font-semibold text-gray-900">{page}</span> of <span className="font-semibold text-gray-900">{totalPages || 1}</span>
+                  Showing page <span className="font-semibold text-gray-900">{page}</span> of <span className="font-semibold text-gray-900">{totalPages || 1}</span>
                 </p>
                 <div className="flex items-center gap-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage((p) => Math.max(1, p - 1))}
-                        disabled={page === 1}
-                        className="rounded-lg border-gray-200 hover:bg-white hover:text-gray-900 text-gray-500 h-8"
-                    >
-                        Previous
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                        disabled={page === totalPages}
-                        className="rounded-lg border-gray-200 hover:bg-white hover:text-gray-900 text-gray-500 h-8"
-                    >
-                        Next
-                    </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                    className="rounded-lg border-gray-200 hover:bg-white hover:text-gray-900 text-gray-500 h-8"
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={page === totalPages}
+                    className="rounded-lg border-gray-200 hover:bg-white hover:text-gray-900 text-gray-500 h-8"
+                  >
+                    Next
+                  </Button>
                 </div>
-                </div>
+              </div>
             )}
           </div>
         </div>
@@ -340,17 +351,17 @@ export default function EarningsPage() {
 }
 
 function LoadingState() {
-    return (
-      <div className="min-h-screen bg-gray-50/50 p-6 md:p-8">
-        <div className="max-w-7xl mx-auto space-y-8 animate-pulse">
-            <div className="h-10 bg-gray-200 rounded-xl w-1/3"></div>
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {[1, 2, 3].map((i) => (
-                    <div key={i} className="h-40 bg-gray-200 rounded-3xl"></div>
-                ))}
-            </div>
-            <div className="h-96 bg-gray-200 rounded-3xl"></div>
+  return (
+    <div className="min-h-screen bg-gray-50/50 p-6 md:p-8">
+      <div className="max-w-7xl mx-auto space-y-8 animate-pulse">
+        <div className="h-10 bg-gray-200 rounded-xl w-1/3"></div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-40 bg-gray-200 rounded-3xl"></div>
+          ))}
         </div>
+        <div className="h-96 bg-gray-200 rounded-3xl"></div>
       </div>
-    );
+    </div>
+  );
 }

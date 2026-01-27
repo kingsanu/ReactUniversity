@@ -195,22 +195,22 @@ export const sidebarData = {
       submenu: [
         { name: "dashboard.careerPathsExplorer", path: "/dashboard/career-paths" },
         { name: "dashboard.universitySuggestions", path: "/dashboard/university" },
-        { name: "dashboard.jobMarketPulse", path: "/dashboard/career/market" },
+        // { name: "dashboard.jobMarketPulse", path: "/dashboard/career/market" },
       ],
     },
-    {
-      id: "benchmarks",
-      name: "nav.benchmarks",
-      icon: "analytics",
-      path: "/dashboard/benchmarks",
-      submenu: [
-        { name: "benchmarks.header.title", path: "/dashboard/benchmarks/overview" },
-        { name: "benchmarks.compensationTitle", path: "/dashboard/benchmarks/compensation" },
-        { name: "benchmarks.market", path: "/dashboard/benchmarks/market" },
-        { name: "benchmarks.skills.title", path: "/dashboard/benchmarks/skills" },
-        { name: "benchmarks.demographics.title", path: "/dashboard/benchmarks/demographics" },
-      ],
-    },
+    // {
+    //   id: "benchmarks",
+    //   name: "nav.benchmarks",
+    //   icon: "analytics",
+    //   path: "/dashboard/benchmarks",
+    //   submenu: [
+    //     { name: "benchmarks.header.title", path: "/dashboard/benchmarks/overview" },
+    //     { name: "benchmarks.compensationTitle", path: "/dashboard/benchmarks/compensation" },
+    //     { name: "benchmarks.market", path: "/dashboard/benchmarks/market" },
+    //     { name: "benchmarks.skills.title", path: "/dashboard/benchmarks/skills" },
+    //     { name: "benchmarks.demographics.title", path: "/dashboard/benchmarks/demographics" },
+    //   ],
+    // },
     {
       id: "learning",
       name: "nav.learning",
@@ -218,7 +218,7 @@ export const sidebarData = {
       path: "/dashboard/learning",
       submenu: [
         { name: "dashboard.courses", path: "/dashboard/learning/courses" },
-        { name: "dashboard.smartGaps", path: "/dashboard/learning/gaps" },
+        // { name: "dashboard.smartGaps", path: "/dashboard/learning/gaps" },
         { name: "dashboard.certifications", path: "/dashboard/learning/certifications" },
         { name: "dashboard.progress", path: "/dashboard/progress" },
       ],
@@ -239,12 +239,12 @@ export const sidebarData = {
         { name: "dashboard.mySessions", path: "/dashboard/my-sessions" },
       ],
     },
-    {
-      id: "transactions",
-      name: "nav.transactions",
-      icon: "transactions",
-      path: "/dashboard/transactions",
-    },
+    // {
+    //   id: "transactions",
+    //   name: "nav.transactions",
+    //   icon: "transactions",
+    //   path: "/dashboard/transactions",
+    // },
     {
       id: "subscriptions",
       name: "dashboard.subscriptions",
@@ -336,6 +336,12 @@ export const adminSidebarData = {
       name: "nav.coaches",
       icon: "opportunities",
       path: "/dashboard/admin/coaches",
+    },
+    {
+      id: "schools",
+      name: "nav.schools",
+      icon: "learning",
+      path: "/dashboard/admin/schools",
     },
     {
       id: "courses",
