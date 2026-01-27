@@ -849,6 +849,7 @@ export default function NexaValuesPage() {
                 <svg className="w-4 h-4" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="#22c55e" /><path d="M5,8 L7,10 L11,6" stroke="white" strokeWidth="1.5" fill="none" /></svg>
               </div>
               {/* Week 5-6 - Cyan */}
+
               <div
                 className="flex-1 bg-[#22d3ee] text-white flex items-center justify-center gap-2 -ml-[15px] z-20 relative font-bold"
                 style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%)', paddingLeft: '15px' }}
