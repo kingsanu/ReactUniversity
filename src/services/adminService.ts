@@ -4,6 +4,35 @@ import { getRoleById } from "./roleService";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+// Helper to get current language from localStorage
+const getCurrentLanguage = (): "en" | "sp" => {
+  if (typeof window !== "undefined") {
+    const lang = localStorage.getItem("i18nextLng") || "en";
+    return lang.startsWith("es") ? "sp" : "en";
+  }
+  return "en";
+};
+
+// Helper to build URL with language parameter
+const buildUrl = (
+  endpoint: string,
+  params?: Record<string, string | number | undefined>
+) => {
+  const url = new URL(`${API_BASE_URL}${endpoint}`);
+  const language = getCurrentLanguage();
+  url.searchParams.append("language", language);
+
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        url.searchParams.append(key, String(value));
+      }
+    });
+  }
+
+  return url.toString();
+};
+
 // Helper to get token
 const getToken = () => localStorage.getItem("token");
 
@@ -194,8 +223,8 @@ export function setTestAdminRole(role: "user" | "admin" | "super_admin") {
     role === "admin"
       ? `${currentToken}-admin`
       : role === "super_admin"
-      ? `${currentToken}-super-admin`
-      : currentToken.replace(/-admin|-super-admin/g, "");
+        ? `${currentToken}-super-admin`
+        : currentToken.replace(/-admin|-super-admin/g, "");
 
   localStorage.setItem("token", adminToken);
 
@@ -209,9 +238,9 @@ export function setTestAdminRole(role: "user" | "admin" | "super_admin") {
 export async function getAdminPayouts(
   status?: "pending" | "approved" | "rejected" | "paid"
 ): Promise<AdminPayoutItem[]> {
-  const query = status ? `?status=${status}` : "";
+  const url = buildUrl("/api/v1/admin/payouts", status ? { status } : undefined);
 
-  const response = await fetch(`${API_BASE_URL}/api/v1/admin/payouts${query}`, {
+  const response = await fetch(url, {
     headers: getHeaders(),
   });
 
@@ -223,12 +252,11 @@ export async function getAdminPayouts(
 export async function approvePayout(
   payoutId: string
 ): Promise<{ success: boolean; message: string }> {
-  const response = await fetch(
-    `${API_BASE_URL}/api/v1/admin/payouts/${payoutId}/approve`,
-    {
-      method: "POST",
-      headers: getHeaders(),
-    }
+  const url = buildUrl(`/api/v1/admin/payouts/${payoutId}/approve`);
+  const response = await fetch(url, {
+    method: "POST",
+    headers: getHeaders(),
+  }
   );
 
   if (!response.ok) throw new Error("Failed to approve payout");
@@ -240,13 +268,12 @@ export async function rejectPayout(
   payoutId: string,
   reason?: string
 ): Promise<{ success: boolean; message: string }> {
-  const response = await fetch(
-    `${API_BASE_URL}/api/v1/admin/payouts/${payoutId}/reject`,
-    {
-      method: "POST",
-      headers: getHeaders(),
-      body: JSON.stringify({ reason }),
-    }
+  const url = buildUrl(`/api/v1/admin/payouts/${payoutId}/reject`);
+  const response = await fetch(url, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify({ reason }),
+  }
   );
 
   if (!response.ok) throw new Error("Failed to reject payout");
@@ -255,11 +282,10 @@ export async function rejectPayout(
 }
 
 export async function getCommissionStats(): Promise<CommissionStats> {
-  const response = await fetch(
-    `${API_BASE_URL}/api/v1/admin/commission-stats`,
-    {
-      headers: getHeaders(),
-    }
+  const url = buildUrl("/api/v1/admin/commission-stats");
+  const response = await fetch(url, {
+    headers: getHeaders(),
+  }
   );
 
   if (!response.ok) throw new Error("Failed to fetch commission stats");
@@ -293,15 +319,15 @@ export async function getAdminUsers(params: {
   role?: string;
   status?: string;
 }): Promise<AdminUsersResponse> {
-  const queryParams = new URLSearchParams();
-  queryParams.append("page", (params.page || 1).toString());
-  queryParams.append("limit", (params.limit || 20).toString());
-  queryParams.append("search", params.search || "");
-  queryParams.append("role", params.role || "");
-  queryParams.append("status", params.status || "");
+  const url = buildUrl("/api/v1/admin/users", {
+    page: params.page || 1,
+    limit: params.limit || 20,
+    search: params.search,
+    role: params.role,
+    status: params.status,
+  });
 
-  const response = await fetch(
-    `${API_BASE_URL}/api/v1/admin/users?${queryParams}`,
+  const response = await fetch(url,
     {
       headers: getHeaders(),
     }
@@ -339,17 +365,16 @@ export async function getAdminTransactions(params: {
   search?: string;
   status?: string;
 }): Promise<AdminTransactionsResponse> {
-  const queryParams = new URLSearchParams();
-  queryParams.append("page", (params.page || 1).toString());
-  queryParams.append("limit", (params.limit || 20).toString());
-  queryParams.append("search", params.search || "");
-  queryParams.append("status", params.status || "");
+  const url = buildUrl("/api/v1/admin/transactions", {
+    page: params.page || 1,
+    limit: params.limit || 20,
+    search: params.search,
+    status: params.status,
+  });
 
-  const response = await fetch(
-    `${API_BASE_URL}/api/v1/admin/transactions?${queryParams}`,
-    {
-      headers: getHeaders(),
-    }
+  const response = await fetch(url, {
+    headers: getHeaders(),
+  }
   );
 
   if (!response.ok) throw new Error("Failed to fetch transactions");
@@ -415,11 +440,10 @@ export interface AdminAnalytics {
 export async function getAdminAnalytics(
   period: "week" | "month" | "year" = "month"
 ): Promise<AdminAnalytics> {
-  const response = await fetch(
-    `${API_BASE_URL}/api/admin/analytics?period=${period}`,
-    {
-      headers: getHeaders(),
-    }
+  const url = buildUrl("/api/admin/analytics", { period });
+  const response = await fetch(url, {
+    headers: getHeaders(),
+  }
   );
 
   if (!response.ok) {

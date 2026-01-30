@@ -7,7 +7,6 @@ import {
   AnalyticsOverview,
   PerformanceTrendData,
   TopPerformer,
-  StudentResult,
   StudentResultsResponse,
   StudentDetailResult,
   SchoolSettings,
@@ -23,13 +22,39 @@ const getToken = () => {
   return null;
 };
 
-// Helper for headers
+// Helper to get current language from i18n
+export const getCurrentLanguage = (): "en" | "sp" => {
+  if (typeof window !== "undefined") {
+    const lang = localStorage.getItem("i18nextLng") || "en";
+    return lang.startsWith("es") ? "sp" : "en";
+  }
+  return "en";
+};
+
+// Helper for headers with optional language
 const getHeaders = () => {
   const token = getToken();
   return {
     "Content-Type": "application/json",
     Authorization: token ? `Bearer ${token}` : "",
   };
+};
+
+// Helper to build URL with language parameter
+const buildUrl = (endpoint: string, params?: Record<string, string | number | undefined>) => {
+  const url = new URL(`${API_BASE_URL}${endpoint}`);
+  const language = getCurrentLanguage();
+  url.searchParams.append("language", language);
+
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        url.searchParams.append(key, String(value));
+      }
+    });
+  }
+
+  return url.toString();
 };
 
 // ============================================
@@ -39,7 +64,7 @@ const getHeaders = () => {
 export async function getSchoolAdminStats(): Promise<SchoolAdminDashboardStats> {
   try {
     const response = await fetch(
-      `${API_BASE_URL}/api/v1/school-admin/dashboard/stats`,
+      buildUrl("/api/v1/school-admin/dashboard/stats"),
       { headers: getHeaders() }
     );
     if (!response.ok) throw new Error("Failed to fetch stats");
@@ -70,17 +95,16 @@ export async function getStudents(params: {
   sortBy?: string;
   sortOrder?: string;
 } = {}): Promise<StudentsResponse> {
-  const query = new URLSearchParams();
-  if (params.page) query.append("page", params.page.toString());
-  if (params.limit) query.append("limit", params.limit.toString());
-  if (params.search) query.append("search", params.search);
-  if (params.status) query.append("status", params.status);
-  if (params.sortBy) query.append("sortBy", params.sortBy);
-  if (params.sortOrder) query.append("sortOrder", params.sortOrder);
-
   try {
     const response = await fetch(
-      `${API_BASE_URL}/api/v1/school-admin/students?${query.toString()}`,
+      buildUrl("/api/v1/school-admin/students", {
+        page: params.page,
+        limit: params.limit,
+        search: params.search,
+        status: params.status,
+        sortBy: params.sortBy,
+        sortOrder: params.sortOrder,
+      }),
       { headers: getHeaders() }
     );
     if (!response.ok) throw new Error("Failed to fetch students");
@@ -101,7 +125,7 @@ export async function inviteStudent(
   data: StudentInvitePayload
 ): Promise<{ success: boolean; message: string; student?: Student }> {
   const response = await fetch(
-    `${API_BASE_URL}/api/v1/school-admin/students/invite`,
+    buildUrl("/api/v1/school-admin/students/invite"),
     {
       method: "POST",
       headers: getHeaders(),
@@ -121,7 +145,7 @@ export async function bulkInviteStudents(
   data: BulkStudentInvitePayload
 ): Promise<{ success: boolean; invited: number; failed: number; results: any[] }> {
   const response = await fetch(
-    `${API_BASE_URL}/api/v1/school-admin/students/bulk-invite`,
+    buildUrl("/api/v1/school-admin/students/bulk-invite"),
     {
       method: "POST",
       headers: getHeaders(),
@@ -141,7 +165,7 @@ export async function resendStudentInvite(
   studentId: string
 ): Promise<{ success: boolean; message: string }> {
   const response = await fetch(
-    `${API_BASE_URL}/api/v1/school-admin/students/${studentId}/resend-invite`,
+    buildUrl(`/api/v1/school-admin/students/${studentId}/resend-invite`),
     {
       method: "POST",
       headers: getHeaders(),
@@ -159,7 +183,7 @@ export async function removeStudent(
   studentId: string
 ): Promise<{ success: boolean; message: string }> {
   const response = await fetch(
-    `${API_BASE_URL}/api/v1/school-admin/students/${studentId}`,
+    buildUrl(`/api/v1/school-admin/students/${studentId}`),
     {
       method: "DELETE",
       headers: getHeaders(),
@@ -182,7 +206,7 @@ export async function getAnalyticsOverview(
 ): Promise<AnalyticsOverview> {
   try {
     const response = await fetch(
-      `${API_BASE_URL}/api/v1/school-admin/analytics/overview?period=${period}`,
+      buildUrl("/api/v1/school-admin/analytics/overview", { period }),
       { headers: getHeaders() }
     );
     if (!response.ok) throw new Error("Failed to fetch analytics");
@@ -210,7 +234,7 @@ export async function getPerformanceTrends(
 ): Promise<PerformanceTrendData> {
   try {
     const response = await fetch(
-      `${API_BASE_URL}/api/v1/school-admin/analytics/performance-trends?period=${period}&metric=${metric}`,
+      buildUrl("/api/v1/school-admin/analytics/performance-trends", { period, metric }),
       { headers: getHeaders() }
     );
     if (!response.ok) throw new Error("Failed to fetch trends");
@@ -230,7 +254,7 @@ export async function getTopPerformers(
 ): Promise<{ data: TopPerformer[] }> {
   try {
     const response = await fetch(
-      `${API_BASE_URL}/api/v1/school-admin/analytics/top-performers?limit=${limit}`,
+      buildUrl("/api/v1/school-admin/analytics/top-performers", { limit }),
       { headers: getHeaders() }
     );
     if (!response.ok) throw new Error("Failed to fetch top performers");
@@ -253,17 +277,16 @@ export async function getStudentResults(params: {
   dateFrom?: string;
   dateTo?: string;
 } = {}): Promise<StudentResultsResponse> {
-  const query = new URLSearchParams();
-  if (params.page) query.append("page", params.page.toString());
-  if (params.limit) query.append("limit", params.limit.toString());
-  if (params.studentId) query.append("studentId", params.studentId);
-  if (params.assessmentType) query.append("assessmentType", params.assessmentType);
-  if (params.dateFrom) query.append("dateFrom", params.dateFrom);
-  if (params.dateTo) query.append("dateTo", params.dateTo);
-
   try {
     const response = await fetch(
-      `${API_BASE_URL}/api/v1/school-admin/results?${query.toString()}`,
+      buildUrl("/api/v1/school-admin/results", {
+        page: params.page,
+        limit: params.limit,
+        studentId: params.studentId,
+        assessmentType: params.assessmentType,
+        dateFrom: params.dateFrom,
+        dateTo: params.dateTo,
+      }),
       { headers: getHeaders() }
     );
     if (!response.ok) throw new Error("Failed to fetch results");
@@ -285,7 +308,7 @@ export async function getStudentDetailResult(
 ): Promise<StudentDetailResult | null> {
   try {
     const response = await fetch(
-      `${API_BASE_URL}/api/v1/school-admin/results/${studentId}/detail`,
+      buildUrl(`/api/v1/school-admin/results/${studentId}/detail`),
       { headers: getHeaders() }
     );
     if (!response.ok) throw new Error("Failed to fetch student detail");
@@ -302,14 +325,13 @@ export async function exportResults(params: {
   dateFrom?: string;
   dateTo?: string;
 }): Promise<Blob> {
-  const query = new URLSearchParams();
-  query.append("format", params.format);
-  if (params.studentId) query.append("studentId", params.studentId);
-  if (params.dateFrom) query.append("dateFrom", params.dateFrom);
-  if (params.dateTo) query.append("dateTo", params.dateTo);
-
   const response = await fetch(
-    `${API_BASE_URL}/api/v1/school-admin/results/export?${query.toString()}`,
+    buildUrl("/api/v1/school-admin/results/export", {
+      format: params.format,
+      studentId: params.studentId,
+      dateFrom: params.dateFrom,
+      dateTo: params.dateTo,
+    }),
     { headers: getHeaders() }
   );
 
@@ -327,7 +349,7 @@ export async function exportResults(params: {
 export async function getSchoolSettings(): Promise<SchoolSettings | null> {
   try {
     const response = await fetch(
-      `${API_BASE_URL}/api/v1/school-admin/settings`,
+      buildUrl("/api/v1/school-admin/settings"),
       { headers: getHeaders() }
     );
     if (!response.ok) throw new Error("Failed to fetch settings");
@@ -343,7 +365,7 @@ export async function updateAdminProfile(data: {
   phone?: string;
 }): Promise<{ success: boolean; message: string }> {
   const response = await fetch(
-    `${API_BASE_URL}/api/v1/school-admin/settings/profile`,
+    buildUrl("/api/v1/school-admin/settings/profile"),
     {
       method: "PUT",
       headers: getHeaders(),
@@ -363,7 +385,7 @@ export async function changePassword(data: {
   newPassword: string;
 }): Promise<{ success: boolean; message: string }> {
   const response = await fetch(
-    `${API_BASE_URL}/api/v1/school-admin/settings/password`,
+    buildUrl("/api/v1/school-admin/settings/password"),
     {
       method: "PUT",
       headers: getHeaders(),
@@ -389,7 +411,7 @@ export async function verifySchoolAdminAccess(): Promise<{
 }> {
   try {
     const response = await fetch(
-      `${API_BASE_URL}/api/v1/school-admin/verify`,
+      buildUrl("/api/v1/school-admin/verify"),
       { headers: getHeaders() }
     );
     if (!response.ok) {

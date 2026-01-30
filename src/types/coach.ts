@@ -18,13 +18,13 @@ export interface Coach {
   activeStudents?: number; // For admin view
   contractStart?: string; // For admin view
   contractEnd?: string; // For admin view
+  platformCommission?: number; // For admin view - platform commission percentage
   hourlyRate?: number;
   currency?: string;
   phone?: string;
   website?: string;
   linkedin?: string;
   twitter?: string;
-  platformCommission?: number; // Coach-specific platform fee percentage (0-100)
 }
 
 export interface OnboardingStatus {
@@ -96,11 +96,11 @@ export interface Booking {
   endTime?: string;
   slot?: BookingSlot;
   status:
-  | "confirmed"
-  | "rescheduled"
-  | "cancelled"
-  | "completed"
-  | "pending_payment";
+    | "confirmed"
+    | "rescheduled"
+    | "cancelled"
+    | "completed"
+    | "pending_payment";
   meetingLink?: string;
 }
 

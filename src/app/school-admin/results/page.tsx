@@ -78,9 +78,9 @@ export default function ResultsPage() {
       a.download = `results.${format}`;
       a.click();
       URL.revokeObjectURL(url);
-      toast.success(`Results exported as ${format.toUpperCase()}`);
+      toast.success(t("schoolAdmin.results.exportSuccess", "Results exported successfully"));
     } catch (error) {
-      toast.error("Failed to export results");
+      toast.error(t("schoolAdmin.results.exportError", "Failed to export results"));
     }
   };
 
@@ -111,11 +111,11 @@ export default function ResultsPage() {
           <div className="flex items-center gap-3">
             <Button variant="outline" onClick={() => handleExport("csv")}>
               <Download className="mr-2 h-4 w-4" />
-              Export CSV
+              {t("schoolAdmin.results.exportCSV", "Export CSV")}
             </Button>
             <Button variant="outline" onClick={() => handleExport("pdf")}>
               <Download className="mr-2 h-4 w-4" />
-              Export PDF
+              {t("schoolAdmin.results.exportPDF", "Export PDF")}
             </Button>
           </div>
         </motion.div>
@@ -145,10 +145,10 @@ export default function ResultsPage() {
               <SelectValue placeholder="Assessment Type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="career">Career Assessment</SelectItem>
-              <SelectItem value="skills">Skills Assessment</SelectItem>
-              <SelectItem value="personality">Personality Test</SelectItem>
+              <SelectItem value="all">{t("schoolAdmin.results.allAssessments", "All Types")}</SelectItem>
+              <SelectItem value="career">{t("schoolAdmin.results.careerAssessment", "Career Assessment")}</SelectItem>
+              <SelectItem value="skills">{t("schoolAdmin.results.skillsAssessment", "Skills Assessment")}</SelectItem>
+              <SelectItem value="personality">{t("schoolAdmin.results.personalityTest", "Personality Test")}</SelectItem>
             </SelectContent>
           </Select>
           <Button variant="outline" size="icon" onClick={() => refetch()}>
@@ -166,13 +166,13 @@ export default function ResultsPage() {
           <Table>
             <TableHeader>
               <TableRow className="bg-gray-50/50">
-                <TableHead>Student</TableHead>
-                <TableHead>Assessment</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Score</TableHead>
-                <TableHead>Duration</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>{t("schoolAdmin.results.table.student", "Student")}</TableHead>
+                <TableHead>{t("schoolAdmin.results.table.assessment", "Assessment")}</TableHead>
+                <TableHead>{t("schoolAdmin.results.table.type", "Type")}</TableHead>
+                <TableHead>{t("schoolAdmin.results.table.score", "Score")}</TableHead>
+                <TableHead>{t("schoolAdmin.results.table.duration", "Duration")}</TableHead>
+                <TableHead>{t("schoolAdmin.results.table.completedAt", "Date")}</TableHead>
+                <TableHead className="text-right">{t("schoolAdmin.results.table.actions", "Actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -181,7 +181,7 @@ export default function ResultsPage() {
                   <TableCell colSpan={7} className="h-24 text-center">
                     <div className="flex justify-center items-center gap-2">
                       <RefreshCw className="animate-spin h-5 w-5 text-gray-400" />
-                      <span className="text-gray-500">Loading results...</span>
+                      <span className="text-gray-500">{t("schoolAdmin.common.loading", "Loading...")}</span>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -190,8 +190,8 @@ export default function ResultsPage() {
                   <TableCell colSpan={7} className="h-32 text-center">
                     <div className="flex flex-col items-center gap-2">
                       <FileText className="w-12 h-12 text-gray-300" />
-                      <p className="text-gray-500 font-medium">No results found</p>
-                      <p className="text-gray-400 text-sm">Results will appear as students complete assessments</p>
+                      <p className="text-gray-500 font-medium">{t("schoolAdmin.results.noResults", "No results found")}</p>
+                      <p className="text-gray-400 text-sm">{t("schoolAdmin.results.noResultsDesc", "Results will appear as students complete assessments")}</p>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -223,7 +223,7 @@ export default function ResultsPage() {
                     <TableCell>
                       <div className="flex items-center gap-1 text-gray-500">
                         <Clock className="w-4 h-4" />
-                        <span>{result.duration} min</span>
+                        <span>{result.duration} {t("schoolAdmin.results.minutes", "min")}</span>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -238,7 +238,7 @@ export default function ResultsPage() {
                         onClick={() => handleViewDetail(result.student.id)}
                       >
                         <Eye className="mr-2 h-4 w-4" />
-                        View
+                        {t("common.view", "View")}
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -260,10 +260,10 @@ export default function ResultsPage() {
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1 || isLoading}
                 >
-                  Previous
+                  {t("common.previous", "Previous")}
                 </Button>
                 <span className="text-sm text-gray-500">
-                  Page {page} of {results.totalPages}
+                  {t("common.page", "Page")} {page} {t("common.of", "of")} {results.totalPages}
                 </span>
                 <Button
                   variant="outline"
@@ -271,7 +271,7 @@ export default function ResultsPage() {
                   onClick={() => setPage((p) => p + 1)}
                   disabled={page >= results.totalPages || isLoading}
                 >
-                  Next
+                  {t("common.next", "Next")}
                 </Button>
               </div>
             </div>
@@ -285,10 +285,10 @@ export default function ResultsPage() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Award className="h-5 w-5 text-teal-600" />
-              Student Performance Detail
+              {t("schoolAdmin.results.detail.title", "Student Performance Detail")}
             </DialogTitle>
             <DialogDescription>
-              Detailed assessment history and performance breakdown
+              {t("schoolAdmin.results.detail.description", "Detailed assessment history and performance breakdown")}
             </DialogDescription>
           </DialogHeader>
 
@@ -313,22 +313,22 @@ export default function ResultsPage() {
               <div className="grid grid-cols-3 gap-4">
                 <div className="bg-white border border-gray-100 rounded-xl p-4 text-center">
                   <p className="text-3xl font-bold text-teal-600">{studentDetail.summary.totalAssessments}</p>
-                  <p className="text-sm text-gray-500">Assessments</p>
+                  <p className="text-sm text-gray-500">{t("schoolAdmin.results.detail.totalAssessments", "Assessments")}</p>
                 </div>
                 <div className="bg-white border border-gray-100 rounded-xl p-4 text-center">
                   <p className="text-3xl font-bold text-violet-600">{studentDetail.summary.averageScore.toFixed(1)}%</p>
-                  <p className="text-sm text-gray-500">Avg. Score</p>
+                  <p className="text-sm text-gray-500">{t("schoolAdmin.results.detail.averageScore", "Avg. Score")}</p>
                 </div>
                 <div className="bg-white border border-gray-100 rounded-xl p-4 text-center">
                   <p className="text-3xl font-bold text-amber-600">{studentDetail.summary.totalTimeSpent}m</p>
-                  <p className="text-sm text-gray-500">Time Spent</p>
+                  <p className="text-sm text-gray-500">{t("schoolAdmin.results.detail.totalTime", "Time Spent")}</p>
                 </div>
               </div>
 
               {/* Strengths & Improvements */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 bg-emerald-50 rounded-xl">
-                  <p className="font-semibold text-emerald-700 mb-2">Strong Areas</p>
+                  <p className="font-semibold text-emerald-700 mb-2">{t("schoolAdmin.results.detail.strongAreas", "Strong Areas")}</p>
                   <ul className="space-y-1">
                     {studentDetail.summary.strongAreas.map((area, i) => (
                       <li key={i} className="text-sm text-emerald-600 flex items-center gap-2">
@@ -338,7 +338,7 @@ export default function ResultsPage() {
                   </ul>
                 </div>
                 <div className="p-4 bg-amber-50 rounded-xl">
-                  <p className="font-semibold text-amber-700 mb-2">Areas for Improvement</p>
+                  <p className="font-semibold text-amber-700 mb-2">{t("schoolAdmin.results.detail.improvementAreas", "Areas for Improvement")}</p>
                   <ul className="space-y-1">
                     {studentDetail.summary.improvementAreas.map((area, i) => (
                       <li key={i} className="text-sm text-amber-600 flex items-center gap-2">
@@ -351,7 +351,7 @@ export default function ResultsPage() {
 
               {/* Assessment List */}
               <div>
-                <h4 className="font-semibold text-gray-900 mb-3">Assessment History</h4>
+                <h4 className="font-semibold text-gray-900 mb-3">{t("schoolAdmin.results.detail.assessmentHistory", "Assessment History")}</h4>
                 <div className="space-y-3">
                   {studentDetail.assessments.map((assessment) => (
                     <div key={assessment.id} className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-xl">
@@ -363,7 +363,7 @@ export default function ResultsPage() {
                         <p className={cn("text-lg font-bold", assessment.score >= 80 ? "text-emerald-600" : assessment.score >= 60 ? "text-amber-600" : "text-red-600")}>
                           {assessment.score}%
                         </p>
-                        <p className="text-xs text-gray-500">{assessment.duration} min</p>
+                        <p className="text-xs text-gray-500">{assessment.duration} {t("schoolAdmin.results.minutes", "min")}</p>
                       </div>
                     </div>
                   ))}
@@ -373,7 +373,7 @@ export default function ResultsPage() {
           ) : (
             <div className="text-center py-12 text-gray-500">
               <FileText className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-              <p>No details available</p>
+              <p>{t("schoolAdmin.results.detail.noAssessments", "No details available")}</p>
             </div>
           )}
         </DialogContent>

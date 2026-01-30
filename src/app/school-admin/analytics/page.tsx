@@ -34,36 +34,36 @@ export default function AnalyticsPage() {
 
   const statCards = overview ? [
     {
-      title: "Student Engagement",
+      title: t("schoolAdmin.analytics.engagement.title", "Student Engagement"),
       value: overview.studentEngagement.active,
-      subtitle: `${overview.studentEngagement.inactive} inactive`,
+      subtitle: `${overview.studentEngagement.inactive} ${t("schoolAdmin.analytics.engagement.inactive", "inactive")}`,
       trend: overview.studentEngagement.trend,
       icon: Users,
       color: "text-teal-600",
       bg: "bg-teal-50",
     },
     {
-      title: "Completion Rate",
+      title: t("schoolAdmin.analytics.completion.rate", "Completion Rate"),
       value: `${overview.assessmentCompletion.completionRate.toFixed(1)}%`,
-      subtitle: `${overview.assessmentCompletion.completed} completed`,
+      subtitle: `${overview.assessmentCompletion.completed} ${t("schoolAdmin.analytics.completion.completed", "completed")}`,
       trend: 0,
       icon: Target,
       color: "text-emerald-600",
       bg: "bg-emerald-50",
     },
     {
-      title: "Average Score",
+      title: t("schoolAdmin.analytics.performance.score", "Average Score"),
       value: `${overview.averagePerformance.score.toFixed(1)}%`,
-      subtitle: "Across all assessments",
+      subtitle: t("schoolAdmin.analytics.allAssessments", "Across all assessments"),
       trend: overview.averagePerformance.trend,
       icon: BarChart3,
       color: "text-violet-600",
       bg: "bg-violet-50",
     },
     {
-      title: "Avg. Time Spent",
+      title: t("schoolAdmin.analytics.timeSpent.average", "Avg. Time Spent"),
       value: `${overview.timeSpent.averageHours.toFixed(1)}h`,
-      subtitle: `${overview.timeSpent.totalHours} total hours`,
+      subtitle: `${overview.timeSpent.totalHours} ${t("schoolAdmin.analytics.timeSpent.total", "total hours")}`,
       trend: overview.timeSpent.trend,
       icon: Clock,
       color: "text-amber-600",
@@ -91,13 +91,13 @@ export default function AnalyticsPage() {
 
           <Select value={period} onValueChange={(v: any) => setPeriod(v)}>
             <SelectTrigger className="w-48 bg-white">
-              <SelectValue placeholder="Select period" />
+              <SelectValue placeholder={t("common.selectPeriod", "Select period")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="week">Last Week</SelectItem>
-              <SelectItem value="month">Last Month</SelectItem>
-              <SelectItem value="quarter">Last Quarter</SelectItem>
-              <SelectItem value="year">Last Year</SelectItem>
+              <SelectItem value="week">{t("schoolAdmin.analytics.period.week", "This Week")}</SelectItem>
+              <SelectItem value="month">{t("schoolAdmin.analytics.period.month", "This Month")}</SelectItem>
+              <SelectItem value="quarter">{t("schoolAdmin.analytics.period.quarter", "This Quarter")}</SelectItem>
+              <SelectItem value="year">{t("schoolAdmin.analytics.period.year", "This Year")}</SelectItem>
             </SelectContent>
           </Select>
         </motion.div>
@@ -154,15 +154,15 @@ export default function AnalyticsPage() {
             className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-6"
           >
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold text-gray-900">Performance Trends</h3>
+              <h3 className="text-lg font-bold text-gray-900">{t("schoolAdmin.analytics.trends.title", "Performance Trends")}</h3>
               <Select value={metric} onValueChange={(v: any) => setMetric(v)}>
                 <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Select metric" />
+                  <SelectValue placeholder={t("common.selectMetric", "Select metric")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="score">Score</SelectItem>
-                  <SelectItem value="completion">Completion</SelectItem>
-                  <SelectItem value="time">Time Spent</SelectItem>
+                  <SelectItem value="score">{t("schoolAdmin.analytics.trends.metric.score", "Score")}</SelectItem>
+                  <SelectItem value="completion">{t("schoolAdmin.analytics.trends.metric.completion", "Completion")}</SelectItem>
+                  <SelectItem value="time">{t("schoolAdmin.analytics.trends.metric.time", "Time Spent")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -198,7 +198,7 @@ export default function AnalyticsPage() {
           >
             <div className="flex items-center gap-2 mb-6">
               <Award className="w-5 h-5 text-amber-500" />
-              <h3 className="text-lg font-bold text-gray-900">Top Performers</h3>
+              <h3 className="text-lg font-bold text-gray-900">{t("schoolAdmin.analytics.topPerformers.title", "Top Performers")}</h3>
             </div>
 
             <div className="space-y-4">
@@ -216,7 +216,7 @@ export default function AnalyticsPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-gray-900 truncate">{student.name}</p>
-                      <p className="text-xs text-gray-500">{student.completedAssessments} assessments</p>
+                      <p className="text-xs text-gray-500">{student.completedAssessments} {t("schoolAdmin.analytics.topPerformers.assessments", "assessments")}</p>
                     </div>
                     <div className="text-right">
                       <p className="font-bold text-teal-600">{student.averageScore.toFixed(1)}%</p>
@@ -226,8 +226,8 @@ export default function AnalyticsPage() {
               ) : (
                 <div className="text-center py-8 text-gray-500">
                   <Activity className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                  <p className="font-medium">No data yet</p>
-                  <p className="text-sm">Performance data will appear here</p>
+                  <p className="font-medium">{t("schoolAdmin.analytics.noData", "No data yet")}</p>
+                  <p className="text-sm">{t("schoolAdmin.analytics.dataWillAppear", "Performance data will appear here")}</p>
                 </div>
               )}
             </div>
@@ -241,7 +241,7 @@ export default function AnalyticsPage() {
           transition={{ delay: 0.5 }}
           className="bg-white rounded-2xl border border-gray-100 p-6"
         >
-          <h3 className="text-lg font-bold text-gray-900 mb-6">Assessment Completion Status</h3>
+          <h3 className="text-lg font-bold text-gray-900 mb-6">{t("schoolAdmin.analytics.completion.title", "Assessment Completion Status")}</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {overview && (
               <>
@@ -251,7 +251,7 @@ export default function AnalyticsPage() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-gray-900">{overview.assessmentCompletion.completed}</p>
-                    <p className="text-sm text-gray-500">Completed</p>
+                    <p className="text-sm text-gray-500">{t("schoolAdmin.analytics.completion.completed", "Completed")}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -260,7 +260,7 @@ export default function AnalyticsPage() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-gray-900">{overview.assessmentCompletion.inProgress}</p>
-                    <p className="text-sm text-gray-500">In Progress</p>
+                    <p className="text-sm text-gray-500">{t("schoolAdmin.analytics.completion.inProgress", "In Progress")}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -269,7 +269,7 @@ export default function AnalyticsPage() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-gray-900">{overview.assessmentCompletion.notStarted}</p>
-                    <p className="text-sm text-gray-500">Not Started</p>
+                    <p className="text-sm text-gray-500">{t("schoolAdmin.analytics.completion.notStarted", "Not Started")}</p>
                   </div>
                 </div>
               </>

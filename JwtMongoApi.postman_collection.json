@@ -538,7 +538,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/auth/google/url?email={{email}}&invitationToken={{invitationToken}}",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/auth/google/url?email={{email}}&invitationToken={{invitationToken}}&redirectUrl={{redirectUrl}}",
                   "protocol": "https",
                   "host": [
                     "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
@@ -555,6 +555,12 @@
                       "value": "{{invitationToken}}",
                       "description": "Invitation token for coach onboarding (optional). If provided, callback will redirect back to invitation URL.",
                       "disabled": true
+                    },
+                    {
+                      "key": "redirectUrl",
+                      "value": "{{redirectUrl}}",
+                      "description": "Optional redirect URL (or 'from') indicating where to return after OAuth (e.g., settings vs onboarding page).",
+                      "disabled": true
                     }
                   ]
                 },
@@ -567,7 +573,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/auth/outlook/url?email={{email}}&invitationToken={{invitationToken}}",
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/auth/outlook/url?email={{email}}&invitationToken={{invitationToken}}&redirectUrl={{redirectUrl}}",
                   "protocol": "https",
                   "host": [
                     "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
@@ -583,6 +589,12 @@
                       "key": "invitationToken",
                       "value": "{{invitationToken}}",
                       "description": "Invitation token for coach onboarding (optional). If provided, callback will redirect back to invitation URL.",
+                      "disabled": true
+                    },
+                    {
+                      "key": "redirectUrl",
+                      "value": "{{redirectUrl}}",
+                      "description": "Optional redirect URL (or 'from') indicating where to return after OAuth (e.g., settings vs onboarding page).",
                       "disabled": true
                     }
                   ]
@@ -2106,6 +2118,139 @@
         {
           "name": "Admin/Management",
           "item": [
+            {
+              "name": "Invite School",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Springfield High School\",\n  \"adminEmail\": \"principal@springfield.edu\",\n  \"maxStudents\": 500,\n  \"details\": \"Contract ID: #12345, Premium Plan\",\n  \"contractStart\": \"2024-01-01\",\n  \"contractEnd\": \"2025-01-01\"\n}"
+                },
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/admin/schools/invite",
+                  "protocol": "https",
+                  "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"],
+                  "path": ["api", "v1", "admin", "schools", "invite"]
+                },
+                "description": "Invite a school to join the platform.\n\n**Endpoint:** `POST /api/v1/admin/schools/invite`\n\n**Request Body:**\n- name (string, required): Name of the school\n- adminEmail (string, required, email): Email of the school administrator\n- maxStudents (number, required): Maximum number of students allowed\n- details (string, optional): Additional contract details\n- contractStart (string, optional): ISO date string\n- contractEnd (string, optional): ISO date string"
+              }
+            },
+            {
+              "name": "Get Schools",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/admin/schools?page=1&limit=10&search=",
+                  "protocol": "https",
+                  "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"],
+                  "path": ["api", "v1", "admin", "schools"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "description": "Page number (default: 1)"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "description": "Items per page (default: 10)"
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "description": "Search by school name or admin email (optional)"
+                    }
+                  ]
+                },
+                "description": "Get paginated list of schools for the admin dashboard.\n\n**Endpoint:** `GET /api/v1/admin/schools`"
+              }
+            },
+            {
+              "name": "Update School",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Springfield High School\",\n  \"adminEmail\": \"principal@springfield.edu\",\n  \"maxStudents\": 600,\n  \"details\": \"Updated contract details...\",\n  \"contractStart\": \"2024-01-01\",\n  \"contractEnd\": \"2026-01-01\",\n  \"status\": \"active\"\n}"
+                },
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/admin/schools/{{schoolId}}",
+                  "protocol": "https",
+                  "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"],
+                  "path": ["api", "v1", "admin", "schools", "{{schoolId}}"]
+                },
+                "description": "Update school details.\n\n**Endpoint:** `PUT /api/v1/admin/schools/:id`"
+              }
+            },
+            {
+              "name": "Resend School Invitation",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/admin/schools/{{schoolId}}/invite",
+                  "protocol": "https",
+                  "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"],
+                  "path": ["api", "v1", "admin", "schools", "{{schoolId}}", "invite"]
+                },
+                "description": "Resend the invitation email to a school administrator.\n\n**Endpoint:** `POST /api/v1/admin/schools/:id/invite`"
+              }
+            },
+            {
+              "name": "Get School Stats",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/admin/schools/stats",
+                  "protocol": "https",
+                  "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"],
+                  "path": ["api", "v1", "admin", "schools", "stats"]
+                },
+                "description": "Get aggregated statistics for Schools dashboard.\n\n**Endpoint:** `GET /api/v1/admin/schools/stats`"
+              }
+            },
             {
               "name": "Get Users Without Coach Profile",
               "request": {

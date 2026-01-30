@@ -43,16 +43,16 @@ export default function SettingsPage() {
 
   const handleUpdateProfile = async () => {
     if (!name && !phone) {
-      toast.error("Please fill in at least one field");
+      toast.error(t("schoolAdmin.settings.profile.fillRequired", "Please fill in at least one field"));
       return;
     }
     setProfileLoading(true);
     try {
       await updateAdminProfile({ name: name || undefined, phone: phone || undefined });
-      toast.success("Profile updated successfully");
+      toast.success(t("schoolAdmin.settings.profile.success", "Profile updated successfully"));
       refetch();
     } catch (error) {
-      toast.error("Failed to update profile");
+      toast.error(t("schoolAdmin.settings.profile.error", "Failed to update profile"));
     } finally {
       setProfileLoading(false);
     }
@@ -60,26 +60,26 @@ export default function SettingsPage() {
 
   const handleChangePassword = async () => {
     if (!currentPassword || !newPassword) {
-      toast.error("Please fill in all password fields");
+      toast.error(t("schoolAdmin.settings.password.fillRequired", "Please fill in all password fields"));
       return;
     }
     if (newPassword !== confirmPassword) {
-      toast.error("New passwords do not match");
+      toast.error(t("schoolAdmin.settings.password.mismatch", "New passwords do not match"));
       return;
     }
     if (newPassword.length < 8) {
-      toast.error("Password must be at least 8 characters");
+      toast.error(t("schoolAdmin.settings.password.minLength", "Password must be at least 8 characters"));
       return;
     }
     setPasswordLoading(true);
     try {
       await changePassword({ currentPassword, newPassword });
-      toast.success("Password changed successfully");
+      toast.success(t("schoolAdmin.settings.password.success", "Password changed successfully"));
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } catch (error) {
-      toast.error("Failed to change password");
+      toast.error(t("schoolAdmin.settings.password.error", "Failed to change password"));
     } finally {
       setPasswordLoading(false);
     }
@@ -112,9 +112,9 @@ export default function SettingsPage() {
             <CardHeader className="bg-gradient-to-r from-teal-50 to-cyan-50 border-b border-gray-100">
               <CardTitle className="flex items-center gap-2">
                 <School className="h-5 w-5 text-teal-600" />
-                School Information
+                {t("schoolAdmin.settings.schoolInfo.title", "School Information")}
               </CardTitle>
-              <CardDescription>Your school details and contract information</CardDescription>
+              <CardDescription>{t("schoolAdmin.settings.schoolInfo.subtitle", "Your school details and contract information")}</CardDescription>
             </CardHeader>
             <CardContent className="pt-6">
               {isLoading ? (
@@ -125,11 +125,11 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <div>
-                      <Label className="text-gray-500">School Name</Label>
+                      <Label className="text-gray-500">{t("schoolAdmin.settings.schoolInfo.name", "School Name")}</Label>
                       <p className="text-lg font-medium text-gray-900">{settings.school.name}</p>
                     </div>
                     <div>
-                      <Label className="text-gray-500">Admin Email</Label>
+                      <Label className="text-gray-500">{t("schoolAdmin.settings.schoolInfo.adminEmail", "Admin Email")}</Label>
                       <p className="text-lg font-medium text-gray-900">{settings.admin.email}</p>
                     </div>
                   </div>
@@ -139,7 +139,7 @@ export default function SettingsPage() {
                         <Users className="w-5 h-5 text-teal-600" />
                       </div>
                       <div>
-                        <p className="text-sm text-gray-500">Student Capacity</p>
+                        <p className="text-sm text-gray-500">{t("schoolAdmin.settings.schoolInfo.maxStudents", "Student Capacity")}</p>
                         <p className="font-medium text-gray-900">
                           {settings.school.currentStudents} / {settings.school.maxStudents}
                         </p>
@@ -150,7 +150,7 @@ export default function SettingsPage() {
                         <Calendar className="w-5 h-5 text-violet-600" />
                       </div>
                       <div>
-                        <p className="text-sm text-gray-500">Contract Period</p>
+                        <p className="text-sm text-gray-500">{t("schoolAdmin.settings.schoolInfo.contractPeriod", "Contract Period")}</p>
                         <p className="font-medium text-gray-900">
                           {settings.school.contractStart} - {settings.school.contractEnd}
                         </p>
@@ -159,7 +159,7 @@ export default function SettingsPage() {
                   </div>
                 </div>
               ) : (
-                <p className="text-gray-500 text-center py-8">Unable to load school info</p>
+                <p className="text-gray-500 text-center py-8">{t("schoolAdmin.settings.schoolInfo.loadError", "Unable to load school info")}</p>
               )}
             </CardContent>
           </Card>
@@ -175,26 +175,26 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="h-5 w-5 text-teal-600" />
-                Profile Settings
+                {t("schoolAdmin.settings.profile.title", "Profile Settings")}
               </CardTitle>
-              <CardDescription>Update your profile information</CardDescription>
+              <CardDescription>{t("schoolAdmin.settings.profile.subtitle", "Update your profile information")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Name</Label>
+                  <Label htmlFor="name">{t("schoolAdmin.settings.profile.name", "Name")}</Label>
                   <Input
                     id="name"
-                    placeholder={settings?.admin.name || "Your name"}
+                    placeholder={settings?.admin.name || t("schoolAdmin.settings.profile.namePlaceholder", "Your name")}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone</Label>
+                  <Label htmlFor="phone">{t("schoolAdmin.settings.profile.phone", "Phone")}</Label>
                   <Input
                     id="phone"
-                    placeholder="+1 234 567 8900"
+                    placeholder={t("schoolAdmin.settings.profile.phonePlaceholder", "+1 234 567 8900")}
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                   />
@@ -208,10 +208,10 @@ export default function SettingsPage() {
                 {profileLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving...
+                    {t("schoolAdmin.settings.profile.updating", "Saving...")}
                   </>
                 ) : (
-                  "Update Profile"
+                  t("schoolAdmin.settings.profile.update", "Update Profile")
                 )}
               </Button>
             </CardContent>
@@ -228,38 +228,38 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Lock className="h-5 w-5 text-teal-600" />
-                Change Password
+                {t("schoolAdmin.settings.password.title", "Change Password")}
               </CardTitle>
-              <CardDescription>Keep your account secure by using a strong password</CardDescription>
+              <CardDescription>{t("schoolAdmin.settings.password.subtitle", "Keep your account secure by using a strong password")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="currentPassword">Current Password</Label>
+                <Label htmlFor="currentPassword">{t("schoolAdmin.settings.password.current", "Current Password")}</Label>
                 <Input
                   id="currentPassword"
                   type="password"
-                  placeholder="Enter current password"
+                  placeholder={t("schoolAdmin.settings.password.currentPlaceholder", "Enter current password")}
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                 />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="newPassword">New Password</Label>
+                  <Label htmlFor="newPassword">{t("schoolAdmin.settings.password.new", "New Password")}</Label>
                   <Input
                     id="newPassword"
                     type="password"
-                    placeholder="Enter new password"
+                    placeholder={t("schoolAdmin.settings.password.newPlaceholder", "Enter new password")}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                  <Label htmlFor="confirmPassword">{t("schoolAdmin.settings.password.confirm", "Confirm New Password")}</Label>
                   <Input
                     id="confirmPassword"
                     type="password"
-                    placeholder="Confirm new password"
+                    placeholder={t("schoolAdmin.settings.password.confirmPlaceholder", "Confirm new password")}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                   />
@@ -273,10 +273,10 @@ export default function SettingsPage() {
                 {passwordLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Changing...
+                    {t("schoolAdmin.settings.password.changing", "Changing...")}
                   </>
                 ) : (
-                  "Change Password"
+                  t("schoolAdmin.settings.password.change", "Change Password")
                 )}
               </Button>
             </CardContent>

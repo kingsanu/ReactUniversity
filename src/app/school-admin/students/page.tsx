@@ -76,19 +76,19 @@ export default function StudentsPage() {
   const handleResendInvite = async (studentId: string, studentName: string) => {
     try {
       await resendInvite.mutateAsync(studentId);
-      toast.success(`Invitation resent to ${studentName}`);
+      toast.success(t("schoolAdmin.students.resendSuccess", "Invitation resent successfully"));
     } catch (error) {
-      toast.error("Failed to resend invitation");
+      toast.error(t("schoolAdmin.students.resendError", "Failed to resend invitation"));
     }
   };
 
   const handleRemoveStudent = async (studentId: string, studentName: string) => {
-    if (!confirm(`Are you sure you want to remove ${studentName}?`)) return;
+    if (!confirm(`${t("schoolAdmin.students.confirmRemove", "Are you sure you want to remove")} ${studentName}?`)) return;
     try {
       await removeStudent.mutateAsync(studentId);
-      toast.success(`${studentName} has been removed`);
+      toast.success(t("schoolAdmin.students.removeSuccess", "Student removed successfully"));
     } catch (error) {
-      toast.error("Failed to remove student");
+      toast.error(t("schoolAdmin.students.removeError", "Failed to remove student"));
     }
   };
 
@@ -103,9 +103,9 @@ export default function StudentsPage() {
   };
 
   const stats = [
-    { label: "Total", value: students?.total || 0, icon: Users, color: "text-teal-600", bg: "bg-teal-50" },
-    { label: "Pending", value: students?.data?.filter(s => s.status === 'pending').length || 0, icon: Clock, color: "text-amber-600", bg: "bg-amber-50" },
-    { label: "Active", value: students?.data?.filter(s => s.status === 'active').length || 0, icon: UserCheck, color: "text-emerald-600", bg: "bg-emerald-50" },
+    { label: t("schoolAdmin.stats.totalStudents", "Total"), value: students?.total || 0, icon: Users, color: "text-teal-600", bg: "bg-teal-50" },
+    { label: t("schoolAdmin.students.status.pending", "Pending"), value: students?.data?.filter(s => s.status === 'pending').length || 0, icon: Clock, color: "text-amber-600", bg: "bg-amber-50" },
+    { label: t("schoolAdmin.students.status.active", "Active"), value: students?.data?.filter(s => s.status === 'active').length || 0, icon: UserCheck, color: "text-emerald-600", bg: "bg-emerald-50" },
   ];
 
   return (
@@ -200,11 +200,11 @@ export default function StudentsPage() {
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="accepted">Accepted</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
+              <SelectItem value="all">{t("schoolAdmin.students.allStatuses", "All Statuses")}</SelectItem>
+              <SelectItem value="active">{t("schoolAdmin.students.status.active", "Active")}</SelectItem>
+              <SelectItem value="pending">{t("schoolAdmin.students.status.pending", "Pending")}</SelectItem>
+              <SelectItem value="accepted">{t("schoolAdmin.students.status.accepted", "Accepted")}</SelectItem>
+              <SelectItem value="inactive">{t("schoolAdmin.students.status.inactive", "Inactive")}</SelectItem>
             </SelectContent>
           </Select>
           <Button variant="outline" size="icon" onClick={() => refetch()}>
@@ -222,12 +222,12 @@ export default function StudentsPage() {
           <Table>
             <TableHeader>
               <TableRow className="bg-gray-50/50">
-                <TableHead>Student</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Progress</TableHead>
-                <TableHead>Avg. Score</TableHead>
-                <TableHead>Last Active</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>{t("schoolAdmin.students.table.student", "Student")}</TableHead>
+                <TableHead>{t("schoolAdmin.students.table.status", "Status")}</TableHead>
+                <TableHead>{t("schoolAdmin.students.table.progress", "Progress")}</TableHead>
+                <TableHead>{t("schoolAdmin.students.table.avgScore", "Avg. Score")}</TableHead>
+                <TableHead>{t("schoolAdmin.students.table.lastActive", "Last Active")}</TableHead>
+                <TableHead className="text-right">{t("schoolAdmin.students.table.actions", "Actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -236,7 +236,7 @@ export default function StudentsPage() {
                   <TableCell colSpan={6} className="h-24 text-center">
                     <div className="flex justify-center items-center gap-2">
                       <RefreshCw className="animate-spin h-5 w-5 text-gray-400" />
-                      <span className="text-gray-500">Loading students...</span>
+                      <span className="text-gray-500">{t("schoolAdmin.common.loading", "Loading...")}</span>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -245,8 +245,8 @@ export default function StudentsPage() {
                   <TableCell colSpan={6} className="h-32 text-center">
                     <div className="flex flex-col items-center gap-2">
                       <Users className="w-12 h-12 text-gray-300" />
-                      <p className="text-gray-500 font-medium">No students found</p>
-                      <p className="text-gray-400 text-sm">Invite students to get started</p>
+                      <p className="text-gray-500 font-medium">{t("schoolAdmin.students.noStudents", "No students found")}</p>
+                      <p className="text-gray-400 text-sm">{t("schoolAdmin.students.noStudentsDesc", "Invite students to get started")}</p>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -266,7 +266,7 @@ export default function StudentsPage() {
                     </TableCell>
                     <TableCell>
                       <span className={cn("px-2.5 py-1 rounded-full text-xs font-medium", getStatusBadge(student.status))}>
-                        {student.status.charAt(0).toUpperCase() + student.status.slice(1)}
+                        {t(`schoolAdmin.students.status.${student.status}`, student.status.charAt(0).toUpperCase() + student.status.slice(1))}
                       </span>
                     </TableCell>
                     <TableCell>
@@ -285,7 +285,7 @@ export default function StudentsPage() {
                     </TableCell>
                     <TableCell>
                       <span className="text-sm text-gray-500">
-                        {student.lastActive ? new Date(student.lastActive).toLocaleDateString() : '-'}
+                        {student.lastActive ? new Date(student.lastActive).toLocaleDateString() : t("schoolAdmin.students.neverActive", "Never")}
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
@@ -298,12 +298,12 @@ export default function StudentsPage() {
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem>
                             <Eye className="mr-2 h-4 w-4" />
-                            View Details
+                            {t("schoolAdmin.students.actions.viewDetails", "View Details")}
                           </DropdownMenuItem>
                           {student.status === 'pending' && (
                             <DropdownMenuItem onClick={() => handleResendInvite(student.id, student.name)}>
                               <Mail className="mr-2 h-4 w-4" />
-                              Resend Invite
+                              {t("schoolAdmin.students.actions.resendInvite", "Resend Invite")}
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuItem
@@ -311,7 +311,7 @@ export default function StudentsPage() {
                             onClick={() => handleRemoveStudent(student.id, student.name)}
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
-                            Remove Student
+                            {t("schoolAdmin.students.actions.removeStudent", "Remove Student")}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -335,10 +335,10 @@ export default function StudentsPage() {
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1 || isLoading}
                 >
-                  Previous
+                  {t("common.previous", "Previous")}
                 </Button>
                 <span className="text-sm text-gray-500">
-                  Page {page} of {students.totalPages}
+                  {t("common.page", "Page")} {page} {t("common.of", "of")} {students.totalPages}
                 </span>
                 <Button
                   variant="outline"
@@ -346,7 +346,7 @@ export default function StudentsPage() {
                   onClick={() => setPage((p) => p + 1)}
                   disabled={page >= students.totalPages || isLoading}
                 >
-                  Next
+                  {t("common.next", "Next")}
                 </Button>
               </div>
             </div>

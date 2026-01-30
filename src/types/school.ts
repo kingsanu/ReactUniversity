@@ -37,3 +37,47 @@ export interface SchoolStats {
   pendingInvites: number;
   totalStudents: number;
 }
+
+// ============================================
+// School Admin Onboarding Types
+// ============================================
+
+export interface SchoolAdminOnboardingStatus {
+  userId: string;
+  email: string;
+  schoolName: string;
+  adminName?: string;
+  maxStudents: number;
+  contractStart?: string;
+  contractEnd?: string;
+  isValid: boolean;
+  status: 'pending' | 'completed' | 'expired';
+}
+
+export interface SchoolAdminOnboardingData {
+  adminInfo: {
+    name: string;
+    phone?: string;
+    position?: string;
+  };
+  schoolSettings: {
+    notifyOnStudentSignup: boolean;
+    notifyOnAssessmentComplete: boolean;
+    allowStudentSelfRegistration: boolean;
+  };
+  password: string;
+}
+
+export const INITIAL_SCHOOL_ADMIN_ONBOARDING_DATA: SchoolAdminOnboardingData = {
+  adminInfo: {
+    name: "",
+    phone: "",
+    position: "",
+  },
+  schoolSettings: {
+    notifyOnStudentSignup: true,
+    notifyOnAssessmentComplete: true,
+    allowStudentSelfRegistration: false,
+  },
+  password: "",
+};

@@ -12,7 +12,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, School as SchoolIcon, Users, UserCheck, Clock, Search } from "lucide-react";
+import { Plus, School as SchoolIcon, Users, UserCheck, Clock, Search, MoreHorizontal, Pencil, Mail } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useTranslation } from "react-i18next";
 import {
   Dialog,
@@ -23,13 +29,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { School, SchoolStats } from "@/types/school";
-import { getSchools, getSchoolStats, resendSchoolInvite } from "@/services/schoolService";
+import { getSchools, getSchoolStats, resendSchoolInvite, updateSchool } from "@/services/schoolService";
+import { SchoolEditForm } from "@/components/admin/SchoolEditForm";
 import { formatDate, cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 export default function SchoolsPage() {
   const { t } = useTranslation();
   const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [selectedSchool, setSelectedSchool] = useState<School | null>(null);
   const [stats, setStats] = useState<SchoolStats>({
     totalSchools: 0,
     activeSchools: 0,
@@ -42,6 +51,31 @@ export default function SchoolsPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const limit = 10;
+
+  const handleInviteSuccess = (newSchool: School) => {
+    setSchools((prev) => [newSchool, ...prev]);
+    setStats((prev) => ({
+      ...prev,
+      totalSchools: prev.totalSchools + 1,
+      pendingInvites: prev.pendingInvites + 1,
+    }));
+    setIsInviteOpen(false);
+    setPage(1);
+  };
+
+  const handleResendInvite = async (school: School) => {
+    try {
+      await resendSchoolInvite(school.id);
+      toast.success(t("admin.schools.resendSuccess", { name: school.name, defaultValue: `Invitation resent to ${school.name}` }));
+    } catch (error) {
+      toast.error(t("admin.schools.resendError", "Failed to resend invitation"));
+    }
+  };
+
+  const handleEditSchool = (school: School) => {
+    setSelectedSchool(school);
+    setIsEditOpen(true);
+  };
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -137,7 +171,38 @@ export default function SchoolsPage() {
                 </DialogDescription>
               </DialogHeader>
               <div className="p-6">
-                <SchoolInviteForm />
+                <SchoolInviteForm onSuccess={handleInviteSuccess} />
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Edit School Dialog */}
+          <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+            <DialogContent className="sm:max-w-xl rounded-2xl p-0 overflow-hidden gap-0">
+              <DialogHeader className="p-6 bg-gray-50/50 border-b border-gray-100">
+                <DialogTitle className="text-xl flex items-center gap-2">
+                  <div className="p-2 bg-white rounded-lg border border-gray-100 shadow-sm">
+                    <Pencil className="h-5 w-5 text-gray-900" />
+                  </div>
+                  {t("admin.schools.editTitle", "Edit School")}
+                </DialogTitle>
+                <DialogDescription className="text-base pt-1">
+                  {t("admin.schools.editDescription", "Update school details.")}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="p-6">
+                {selectedSchool && (
+                  <SchoolEditForm
+                    school={selectedSchool}
+                    onSuccess={(updatedSchool) => {
+                      setSchools((prev) =>
+                        prev.map((s) => (s.id === updatedSchool.id ? updatedSchool : s))
+                      );
+                      setIsEditOpen(false);
+                      setSelectedSchool(null);
+                    }}
+                  />
+                )}
               </div>
             </DialogContent>
           </Dialog>
@@ -251,15 +316,28 @@ export default function SchoolsPage() {
                       </span>
                     </TableCell>
                     <TableCell>
-                      {school.contractEnd ? (
-                        // Assuming simple string date or conversion if needed. 
-                        // formatDate from utils usually handles Date | string | number
-                        // Using simple string for now to match interface
-                        school.contractEnd
-                      ) : "-"}
+                      {school.contractEnd ? formatDate(school.contractEnd) : "-"}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="sm">Manage</Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleEditSchool(school)}>
+                            <Pencil className="mr-2 h-4 w-4" />
+                            {t("common.edit", "Edit")}
+                          </DropdownMenuItem>
+                          {(school.status === "invited" || school.status === "pending") && (
+                            <DropdownMenuItem onClick={() => handleResendInvite(school)}>
+                              <Mail className="mr-2 h-4 w-4" />
+                              {t("admin.schools.resendInvite", "Resend Invite")}
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))

@@ -1,4 +1,4 @@
-import { School, SchoolInvitePayload, SchoolsResponse, SchoolStats } from "@/types/school";
+import { School, SchoolInvitePayload, SchoolsResponse, SchoolStats, SchoolAdminOnboardingStatus, SchoolAdminOnboardingData } from "@/types/school";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -118,4 +118,36 @@ export async function getSchoolStats(): Promise<SchoolStats> {
       totalStudents: 0
     }
   }
+}
+
+// ============================================
+// School Admin Onboarding
+// ============================================
+
+export async function getSchoolAdminOnboardingStatus(
+  token: string
+): Promise<SchoolAdminOnboardingStatus> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/school-admin/${token}/onboarding-status`
+  );
+  if (!response.ok) throw new Error("Failed to get onboarding status");
+  const json = await response.json();
+  return json.data;
+}
+
+export async function submitSchoolAdminOnboarding(
+  token: string,
+  data: SchoolAdminOnboardingData
+): Promise<{ success: boolean; redirectUrl: string }> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/school-admin/${token}/onboarding`,
+    {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify(data),
+    }
+  );
+
+  if (!response.ok) throw new Error("Failed to submit onboarding data");
+  return response.json();
 }

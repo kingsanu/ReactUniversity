@@ -36,10 +36,10 @@ const getHeaders = (isMultipart = false) => {
 // --- Onboarding Endpoints ---
 
 export async function getOnboardingStatus(
-  coachId: string
+  coachId: string,
 ): Promise<OnboardingStatus> {
   const response = await fetch(
-    `${API_BASE_URL}/api/v1/coach/${coachId}/onboarding-status`
+    `${API_BASE_URL}/api/v1/coach/${coachId}/onboarding-status`,
   );
   if (!response.ok) throw new Error("Failed to get onboarding status");
   const json = await response.json();
@@ -48,7 +48,7 @@ export async function getOnboardingStatus(
 
 export async function submitOnboardingData(
   coachId: string,
-  data: OnboardingData
+  data: OnboardingData,
 ): Promise<{ success: boolean; coachId: string; redirectUrl: string }> {
   const response = await fetch(
     `${API_BASE_URL}/api/v1/coach/${coachId}/onboarding`,
@@ -56,7 +56,7 @@ export async function submitOnboardingData(
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify(data),
-    }
+    },
   );
 
   if (!response.ok) throw new Error("Failed to submit onboarding data");
@@ -66,13 +66,12 @@ export async function submitOnboardingData(
 export async function getCalendarAuthUrl(
   provider: "google" | "outlook",
   email?: string,
-  redirectUrl?: string
 ): Promise<{ url: string }> {
   const query = new URLSearchParams();
   if (email) query.append("email", email);
-  if (redirectUrl) query.append("redirectUrl", redirectUrl);
-  const requestUrl = `${API_BASE_URL}/api/v1/auth/${provider}/url${query.toString() ? `?${query.toString()}` : ""
-    }`;
+  const requestUrl = `${API_BASE_URL}/api/v1/auth/${provider}/url${
+    query.toString() ? `?${query.toString()}` : ""
+  }`;
 
   console.log(`[getCalendarAuthUrl] Requesting: ${requestUrl}`);
 
@@ -89,7 +88,7 @@ export async function getCalendarAuthUrl(
 
   console.log(
     `[getCalendarAuthUrl] Response data:`,
-    JSON.stringify(data, null, 2)
+    JSON.stringify(data, null, 2),
   );
   debugger;
   const nested = data && typeof data === "object" ? data.data || data : data;
@@ -97,13 +96,13 @@ export async function getCalendarAuthUrl(
     nested?.url || nested?.callbackurl || data?.url || data?.callbackurl;
   if (!url) {
     throw new Error(
-      `API did not return a valid URL. Response: ${JSON.stringify(data)}`
+      `API did not return a valid URL. Response: ${JSON.stringify(data)}`,
     );
   }
   return { url };
 }
 
-export async function checkCalendarAuthStatus(provider: "google" | "outlook", email?: string): Promise<{
+export async function checkGoogleAuthStatus(email: string): Promise<{
   isAuthenticated: boolean;
   email: string;
   userId: string;
@@ -114,27 +113,18 @@ export async function checkCalendarAuthStatus(provider: "google" | "outlook", em
     isTokenValid: boolean;
     isTokenExpired: boolean;
     tokenStatus: string;
-    provider: "google" | "outlook";
   };
 }> {
-  const query = new URLSearchParams();
-  if (email) query.append("email", email);
-
   const response = await fetch(
-    `${API_BASE_URL}/api/v1/auth/${provider}/status?${query.toString()}`,
+    `${API_BASE_URL}/api/v1/auth/google/status?email=${email}`,
     {
       headers: getHeaders(),
-    }
+    },
   );
 
-  if (!response.ok) throw new Error(`Failed to check ${provider} auth status`);
+  if (!response.ok) throw new Error("Failed to check Google auth status");
   const json = await response.json();
   return json.data || json;
-}
-
-// Deprecated alias for backward compatibility if needed, using the new function
-export async function checkGoogleAuthStatus(email: string) {
-  return checkCalendarAuthStatus("google", email);
 }
 
 // --- User Side APIs ---
@@ -145,7 +135,7 @@ export async function getCoaches(
     limit?: number;
     specialization?: string;
     search?: string;
-  } = {}
+  } = {},
 ): Promise<CoachesResponse> {
   const query = new URLSearchParams();
   if (params.page) query.append("page", params.page.toString());
@@ -155,7 +145,7 @@ export async function getCoaches(
   if (params.search) query.append("search", params.search);
 
   const response = await fetch(
-    `${API_BASE_URL}/api/v1/coach?${query.toString()}`
+    `${API_BASE_URL}/api/v1/coach?${query.toString()}`,
   );
   if (!response.ok) throw new Error("Failed to fetch coaches");
   return response.json();
@@ -173,7 +163,7 @@ export async function getCoachAnalytics(): Promise<{ data: CoachAnalytics }> {
 export async function getCoachAnalyticsReport(
   startDate?: string,
   endDate?: string,
-  type: "csv" | "pdf" = "pdf"
+  type: "csv" | "pdf" = "pdf",
 ): Promise<Blob | { data: any }> {
   const query = new URLSearchParams();
   if (startDate) query.append("startDate", startDate);
@@ -194,13 +184,13 @@ export async function getCoachAnalyticsReport(
 }
 
 export async function getBookingNotes(
-  bookingId: string
+  bookingId: string,
 ): Promise<{ notes: string }> {
   const response = await fetch(
     `${API_BASE_URL}/api/v1/bookings/${bookingId}/notes`,
     {
       headers: getHeaders(),
-    }
+    },
   );
   if (!response.ok) throw new Error("Failed to fetch booking notes");
   return response.json();
@@ -208,7 +198,7 @@ export async function getBookingNotes(
 
 export async function updateBookingNotes(
   bookingId: string,
-  notes: string
+  notes: string,
 ): Promise<{ success: boolean; notes: string }> {
   const response = await fetch(
     `${API_BASE_URL}/api/v1/bookings/${bookingId}/notes`,
@@ -216,20 +206,20 @@ export async function updateBookingNotes(
       method: "PUT",
       headers: getHeaders(),
       body: JSON.stringify({ notes }),
-    }
+    },
   );
   if (!response.ok) throw new Error("Failed to update booking notes");
   return response.json();
 }
 
 export async function getCoachStudentById(
-  studentId: string
+  studentId: string,
 ): Promise<{ data: StudentDetails }> {
   const response = await fetch(
     `${API_BASE_URL}/api/v1/coach/me/students/${studentId}`,
     {
       headers: getHeaders(),
-    }
+    },
   );
   if (!response.ok) throw new Error("Failed to fetch coach student details");
   return response.json();
@@ -266,8 +256,9 @@ export async function getCoachPayouts(params?: {
   if (params?.limit) query.append("limit", params.limit.toString());
   if (params?.status) query.append("status", params.status);
 
-  const requestUrl = `${API_BASE_URL}/api/v1/coach/me/payouts${query.toString() ? `?${query.toString()}` : ""
-    }`;
+  const requestUrl = `${API_BASE_URL}/api/v1/coach/me/payouts${
+    query.toString() ? `?${query.toString()}` : ""
+  }`;
   const response = await fetch(requestUrl, {
     headers: getHeaders(),
   });
@@ -351,14 +342,14 @@ export async function getNotifications(): Promise<{ data: Notification[] }> {
 }
 
 export async function markNotificationRead(
-  notificationId: string
+  notificationId: string,
 ): Promise<{ success: boolean }> {
   const response = await fetch(
     `${API_BASE_URL}/api/v1/notifications/${notificationId}/read`,
     {
       method: "PUT",
       headers: getHeaders(),
-    }
+    },
   );
   if (!response.ok) throw new Error("Failed to mark notification as read");
   return response.json();
@@ -375,14 +366,14 @@ export async function getCoachDetails(coachId: string): Promise<Coach> {
 export async function getCoachAvailableSlots(
   coachId: string,
   date: string,
-  timezone?: string
+  timezone?: string,
 ): Promise<CoachSlotsResponse> {
   const query = new URLSearchParams();
   query.append("date", date);
   if (timezone) query.append("timezone", timezone);
 
   const response = await fetch(
-    `${API_BASE_URL}/api/v1/coach/${coachId}/slots?${query.toString()}`
+    `${API_BASE_URL}/api/v1/coach/${coachId}/slots?${query.toString()}`,
   );
 
   if (!response.ok) {
@@ -422,13 +413,13 @@ export async function bookSession(data: {
 // --- User Sessions API ---
 
 export async function getUserSessions(
-  status: "upcoming" | "past" | "all" = "all"
+  status: "upcoming" | "past" | "all" = "all",
 ): Promise<{ data: Booking[] }> {
   const response = await fetch(
     `${API_BASE_URL}/api/v1/bookings/me?status=${status}`,
     {
       headers: getHeaders(),
-    }
+    },
   );
 
   if (!response.ok) throw new Error("Failed to fetch user sessions");
@@ -438,13 +429,13 @@ export async function getUserSessions(
 // --- Coach Dashboard APIs ---
 
 export async function getCoachSessions(
-  status: "upcoming" | "past" | "all" = "all"
+  status: "upcoming" | "past" | "all" = "all",
 ): Promise<{ data: Booking[] }> {
   const response = await fetch(
     `${API_BASE_URL}/api/v1/coach/me/sessions?status=${status}`,
     {
       headers: getHeaders(),
-    }
+    },
   );
 
   if (!response.ok) throw new Error("Failed to fetch sessions");
@@ -453,7 +444,7 @@ export async function getCoachSessions(
 
 export async function rescheduleSession(
   bookingId: string,
-  newSlot: { start: string; end: string }
+  newSlot: { start: string; end: string },
 ): Promise<BookingResponse> {
   const response = await fetch(
     `${API_BASE_URL}/api/v1/bookings/${bookingId}/reschedule`,
@@ -461,7 +452,7 @@ export async function rescheduleSession(
       method: "PUT",
       headers: getHeaders(),
       body: JSON.stringify({ newSlot }),
-    }
+    },
   );
 
   if (!response.ok) throw new Error("Failed to reschedule session");
@@ -479,7 +470,7 @@ export async function getAvailability(): Promise<Availability> {
 }
 
 export async function updateAvailability(
-  availability: Availability
+  availability: Availability,
 ): Promise<Availability> {
   const response = await fetch(`${API_BASE_URL}/api/v1/coach/me/availability`, {
     method: "PUT",
@@ -490,15 +481,6 @@ export async function updateAvailability(
   if (!response.ok) throw new Error("Failed to update availability");
   const json = await response.json();
   return json.data;
-}
-
-export async function getCoachProfile(): Promise<Coach> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/coach/me`, {
-    headers: getHeaders(),
-  });
-  if (!response.ok) throw new Error("Failed to fetch profile");
-  const json = await response.json();
-  return json.data || json;
 }
 
 export async function updateCoachProfile(data: Partial<Coach>): Promise<Coach> {
@@ -514,7 +496,7 @@ export async function updateCoachProfile(data: Partial<Coach>): Promise<Coach> {
 
 export async function cancelSession(
   bookingId: string,
-  reason: string
+  reason: string,
 ): Promise<BookingResponse> {
   const response = await fetch(
     `${API_BASE_URL}/api/v1/bookings/${bookingId}/cancel`,
@@ -522,7 +504,7 @@ export async function cancelSession(
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify({ reason }),
-    }
+    },
   );
 
   if (!response.ok) throw new Error("Failed to cancel session");
@@ -533,7 +515,7 @@ export async function cancelSession(
 
 export async function submitReview(
   coachId: string,
-  data: { bookingId: string; rating: number; comment: string }
+  data: { bookingId: string; rating: number; comment: string },
 ): Promise<Review> {
   const response = await fetch(
     `${API_BASE_URL}/api/v1/coach/${coachId}/reviews`,
@@ -541,7 +523,7 @@ export async function submitReview(
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify(data),
-    }
+    },
   );
 
   if (!response.ok) throw new Error("Failed to submit review");
@@ -578,7 +560,7 @@ export async function getCoachStats(): Promise<CoachStats> {
 }
 
 export async function getAllCoachesAdmin(
-  params: { page?: number; limit?: number; search?: string } = {}
+  params: { page?: number; limit?: number; search?: string } = {},
 ): Promise<CoachesResponse> {
   const query = new URLSearchParams();
   if (params.page) query.append("page", params.page.toString());
@@ -589,7 +571,7 @@ export async function getAllCoachesAdmin(
     `${API_BASE_URL}/authapi/coaches?${query.toString()}`,
     {
       headers: getHeaders(),
-    }
+    },
   );
 
   if (!response.ok) throw new Error("Failed to fetch coaches (admin)");
@@ -601,7 +583,6 @@ export async function inviteCoach(data: {
   name?: string;
   contractStart?: string;
   contractEnd?: string;
-  platformCommission?: number;
 }): Promise<{ message: string; invitationId: string }> {
   const response = await fetch(`${API_BASE_URL}/authapi/invite-coach`, {
     method: "POST",
@@ -628,7 +609,10 @@ export async function inviteCoachBulk(file: File): Promise<any[]> {
   return response.json();
 }
 
-export async function updateCoach(coachId: string, data: Partial<Coach>): Promise<{ success: boolean; message: string }> {
+export async function updateCoach(
+  coachId: string,
+  data: Partial<Coach>,
+): Promise<{ success: boolean; message: string }> {
   const response = await fetch(`${API_BASE_URL}/authapi/coaches/${coachId}`, {
     method: "PUT",
     headers: getHeaders(),
@@ -643,22 +627,8 @@ export async function updateCoach(coachId: string, data: Partial<Coach>): Promis
   return response.json();
 }
 
-export async function deactivateCoach(coachId: string): Promise<{ success: boolean; message: string }> {
-  const response = await fetch(`${API_BASE_URL}/authapi/coaches/${coachId}/deactivate`, {
-    method: "POST",
-    headers: getHeaders(),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || "Failed to deactivate coach");
-  }
-
-  return response.json();
-}
-
 export async function signupCoachBulk(
-  coaches: { fullName: string; email: string; password?: string; platformCommission?: number }[]
+  coaches: { fullName: string; email: string; password?: string }[],
 ): Promise<any[]> {
   const response = await fetch(`${API_BASE_URL}/authapi/signup-coach-bulk`, {
     method: "POST",
@@ -731,7 +701,7 @@ export async function getCoachStudents(params?: {
     `${API_BASE_URL}/api/v1/coach/me/students?${query.toString()}`,
     {
       headers: getHeaders(),
-    }
+    },
   );
 
   if (!response.ok) throw new Error("Failed to fetch students");
@@ -744,7 +714,7 @@ export async function getCoachStudentDetails(studentId: string): Promise<any> {
     `${API_BASE_URL}/api/v1/coach/me/students/${studentId}`,
     {
       headers: getHeaders(),
-    }
+    },
   );
 
   if (!response.ok) throw new Error("Failed to fetch student details");
@@ -797,7 +767,7 @@ export async function getCoachEarningsHistory(): Promise<
     `${API_BASE_URL}/api/v1/coach/me/earnings/history`,
     {
       headers: getHeaders(),
-    }
+    },
   );
 
   if (!response.ok) throw new Error("Failed to fetch earnings history");
@@ -806,13 +776,13 @@ export async function getCoachEarningsHistory(): Promise<
 }
 
 export async function exportCoachEarnings(
-  format: "csv" | "pdf" = "csv"
+  format: "csv" | "pdf" = "csv",
 ): Promise<void> {
   const response = await fetch(
     `${API_BASE_URL}/api/v1/coach/me/earnings/export?format=${format}`,
     {
       headers: getHeaders(),
-    }
+    },
   );
 
   if (!response.ok) throw new Error("Failed to export earnings");
@@ -834,7 +804,7 @@ export async function getCoachPayoutSettings(): Promise<PayoutSettings> {
     `${API_BASE_URL}/api/v1/coach/me/payout-settings`,
     {
       headers: getHeaders(),
-    }
+    },
   );
 
   if (!response.ok) throw new Error("Failed to fetch payout settings");
@@ -843,16 +813,19 @@ export async function getCoachPayoutSettings(): Promise<PayoutSettings> {
 }
 
 export async function updateCoachPayoutSettings(
-  settings: Partial<PayoutSettings>
+  settings: Partial<PayoutSettings>,
 ): Promise<PayoutSettings> {
   // Map UI field names to API field names
   const requestBody: any = {};
   if (settings.frequency) requestBody.frequency = settings.frequency;
   if (settings.method) requestBody.method = settings.method;
-  if (settings.bankAccountNumber) requestBody.bankAccountNumber = settings.bankAccountNumber;
-  if (settings.bankRoutingNumber) requestBody.bankRoutingNumber = settings.bankRoutingNumber;
+  if (settings.bankAccountNumber)
+    requestBody.bankAccountNumber = settings.bankAccountNumber;
+  if (settings.bankRoutingNumber)
+    requestBody.bankRoutingNumber = settings.bankRoutingNumber;
   if (settings.bankName) requestBody.bankName = settings.bankName;
-  if (settings.accountHolderName) requestBody.accountHolderName = settings.accountHolderName;
+  if (settings.accountHolderName)
+    requestBody.accountHolderName = settings.accountHolderName;
 
   const response = await fetch(
     `${API_BASE_URL}/api/v1/coach/me/payout-settings`,
@@ -860,7 +833,7 @@ export async function updateCoachPayoutSettings(
       method: "PUT",
       headers: getHeaders(),
       body: JSON.stringify(requestBody),
-    }
+    },
   );
 
   if (!response.ok) throw new Error("Failed to update payout settings");
@@ -904,7 +877,7 @@ export async function getCoachBilling(params?: {
     `${API_BASE_URL}/api/v1/coach/me/billing${query.toString() ? `?${query.toString()}` : ""}`,
     {
       headers: getHeaders(),
-    }
+    },
   );
 
   if (!response.ok) throw new Error("Failed to fetch billing data");
@@ -917,7 +890,7 @@ export async function downloadInvoice(billingId: string): Promise<void> {
     `${API_BASE_URL}/api/v1/coach/me/billing/${billingId}/invoice`,
     {
       headers: getHeaders(),
-    }
+    },
   );
 
   if (!response.ok) throw new Error("Failed to download invoice");
