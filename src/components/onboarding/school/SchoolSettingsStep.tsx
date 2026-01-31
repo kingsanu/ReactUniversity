@@ -36,8 +36,14 @@ export function SchoolSettingsStep({
     {
       id: "notifyOnStudentSignup",
       icon: UserPlus,
-      title: t("onboarding.school.settings.notifySignup", "Notify on Student Signup"),
-      description: t("onboarding.school.settings.notifySignupDesc", "Receive an email when a student accepts their invitation."),
+      title: t(
+        "onboarding.school.settings.notifySignup",
+        "Notify on Student Signup",
+      ),
+      description: t(
+        "onboarding.school.settings.notifySignupDesc",
+        "Receive an email when a student accepts their invitation.",
+      ),
       value: formData.notifyOnStudentSignup,
       onChange: (checked: boolean) =>
         setFormData((prev) => ({ ...prev, notifyOnStudentSignup: checked })),
@@ -45,20 +51,38 @@ export function SchoolSettingsStep({
     {
       id: "notifyOnAssessmentComplete",
       icon: Bell,
-      title: t("onboarding.school.settings.notifyAssessment", "Notify on Assessment Complete"),
-      description: t("onboarding.school.settings.notifyAssessmentDesc", "Receive an email when a student completes an assessment."),
+      title: t(
+        "onboarding.school.settings.notifyAssessment",
+        "Notify on Assessment Complete",
+      ),
+      description: t(
+        "onboarding.school.settings.notifyAssessmentDesc",
+        "Receive an email when a student completes an assessment.",
+      ),
       value: formData.notifyOnAssessmentComplete,
       onChange: (checked: boolean) =>
-        setFormData((prev) => ({ ...prev, notifyOnAssessmentComplete: checked })),
+        setFormData((prev) => ({
+          ...prev,
+          notifyOnAssessmentComplete: checked,
+        })),
     },
     {
       id: "allowStudentSelfRegistration",
       icon: Users,
-      title: t("onboarding.school.settings.selfRegistration", "Allow Student Self-Registration"),
-      description: t("onboarding.school.settings.selfRegistrationDesc", "Allow students to register themselves using a school code."),
+      title: t(
+        "onboarding.school.settings.selfRegistration",
+        "Allow Student Self-Registration",
+      ),
+      description: t(
+        "onboarding.school.settings.selfRegistrationDesc",
+        "Allow students to register themselves using a school code.",
+      ),
       value: formData.allowStudentSelfRegistration,
       onChange: (checked: boolean) =>
-        setFormData((prev) => ({ ...prev, allowStudentSelfRegistration: checked })),
+        setFormData((prev) => ({
+          ...prev,
+          allowStudentSelfRegistration: checked,
+        })),
     },
   ];
 
@@ -74,10 +98,15 @@ export function SchoolSettingsStep({
               <option.icon className="h-5 w-5 text-gray-700" />
             </div>
             <div className="flex-1 min-w-0">
-              <Label htmlFor={option.id} className="text-base font-medium text-gray-900 cursor-pointer">
+              <Label
+                htmlFor={option.id}
+                className="text-base font-medium text-gray-900 cursor-pointer"
+              >
                 {option.title}
               </Label>
-              <p className="text-sm text-gray-500 mt-0.5">{option.description}</p>
+              <p className="text-sm text-gray-500 mt-0.5">
+                {option.description}
+              </p>
             </div>
             <Switch
               id={option.id}

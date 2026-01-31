@@ -35,7 +35,9 @@ export function SchoolInviteForm({ onSuccess }: SchoolInviteFormProps) {
 
   const handleSubmit = async () => {
     if (!adminEmail || !name || !maxStudents) {
-      toast.error(t("admin.invite.fillRequired", "Please fill in all required fields"));
+      toast.error(
+        t("admin.invite.fillRequired", "Please fill in all required fields"),
+      );
       return;
     }
 
@@ -47,23 +49,37 @@ export function SchoolInviteForm({ onSuccess }: SchoolInviteFormProps) {
         adminEmail,
         maxStudents,
         details,
-        contractStart: contractStart ? format(contractStart, "yyyy-MM-dd") : undefined,
-        contractEnd: contractEnd ? format(contractEnd, "yyyy-MM-dd") : undefined,
+        contractStart: contractStart
+          ? format(contractStart, "yyyy-MM-dd")
+          : undefined,
+        contractEnd: contractEnd
+          ? format(contractEnd, "yyyy-MM-dd")
+          : undefined,
       });
       const newSchool: School = {
-        id: (globalThis.crypto?.randomUUID?.() || Date.now().toString()),
+        id: globalThis.crypto?.randomUUID?.() || Date.now().toString(),
         name,
         adminEmail,
         maxStudents,
         studentCount: 0,
         status: "invited",
         details,
-        contractStart: contractStart ? format(contractStart, "yyyy-MM-dd") : undefined,
-        contractEnd: contractEnd ? format(contractEnd, "yyyy-MM-dd") : undefined,
+        contractStart: contractStart
+          ? format(contractStart, "yyyy-MM-dd")
+          : undefined,
+        contractEnd: contractEnd
+          ? format(contractEnd, "yyyy-MM-dd")
+          : undefined,
       };
       onSuccess?.(newSchool);
 
-      toast.success(t("admin.schools.inviteSuccess", { name, adminEmail, defaultValue: `Invitation sent to ${name}` }));
+      toast.success(
+        t("admin.schools.inviteSuccess", {
+          name,
+          adminEmail,
+          defaultValue: `Invitation sent to ${name}`,
+        }),
+      );
       setName("");
       setAdminEmail("");
       setMaxStudents(0);
@@ -71,27 +87,43 @@ export function SchoolInviteForm({ onSuccess }: SchoolInviteFormProps) {
       setContractStart(undefined);
       setContractEnd(undefined);
     } catch (error) {
-      toast.error(t("admin.schools.inviteError", "Failed to send invitation. Please try again."));
+      toast.error(
+        t(
+          "admin.schools.inviteError",
+          "Failed to send invitation. Please try again.",
+        ),
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-4">
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleSubmit();
+      }}
+      className="space-y-4"
+    >
       <div className="space-y-2">
         <Label htmlFor="name">{t("admin.schools.name", "School Name")}</Label>
         <Input
           id="name"
           type="text"
-          placeholder={t("admin.schools.namePlaceholder", "e.g. Springfield High")}
+          placeholder={t(
+            "admin.schools.namePlaceholder",
+            "e.g. Springfield High",
+          )}
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="adminEmail">{t("admin.schools.email", "Admin Email")}</Label>
+        <Label htmlFor="adminEmail">
+          {t("admin.schools.email", "Admin Email")}
+        </Label>
         <Input
           id="adminEmail"
           type="email"
@@ -102,7 +134,9 @@ export function SchoolInviteForm({ onSuccess }: SchoolInviteFormProps) {
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="maxStudents">{t("admin.schools.maxStudents", "Max Students")}</Label>
+        <Label htmlFor="maxStudents">
+          {t("admin.schools.maxStudents", "Max Students")}
+        </Label>
         <Input
           id="maxStudents"
           type="number"
@@ -115,18 +149,24 @@ export function SchoolInviteForm({ onSuccess }: SchoolInviteFormProps) {
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2 flex flex-col">
-          <Label>{t("admin.invite.contractStart", "Contract Start Date")}</Label>
+          <Label>
+            {t("admin.invite.contractStart", "Contract Start Date")}
+          </Label>
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant={"outline"}
                 className={cn(
                   "w-full justify-start text-left font-normal",
-                  !contractStart && "text-muted-foreground"
+                  !contractStart && "text-muted-foreground",
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" aria-hidden="true" />
-                {contractStart ? format(contractStart, "PPP") : <span>{t("common.pickDate", "Pick a date")}</span>}
+                {contractStart ? (
+                  format(contractStart, "PPP")
+                ) : (
+                  <span>{t("common.pickDate", "Pick a date")}</span>
+                )}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -150,11 +190,15 @@ export function SchoolInviteForm({ onSuccess }: SchoolInviteFormProps) {
                 variant={"outline"}
                 className={cn(
                   "w-full justify-start text-left font-normal",
-                  !contractEnd && "text-muted-foreground"
+                  !contractEnd && "text-muted-foreground",
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" aria-hidden="true" />
-                {contractEnd ? format(contractEnd, "PPP") : <span>{t("common.pickDate", "Pick a date")}</span>}
+                {contractEnd ? (
+                  format(contractEnd, "PPP")
+                ) : (
+                  <span>{t("common.pickDate", "Pick a date")}</span>
+                )}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -175,10 +219,15 @@ export function SchoolInviteForm({ onSuccess }: SchoolInviteFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="details">{t("admin.schools.details", "Details / Contract Info")}</Label>
+        <Label htmlFor="details">
+          {t("admin.schools.details", "Details / Contract Info")}
+        </Label>
         <Textarea
           id="details"
-          placeholder={t("admin.schools.detailsPlaceholder", "Enter contract info or other details...")}
+          placeholder={t(
+            "admin.schools.detailsPlaceholder",
+            "Enter contract info or other details...",
+          )}
           value={details}
           onChange={(e) => setDetails(e.target.value)}
           className="min-h-[100px]"

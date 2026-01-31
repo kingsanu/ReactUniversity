@@ -55,12 +55,15 @@ export function SchoolAdminInfoStep({
             <Building2 className="h-5 w-5 text-gray-700" />
           </div>
           <div>
-            <p className="text-sm text-gray-500">{t("onboarding.school.schoolName", "School")}</p>
+            <p className="text-sm text-gray-500">
+              {t("onboarding.school.schoolName", "School")}
+            </p>
             <p className="font-semibold text-gray-900">{schoolName}</p>
           </div>
         </div>
         <div className="text-sm text-gray-500">
-          {t("onboarding.school.adminEmail", "Admin Email")}: <span className="text-gray-700">{email}</span>
+          {t("onboarding.school.adminEmail", "Admin Email")}:{" "}
+          <span className="text-gray-700">{email}</span>
         </div>
       </div>
 
@@ -75,7 +78,9 @@ export function SchoolAdminInfoStep({
           type="text"
           placeholder={t("onboarding.school.namePlaceholder", "John Smith")}
           value={formData.name}
-          onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+          onChange={(e) =>
+            setFormData((prev) => ({ ...prev, name: e.target.value }))
+          }
           className={errors.name ? "border-red-500" : ""}
         />
         {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
@@ -90,9 +95,14 @@ export function SchoolAdminInfoStep({
         <Input
           id="position"
           type="text"
-          placeholder={t("onboarding.school.positionPlaceholder", "Principal, Administrator, etc.")}
+          placeholder={t(
+            "onboarding.school.positionPlaceholder",
+            "Principal, Administrator, etc.",
+          )}
           value={formData.position || ""}
-          onChange={(e) => setFormData((prev) => ({ ...prev, position: e.target.value }))}
+          onChange={(e) =>
+            setFormData((prev) => ({ ...prev, position: e.target.value }))
+          }
         />
       </div>
 
@@ -105,9 +115,14 @@ export function SchoolAdminInfoStep({
         <Input
           id="phone"
           type="tel"
-          placeholder={t("onboarding.school.phonePlaceholder", "+1 (555) 123-4567")}
+          placeholder={t(
+            "onboarding.school.phonePlaceholder",
+            "+1 (555) 123-4567",
+          )}
           value={formData.phone || ""}
-          onChange={(e) => setFormData((prev) => ({ ...prev, phone: e.target.value }))}
+          onChange={(e) =>
+            setFormData((prev) => ({ ...prev, phone: e.target.value }))
+          }
         />
       </div>
 

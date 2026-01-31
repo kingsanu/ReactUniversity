@@ -36,7 +36,7 @@ export default function SchoolAdminOnboardingPage({
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [data, setData] = useState<SchoolAdminOnboardingData>(
-    INITIAL_SCHOOL_ADMIN_ONBOARDING_DATA
+    INITIAL_SCHOOL_ADMIN_ONBOARDING_DATA,
   );
   const [schoolName, setSchoolName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
@@ -64,22 +64,29 @@ export default function SchoolAdminOnboardingPage({
   // Save data to localStorage whenever it changes
   useEffect(() => {
     if (data !== INITIAL_SCHOOL_ADMIN_ONBOARDING_DATA) {
-      localStorage.setItem(`school_onboarding_data_${token}`, JSON.stringify(data));
+      localStorage.setItem(
+        `school_onboarding_data_${token}`,
+        JSON.stringify(data),
+      );
     }
   }, [data, token]);
 
   // Save current step to localStorage
   useEffect(() => {
-    localStorage.setItem(`school_onboarding_step_${token}`, currentStep.toString());
+    localStorage.setItem(
+      `school_onboarding_step_${token}`,
+      currentStep.toString(),
+    );
   }, [currentStep, token]);
 
   // Fetch onboarding status
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const { getSchoolAdminOnboardingStatus } = await import("@/services/schoolService");
+        const { getSchoolAdminOnboardingStatus } =
+          await import("@/services/schoolService");
         const status = await getSchoolAdminOnboardingStatus(token);
-        
+
         if (!status.isValid) {
           toast.error("This invitation link is invalid or has expired.");
           router.push("/login");
@@ -137,7 +144,8 @@ export default function SchoolAdminOnboardingPage({
   const handleSubmit = async (finalData: SchoolAdminOnboardingData) => {
     try {
       setIsLoading(true);
-      const { submitSchoolAdminOnboarding } = await import("@/services/schoolService");
+      const { submitSchoolAdminOnboarding } =
+        await import("@/services/schoolService");
 
       const response = await submitSchoolAdminOnboarding(token, finalData);
 
@@ -182,13 +190,17 @@ export default function SchoolAdminOnboardingPage({
           data={data.adminInfo}
           schoolName={schoolName}
           email={email}
-          onNext={(adminInfo: SchoolAdminOnboardingData["adminInfo"]) => handleNext({ adminInfo })}
+          onNext={(adminInfo: SchoolAdminOnboardingData["adminInfo"]) =>
+            handleNext({ adminInfo })
+          }
         />
       )}
       {currentStep === 2 && (
         <SchoolSettingsStep
           data={data.schoolSettings}
-          onNext={(schoolSettings: SchoolAdminOnboardingData["schoolSettings"]) => handleNext({ schoolSettings })}
+          onNext={(
+            schoolSettings: SchoolAdminOnboardingData["schoolSettings"],
+          ) => handleNext({ schoolSettings })}
           onBack={handleBack}
         />
       )}

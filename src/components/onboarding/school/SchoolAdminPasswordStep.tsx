@@ -23,10 +23,22 @@ export function SchoolAdminPasswordStep({
   const [error, setError] = useState("");
 
   const passwordRequirements = [
-    { label: t("onboarding.password.req.length", "At least 8 characters"), valid: password.length >= 8 },
-    { label: t("onboarding.password.req.uppercase", "One uppercase letter"), valid: /[A-Z]/.test(password) },
-    { label: t("onboarding.password.req.lowercase", "One lowercase letter"), valid: /[a-z]/.test(password) },
-    { label: t("onboarding.password.req.number", "One number"), valid: /\d/.test(password) },
+    {
+      label: t("onboarding.password.req.length", "At least 8 characters"),
+      valid: password.length >= 8,
+    },
+    {
+      label: t("onboarding.password.req.uppercase", "One uppercase letter"),
+      valid: /[A-Z]/.test(password),
+    },
+    {
+      label: t("onboarding.password.req.lowercase", "One lowercase letter"),
+      valid: /[a-z]/.test(password),
+    },
+    {
+      label: t("onboarding.password.req.number", "One number"),
+      valid: /\d/.test(password),
+    },
   ];
 
   const isPasswordValid = passwordRequirements.every((req) => req.valid);
@@ -36,7 +48,12 @@ export function SchoolAdminPasswordStep({
     setError("");
 
     if (!isPasswordValid) {
-      setError(t("onboarding.password.requirements", "Please meet all password requirements"));
+      setError(
+        t(
+          "onboarding.password.requirements",
+          "Please meet all password requirements",
+        ),
+      );
       return;
     }
 
@@ -61,7 +78,10 @@ export function SchoolAdminPasswordStep({
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all"
-              placeholder={t("onboarding.password.placeholder", "Enter your password")}
+              placeholder={t(
+                "onboarding.password.placeholder",
+                "Enter your password",
+              )}
               required
             />
             <button
@@ -86,7 +106,10 @@ export function SchoolAdminPasswordStep({
         {/* Password Requirements */}
         <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
           <p className="text-sm font-medium text-gray-700 mb-2">
-            {t("onboarding.password.requirementsTitle", "Password Requirements")}
+            {t(
+              "onboarding.password.requirementsTitle",
+              "Password Requirements",
+            )}
           </p>
           <ul className="space-y-1.5">
             {passwordRequirements.map((req, index) => (
@@ -114,7 +137,10 @@ export function SchoolAdminPasswordStep({
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all"
-            placeholder={t("onboarding.password.confirmPlaceholder", "Confirm your password")}
+            placeholder={t(
+              "onboarding.password.confirmPlaceholder",
+              "Confirm your password",
+            )}
             required
           />
         </div>

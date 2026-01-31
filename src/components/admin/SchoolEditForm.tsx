@@ -30,17 +30,19 @@ export function SchoolEditForm({ school, onSuccess }: SchoolEditFormProps) {
   const [maxStudents, setMaxStudents] = useState<number>(school.maxStudents);
   const [details, setDetails] = useState(school.details || "");
   const [contractStart, setContractStart] = useState<Date | undefined>(
-    school.contractStart ? parseISO(school.contractStart) : undefined
+    school.contractStart ? parseISO(school.contractStart) : undefined,
   );
   const [contractEnd, setContractEnd] = useState<Date | undefined>(
-    school.contractEnd ? parseISO(school.contractEnd) : undefined
+    school.contractEnd ? parseISO(school.contractEnd) : undefined,
   );
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useTranslation();
 
   const handleSubmit = async () => {
     if (!adminEmail || !name || !maxStudents) {
-      toast.error(t("admin.invite.fillRequired", "Please fill in all required fields"));
+      toast.error(
+        t("admin.invite.fillRequired", "Please fill in all required fields"),
+      );
       return;
     }
 
@@ -51,8 +53,12 @@ export function SchoolEditForm({ school, onSuccess }: SchoolEditFormProps) {
         adminEmail,
         maxStudents,
         details,
-        contractStart: contractStart ? format(contractStart, "yyyy-MM-dd") : undefined,
-        contractEnd: contractEnd ? format(contractEnd, "yyyy-MM-dd") : undefined,
+        contractStart: contractStart
+          ? format(contractStart, "yyyy-MM-dd")
+          : undefined,
+        contractEnd: contractEnd
+          ? format(contractEnd, "yyyy-MM-dd")
+          : undefined,
       });
 
       const updatedSchool: School = {
@@ -61,12 +67,18 @@ export function SchoolEditForm({ school, onSuccess }: SchoolEditFormProps) {
         adminEmail,
         maxStudents,
         details,
-        contractStart: contractStart ? format(contractStart, "yyyy-MM-dd") : undefined,
-        contractEnd: contractEnd ? format(contractEnd, "yyyy-MM-dd") : undefined,
+        contractStart: contractStart
+          ? format(contractStart, "yyyy-MM-dd")
+          : undefined,
+        contractEnd: contractEnd
+          ? format(contractEnd, "yyyy-MM-dd")
+          : undefined,
       };
 
       onSuccess?.(updatedSchool);
-      toast.success(t("admin.schools.updateSuccess", "School updated successfully"));
+      toast.success(
+        t("admin.schools.updateSuccess", "School updated successfully"),
+      );
     } catch (error) {
       toast.error(t("admin.schools.updateError", "Failed to update school"));
     } finally {
@@ -75,20 +87,33 @@ export function SchoolEditForm({ school, onSuccess }: SchoolEditFormProps) {
   };
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-4">
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleSubmit();
+      }}
+      className="space-y-4"
+    >
       <div className="space-y-2">
-        <Label htmlFor="edit-name">{t("admin.schools.name", "School Name")}</Label>
+        <Label htmlFor="edit-name">
+          {t("admin.schools.name", "School Name")}
+        </Label>
         <Input
           id="edit-name"
           type="text"
-          placeholder={t("admin.schools.namePlaceholder", "e.g. Springfield High")}
+          placeholder={t(
+            "admin.schools.namePlaceholder",
+            "e.g. Springfield High",
+          )}
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="edit-adminEmail">{t("admin.schools.email", "Admin Email")}</Label>
+        <Label htmlFor="edit-adminEmail">
+          {t("admin.schools.email", "Admin Email")}
+        </Label>
         <Input
           id="edit-adminEmail"
           type="email"
@@ -99,7 +124,9 @@ export function SchoolEditForm({ school, onSuccess }: SchoolEditFormProps) {
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="edit-maxStudents">{t("admin.schools.maxStudents", "Max Students")}</Label>
+        <Label htmlFor="edit-maxStudents">
+          {t("admin.schools.maxStudents", "Max Students")}
+        </Label>
         <Input
           id="edit-maxStudents"
           type="number"
@@ -112,18 +139,24 @@ export function SchoolEditForm({ school, onSuccess }: SchoolEditFormProps) {
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2 flex flex-col">
-          <Label>{t("admin.invite.contractStart", "Contract Start Date")}</Label>
+          <Label>
+            {t("admin.invite.contractStart", "Contract Start Date")}
+          </Label>
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant={"outline"}
                 className={cn(
                   "w-full justify-start text-left font-normal",
-                  !contractStart && "text-muted-foreground"
+                  !contractStart && "text-muted-foreground",
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" aria-hidden="true" />
-                {contractStart ? format(contractStart, "PPP") : <span>{t("common.pickDate", "Pick a date")}</span>}
+                {contractStart ? (
+                  format(contractStart, "PPP")
+                ) : (
+                  <span>{t("common.pickDate", "Pick a date")}</span>
+                )}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -144,11 +177,15 @@ export function SchoolEditForm({ school, onSuccess }: SchoolEditFormProps) {
                 variant={"outline"}
                 className={cn(
                   "w-full justify-start text-left font-normal",
-                  !contractEnd && "text-muted-foreground"
+                  !contractEnd && "text-muted-foreground",
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" aria-hidden="true" />
-                {contractEnd ? format(contractEnd, "PPP") : <span>{t("common.pickDate", "Pick a date")}</span>}
+                {contractEnd ? (
+                  format(contractEnd, "PPP")
+                ) : (
+                  <span>{t("common.pickDate", "Pick a date")}</span>
+                )}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -169,10 +206,15 @@ export function SchoolEditForm({ school, onSuccess }: SchoolEditFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="edit-details">{t("admin.schools.details", "Details / Contract Info")}</Label>
+        <Label htmlFor="edit-details">
+          {t("admin.schools.details", "Details / Contract Info")}
+        </Label>
         <Textarea
           id="edit-details"
-          placeholder={t("admin.schools.detailsPlaceholder", "Enter contract info or other details...")}
+          placeholder={t(
+            "admin.schools.detailsPlaceholder",
+            "Enter contract info or other details...",
+          )}
           value={details}
           onChange={(e) => setDetails(e.target.value)}
           className="min-h-[100px]"

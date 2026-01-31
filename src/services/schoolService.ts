@@ -1,10 +1,17 @@
-import { School, SchoolInvitePayload, SchoolsResponse, SchoolStats, SchoolAdminOnboardingStatus, SchoolAdminOnboardingData } from "@/types/school";
+import {
+  School,
+  SchoolInvitePayload,
+  SchoolsResponse,
+  SchoolStats,
+  SchoolAdminOnboardingStatus,
+  SchoolAdminOnboardingData,
+} from "@/types/school";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 // Helper to get token
 const getToken = () => {
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     return localStorage.getItem("token");
   }
   return null;
@@ -24,7 +31,7 @@ export async function getSchools(
     page?: number;
     limit?: number;
     search?: string;
-  } = {}
+  } = {},
 ): Promise<SchoolsResponse> {
   const query = new URLSearchParams();
   if (params.page) query.append("page", params.page.toString());
@@ -37,7 +44,7 @@ export async function getSchools(
       `${API_BASE_URL}/api/v1/admin/schools?${query.toString()}`,
       {
         headers: getHeaders(),
-      }
+      },
     );
 
     if (!response.ok) {
@@ -53,12 +60,14 @@ export async function getSchools(
       total: 0,
       page: 1,
       limit: 10,
-      totalPages: 0
+      totalPages: 0,
     };
   }
 }
 
-export async function inviteSchool(data: SchoolInvitePayload): Promise<{ success: boolean; message: string }> {
+export async function inviteSchool(
+  data: SchoolInvitePayload,
+): Promise<{ success: boolean; message: string }> {
   const response = await fetch(`${API_BASE_URL}/api/v1/admin/schools/invite`, {
     method: "POST",
     headers: getHeaders(),
@@ -73,12 +82,18 @@ export async function inviteSchool(data: SchoolInvitePayload): Promise<{ success
   return response.json();
 }
 
-export async function updateSchool(schoolId: string, data: Partial<SchoolInvitePayload>): Promise<{ success: boolean; message: string }> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/admin/schools/${schoolId}`, {
-    method: "PUT",
-    headers: getHeaders(),
-    body: JSON.stringify(data),
-  });
+export async function updateSchool(
+  schoolId: string,
+  data: Partial<SchoolInvitePayload>,
+): Promise<{ success: boolean; message: string }> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/admin/schools/${schoolId}`,
+    {
+      method: "PUT",
+      headers: getHeaders(),
+      body: JSON.stringify(data),
+    },
+  );
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
@@ -88,11 +103,16 @@ export async function updateSchool(schoolId: string, data: Partial<SchoolInviteP
   return response.json();
 }
 
-export async function resendSchoolInvite(schoolId: string): Promise<{ success: boolean; message: string }> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/admin/schools/${schoolId}/invite`, {
-    method: "POST",
-    headers: getHeaders(),
-  });
+export async function resendSchoolInvite(
+  schoolId: string,
+): Promise<{ success: boolean; message: string }> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/admin/schools/${schoolId}/invite`,
+    {
+      method: "POST",
+      headers: getHeaders(),
+    },
+  );
 
   if (!response.ok) {
     throw new Error("Failed to resend invitation");
@@ -115,8 +135,8 @@ export async function getSchoolStats(): Promise<SchoolStats> {
       totalSchools: 0,
       activeSchools: 0,
       pendingInvites: 0,
-      totalStudents: 0
-    }
+      totalStudents: 0,
+    };
   }
 }
 
@@ -125,10 +145,10 @@ export async function getSchoolStats(): Promise<SchoolStats> {
 // ============================================
 
 export async function getSchoolAdminOnboardingStatus(
-  token: string
+  token: string,
 ): Promise<SchoolAdminOnboardingStatus> {
   const response = await fetch(
-    `${API_BASE_URL}/api/v1/school-admin/${token}/onboarding-status`
+    `${API_BASE_URL}/api/v1/school-admin/${token}/onboarding-status`,
   );
   if (!response.ok) throw new Error("Failed to get onboarding status");
   const json = await response.json();
@@ -137,7 +157,7 @@ export async function getSchoolAdminOnboardingStatus(
 
 export async function submitSchoolAdminOnboarding(
   token: string,
-  data: SchoolAdminOnboardingData
+  data: SchoolAdminOnboardingData,
 ): Promise<{ success: boolean; redirectUrl: string }> {
   const response = await fetch(
     `${API_BASE_URL}/api/v1/school-admin/${token}/onboarding`,
@@ -145,7 +165,7 @@ export async function submitSchoolAdminOnboarding(
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify(data),
-    }
+    },
   );
 
   if (!response.ok) throw new Error("Failed to submit onboarding data");

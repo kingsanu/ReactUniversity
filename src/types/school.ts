@@ -1,4 +1,4 @@
-export type SchoolStatus = 'active' | 'inactive' | 'invited' | 'pending';
+export type SchoolStatus = "active" | "inactive" | "invited" | "pending";
 
 export interface School {
   id: string;
@@ -51,7 +51,7 @@ export interface SchoolAdminOnboardingStatus {
   contractStart?: string;
   contractEnd?: string;
   isValid: boolean;
-  status: 'pending' | 'completed' | 'expired';
+  status: "pending" | "completed" | "expired";
 }
 
 export interface SchoolAdminOnboardingData {
