@@ -738,7 +738,7 @@ export default function NexaValuesPage() {
             </div>
 
             {/* Timeline headers - rectangular style */}
-            <div className="flex w-full h-[38px] font-montserrat text-[13px] font-bold mb-6">
+            <div className="flex h-[38px] font-montserrat text-[13px] font-bold mb-6 w-[95%]">
               {/* Month 0-1 - Dark navy */}
               <div className="flex-1 bg-[#0f3443] text-white flex items-center justify-center rounded-l-md font-bold">
                 Month 0–1
@@ -758,9 +758,9 @@ export default function NexaValuesPage() {
             </div>
 
             {/* Timeline content */}
-            <div className="flex bg-white pt-2 w-[90%]">
+            <div className="flex bg-white pt-2 w-[95%]">
               {/* Month 0-1 */}
-              <div className="flex-1 p-2 pr-3 border-r border-slate-100 last:border-0">
+              <div className="flex-1 p-2 pr-3  border-slate-100 last:border-0">
                 <h4 className="font-bold text-[18px] text-[#008996] mb-1 leading-tight">Quick confirmation</h4>
                 <p className="text-[14px] text-slate-600 font-medium leading-snug mb-4">
                   Intensive SketchUp, AutoCAD course (20–40 h); drawing workshop (10–20 h); 1-day job-shadowing at a studio/workshop.
@@ -771,7 +771,7 @@ export default function NexaValuesPage() {
               </div>
 
               {/* Month 1-3 */}
-              <div className="flex-1 p-2 pr-3 border-r border-slate-100 last:border-0">
+              <div className="flex-1 p-2 pr-3 border-slate-100 last:border-0">
                 <h4 className="font-bold text-[18px] text-[#008996] mb-1 leading-tight">Minimum portfolio</h4>
                 <p className="text-[14px] text-slate-600 font-medium leading-snug mb-4">
                   Create 2 projects, (A) plan + elevation + 3D view of a space; (B) documented object/prototype.
@@ -782,7 +782,7 @@ export default function NexaValuesPage() {
               </div>
 
               {/* Month 3-6 */}
-              <div className="flex-1 p-2 pr-3 border-r border-slate-100 last:border-0">
+              <div className="flex-1 p-2 pr-3  border-slate-100 last:border-0">
                 <h4 className="font-bold text-[18px] text-[#008996] mb-1 leading-tight">Technical validation</h4>
                 <p className="text-[14px] text-slate-600 font-medium leading-snug mb-4">
                   Intermediate courses (BIM / SolidWorks); micro-internship 2–4 weeks.
@@ -830,61 +830,44 @@ export default function NexaValuesPage() {
               </svg>
             </div>
 
-            {/* Timeline headers with checkmarks - arrow style */}
-            <div className="flex w-full h-[38px] font-montserrat text-[13px] font-bold relative mb-6">
+            {/* Timeline headers - rectangular style */}
+            <div className="flex  h-[38px] font-montserrat text-[13px] font-bold mb-6 w-[95%]">
               {/* Week 1-2 - Dark navy */}
-              <div
-                className="flex-1 bg-[#0f172a] text-white flex items-center justify-center gap-2 rounded-l-md font-bold z-40 relative"
-                style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%)' }}
-              >
+              <div className="flex-1 bg-[#0f3443] text-white flex items-center justify-center rounded-l-md font-bold">
                 Week 1–2
-                <svg className="w-4 h-4" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="#22c55e" /><path d="M5,8 L7,10 L11,6" stroke="white" strokeWidth="1.5" fill="none" /></svg>
               </div>
               {/* Week 3-4 - Teal */}
-              <div
-                className="flex-1 bg-[#008996] text-white flex items-center justify-center gap-2 -ml-[15px] z-30 relative font-bold"
-                style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%)', paddingLeft: '15px' }}
-              >
+              <div className="flex-1 bg-[#008996] text-white flex items-center justify-center font-bold">
                 Week 3–4
-                <svg className="w-4 h-4" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="#22c55e" /><path d="M5,8 L7,10 L11,6" stroke="white" strokeWidth="1.5" fill="none" /></svg>
               </div>
               {/* Week 5-6 - Cyan */}
-
-              <div
-                className="flex-1 bg-[#22d3ee] text-white flex items-center justify-center gap-2 -ml-[15px] z-20 relative font-bold"
-                style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%)', paddingLeft: '15px' }}
-              >
+              <div className="flex-1 bg-[#22d3ee] text-white flex items-center justify-center font-bold">
                 Week 5–6
-                <svg className="w-4 h-4" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="#22c55e" /><path d="M5,8 L7,10 L11,6" stroke="white" strokeWidth="1.5" fill="none" /></svg>
               </div>
               {/* Week 7-8 - Light cyan */}
-              <div
-                className="flex-1 bg-[#b2f0f5] text-[#006d77] flex items-center justify-center gap-2 -ml-[15px] z-10 relative rounded-r-md font-bold"
-                style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)', paddingLeft: '15px' }}
-              >
+              <div className="flex-1 bg-[#b2f0f5] text-[#006d77] flex items-center justify-center rounded-r-md font-bold">
                 Week 7–8
-                <svg className="w-4 h-4" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="#22c55e" /><path d="M5,8 L7,10 L11,6" stroke="white" strokeWidth="1.5" fill="none" /></svg>
               </div>
             </div>
 
             {/* Timeline content */}
-            <div className="flex bg-white pt-2 w-[90%]">
+            <div className="flex bg-white pt-2 w-[95%]">
               {/* Week 1-2 */}
-              <div className="flex-1 p-2 pr-3 border-r border-slate-100 last:border-0">
+              <div className="flex-1 p-2 pr-3 border-slate-100 last:border-0">
                 <p className="text-[14px] text-slate-600 leading-snug font-medium mb-4">
                   Enroll in a basic CAD course; define the portfolio project
                 </p>
               </div>
 
               {/* Week 3-4 */}
-              <div className="flex-1 p-2 pr-3 border-r border-slate-100 last:border-0">
+              <div className="flex-1 p-2 pr-3  border-slate-100 last:border-0">
                 <p className="text-[14px] text-slate-600 leading-snug font-medium mb-4">
                   Execute the first draft; feedback session with a mentor.
                 </p>
               </div>
 
               {/* Week 5-6 */}
-              <div className="flex-1 p-2 pr-3 border-r border-slate-100 last:border-0">
+              <div className="flex-1 p-2 pr-3  border-slate-100 last:border-0">
                 <p className="text-[14px] text-slate-600 leading-snug font-medium mb-4">
                   3D modeling; second feedback and adjustment.
                 </p>
@@ -902,6 +885,474 @@ export default function NexaValuesPage() {
 
         {/* Bottom teal bar */}
         <div className="w-full h-3 bg-[#008996] mt-auto"></div>
+      </div>
+
+      {/* ========== PAGE 5: INDICATORS & TRAINING ========== */}
+      <div
+        className="bg-white w-[210mm] min-h-[297mm] mx-auto shadow-lg flex flex-col relative print:w-[210mm] print:h-[297mm] print:overflow-hidden"
+        style={{ breakAfter: "page" }}
+      >
+        {/* Top teal bar - Updated to match Page 2/3 style (3 segments, absolute) */}
+        <div className="absolute top-0 left-0 w-full flex flex-row h-[21px] gap-6 px-10">
+          <div className="flex-1 bg-[#008996] "></div>
+          <div className="flex-1 bg-[#008996]"></div>
+          <div className="flex-1 bg-[#008996] mr-1"></div>
+        </div>
+
+        {/* Content */}
+        <div className="px-10 pb-6 pt-12 flex-1 relative">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-10">
+            <span className=" text-sm font-roboto">Maria Paula Mendoza</span>
+            <span className=" text-sm font-roboto  tracking-wide">Septiembre 23/2025</span>
+          </div>
+
+          {/* Section 7: Indicators and tracking */}
+          <div className="mb-16 relative">
+            {/* Rocket Icon - Absolute Right - Sticker Style */}
+            <div className="absolute -right-14 top-10 z-20 w-[260px] h-[320px] rotate-[15deg]">
+              <svg viewBox="0 0 200 200" className="w-full h-full drop-shadow-xl shadow-white">
+                <defs>
+                  {/* Define the Rocket Shape for reuse */}
+                  <g id="rocket-shape">
+                    {/* Flames */}
+                    <path d="M100 175 Q120 200 100 220 Q80 200 100 175" fill="#facc15" stroke="#1e293b" strokeWidth="2.5" />
+                    <path d="M100 175 Q110 190 100 205 Q90 190 100 175" fill="#f97316" stroke="#1e293b" strokeWidth="2" />
+
+                    {/* Fins */}
+                    <path d="M65 145 L40 165 L75 160 Z" fill="#ef4444" stroke="#1e293b" strokeWidth="3" strokeLinejoin="round" />
+                    <path d="M135 145 L160 165 L125 160 Z" fill="#ef4444" stroke="#1e293b" strokeWidth="3" strokeLinejoin="round" />
+
+                    {/* Rocket Body */}
+                    <path d="M100 25 Q150 70 140 155 L60 155 Q50 70 100 25 Z" fill="white" stroke="#1e293b" strokeWidth="3" strokeLinejoin="round" />
+
+                    {/* Nose Cone */}
+                    <path d="M100 25 Q124 45 130 65 L70 65 Q76 45 100 25 Z" fill="#ef4444" stroke="#1e293b" strokeWidth="3" strokeLinejoin="round" />
+
+                    {/* Window */}
+                    <circle cx="100" cy="95" r="28" fill="#a5f3fc" stroke="#1e293b" strokeWidth="3" />
+                    <circle cx="100" cy="95" r="16" fill="#0e7490" stroke="#1e293b" strokeWidth="2.5" />
+                    <circle cx="106" cy="89" r="4" fill="white" opacity="0.6" />
+
+                    {/* Engine */}
+                    <path d="M70 155 L75 165 L125 165 L130 155 Z" fill="#475569" stroke="#1e293b" strokeWidth="3" strokeLinejoin="round" />
+                  </g>
+                </defs>
+
+                {/* White Halo / Sticker Border (Behind) */}
+                <use href="#rocket-shape" stroke="white" strokeWidth="12" strokeLinejoin="round" />
+
+                {/* Main Icon (Front) */}
+                <use href="#rocket-shape" />
+              </svg>
+            </div>
+
+            <h2 className="text-[#008996] text-[24px] font-bold mb-0.5 font-montserrat tracking-tight leading-none relative z-10 w-[70%]">
+              7. Indicators and tracking
+            </h2>
+            <p className="text-[#0f172a] text-[15px] mb-8 font-montserrat font-bold tracking-tight pl-0.5 relative z-10">KPIs</p>
+
+            <div className="space-y-4 w-[78%]">
+              {[
+                { label: "Portfolio:", text: "2 completed pieces in", bold: "3 months." },
+                { label: "Deadlines:", text: "% of deliverables submitted on time,", bold: "target ≥ 90% at 3 mo." },
+                { label: "Quality:", text: "reduction of errors found between revisions,", bold: "-20% in 3 mo." },
+                { label: "Training:", text: "", bold: "courses completed", extra: "(basic cad, intermediate bim) within", boldEnd: "6 mo." },
+                { label: "Professional feedback:", text: "", bold: "2 reviews", extra: "with recommendations implemented." },
+              ].map((item, i) => (
+                <div key={i} className="bg-[#f1f5f9] rounded-full py-2.5 px-6 flex items-center text-[13px] text-slate-700 font-roboto leading-none relative z-0">
+                  <span className="font-bold text-[#0f172a] mr-1">{item.label}</span>
+                  {item.text && <span className="mr-1">{item.text}</span>}
+                  {item.bold && <span className="font-bold text-slate-900 mr-1">{item.bold}</span>}
+                  {item.extra && <span className="mr-1">{item.extra}</span>}
+                  {item.boldEnd && <span className="font-bold text-slate-900">{item.boldEnd}</span>}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Section 8: Training and support */}
+          <div className="relative">
+            {/* Scroll Icon - Absolute Right - Sticker Style */}
+            <div className="absolute -right-6 top-40 z-20 w-[240px] h-[240px] rotate-[8deg]">
+              <svg viewBox="0 0 200 200" className="w-full h-full drop-shadow-md">
+                <defs>
+                  <g id="scroll-shape">
+                    {/* Rolled top (hint) */}
+                    <path d="M40 38 Q100 25 160 38" fill="none" stroke="#1e293b" strokeWidth="3" strokeLinecap="round" />
+
+                    {/* Main Sheet */}
+                    <path d="M40 40 L160 55 L145 180 L25 165 Z" fill="#fef08a" stroke="#1e293b" strokeWidth="3" strokeLinejoin="round" />
+
+                    {/* Rolled bottom */}
+                    <path d="M25 165 Q85 180 145 180 L145 165 Q85 165 25 150 Z" fill="#facc15" stroke="#1e293b" strokeWidth="3" strokeLinejoin="round" />
+                    <path d="M145 180 L145 165" stroke="#1e293b" strokeWidth="3" strokeLinecap="round" />
+
+                    {/* Strategy Map Path */}
+                    <path d="M60 135 C80 100 120 120 115 85" fill="none" stroke="#1e293b" strokeWidth="4" strokeLinecap="round" />
+
+                    {/* Arrow Head */}
+                    <path d="M115 85 L108 92 M115 85 L124 88" fill="none" stroke="#1e293b" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+
+                    {/* Location Circle */}
+                    <circle cx="125" cy="70" r="6" fill="none" stroke="#1e293b" strokeWidth="3" />
+
+                    {/* Marks */}
+                    <path d="M55 130 L65 140 M65 130 L55 140" stroke="#1e293b" strokeWidth="4" strokeLinecap="round" />
+                  </g>
+                </defs>
+
+                {/* White Halo / Sticker Border (Behind) */}
+                <use href="#scroll-shape" stroke="white" strokeWidth="12" strokeLinejoin="round" />
+
+                {/* Main Icon (Front) */}
+                <use href="#scroll-shape" />
+              </svg>
+            </div>
+
+            <h2 className="text-[#008996] text-[24px] font-bold mb-8 font-montserrat tracking-tight leading-tight w-[60%] relative z-10">
+              8. Training and support recommendations
+            </h2>
+
+            <div className="space-y-4 w-[75%]">
+              {[
+                { label: "Technical:", text: "AutoCAD, SketchUp, Revit/basic BIM, SolidWorks or Rhino (depending on focus)." },
+                { label: "Practice:", text: "maker workshops / 3D printing / short internships." },
+                { label: "Transversal:", text: "Project management fundamentals, technical communication and presentation skills." },
+                { label: "Support:", text: "Monthly mentoring and coaching sessions focused on decisionmaking." },
+              ].map((item, i) => (
+                <div key={i} className="bg-[#f1f5f9] rounded-[24px] py-4 px-6 text-[13px] text-slate-700 font-roboto leading-snug relative z-0">
+                  <span className="font-bold text-[#0f172a] block mb-0.5">{item.label}</span>
+                  <span>{item.text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+
+        {/* Bottom teal bar */}
+        <div className="w-full h-3 bg-[#008996] mt-auto"></div>
+      </div>
+
+
+      {/* ========== PAGE 6: COMPARATIVE MAPPING ========== */}
+      <div
+        className="bg-white w-[210mm] min-h-[297mm] mx-auto shadow-lg flex flex-col relative print:w-[210mm] print:h-[297mm] print:overflow-hidden sidebar-print-page"
+        style={{ breakAfter: "page" }}
+      >
+        {/* Top teal bar */}
+        <div className="absolute top-0 left-0 w-full flex flex-row h-[21px] gap-6 px-10">
+          <div className="flex-1 bg-[#008996] "></div>
+          <div className="flex-1 bg-[#008996]"></div>
+          <div className="flex-1 bg-[#008996] mr-1"></div>
+        </div>
+
+        {/* Content */}
+        <div className="px-10 pb-6 pt-12 flex-1 relative">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-8">
+            <span className=" text-sm font-roboto">Maria Paula Mendoza</span>
+            <span className=" text-sm font-roboto tracking-wide">Septiembre 23/2025</span>
+          </div>
+
+          {/* Title */}
+          <div className="mb-8">
+            <h2 className="text-[#008996] text-[26px] font-bold mb-1 font-montserrat tracking-tight leading-none">
+              Comparative mapping of universities
+            </h2>
+            <p className="text-[#008996] text-[18px] font-montserrat font-medium tracking-wide">
+              Italy — Spain — Bogotá
+            </p>
+          </div>
+
+          {/* Table */}
+          <div className="w-full mb-8">
+            {/* Table Header */}
+            <div className="grid grid-cols-[0.8fr_1.8fr_1.8fr_1.4fr_1.6fr_1.6fr] gap-1 mb-1">
+              {["Location", "University", "Program", "Type", "Requirements", "Highlights"].map((header, i) => (
+                <div key={i} className={`bg-[#e0f7fa] text-[#008996] font-bold text-[11px] font-montserrat py-3 px-1 text-center flex items-center justify-center rounded-sm leading-tight`}>
+                  {header === "Highlights" ? "Hightlights" : header}
+                </div>
+              ))}
+            </div>
+
+            {/* Table Body */}
+            <div className="flex flex-col gap-1">
+              {[
+                {
+                  country: "IT", code: "MIL", uni: "Politecnico di Milano", prog: "Architecture;\nProduct Design",
+                  type: "Degree / Laurea\n(3–5 years)", req: "Entrance exam /\nPortfolio", high: "Top school; strong\nprototyping labs"
+                },
+                {
+                  country: "IT", code: "TOR", uni: "Politecnico di\nTorino", prog: "Architecture;\nProduct Design",
+                  type: "Laurea / Laurea\nMagistrale", req: "Entrance exam /\nPortfolio", high: "Technical focus with\nstrong industry\nconnections"
+                },
+                {
+                  country: "IT", code: "VEN", uni: "IUAV Università\nluav di Venezia", prog: "Architecture;\nProduct Design",
+                  type: "Degree / Master", req: "Entrance exam /\nPortfolio", high: "Highly practical\nprograms"
+                },
+                {
+                  country: "IT", code: "ROM", uni: "Sapienza\nUniversità di\nRoma", prog: "Architecture;\nProduct Design",
+                  type: "Degree\n/ 3+2 cycle", req: "Entrance exam /\nPortfolio", high: "Research\norientation"
+                },
+                {
+                  country: "ES", code: "BCN", uni: "Universitat\nPolitècnica de\nCatalunya", prog: "Architecture;\nProduct Design",
+                  type: "Degree\n(4–5 years)", req: "Grade cutoff /\nPortfolio", high: "Highly practical\nprograms"
+                },
+                {
+                  country: "ES", code: "MAD", uni: "Politecnico di\nMilano", prog: "Architecture;\nProduct Design",
+                  type: "Degree / Master", req: "Portfolio required", high: "Academic\nprestige"
+                },
+                {
+                  country: "ES", code: "VLC", uni: "Politecnico di\nTorino", prog: "Architecture;\nProduct Design",
+                  type: "Degree", req: "Portfolio required", high: "Project-based\nlearning"
+                },
+                {
+                  country: "CO", code: "BCN", uni: "IUAV Università\nluav di Venezia", prog: "Architecture;\nProduct Design",
+                  type: "Undergraduate\n(~10 semesters)", req: "Institutional\nadmission", high: "Applied focus\nwith ties to local\nstudios"
+                },
+              ].map((row, i) => (
+                <div key={i} className="grid grid-cols-[0.8fr_1.8fr_1.8fr_1.4fr_1.6fr_1.6fr] gap-1 min-h-[50px]">
+                  {/* Location Cell */}
+                  <div className="bg-[#f8fafc] flex flex-row items-center justify-center gap-2 p-1 rounded-sm">
+                    {/* Flag SVG */}
+                    <div className="w-6 h-4 shrink-0 shadow-sm border border-slate-100 overflow-hidden">
+                      {row.country === "IT" && (
+                        <svg viewBox="0 0 3 2" className="w-full h-full">
+                          <rect width="1" height="2" x="0" fill="#009246" />
+                          <rect width="1" height="2" x="1" fill="#ffffff" />
+                          <rect width="1" height="2" x="2" fill="#ce2b37" />
+                        </svg>
+                      )}
+                      {row.country === "ES" && (
+                        <svg viewBox="0 0 3 2" className="w-full h-full">
+                          <rect width="3" height="2" fill="#aa151b" />
+                          <rect width="3" height="1" y="0.5" fill="#f1bf00" />
+                        </svg>
+                      )}
+                      {row.country === "CO" && (
+                        <svg viewBox="0 0 3 2" className="w-full h-full">
+                          <rect width="3" height="1" fill="#fcd116" />
+                          <rect width="3" height="0.5" y="1" fill="#003893" />
+                          <rect width="3" height="0.5" y="1.5" fill="#ce1126" />
+                        </svg>
+                      )}
+                    </div>
+                    <span className="text-[14px] font-bold text-slate-800 font-roboto">{row.code}</span>
+                  </div>
+
+                  {/* University */}
+                  <div className="bg-[#f8fafc] flex items-center justify-center text-center p-2 rounded-sm">
+                    <span className="text-[11px] text-slate-700 font-medium leading-tight font-roboto whitespace-pre-line">{row.uni}</span>
+                  </div>
+
+                  {/* Program */}
+                  <div className="bg-[#f8fafc] flex items-center justify-center text-center p-2 rounded-sm">
+                    <span className="text-[11px] text-slate-700 leading-tight font-roboto whitespace-pre-line">{row.prog}</span>
+                  </div>
+
+                  {/* Type */}
+                  <div className="bg-[#f8fafc] flex items-center justify-center text-center p-2 rounded-sm">
+                    <span className="text-[11px] text-slate-700 leading-tight font-roboto whitespace-pre-line">{row.type}</span>
+                  </div>
+
+                  {/* Requirements */}
+                  <div className="bg-[#f8fafc] flex items-center justify-center text-center p-2 rounded-sm">
+                    <span className="text-[11px] text-slate-700 leading-tight font-roboto whitespace-pre-line">{row.req}</span>
+                  </div>
+
+                  {/* Highlights */}
+                  <div className="bg-[#f8fafc] flex items-center justify-center text-center p-2 rounded-sm">
+                    <span className="text-[11px] text-slate-700 leading-tight font-roboto whitespace-pre-line">{row.high}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Footer Recommendation */}
+          <div className="mt-8">
+            <p className="text-[#0f172a] text-[13px] font-roboto leading-snug text-justify">
+              Recommendations for use: prioritize universities that require a portfolio and offer workshops/labs from year one (e.g., Polimi, IUAV, ETSAB, Uniandes, ELISAVA). Plan portfolio preparation 3–6 months in advance.
+            </p>
+          </div>
+
+        </div>
+
+        {/* Bottom teal bar */}
+        <div className="w-full h-3 bg-[#008996] mt-auto"></div>
+      </div>
+
+      {/* ========== PAGE 7: CONCLUSION & ROADMAP ========== */}
+      <div
+        className="bg-white w-[210mm] min-h-[297mm] mx-auto shadow-lg flex flex-col relative print:w-[210mm] print:h-[297mm] print:overflow-hidden sidebar-print-page"
+        style={{ breakAfter: "page" }}
+      >
+        {/* Top teal bar */}
+        <div className="absolute top-0 left-0 w-full flex flex-row h-[21px] gap-6 px-10">
+          <div className="flex-1 bg-[#008996] "></div>
+          <div className="flex-1 bg-[#008996]"></div>
+          <div className="flex-1 bg-[#008996] mr-1"></div>
+        </div>
+
+        {/* Content */}
+        <div className="px-10 pb-6 pt-12 flex-1 relative">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-10">
+            <span className=" text-sm font-roboto">Maria Paula Mendoza</span>
+            <span className=" text-sm font-roboto tracking-wide">Septiembre 23/2025</span>
+          </div>
+
+          {/* Title */}
+          <h2 className="text-[#008996] text-[26px] font-bold mb-6 font-montserrat tracking-tight leading-none">
+            Conclusion and next steps
+          </h2>
+
+          {/* Conclusion Text */}
+          <div className="mb-6">
+            <h3 className="text-[#008996] text-[18px] font-bold mb-2 font-montserrat">Conclusion:</h3>
+            <p className="text-[#475569] text-[14px] font-roboto leading-snug text-justify">
+              Maria Paula displays high potential for majors combining spatial visualization and attention to detail,
+              and she also has interpersonal skills that facilitate teamwork and project presentation. Prioritizing
+              Architecture, Industrial Design and Civil Engineering is the main recommendation, with an
+              exploration-and-portfolio plan as the immediate path.
+            </p>
+          </div>
+
+          {/* Next Steps Text */}
+          <div className="mb-6">
+            <h3 className="text-[#008996] text-[18px] font-bold mb-2 font-montserrat">Immediate operational next steps suggested:</h3>
+            <ol className="list-decimal pl-5 text-[#475569] text-[14px] font-roboto leading-snug space-y-1">
+              <li>Start the 8-week plan (enroll in a CAD course + portfolio project).</li>
+              <li>Select 4 target universities (2 aspirational, 2 safe) and verify admission calls/deadlines).</li>
+              <li>Request 2 portfolio reviews by professionals (mentors) during months 1–3.</li>
+              <li>Schedule decision-making coaching (3 sessions) to address low dominance.</li>
+            </ol>
+          </div>
+
+          {/* ANNEXES BOX (Floating Right) */}
+          <div className="absolute right-0 top-[420px] w-[70%] bg-[#67e8f9] p-8 pr-10 z-10 rounded-l-md shadow-sm">
+            <h3 className="text-white text-[20px] font-bold mb-3 font-montserrat">Annexes and references</h3>
+            <p className="text-[#0e7490] text-[14px] font-roboto mb-2 font-medium">Model report: Professional Guidance Report (Structure and template).</p>
+            <ul className="list-disc pl-5 text-[#155e75] text-[14px] font-roboto space-y-1 font-bold">
+              <li>MIL — Sara Decarlini results (MIL).</li>
+              <li>PCA — Sara Decarlini results (PCA).</li>
+              <li>University web sources <span className="font-normal italic text-[#0e7490]">(official links consulted to review programs and requirements)</span>. <span className="font-normal text-[#0e7490]">If detailed university fact sheets are required, I can provide them with updated dates and requirements.</span></li>
+            </ul>
+          </div>
+
+          {/* ROADMAP VISUALIZATION */}
+          <div className="relative mt-[160px] h-[550px] w-full">
+            {/* Dashed Path SVG */}
+            <svg className="absolute top-0 left-0 w-full h-full z-0" viewBox="0 0 800 600">
+              {/* Smoother, continuous winding path with higher bottom points */}
+              <path
+                d="M100 100 C 200 100, 250 160, 270 220 C 300 300, 200 340, 150 380 C 100 420, 150 480, 260 480 C 350 480, 400 400, 400 320 C 400 240, 500 240, 580 280 C 650 340, 680 440, 600 500"
+                fill="none"
+                stroke="#475569"
+                strokeWidth="2.5"
+                strokeDasharray="6 4"
+                strokeLinecap="round"
+                className="opacity-70"
+              />
+            </svg>
+
+            {/* 1. Crossroads (Maze) - Path Start (100, 100) */}
+            <div className="absolute top-[68px] left-[68px] w-24 flex flex-col items-center z-10">
+              <div className="bg-[#bce6eb] p-2 rounded-lg border-2 border-slate-400 mb-1 w-16 h-16 flex items-center justify-center shadow-sm">
+                {/* Maze Icon */}
+                <svg viewBox="0 0 24 24" className="w-10 h-10 text-slate-600">
+                  <path fill="currentColor" d="M3 3H21V21H3V3M5 5V19H19V5H5M15 11H17V17H11V15H15V11M7 7H13V9H9V13H7V7Z" />
+                  <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+                </svg>
+              </div>
+              <span className="font-bold text-[12px] text-slate-800">Crossroads</span>
+              <span className="text-[10px] text-slate-600 text-center leading-tight">Choosing a direction.</span>
+            </div>
+
+            {/* 2. Diagnosis (Clipboard) - Curve (270, 220) */}
+            <div className="absolute top-[188px] left-[242px] w-24 flex flex-col items-center z-10">
+              <div className="bg-[#fff1cd] p-1 rounded-lg border-2 border-slate-400 mb-1 w-14 h-16 flex items-center justify-center shadow-sm">
+                <svg viewBox="0 0 24 24" className="w-8 h-8 text-slate-600">
+                  <path fill="currentColor" d="M19 3H14.82C14.4 1.84 13.3 1 12 1S9.6 1.84 9.18 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3M12 3C12.55 3 13 3.45 13 4S12.55 5 12 5 11 4.55 11 4 11.45 3 12 3M7 7H17V9H7V7M7 11H17V13H7V11M7 15H14V17H7V15Z" />
+                </svg>
+              </div>
+              <span className="font-bold text-[12px] text-slate-800">Diagnosis</span>
+              <span className="text-[10px] text-slate-600 text-center leading-tight">Understanding the starting point.</span>
+            </div>
+
+            {/* 3. Planning (Flowchart) - Loop Bottom (150, 380) */}
+            <div className="absolute top-[342px] left-[28px] w-24 flex flex-col items-center z-10">
+              <div className="bg-[#e0f7fa] p-1 rounded-lg border-2 border-slate-400 mb-1 w-16 h-14 flex items-center justify-center shadow-sm">
+                {/* Hierarchy Icon */}
+                <svg viewBox="0 0 24 24" className="w-9 h-9 text-slate-600">
+                  <path fill="currentColor" d="M16 17H13V15H16V17M11 17H8V15H11V17M13.5 13H10.5L12 11L13.5 13M3 3H21V21H3V3M5 5V19H19V5H5Z" opacity="0.3" />
+                  <path fill="currentColor" d="M16 6H8C6.9 6 6 6.9 6 8V10C6 11.1 6.9 12 8 12H10V15H6V18C6 19.1 6.9 20 8 20H10C11.1 20 12 19.1 12 18V16H12C12 17.1 12.9 18 14 18H16C17.1 18 18 17.1 18 16V14C18 12.9 17.1 12 16 12H14V9H16C17.1 9 18 8.1 18 7V6C18 4.9 17.1 4 16 4H16C16 5.1 16 6 16 6M8 8H16V10H8V8M8 16H10V18H8V16M14 14H16V16H14V14Z" />
+                </svg>
+              </div>
+              <span className="font-bold text-[12px] text-slate-800">Planning</span>
+              <span className="text-[10px] text-slate-600 text-center leading-tight">Designing the path forward.</span>
+            </div>
+
+            {/* 4. Implementation (A/B/C) - Rising Curve (260, 480) */}
+            <div className="absolute top-[446px] left-[188px] w-24 flex flex-col items-center z-10">
+              <div className="relative w-16 h-12 mb-1 pl-2">
+                <div className="absolute top-4 left-0 bg-[#ef4444] rounded-full w-7 h-7 flex items-center justify-center text-white font-bold text-[10px] border border-slate-600 z-10">A</div>
+                <div className="absolute top-4 left-5 bg-[#facc15] rounded-full w-7 h-7 flex items-center justify-center text-white font-bold text-[10px] border border-slate-600 z-10">B</div>
+                <div className="absolute top-0 left-2.5 bg-[#22d3ee] rounded-full w-7 h-7 flex items-center justify-center text-white font-bold text-[10px] border border-slate-600 z-0">C</div>
+              </div>
+              <span className="font-bold text-[12px] text-slate-800 mt-1">Implementation</span>
+              <span className="text-[10px] text-slate-600 text-center leading-tight">Putting the plan into action.</span>
+            </div>
+
+            {/* 5. Progress (Up Arrow) - Mid High Point (400, 320) */}
+            <div className="absolute top-[246px] left-[376px] w-24 flex flex-col items-center z-10">
+              {/* Arrow Icon */}
+              <div className="relative w-12 h-12 flex items-end justify-center mb-1">
+                <svg viewBox="0 0 24 24" className="w-full h-full drop-shadow-sm">
+                  <path d="M12 2L2 12H7V22H17V12H22L12 2Z" fill="#ff5722" stroke="#475569" strokeWidth="1.5" />
+                  <rect x="9" y="14" width="2" height="6" fill="white" opacity="0.5" />
+                  <rect x="13" y="16" width="2" height="4" fill="white" opacity="0.5" />
+                </svg>
+              </div>
+              <span className="font-bold text-[12px] text-slate-800">Progress</span>
+              <span className="text-[10px] text-slate-600 text-center leading-tight">Tracking measurable growth.</span>
+            </div>
+
+            {/* 6. Validation (Puzzle) - Top Right Curve (580, 280) */}
+            <div className="absolute top-[266px] left-[570px] w-24 flex flex-col items-center z-10">
+              <div className="flex gap-0 mb-1">
+                {/* Puzzle Icon */}
+                <svg viewBox="0 0 24 24" className="w-12 h-12">
+                  <path d="M19 19H15V19C15 17.9 14.1 17 13 17S11 17.9 11 19V19H7V15H7C8.1 15 9 14.1 9 13S8.1 11 7 11V7H11V7C11 5.9 11.9 5 13 5S15 5.9 15 7V7H19C20.1 7 21 7.9 21 9V17C21 18.1 20.1 19 19 19Z" fill="#fca5a5" stroke="#475569" strokeWidth="1.5" />
+                  <path d="M13 17V13M7 13H11" stroke="#475569" strokeWidth="1.5" strokeDasharray="2 2" />
+                </svg>
+              </div>
+              <span className="font-bold text-[12px] text-slate-800">Validation</span>
+              <span className="text-[10px] text-slate-600 text-center leading-tight">Confirming results and alignment.</span>
+            </div>
+
+            {/* 7. Success (Target) - End (600, 500) */}
+            <div className="absolute top-[442px] left-[492px] w-24 flex flex-col items-center z-10">
+              <div className="relative w-14 h-14 mb-1">
+                <svg viewBox="0 0 100 100" className="w-full h-full">
+                  <circle cx="50" cy="50" r="45" fill="#facc15" stroke="#1e293b" strokeWidth="2" />
+                  <circle cx="50" cy="50" r="30" fill="#22d3ee" stroke="#1e293b" strokeWidth="2" />
+                  <circle cx="50" cy="50" r="10" fill="#ef4444" stroke="#1e293b" strokeWidth="2" />
+                  {/* Arrow sticking in */}
+                  <path d="M10 90 L45 55" stroke="#1e293b" strokeWidth="4" />
+                  <path d="M40 50 L50 60" stroke="#1e293b" strokeWidth="4" />
+                  <circle cx="10" cy="90" r="4" fill="#ef4444" stroke="#1e293b" strokeWidth="2" />
+                </svg>
+              </div>
+              <span className="font-bold text-[12px] text-slate-800">Success</span>
+              <span className="text-[10px] text-slate-600 text-center leading-tight">Reaching the final goal.</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom teal bar */}
       </div>
 
     </div>

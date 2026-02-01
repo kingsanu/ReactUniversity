@@ -66,9 +66,12 @@ export async function submitOnboardingData(
 export async function getCalendarAuthUrl(
   provider: "google" | "outlook",
   email?: string,
+  redirectUrl?: string,
 ): Promise<{ url: string }> {
   const query = new URLSearchParams();
   if (email) query.append("email", email);
+  if (redirectUrl) query.append("redirectUrl", redirectUrl);
+
   const requestUrl = `${API_BASE_URL}/api/v1/auth/${provider}/url${
     query.toString() ? `?${query.toString()}` : ""
   }`;
@@ -100,6 +103,53 @@ export async function getCalendarAuthUrl(
     );
   }
   return { url };
+}
+
+export async function checkCalendarAuthStatus(
+  provider: "google" | "outlook",
+  email: string,
+): Promise<{
+  isAuthenticated: boolean;
+  email: string;
+  userId: string;
+  authDetails: {
+    connected: boolean;
+    hasAccessToken: boolean;
+    hasRefreshToken: boolean;
+    isTokenValid: boolean;
+    isTokenExpired: boolean;
+    tokenStatus: string;
+    provider: string;
+  };
+}> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/auth/${provider}/status?email=${email}`,
+    {
+      headers: getHeaders(),
+    },
+  );
+
+  if (!response.ok) throw new Error(`Failed to check ${provider} auth status`);
+  const json = await response.json();
+  return json.data || json;
+}
+
+export async function disconnectCalendar(
+  provider: "google" | "outlook",
+  email?: string,
+): Promise<{ success: boolean; message: string }> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/auth/${provider}/disconnect`,
+    {
+      method: "DELETE",
+      headers: getHeaders(),
+      body: email ? JSON.stringify({ email }) : undefined,
+    },
+  );
+
+  if (!response.ok)
+    throw new Error(`Failed to disconnect ${provider} calendar`);
+  return response.json();
 }
 
 export async function checkGoogleAuthStatus(email: string): Promise<{
@@ -430,9 +480,16 @@ export async function getUserSessions(
 
 export async function getCoachSessions(
   status: "upcoming" | "past" | "all" = "all",
+  startDate?: string,
+  endDate?: string,
 ): Promise<{ data: Booking[] }> {
+  const query = new URLSearchParams();
+  query.append("status", status);
+  if (startDate) query.append("startDate", startDate);
+  if (endDate) query.append("endDate", endDate);
+
   const response = await fetch(
-    `${API_BASE_URL}/api/v1/coach/me/sessions?status=${status}`,
+    `${API_BASE_URL}/api/v1/coach/me/sessions?${query.toString()}`,
     {
       headers: getHeaders(),
     },
