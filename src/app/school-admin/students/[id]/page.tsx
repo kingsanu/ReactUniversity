@@ -116,13 +116,15 @@ export default function StudentDetailsPage() {
                 <Mail className="h-4 w-4 text-gray-400" />
                 {student.email}
               </div>
-              {student.items && ( // Assuming phone/etc might be in generic items or added later
-                <span className="hidden md:inline text-gray-300">|</span>
+              {(student.createdAt || student.joinedAt) && (
+                <>
+                  <span className="hidden md:inline text-gray-300">|</span>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-gray-400" />
+                    {t("schoolAdmin.students.joined", "Joined")}: {format(new Date(student.createdAt || student.joinedAt!), "MMM d, yyyy")}
+                  </div>
+                </>
               )}
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-gray-400" />
-                {t("schoolAdmin.students.joined", "Joined")}: {format(new Date(student.createdAt), "MMM d, yyyy")}
-              </div>
             </div>
           </div>
         </div>

@@ -5,7 +5,9 @@ export interface Student {
   name: string;
   email: string;
   status: StudentStatus;
+  avatar?: string;
   joinedAt?: string;
+  createdAt?: string;
   lastActive?: string;
   completedAssessments: number;
   averageScore: number;
