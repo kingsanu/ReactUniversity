@@ -318,10 +318,10 @@ export function AvailabilitySettingsTab({
           {/* Google Calendar */}
           <div
             className={`border rounded-xl p-4 flex items-center justify-between transition-all ${calendarConnection.provider === "google"
-                ? "border-emerald-200 bg-emerald-50/30"
-                : calendarConnection.connected
-                  ? "border-gray-100 opacity-50 bg-gray-50"
-                  : "border-gray-200 hover:border-gray-300 bg-white"
+              ? "border-emerald-200 bg-emerald-50/30"
+              : calendarConnection.connected
+                ? "border-gray-100 opacity-50 bg-gray-50"
+                : "border-gray-200 hover:border-gray-300 bg-white"
               }`}
           >
             <div className="flex items-center gap-3">
@@ -364,10 +364,10 @@ export function AvailabilitySettingsTab({
           {/* Outlook Calendar */}
           <div
             className={`border rounded-xl p-4 flex items-center justify-between transition-all ${calendarConnection.provider === "outlook"
-                ? "border-blue-200 bg-blue-50/30"
-                : calendarConnection.connected
-                  ? "border-gray-100 opacity-50 bg-gray-50"
-                  : "border-gray-200 hover:border-gray-300 bg-white"
+              ? "border-blue-200 bg-blue-50/30"
+              : calendarConnection.connected
+                ? "border-gray-100 opacity-50 bg-gray-50"
+                : "border-gray-200 hover:border-gray-300 bg-white"
               }`}
           >
             <div className="flex items-center gap-3">
