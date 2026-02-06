@@ -93,15 +93,15 @@ export async function getUserAssessmentProgress(
             averageScore:
               completedExams.length > 0
                 ? completedExams.reduce(
-                    (sum: number, exam: any) => sum + exam.scorePercentage,
-                    0
-                  ) / completedExams.length
+                  (sum: number, exam: any) => sum + exam.scorePercentage,
+                  0
+                ) / completedExams.length
                 : 0,
             bestScore:
               completedExams.length > 0
                 ? Math.max(
-                    ...completedExams.map((exam: any) => exam.scorePercentage)
-                  )
+                  ...completedExams.map((exam: any) => exam.scorePercentage)
+                )
                 : 0,
             examResults: [],
             examTypes: {},
@@ -176,9 +176,9 @@ export async function getUserAssessmentProgress(
 
         evaluationStatus =
           selfCompleted &&
-          parentCompleted &&
-          teacherCompleted &&
-          siblingFriendCompleted
+            parentCompleted &&
+            teacherCompleted &&
+            siblingFriendCompleted
             ? "completed"
             : "in_progress";
 
@@ -218,8 +218,8 @@ export async function getUserAssessmentProgress(
         pcaData.status === "completed"
           ? 100
           : pcaData.status === "in_progress"
-          ? 50
-          : 0;
+            ? 50
+            : 0;
       pcaLastActivity = pcaData.lastActivity;
       pcaHasResults = pcaData.hasResults ?? false;
       pcaCod = pcaData.pcaCod;
@@ -298,13 +298,13 @@ export async function getDashboardAssessmentSummary(
           status: progress.milAssessment.status,
           completion: progress.milAssessment.enhancedData
             ? Math.round(
-                progress.milAssessment.enhancedData.completionPercentage
-              )
+              progress.milAssessment.enhancedData.completionPercentage
+            )
             : progress.milAssessment.status === "completed"
-            ? 100
-            : progress.milAssessment.status === "in_progress"
-            ? 50
-            : 0,
+              ? 100
+              : progress.milAssessment.status === "in_progress"
+                ? 50
+                : 0,
           lastActivity: progress.milAssessment.lastActivity,
           stats: {
             totalAttempts: progress.milAssessment.progress.totalAttempts,
@@ -319,8 +319,8 @@ export async function getDashboardAssessmentSummary(
             progress.evaluationAssessment.status === "completed"
               ? 100
               : progress.evaluationAssessment.status === "in_progress"
-              ? 50
-              : 0,
+                ? 50
+                : 0,
           lastActivity: progress.evaluationAssessment.lastActivity,
           stats: {
             totalEvaluators: progress.evaluationAssessment.progress.totalGroups,
@@ -338,8 +338,8 @@ export async function getDashboardAssessmentSummary(
             progress.pcaAssessment.status === "completed"
               ? 100
               : progress.pcaAssessment.status === "in_progress"
-              ? 50
-              : 0,
+                ? 50
+                : 0,
           lastActivity: progress.pcaAssessment.lastActivity,
           stats: {},
         },
@@ -358,5 +358,40 @@ export async function getDashboardAssessmentSummary(
   } catch (error) {
     console.error("Error getting dashboard assessment summary:", error);
     throw error;
+  }
+}
+
+/**
+ * Fetch full assessment report data for PDF generation
+ * Returns null on failure so caller can use fallback data
+ */
+export async function getAssessmentReportData(
+  assessmentId: string
+): Promise<import("@/types/assessmentReport").AssessmentReportData | null> {
+  try {
+    const token = localStorage.getItem("token");
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
+
+    const response = await fetch(
+      `${baseUrl}/api/assessments/${assessmentId}/report`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      }
+    );
+
+    if (!response.ok) {
+      console.warn(`Assessment report API returned ${response.status}`);
+      return null;
+    }
+
+    const json = await response.json();
+    return json.data || json;
+  } catch (error) {
+    console.error("Error fetching assessment report data:", error);
+    return null;
   }
 }

@@ -202,7 +202,12 @@ export function AssessmentProgressCard() {
           onClick={async () => {
             setIsDownloading(true);
             try {
-              await generateAssessmentPDF(<NexaReport />);
+              // Fetch dynamic data from API, fallback to undefined (which uses default mock data)
+              const { getAssessmentReportData } = await import("@/services/assessmentProgressService");
+              const reportData = await getAssessmentReportData(user?.id || "current");
+
+              // NexaReport uses defaultMockData when data prop is undefined
+              await generateAssessmentPDF(<NexaReport data={reportData || undefined} />);
             } catch (error) {
               console.error(error);
             } finally {

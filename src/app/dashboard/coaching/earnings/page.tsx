@@ -46,6 +46,7 @@ export default function EarningsPage() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState("all");
   const [commissionRate, setCommissionRate] = useState<number>(20); // Default 20% fallback
+  const [isExporting, setIsExporting] = useState(false);
 
   // Pagination State
   const [page, setPage] = useState(1);
@@ -153,7 +154,7 @@ export default function EarningsPage() {
   const totalPages = Math.ceil(earningsHistory.length / limit);
   const paginatedHistory = earningsHistory.slice((page - 1) * limit, page * limit);
 
-  const [isExporting, setIsExporting] = useState(false);
+
 
   const handleExport = async () => {
     try {
