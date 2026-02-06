@@ -2,36 +2,117 @@ import React from "react";
 import { Glasses, Settings, Calculator, Puzzle, Timer } from "lucide-react";
 
 // Mock Data for Visual Dev
-const mockData = {
-  candidateName: "Maria Paula Mendoza",
-  date: "Septiembre 23/2025",
-  executiveSummary:
-    "Maria Paula shows two exceptional cognitive markers: Detection of Characteristics = 96% (Exceptional) and Spatial Orientation / Visualization = Exceptional (78%). Her PCA shows high Influence, a service orientation, a strong concern for quality, and low Dominance. In simple terms: she has a keen eye for detail, can visualize in 2D/3D with ease, and relates very well to others — making her an ideal candidate for Architecture, Industrial Design, and programs that combine design with technical precision.",
-  steps: [
-    {
-      number: 1,
-      text: "Translate LIA and PCA results into clear study recommendations.",
-    },
-    {
-      number: 2,
-      text: "Prioritize majors (Top-10) with cognitive behavioral justification.",
-    },
-    {
-      number: 3,
-      text: "Provide an exploration and decision plan (0–12 months) for a student.",
-    },
-    {
-      number: 4,
-      text: "Deliver an immediate operational plan (8 weeks) and tracking KPIs.",
-    },
-    {
-      number: 5,
-      text: "Map recommended universities and facilitate immediate application actions.",
-    },
+import { AssessmentReportData } from "@/types/assessmentReport";
+
+const defaultMockData: AssessmentReportData = {
+  candidate: {
+    name: "Maria Paula Mendoza",
+    assessmentDate: "September 23/2025",
+    profileImage: "/report/1.jpeg"
+  },
+  executiveSummary: {
+    text: "Maria Paula shows two exceptional cognitive markers: Detection of Characteristics = 96% (Exceptional) and Spatial Orientation / Visualization = Exceptional (78%). Her PCA shows high Influence, a service orientation, a strong concern for quality, and low Dominance. In simple terms: she has a keen eye for detail, can visualize in 2D/3D with ease, and relates very well to others — making her an ideal candidate for Architecture, Industrial Design, and programs that combine design with technical precision.",
+    summaryTitle: "Influence / Technical precision",
+    steps: [
+      { number: 1, text: "Translate LIA and PCA results into clear study recommendations." },
+      { number: 2, text: "Prioritize majors (Top-10) with cognitive behavioral justification." },
+      { number: 3, text: "Provide an exploration and decision plan (0–12 months) for a student." },
+      { number: 4, text: "Deliver an immediate operational plan (8 weeks) and tracking KPIs." },
+      { number: 5, text: "Map recommended universities and facilitate immediate application actions." },
+    ]
+  },
+  liaSubtests: [
+    { title: "Detection of characteristics:", description: "Identifies errors, patterns and details; agile learning and precise execution — key for quality control and project review.", iconType: "glasses" },
+    { title: "Reasoning:", description: "verbal fluency and logical analysis: Useful for argumentation, problem solving and presenting proposals.", iconType: "gears" },
+    { title: "Numerical speed and accuracy:", description: "Agility for practical calculations; sufficient for basic technical tasks.", iconType: "math" },
+    { title: "Working memory:", description: "Retention and manipulation of information; for Sara it is adequate, and it is advisable to support it with tools.", iconType: "puzzle" },
+    { title: "Orientation / General visualization:", description: "Mental rotation, interpretation of plans and 3D prototyping — a differentiating ability for spatially oriented majors.", iconType: "timer" },
   ],
+  integratedDiagnosis: {
+    chartData: [
+      { label: "F", value: 14, color: "#1a1a2e" },
+      { label: "A", value: 35, color: "#0f172a" },
+      { label: "B", value: 25, color: "#006d77" },
+      { label: "C", value: 9, color: "#99e2e8" },
+      { label: "D", value: 17, color: "#22d3ee" },
+    ],
+    legend: [
+      { label: "A", title: "Strengths:", description: "She quickly detects details and communicates very well with others.", bg: "#0f172a", borderColor: "#0f172a" },
+      { label: "B", title: "Opportunities:", description: "Her reasoning and verbal skills are good and can grow even more.", bg: "#006d77", borderColor: "#008996" },
+      { label: "C", title: "Stable Areas:", description: "Her memory works well when information is clear and organized.", bg: "#99e2e8", borderColor: "#22d3ee" },
+      { label: "D", title: "Risks:", description: "She may struggle to make firm decisions in difficult situations.", bg: "#22d3ee", borderColor: "#22d3ee" },
+      { label: "F", title: "Needs:", description: "She benefits from checklists and step-by-step tasks to stay on track.", bg: "#1a1a2e", borderColor: "#008996" },
+    ],
+    majors: {
+      perfectFit: [
+        { id: 1, title: "Architecture", description: "Spatial visualization + portfolio from the start; client interaction." },
+        { id: 2, title: "Industrial Design / Product Design", description: "3D prototyping, testing and product improvement." },
+        { id: 3, title: "Civil Engineering", extra: "(project design and supervision)", description: "plan reading, site control and technical management." }
+      ],
+      highlyRecommended: [
+        { id: 4, title: "Interior Architecture / Interior Design" },
+        { id: 5, title: "Mechanical Engineering", extra: "(design and prototyping)" },
+        { id: 6, title: "Materials Engineering / Materials Science" }
+      ],
+      complementary: [
+        "Naval Engineering / Naval Architecture",
+        "UX/UI with physical prototyping / 3D product focus",
+        "Technical Quality Control / Quality Engineering"
+      ]
+    }
+  },
+  notRecommended: [
+    { category: "Programs that rely exclusively on repetitive routines with little visualization", reason: "(e.g., some pure branches of accounting without a technical component)." },
+    { category: "Programs that demand high dominance or aggressive sales without support", reason: "(due to low dominance)." }
+  ],
+  explorationPlan: [
+    { phase: "Month 0–1", title: "Quick confirmation", activities: "Intensive SketchUp, AutoCAD course (20–40 h); drawing workshop (10–20 h); 1-day job-shadowing at a studio/workshop.", kpiLabel: "KPI:", kpi: "enjoy at least 2 of the 3 activities." },
+    { phase: "Month 1–3", title: "Minimum portfolio", activities: "Create 2 projects, (A) plan + elevation + 3D view of a space; (B) documented object/prototype.", kpiLabel: "Request feedback:", kpi: "from 2 professionals" },
+    { phase: "Month 3–6", title: "Technical validation", activities: "Intermediate courses (BIM / SolidWorks); micro-internship 2–4 weeks.", kpiLabel: "KPI:", kpi: "improved portfolio and positive feedback from 1 professional." },
+    { phase: "Month 6–12", title: "Decision and admission", activities: "Select 2–4 programs (1–2 reach schools, 1–2 safe options). Prepare final portfolio, letters and admission tests." }
+  ],
+  operationalPlan: [
+    { phase: "Week 1–2", text: "Enroll in a basic CAD course; define the portfolio project" },
+    { phase: "Week 3–4", text: "Execute the first draft; feedback session with a mentor." },
+    { phase: "Week 5–6", text: "3D modeling; second feedback and adjustment." },
+    { phase: "Week 7–8", text: "Present portfolio version 1; list target universities; prepare admission steps." }
+  ],
+  indicators: [
+    { label: "Portfolio:", text: "2 completed pieces in", bold: "3 months." },
+    { label: "Deadlines:", text: "% of deliverables submitted on time,", bold: "target ≥ 90% at 3 mo." },
+    { label: "Quality:", text: "reduction of errors found between revisions,", bold: "-20% in 3 mo." },
+    { label: "Training:", text: "", bold: "courses completed", extra: "(basic cad, intermediate bim) within", boldEnd: "6 mo." },
+    { label: "Professional feedback:", text: "", bold: "2 reviews", extra: "with recommendations implemented." },
+  ],
+  training: [
+    { label: "Technical:", text: "AutoCAD, SketchUp, Revit/basic BIM, SolidWorks or Rhino (depending on focus)." },
+    { label: "Practice:", text: "maker workshops / 3D printing / short internships." },
+    { label: "Transversal:", text: "Project management fundamentals, technical communication and presentation skills." },
+    { label: "Support:", text: "Monthly mentoring and coaching sessions focused on decisionmaking." },
+  ],
+  universityMapping: [
+    { country: "IT", code: "MIL", uni: "Politecnico di Milano", prog: "Architecture;\nProduct Design", type: "Degree / Laurea\n(3–5 years)", req: "Entrance exam /\nPortfolio", high: "Top school; strong\nprototyping labs" },
+    { country: "IT", code: "TOR", uni: "Politecnico di\nTorino", prog: "Architecture;\nProduct Design", type: "Laurea / Laurea\nMagistrale", req: "Entrance exam /\nPortfolio", high: "Technical focus with\nstrong industry\nconnections" },
+    { country: "IT", code: "VEN", uni: "IUAV Università\nluav di Venezia", prog: "Architecture;\nProduct Design", type: "Degree / Master", req: "Entrance exam /\nPortfolio", high: "Highly practical\nprograms" },
+    { country: "IT", code: "ROM", uni: "Sapienza\nUniversità di\nRoma", prog: "Architecture;\nProduct Design", type: "Degree\n/ 3+2 cycle", req: "Entrance exam /\nPortfolio", high: "Research\norientation" },
+    { country: "ES", code: "BCN", uni: "Universitat\nPolitècnica de\nCatalunya", prog: "Architecture;\nProduct Design", type: "Degree\n(4–5 years)", req: "Grade cutoff /\nPortfolio", high: "Highly practical\nprograms" },
+    { country: "ES", code: "MAD", uni: "Politecnico di\nMilano", prog: "Architecture;\nProduct Design", type: "Degree / Master", req: "Portfolio required", high: "Academic\nprestige" },
+    { country: "ES", code: "VLC", uni: "Politecnico di\nTorino", prog: "Architecture;\nProduct Design", type: "Degree", req: "Portfolio required", high: "Project-based\nlearning" },
+    { country: "CO", code: "BCN", uni: "IUAV Università\nluav di Venezia", prog: "Architecture;\nProduct Design", type: "Undergraduate\n(~10 semesters)", req: "Institutional\nadmission", high: "Applied focus\nwith ties to local\nstudios" },
+  ],
+  conclusion: {
+    text: "Maria Paula displays high potential for majors combining spatial visualization and attention to detail, and she also has interpersonal skills that facilitate teamwork and project presentation. Prioritizing Architecture, Industrial Design and Civil Engineering is the main recommendation, with an exploration-and-portfolio plan as the immediate path.",
+    nextSteps: [
+      "Start the 8-week plan (enroll in a CAD course + portfolio project).",
+      "Select 4 target universities (2 aspirational, 2 safe) and verify admission calls/deadlines).",
+      "Request 2 portfolio reviews by professionals (mentors) during months 1–3.",
+      "Schedule decision-making coaching (3 sessions) to address low dominance."
+    ]
+  }
 };
 
-export default function NexaValuesPage() {
+export const NexaReport = ({ data = defaultMockData }: { data?: AssessmentReportData }) => {
+
   return (
     <div className="min-h-screen bg-gray-100 py-8 flex flex-col items-center gap-8 print:py-0 print:gap-0 print:bg-white">
       <style type="text/css" media="print">
@@ -77,7 +158,7 @@ export default function NexaValuesPage() {
             {/* Date - Top Right */}
             <div className="absolute top-[12mm] right-10 z-10">
               <span className="text-sm font-bold text-slate-700 tracking-wide font-montserrat">
-                September 23/2025
+                {data.candidate.assessmentDate}
               </span>
             </div>
 
@@ -85,7 +166,7 @@ export default function NexaValuesPage() {
             {/* Name - Centered in Teal Bar */}
             <div className="absolute top-[22mm] h-[40%] right-0 w-[60%] flex items-center justify-start pl-4 z-10">
               <h1 className="text-white font-bold text-3xl tracking-wide whitespace-nowrap font-montserrat">
-                Maria Paula Mendoza
+                {data.candidate.name}
               </h1>
             </div>
           </div>
@@ -110,13 +191,7 @@ export default function NexaValuesPage() {
             <div className="w-[40%] flex flex-col items-center mt-[-3mm] pr-2">
               <div className="bg-[#eff6ff] rounded-[2.5rem] p-6 relative overflow-hidden shadow-sm border border-slate-100">
                 <p className="text-[rgb(0,59,89)] font-bold text-[1.1rem] leading-tight mb-5 text-left font-roboto tracking-tight">
-                  This report practically integrates the results of Sara
-                  Decarlini’s Work Intelligence Assessment (LIA) and Personal
-                  Competences Analysis (PCA) to guide her vocational decision.
-                  The structure provides a clear presentation and an appropriate
-                  level of detail, with a practical focus designed to support
-                  students deciding whether to enter undergraduate programs or
-                  technical study tracks.
+                  This report practically integrates the results of {data.candidate.name}’s Work Intelligence Assessment (LIA) and Personal Competences Analysis (PCA) to guide her vocational decision. The structure provides a clear presentation and an appropriate level of detail, with a practical focus designed to support students deciding whether to enter undergraduate programs or technical study tracks.
                 </p>
               </div>
 
@@ -125,7 +200,7 @@ export default function NexaValuesPage() {
                 <div className="w-[300px] h-[300px] relative">
                   <div className="w-full h-full   overflow-hidden bg-[#fcd34d] flex items-center justify-center">
                     <img
-                      src="/report/1.jpeg"
+                      src={data.candidate.profileImage || "/report/1.jpeg"}
                       className="w-[160%] max-w-none ml-[-5%] mt-[10%]"
                       alt="Profile Illustration"
                     />
@@ -135,7 +210,7 @@ export default function NexaValuesPage() {
                 {/* Pill */}
                 <div className="mt-[-54px] z-10 bg-[#008996] rounded-full py-2.5 px-10 text-center shadow-none ">
                   <span className="text-white font-bold text-xs tracking-wide font-antonio">
-                    Influence / Technical precision
+                    {data.executiveSummary.summaryTitle}
                   </span>
                 </div>
               </div>
@@ -147,11 +222,11 @@ export default function NexaValuesPage() {
                 Executive Summary
               </h2>
               <p className="text-[#1e293b] text-md leading-6 mb-12 text-justify font-medium font-roboto">
-                {mockData.executiveSummary}
+                {data.executiveSummary.text}
               </p>
 
               <div className="space-y-8">
-                {mockData.steps.map((step) => (
+                {data.executiveSummary.steps.map((step) => (
                   <div
                     key={step.number}
                     className="flex flex-row items-center gap-2"
@@ -203,137 +278,84 @@ export default function NexaValuesPage() {
           </p>
 
           <div className="flex flex-col gap-5">
-            {[
-              {
-                text: (
-                  <>
-                    <span className="font-bold">
-                      Detection of characteristics:
-                    </span>{" "}
-                    Identifies errors, patterns and details; agile learning and
-                    precise execution — key for quality control and project
-                    review.
-                  </>
-                ),
-                icon: (
-                  <Glasses
-                    size={40}
-                    className="text-[#008996]"
-                    strokeWidth={2}
-                  />
-                ),
-              },
-              {
-                text: (
-                  <>
-                    <span className="font-bold">Reasoning:</span> verbal fluency
-                    and logical analysis: Useful for argumentation, problem
-                    solving and presenting proposals.
-                  </>
-                ),
-                icon: (
-                  <div className="relative w-10 h-10">
-                    <Settings
-                      size={28}
-                      className="text-[#008996] absolute top-[-2px] left-[-2px]"
-                      strokeWidth={2}
-                    />
-                    <Settings
-                      size={22}
-                      className="text-[#008996] absolute bottom-[-2px] right-[-2px]"
-                      strokeWidth={2}
-                    />
-                  </div>
-                ),
-              },
-              {
-                text: (
-                  <>
-                    <span className="font-bold">
-                      Numerical speed and accuracy:
-                    </span>{" "}
-                    Agility for practical calculations; sufficient for basic
-                    technical tasks.
-                  </>
-                ),
-                icon: (
-                  <div className="text-[#008996] font-bold text-3xl leading-none flex flex-col items-center justify-center gap-1">
-                    <div className="flex gap-2">
-                      <span>+</span>
-                      <span>-</span>
+            {data.liaSubtests.map((item, i) => {
+              // Map icon string to Lucide component
+              let IconComponent;
+              let iconElement;
+
+              switch (item.iconType) {
+                case "glasses":
+                  IconComponent = Glasses;
+                  iconElement = <IconComponent size={40} className="text-[#008996]" strokeWidth={2} />;
+                  break;
+                case "gears":
+                  iconElement = (
+                    <div className="relative w-10 h-10">
+                      <Settings
+                        size={28}
+                        className="text-[#008996] absolute top-[-2px] left-[-2px]"
+                        strokeWidth={2}
+                      />
+                      <Settings
+                        size={22}
+                        className="text-[#008996] absolute bottom-[-2px] right-[-2px]"
+                        strokeWidth={2}
+                      />
                     </div>
-                    <div className="flex gap-2">
-                      <span>×</span>
-                      <span>÷</span>
+                  );
+                  break;
+                case "math":
+                  iconElement = (
+                    <div className="text-[#008996] font-bold text-3xl leading-none flex flex-col items-center justify-center gap-1">
+                      <div className="flex gap-2">
+                        <span>+</span>
+                        <span>-</span>
+                      </div>
+                      <div className="flex gap-2">
+                        <span>×</span>
+                        <span>÷</span>
+                      </div>
+                    </div>
+                  );
+                  break;
+                case "puzzle":
+                  iconElement = (
+                    <div className="grid grid-cols-2 gap-0.5 w-9 h-9">
+                      <Puzzle size={18} className="text-[#008996] rotate-90" strokeWidth={2} />
+                      <Puzzle size={18} className="text-[#008996] rotate-180" strokeWidth={2} />
+                      <Puzzle size={18} className="text-[#008996]" strokeWidth={2} />
+                      <Puzzle size={18} className="text-[#008996] -rotate-90" strokeWidth={2} />
+                    </div>
+                  );
+                  break;
+                case "timer":
+                  IconComponent = Timer;
+                  iconElement = <IconComponent size={40} className="text-[#008996]" strokeWidth={2} />;
+                  break;
+                default:
+                  IconComponent = Puzzle; // Default fallback
+                  iconElement = <IconComponent size={40} className="text-[#008996]" strokeWidth={2} />;
+              }
+
+              return (
+                <div
+                  key={i}
+                  className="flex flex-row items-center bg-[#f3f4f6] rounded-[100px] p-4 pr-8 gap-6 min-h-[125px]"
+                >
+                  <div className="w-24 h-24 rounded-full bg-white flex items-center justify-center shrink-0 shadow-none ml-1.5">
+                    {/* Icon Container */}
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center">
+                      {iconElement}
                     </div>
                   </div>
-                ),
-              },
-              {
-                text: (
-                  <>
-                    <span className="font-bold">Working memory:</span> Retention
-                    and manipulation of information; for Sara it is adequate,
-                    and it is advisable to support it with tools.
-                  </>
-                ),
-                icon: (
-                  <div className="grid grid-cols-2 gap-0.5 w-9 h-9">
-                    <Puzzle
-                      size={18}
-                      className="text-[#008996] rotate-90"
-                      strokeWidth={2}
-                    />
-                    <Puzzle
-                      size={18}
-                      className="text-[#008996] rotate-180"
-                      strokeWidth={2}
-                    />
-                    <Puzzle
-                      size={18}
-                      className="text-[#008996]"
-                      strokeWidth={2}
-                    />
-                    <Puzzle
-                      size={18}
-                      className="text-[#008996] -rotate-90"
-                      strokeWidth={2}
-                    />
-                  </div>
-                ),
-              },
-              {
-                text: (
-                  <>
-                    <span className="font-bold">
-                      Orientation / General visualization:
-                    </span>{" "}
-                    Mental rotation, interpretation of plans and 3D prototyping
-                    — a differentiating ability for spatially oriented majors.
-                  </>
-                ),
-                icon: (
-                  <Timer size={40} className="text-[#008996]" strokeWidth={2} />
-                ),
-              },
-            ].map((item, i) => (
-              <div
-                key={i}
-                className="flex flex-row items-center bg-[#f3f4f6] rounded-[100px] p-4 pr-8 gap-6 min-h-[125px]"
-              >
-                <div className="w-24 h-24 rounded-full bg-white flex items-center justify-center shrink-0 shadow-none ml-1.5">
-                  {/* Icon Container */}
-                  <div className="w-16 h-16 rounded-full flex items-center justify-center">
-                    {item.icon}
+                  <div className="flex flex-col flex-1">
+                    <p className="text-[rgb(0,59,89)] text-[0.95rem] leading-snug font-roboto font-medium px-1">
+                      <span className="font-bold">{item.title}</span> {item.description}
+                    </p>
                   </div>
                 </div>
-                <div className="flex flex-col flex-1">
-                  <p className="text-[rgb(0,59,89)] text-[0.95rem] leading-snug font-roboto font-medium px-1">
-                    {item.text}
-                  </p>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </div>
@@ -350,8 +372,8 @@ export default function NexaValuesPage() {
 
         {/* Header Text Row */}
         <div className="flex flex-row justify-between items-end px-10 mb-10 pt-4">
-          <h2 className="text-slate-800 text-sm font-bold font-montserrat">Maria Paula Mendoza</h2>
-          <span className="text-slate-800 text-sm font-montserrat">Septiembre 23/2025</span>
+          <h2 className="text-slate-800 text-sm font-bold font-montserrat">{data.candidate.name}</h2>
+          <span className="text-slate-800 text-sm font-montserrat">{data.candidate.assessmentDate}</span>
         </div>
 
         <div className="px-10 pb-12">
@@ -367,13 +389,7 @@ export default function NexaValuesPage() {
             {(() => {
               // Chart Data - ORDER: Starting from TOP going CLOCKWISE
               // Reference shows: 14% (dark) at top, then 35% (navy), 25% (teal), 9% (light cyan), 17% (cyan)
-              const chartData = [
-                { label: "F", value: 14, color: "#1a1a2e" },    // Dark - Needs (TOP)
-                { label: "A", value: 35, color: "#0f172a" },    // Navy - Strengths
-                { label: "B", value: 25, color: "#006d77" },    // Dark Teal - Opportunities
-                { label: "C", value: 9, color: "#99e2e8" },     // Light Cyan - Stable Areas
-                { label: "D", value: 17, color: "#22d3ee" },    // Cyan - Risks
-              ];
+              const chartData = data.integratedDiagnosis.chartData;
 
               // Calculate total to normalize
               const total = chartData.reduce((sum, item) => sum + item.value, 0);
@@ -542,43 +558,7 @@ export default function NexaValuesPage() {
 
             {/* Legend List - Compact with title and desc on same line */}
             <div className="flex flex-col flex-1 gap-0">
-              {[
-                {
-                  l: "A",
-                  title: "Strengths:",
-                  desc: "She quickly detects details and communicates very well with others.",
-                  bg: "#0f172a",
-                  borderColor: "#0f172a"
-                },
-                {
-                  l: "B",
-                  title: "Opportunities:",
-                  desc: "Her reasoning and verbal skills are good and can grow even more.",
-                  bg: "#006d77",
-                  borderColor: "#008996"
-                },
-                {
-                  l: "C",
-                  title: "Stable Areas:",
-                  desc: "Her memory works well when information is clear and organized.",
-                  bg: "#99e2e8",
-                  borderColor: "#22d3ee"
-                },
-                {
-                  l: "D",
-                  title: "Risks:",
-                  desc: "She may struggle to make firm decisions in difficult situations.",
-                  bg: "#22d3ee",
-                  borderColor: "#22d3ee"
-                },
-                {
-                  l: "F",
-                  title: "Needs:",
-                  desc: "She benefits from checklists and step-by-step tasks to stay on track.",
-                  bg: "#1a1a2e",
-                  borderColor: "#008996"
-                },
-              ].map((item, i) => (
+              {data.integratedDiagnosis.legend.map((item, i) => (
                 <div
                   key={i}
                   className="flex flex-row items-stretch py-1.5"
@@ -588,11 +568,11 @@ export default function NexaValuesPage() {
                     className="w-10 flex items-center justify-center text-white font-bold text-lg mr-3 shrink-0 rounded-[6px] self-stretch"
                     style={{ backgroundColor: item.bg, color: item.bg === "#99e2e8" ? "#006d77" : "white" }}
                   >
-                    {item.l}
+                    {item.label}
                   </div>
                   <p className="text-[13px] leading-snug self-center">
                     <span className="font-bold text-[#0f172a]">{item.title}</span>{" "}
-                    <span className="text-slate-500 font-roboto">{item.desc}</span>
+                    <span className="text-slate-500 font-roboto">{item.description}</span>
                   </p>
                 </div>
               ))}
@@ -614,15 +594,11 @@ export default function NexaValuesPage() {
                 <div className="h-[1px] bg-[#008996] flex-1"></div>
               </div>
               <ul className="space-y-1 pl-8">
-                {[
-                  { id: 1, title: "Architecture", desc: "Spatial visualization + portfolio from the start; client interaction." },
-                  { id: 2, title: "Industrial Design / Product Design", desc: "3D prototyping, testing and product improvement." },
-                  { id: 3, title: "Civil Engineering", extra: "(project design and supervision)", desc: "plan reading, site control and technical management." }
-                ].map((item) => (
+                {data.integratedDiagnosis.majors.perfectFit.map((item) => (
                   <li key={item.id} className="text-[#0f172a] text-sm font-roboto">
                     <span className="font-bold">{item.id}. {item.title}</span>
                     {item.extra && <span className="italic text-slate-500"> {item.extra}</span>}
-                    <span className="text-slate-600">: {item.desc}</span>
+                    <span className="text-slate-600">: {item.description}</span>
                   </li>
                 ))}
               </ul>
@@ -635,11 +611,7 @@ export default function NexaValuesPage() {
                 <div className="h-[1px] bg-[#008996] flex-1"></div>
               </div>
               <ul className="space-y-1 pl-8">
-                {[
-                  { id: 4, title: "Interior Architecture / Interior Design" },
-                  { id: 5, title: "Mechanical Engineering", extra: "(design and prototyping)" },
-                  { id: 6, title: "Materials Engineering / Materials Science" }
-                ].map((item) => (
+                {data.integratedDiagnosis.majors.highlyRecommended.map((item) => (
                   <li key={item.id} className="text-[#0f172a] text-sm font-roboto">
                     <span className="font-bold">{item.id}. {item.title}</span>
                     {item.extra && <span className="text-slate-500"> {item.extra}</span>}
@@ -655,11 +627,7 @@ export default function NexaValuesPage() {
                 <div className="h-[1px] bg-[#008996] flex-1"></div>
               </div>
               <ul className="space-y-1 pl-8">
-                {[
-                  "Naval Engineering / Naval Architecture",
-                  "UX/UI with physical prototyping / 3D product focus",
-                  "Technical Quality Control / Quality Engineering"
-                ].map((item, i) => (
+                {data.integratedDiagnosis.majors.complementary.map((item, i) => (
                   <li key={i} className="text-[#0f172a] text-sm font-bold font-roboto">
                     {item}
                   </li>
@@ -759,49 +727,21 @@ export default function NexaValuesPage() {
 
             {/* Timeline content */}
             <div className="flex bg-white pt-2 w-[95%]">
-              {/* Month 0-1 */}
-              <div className="flex-1 p-2 pr-3  border-slate-100 last:border-0">
-                <h4 className="font-bold text-[18px] text-[#008996] mb-1 leading-tight">Quick confirmation</h4>
-                <p className="text-[14px] text-slate-600 font-medium leading-snug mb-4">
-                  Intensive SketchUp, AutoCAD course (20–40 h); drawing workshop (10–20 h); 1-day job-shadowing at a studio/workshop.
-                </p>
-                <p className="text-[14px] text-slate-700">
-                  <span className="font-bold">KPI:</span> enjoy at least 2 of the 3 activities.
-                </p>
-              </div>
-
-              {/* Month 1-3 */}
-              <div className="flex-1 p-2 pr-3 border-slate-100 last:border-0">
-                <h4 className="font-bold text-[18px] text-[#008996] mb-1 leading-tight">Minimum portfolio</h4>
-                <p className="text-[14px] text-slate-600 font-medium leading-snug mb-4">
-                  Create 2 projects, (A) plan + elevation + 3D view of a space; (B) documented object/prototype.
-                </p>
-                <p className="text-[14px] text-slate-700">
-                  <span className="font-bold">Request feedback:</span> from 2 professionals
-                </p>
-              </div>
-
-              {/* Month 3-6 */}
-              <div className="flex-1 p-2 pr-3  border-slate-100 last:border-0">
-                <h4 className="font-bold text-[18px] text-[#008996] mb-1 leading-tight">Technical validation</h4>
-                <p className="text-[14px] text-slate-600 font-medium leading-snug mb-4">
-                  Intermediate courses (BIM / SolidWorks); micro-internship 2–4 weeks.
-                </p>
-                <p className="text-[14px] text-slate-700">
-                  <span className="font-bold">KPI:</span> improved portfolio and positive feedback from 1 professional.
-                </p>
-              </div>
-
-              {/* Month 6-12 */}
-              <div className="flex-1 p-2 pr-0">
-                <h4 className="font-bold text-[18px] text-[#008996] mb-1 leading-tight">Decision and admission</h4>
-                <p className="text-[14px] text-slate-600 font-medium leading-snug mb-4">
-                  Select 2–4 programs (1–2 reach schools, 1–2 safe options). Prepare final portfolio, letters and admission tests.
-                </p>
-                <p className="text-[14px] text-slate-700">
-                  <span className="font-bold">Plan B:</span> technical cycle or intensive courses.
-                </p>
-              </div>
+              {/* Maintain 4 fixed columns logic, or map them dynamically if len=4 */}
+              {/* Ensure we have exactly 4 items expected from API as per documentation */}
+              {data.explorationPlan.map((phase, i) => (
+                <div key={i} className={`flex-1 p-2 ${i < 3 ? 'pr-3 border-r border-slate-100' : 'pr-0'}`}>
+                  <h4 className="font-bold text-[18px] text-[#008996] mb-1 leading-tight">{phase.title}</h4>
+                  <p className="text-[14px] text-slate-600 font-medium leading-snug mb-4">
+                    {phase.activities}
+                  </p>
+                  {(phase.kpi || phase.kpiLabel) && (
+                    <p className="text-[14px] text-slate-700">
+                      <span className="font-bold">{phase.kpiLabel || "KPI:"}</span> {phase.kpi}
+                    </p>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
 
@@ -852,33 +792,13 @@ export default function NexaValuesPage() {
 
             {/* Timeline content */}
             <div className="flex bg-white pt-2 w-[95%]">
-              {/* Week 1-2 */}
-              <div className="flex-1 p-2 pr-3 border-slate-100 last:border-0">
-                <p className="text-[14px] text-slate-600 leading-snug font-medium mb-4">
-                  Enroll in a basic CAD course; define the portfolio project
-                </p>
-              </div>
-
-              {/* Week 3-4 */}
-              <div className="flex-1 p-2 pr-3  border-slate-100 last:border-0">
-                <p className="text-[14px] text-slate-600 leading-snug font-medium mb-4">
-                  Execute the first draft; feedback session with a mentor.
-                </p>
-              </div>
-
-              {/* Week 5-6 */}
-              <div className="flex-1 p-2 pr-3  border-slate-100 last:border-0">
-                <p className="text-[14px] text-slate-600 leading-snug font-medium mb-4">
-                  3D modeling; second feedback and adjustment.
-                </p>
-              </div>
-
-              {/* Week 7-8 */}
-              <div className="flex-1 p-2 pr-0">
-                <p className="text-[14px] text-slate-600 leading-snug font-medium mb-4">
-                  Present portfolio version 1; list target universities; prepare admission steps.
-                </p>
-              </div>
+              {data.operationalPlan.map((phase, i) => (
+                <div key={i} className={`flex-1 p-2 ${i < 3 ? 'pr-3 border-r border-slate-100' : 'pr-0'}`}>
+                  <p className="text-[14px] text-slate-600 leading-snug font-medium mb-4">
+                    {phase.text}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -903,8 +823,8 @@ export default function NexaValuesPage() {
         <div className="px-10 pb-6 pt-12 flex-1 relative">
           {/* Header */}
           <div className="flex justify-between items-center mb-10">
-            <span className=" text-sm font-roboto">Maria Paula Mendoza</span>
-            <span className=" text-sm font-roboto  tracking-wide">Septiembre 23/2025</span>
+            <span className=" text-sm font-roboto">{data.candidate.name}</span>
+            <span className=" text-sm font-roboto  tracking-wide">{data.candidate.assessmentDate}</span>
           </div>
 
           {/* Section 7: Indicators and tracking */}
@@ -953,13 +873,7 @@ export default function NexaValuesPage() {
             <p className="text-[#0f172a] text-[15px] mb-8 font-montserrat font-bold tracking-tight pl-0.5 relative z-10">KPIs</p>
 
             <div className="space-y-4 w-[78%]">
-              {[
-                { label: "Portfolio:", text: "2 completed pieces in", bold: "3 months." },
-                { label: "Deadlines:", text: "% of deliverables submitted on time,", bold: "target ≥ 90% at 3 mo." },
-                { label: "Quality:", text: "reduction of errors found between revisions,", bold: "-20% in 3 mo." },
-                { label: "Training:", text: "", bold: "courses completed", extra: "(basic cad, intermediate bim) within", boldEnd: "6 mo." },
-                { label: "Professional feedback:", text: "", bold: "2 reviews", extra: "with recommendations implemented." },
-              ].map((item, i) => (
+              {data.indicators.map((item, i) => (
                 <div key={i} className="bg-[#f1f5f9] rounded-full py-2.5 px-6 flex items-center text-[13px] text-slate-700 font-roboto leading-none relative z-0">
                   <span className="font-bold text-[#0f172a] mr-1">{item.label}</span>
                   {item.text && <span className="mr-1">{item.text}</span>}
@@ -1015,12 +929,7 @@ export default function NexaValuesPage() {
             </h2>
 
             <div className="space-y-4 w-[75%]">
-              {[
-                { label: "Technical:", text: "AutoCAD, SketchUp, Revit/basic BIM, SolidWorks or Rhino (depending on focus)." },
-                { label: "Practice:", text: "maker workshops / 3D printing / short internships." },
-                { label: "Transversal:", text: "Project management fundamentals, technical communication and presentation skills." },
-                { label: "Support:", text: "Monthly mentoring and coaching sessions focused on decisionmaking." },
-              ].map((item, i) => (
+              {data.training.map((item, i) => (
                 <div key={i} className="bg-[#f1f5f9] rounded-[24px] py-4 px-6 text-[13px] text-slate-700 font-roboto leading-snug relative z-0">
                   <span className="font-bold text-[#0f172a] block mb-0.5">{item.label}</span>
                   <span>{item.text}</span>
@@ -1052,8 +961,8 @@ export default function NexaValuesPage() {
         <div className="px-10 pb-6 pt-12 flex-1 relative">
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
-            <span className=" text-sm font-roboto">Maria Paula Mendoza</span>
-            <span className=" text-sm font-roboto tracking-wide">Septiembre 23/2025</span>
+            <span className=" text-sm font-roboto">{data.candidate.name}</span>
+            <span className=" text-sm font-roboto tracking-wide">{data.candidate.assessmentDate}</span>
           </div>
 
           {/* Title */}
@@ -1079,40 +988,7 @@ export default function NexaValuesPage() {
 
             {/* Table Body */}
             <div className="flex flex-col gap-1">
-              {[
-                {
-                  country: "IT", code: "MIL", uni: "Politecnico di Milano", prog: "Architecture;\nProduct Design",
-                  type: "Degree / Laurea\n(3–5 years)", req: "Entrance exam /\nPortfolio", high: "Top school; strong\nprototyping labs"
-                },
-                {
-                  country: "IT", code: "TOR", uni: "Politecnico di\nTorino", prog: "Architecture;\nProduct Design",
-                  type: "Laurea / Laurea\nMagistrale", req: "Entrance exam /\nPortfolio", high: "Technical focus with\nstrong industry\nconnections"
-                },
-                {
-                  country: "IT", code: "VEN", uni: "IUAV Università\nluav di Venezia", prog: "Architecture;\nProduct Design",
-                  type: "Degree / Master", req: "Entrance exam /\nPortfolio", high: "Highly practical\nprograms"
-                },
-                {
-                  country: "IT", code: "ROM", uni: "Sapienza\nUniversità di\nRoma", prog: "Architecture;\nProduct Design",
-                  type: "Degree\n/ 3+2 cycle", req: "Entrance exam /\nPortfolio", high: "Research\norientation"
-                },
-                {
-                  country: "ES", code: "BCN", uni: "Universitat\nPolitècnica de\nCatalunya", prog: "Architecture;\nProduct Design",
-                  type: "Degree\n(4–5 years)", req: "Grade cutoff /\nPortfolio", high: "Highly practical\nprograms"
-                },
-                {
-                  country: "ES", code: "MAD", uni: "Politecnico di\nMilano", prog: "Architecture;\nProduct Design",
-                  type: "Degree / Master", req: "Portfolio required", high: "Academic\nprestige"
-                },
-                {
-                  country: "ES", code: "VLC", uni: "Politecnico di\nTorino", prog: "Architecture;\nProduct Design",
-                  type: "Degree", req: "Portfolio required", high: "Project-based\nlearning"
-                },
-                {
-                  country: "CO", code: "BCN", uni: "IUAV Università\nluav di Venezia", prog: "Architecture;\nProduct Design",
-                  type: "Undergraduate\n(~10 semesters)", req: "Institutional\nadmission", high: "Applied focus\nwith ties to local\nstudios"
-                },
-              ].map((row, i) => (
+              {data.universityMapping.map((row, i) => (
                 <div key={i} className="grid grid-cols-[0.8fr_1.8fr_1.8fr_1.4fr_1.6fr_1.6fr] gap-1 min-h-[50px]">
                   {/* Location Cell */}
                   <div className="bg-[#f8fafc] flex flex-row items-center justify-center gap-2 p-1 rounded-sm">
@@ -1200,8 +1076,8 @@ export default function NexaValuesPage() {
         <div className="px-10 pb-6 pt-12 flex-1 relative">
           {/* Header */}
           <div className="flex justify-between items-center mb-10">
-            <span className=" text-sm font-roboto">Maria Paula Mendoza</span>
-            <span className=" text-sm font-roboto tracking-wide">Septiembre 23/2025</span>
+            <span className=" text-sm font-roboto">{data.candidate.name}</span>
+            <span className=" text-sm font-roboto tracking-wide">{data.candidate.assessmentDate}</span>
           </div>
 
           {/* Title */}
@@ -1213,10 +1089,7 @@ export default function NexaValuesPage() {
           <div className="mb-6">
             <h3 className="text-[#008996] text-[18px] font-bold mb-2 font-montserrat">Conclusion:</h3>
             <p className="text-[#475569] text-[14px] font-roboto leading-snug text-justify">
-              Maria Paula displays high potential for majors combining spatial visualization and attention to detail,
-              and she also has interpersonal skills that facilitate teamwork and project presentation. Prioritizing
-              Architecture, Industrial Design and Civil Engineering is the main recommendation, with an
-              exploration-and-portfolio plan as the immediate path.
+              {data.conclusion.text}
             </p>
           </div>
 
@@ -1224,10 +1097,9 @@ export default function NexaValuesPage() {
           <div className="mb-6">
             <h3 className="text-[#008996] text-[18px] font-bold mb-2 font-montserrat">Immediate operational next steps suggested:</h3>
             <ol className="list-decimal pl-5 text-[#475569] text-[14px] font-roboto leading-snug space-y-1">
-              <li>Start the 8-week plan (enroll in a CAD course + portfolio project).</li>
-              <li>Select 4 target universities (2 aspirational, 2 safe) and verify admission calls/deadlines).</li>
-              <li>Request 2 portfolio reviews by professionals (mentors) during months 1–3.</li>
-              <li>Schedule decision-making coaching (3 sessions) to address low dominance.</li>
+              {data.conclusion.nextSteps.map((step, i) => (
+                <li key={i}>{step}</li>
+              ))}
             </ol>
           </div>
 
@@ -1357,4 +1229,8 @@ export default function NexaValuesPage() {
 
     </div>
   );
+}
+
+export default function Page() {
+  return <NexaReport />;
 }

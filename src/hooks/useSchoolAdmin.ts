@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getSchoolAdminStats,
   getStudents,
+  getStudent,
   inviteStudent,
   bulkInviteStudents,
   resendStudentInvite,
@@ -64,6 +65,15 @@ export function useStudents(params: {
     queryKey: schoolAdminKeys.studentList(params),
     queryFn: () => getStudents(params),
     staleTime: 1000 * 60 * 2, // 2 minutes
+  });
+}
+
+export function useStudent(studentId: string) {
+  return useQuery({
+    queryKey: [...schoolAdminKeys.students(), "detail", studentId],
+    queryFn: () => getStudent(studentId),
+    enabled: !!studentId,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
 

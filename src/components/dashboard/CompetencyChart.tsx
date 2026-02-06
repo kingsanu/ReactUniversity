@@ -40,10 +40,10 @@ export function CompetencyChart() {
               const circumference = 2 * Math.PI * 80;
               const strokeDasharray = (item.percentage / 100) * circumference;
               const strokeDashoffset = circumference - strokeDasharray;
-              
+
               return (
                 <motion.circle
-                  key={item.name}
+                  key={`${item.name}-${index}`}
                   cx="96"
                   cy="96"
                   r="80"
@@ -66,8 +66,8 @@ export function CompetencyChart() {
 
         {/* Legend */}
         <div className="space-y-3" role="list">
-          {competencyData.map((item) => (
-            <div key={item.name} className="flex items-center space-x-3" role="listitem">
+          {competencyData.map((item, index) => (
+            <div key={`${item.name}-${index}`} className="flex items-center space-x-3" role="listitem">
               <div
                 className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: item.color }}

@@ -52,7 +52,7 @@ export default function LoginPage() {
   const { setUser } = useGlobalStore();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirect") || "/dashboard";
+  const defaultRedirect = searchParams.get("redirect") || "/dashboard";
 
   // submit handler
   const onSubmit = async (data: LoginFormData) => {
@@ -79,6 +79,18 @@ export default function LoginPage() {
         import("@/utils/testJWTDecoding").then(({ testJWTDecoding }) => {
           testJWTDecoding();
         });
+      }
+
+      // Role-based redirect: Different roles go to their respective dashboards
+      const normalizedRole = (roleName || "").toLowerCase();
+      let redirectTo = defaultRedirect;
+
+      if (normalizedRole.includes("super") || normalizedRole === "superadmin" || normalizedRole === "super_admin" || normalizedRole === "admin") {
+        // Super admin - redirect to admin dashboard
+        redirectTo = "/dashboard/admin";
+      } else if (normalizedRole.includes("school") || normalizedRole === "schooladmin" || normalizedRole === "school_admin") {
+        // School admin - redirect to school admin dashboard
+        redirectTo = "/school-admin";
       }
 
       router.push(redirectTo);
@@ -225,7 +237,7 @@ export default function LoginPage() {
                             className={cn(
                               "h-12 text-base bg-white/50 backdrop-blur-sm border-gray-200/50 focus:border-indigo-500 focus:ring-indigo-500/20",
                               errors.email &&
-                                "border-red-300 focus:border-red-500 focus:ring-red-500/20"
+                              "border-red-300 focus:border-red-500 focus:ring-red-500/20"
                             )}
                           />
                         </FormControl>
@@ -264,7 +276,7 @@ export default function LoginPage() {
                               className={cn(
                                 "h-12 text-base bg-white/50 backdrop-blur-sm border-gray-200/50 focus:border-indigo-500 focus:ring-indigo-500/20 pr-12",
                                 errors.password &&
-                                  "border-red-300 focus:border-red-500 focus:ring-red-500/20"
+                                "border-red-300 focus:border-red-500 focus:ring-red-500/20"
                               )}
                             />
                           </FormControl>

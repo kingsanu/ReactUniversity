@@ -121,6 +121,20 @@ export async function getStudents(params: {
   }
 }
 
+export async function getStudent(studentId: string): Promise<Student> {
+  const response = await fetch(
+    buildUrl(`/api/v1/school-admin/students/${studentId}`),
+    { headers: getHeaders() }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch student");
+  }
+
+  const json = await response.json();
+  return json.data || json;
+}
+
 export async function inviteStudent(
   data: StudentInvitePayload
 ): Promise<{ success: boolean; message: string; student?: Student }> {

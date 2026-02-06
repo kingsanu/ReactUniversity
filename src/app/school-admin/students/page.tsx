@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
+  DialogClose,
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -55,10 +58,14 @@ import { StudentStatus } from "@/types/student";
 
 export default function StudentsPage() {
   const { t } = useTranslation();
+  const router = useRouter();
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [page, setPage] = useState(1);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteName, setDeleteName] = useState("");
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const limit = 10;
 
   const { data: students, isLoading, refetch } = useStudents({
@@ -82,14 +89,25 @@ export default function StudentsPage() {
     }
   };
 
-  const handleRemoveStudent = async (studentId: string, studentName: string) => {
-    if (!confirm(`${t("schoolAdmin.students.confirmRemove", "Are you sure you want to remove")} ${studentName}?`)) return;
+  const confirmRemoveStudent = (studentId: string, studentName: string) => {
+    setDeleteId(studentId);
+    setDeleteName(studentName);
+    setIsDeleteOpen(true);
+  };
+
+  const handleRemoveStudent = async () => {
+    if (!deleteId) return;
     try {
-      await removeStudent.mutateAsync(studentId);
+      await removeStudent.mutateAsync(deleteId);
       toast.success(t("schoolAdmin.students.removeSuccess", "Student removed successfully"));
+      setIsDeleteOpen(false);
     } catch (error) {
       toast.error(t("schoolAdmin.students.removeError", "Failed to remove student"));
     }
+  };
+
+  const handleViewDetails = (studentId: string) => {
+    router.push(`/school-admin/students/${studentId}`);
   };
 
   const getStatusBadge = (status: StudentStatus) => {
@@ -296,7 +314,7 @@ export default function StudentsPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleViewDetails(student.id)}>
                             <Eye className="mr-2 h-4 w-4" />
                             {t("schoolAdmin.students.actions.viewDetails", "View Details")}
                           </DropdownMenuItem>
@@ -307,8 +325,11 @@ export default function StudentsPage() {
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuItem
-                            className="text-red-600"
-                            onClick={() => handleRemoveStudent(student.id, student.name)}
+                            className="text-red-600 w-full cursor-pointer"
+                            onSelect={(e) => {
+                              e.preventDefault();
+                              confirmRemoveStudent(student.id, student.name);
+                            }}
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
                             {t("schoolAdmin.students.actions.removeStudent", "Remove Student")}
@@ -352,6 +373,25 @@ export default function StudentsPage() {
             </div>
           )}
         </motion.div>
+
+        <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{t("schoolAdmin.students.deleteTitle", "Delete Student")}</DialogTitle>
+              <DialogDescription>
+                {t("schoolAdmin.students.deleteConfirm", "Are you sure you want to delete")} <span className="font-semibold text-gray-900">{deleteName}</span>? {t("schoolAdmin.students.deleteWarning", "This action cannot be undone.")}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline">{t("common.cancel", "Cancel")}</Button>
+              </DialogClose>
+              <Button variant="destructive" onClick={handleRemoveStudent}>
+                {t("common.delete", "Delete")}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

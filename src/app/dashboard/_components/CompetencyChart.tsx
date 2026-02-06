@@ -42,9 +42,9 @@ export function CompetencyChart({ className }: CompetencyChartProps) {
         <div className="flex-1">
           <div className="relative w-64 h-64 mx-auto">
             {/* SVG Doughnut Chart with accessibility */}
-            <svg 
-              width="256" 
-              height="256" 
+            <svg
+              width="256"
+              height="256"
               className="transform -rotate-90"
               role="img"
               aria-labelledby="chart-title chart-desc"
@@ -76,7 +76,7 @@ export function CompetencyChart({ className }: CompetencyChartProps) {
 
                 return (
                   <motion.circle
-                    key={category.name}
+                    key={`${category.name}-${index}`}
                     cx="128"
                     cy="128"
                     r="100"
@@ -106,8 +106,8 @@ export function CompetencyChart({ className }: CompetencyChartProps) {
 
         {/* Legend */}
         <ul className="space-y-4" aria-label="Chart legend">
-          {competencyPlan.categories.map((category) => (
-            <li key={category.name} className="flex items-center space-x-3">
+          {competencyPlan.categories.map((category, index) => (
+            <li key={`${category.name}-${index}`} className="flex items-center space-x-3">
               <div
                 className="w-3 h-3 rounded-full flex-shrink-0"
                 style={{ backgroundColor: category.color }}
@@ -135,4 +135,3 @@ export function CompetencyChart({ className }: CompetencyChartProps) {
     </motion.section>
   );
 }
-

@@ -9,21 +9,21 @@ export const dashboardData = {
     title: "Competency Profit & Development Plan",
     date: "Tue, 14 Nov, 2022, 11:30 AM",
     categories: [
-      { name: "Leadership", percentage: 54, color: "#3B82F6", trend: "up" },
+      { name: "Leadership", percentage: 25, color: "#3B82F6", trend: "up" },
       {
         name: "PCA/LIA/Interest",
         percentage: 20,
         color: "#10B981",
         trend: "up",
       },
-      { name: "Thinking", percentage: 26, color: "#EF4444", trend: "down" },
+      { name: "Thinking", percentage: 15, color: "#EF4444", trend: "down" },
       {
         name: "Technical Analytics",
-        percentage: 28,
+        percentage: 20,
         color: "#8B5CF6",
         trend: "down",
       },
-      { name: "Thinking", percentage: 26, color: "#F59E0B", trend: "down" },
+      { name: "Strategic Thinking", percentage: 20, color: "#F59E0B", trend: "down" },
     ],
   },
 

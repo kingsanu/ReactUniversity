@@ -9,7 +9,7 @@ interface AuthWrapperProps {
   children: React.ReactNode;
 }
 
-const protectedRoutes = ["/dashboard", "/subscribe"];
+const protectedRoutes = ["/dashboard", "/subscribe", "/school-admin"];
 const authRoutes = ["/login", "/signup"];
 
 export function AuthWrapper({ children }: AuthWrapperProps) {
@@ -17,7 +17,7 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [isInitializing, setIsInitializing] = useState(true);
-  
+
   // Monitor token expiry in background - auto-logout when expired
   useTokenMonitor(5); // Warn 5 minutes before expiry
 
@@ -63,11 +63,39 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
 
     // Check if user is a student (default role for regular users)
     const userRole = user.role?.toLowerCase() || "";
+    const isSuperAdmin = userRole.includes("super") || userRole === "superadmin" || userRole === "super_admin" || userRole === "admin";
+    const isSchoolAdmin = userRole.includes("school") || userRole === "schooladmin" || userRole === "school_admin";
     const isStudent =
       !userRole ||
       userRole === "student" ||
       userRole === "user" ||
-      (!userRole.includes("admin") && !userRole.includes("coach"));
+      (!userRole.includes("admin") && !userRole.includes("coach") && !isSchoolAdmin && !isSuperAdmin);
+
+    // Super Admin Route Protection
+    // Redirect super admins to admin dashboard if they try to access student dashboard
+    if (user.isAuthenticated && isSuperAdmin) {
+      // Redirect super admins away from school-admin
+      if (pathname.startsWith("/school-admin")) {
+        router.push("/dashboard/admin");
+        return;
+      }
+    }
+
+    // School Admin Route Protection
+    // Redirect school admins away from student dashboard to their own dashboard
+    if (user.isAuthenticated && isSchoolAdmin && !isSuperAdmin) {
+      // If school admin tries to access student dashboard, redirect to school-admin
+      if (pathname.startsWith("/dashboard") && !pathname.startsWith("/dashboard/admin")) {
+        router.push("/school-admin");
+        return;
+      }
+    }
+
+    // Redirect students away from admin routes
+    if (user.isAuthenticated && !isSchoolAdmin && !isSuperAdmin && pathname.startsWith("/school-admin")) {
+      router.push("/dashboard");
+      return;
+    }
 
     // Enforce subscription for students
     // Note: subscriptionStatus can be null/undefined for new users or 'none' if never subscribed
@@ -120,9 +148,17 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
       }
     }
 
-    // If user is authenticated and trying to access auth routes, redirect to dashboard
+    // If user is authenticated and trying to access auth routes, redirect appropriately
     if (user.isAuthenticated && isAuthRoute) {
-      router.push("/dashboard");
+      // Super admins go to student dashboard by default
+      if (isSuperAdmin) {
+        router.push("/dashboard");
+      } else if (isSchoolAdmin) {
+        // School admins go to school-admin dashboard
+        router.push("/school-admin");
+      } else {
+        router.push("/dashboard");
+      }
       return;
     }
   }, [
