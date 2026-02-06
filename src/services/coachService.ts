@@ -72,9 +72,8 @@ export async function getCalendarAuthUrl(
   if (email) query.append("email", email);
   if (redirectUrl) query.append("redirectUrl", redirectUrl);
 
-  const requestUrl = `${API_BASE_URL}/api/v1/auth/${provider}/url${
-    query.toString() ? `?${query.toString()}` : ""
-  }`;
+  const requestUrl = `${API_BASE_URL}/api/v1/auth/${provider}/url${query.toString() ? `?${query.toString()}` : ""
+    }`;
 
   console.log(`[getCalendarAuthUrl] Requesting: ${requestUrl}`);
 
@@ -306,9 +305,8 @@ export async function getCoachPayouts(params?: {
   if (params?.limit) query.append("limit", params.limit.toString());
   if (params?.status) query.append("status", params.status);
 
-  const requestUrl = `${API_BASE_URL}/api/v1/coach/me/payouts${
-    query.toString() ? `?${query.toString()}` : ""
-  }`;
+  const requestUrl = `${API_BASE_URL}/api/v1/coach/me/payouts${query.toString() ? `?${query.toString()}` : ""
+    }`;
   const response = await fetch(requestUrl, {
     headers: getHeaders(),
   });
@@ -538,6 +536,16 @@ export async function updateAvailability(
   if (!response.ok) throw new Error("Failed to update availability");
   const json = await response.json();
   return json.data;
+}
+
+export async function getCoachProfile(): Promise<Coach> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/coach/me`, {
+    headers: getHeaders(),
+  });
+
+  if (!response.ok) throw new Error("Failed to fetch coach profile");
+  const json = await response.json();
+  return json.data || json;
 }
 
 export async function updateCoachProfile(data: Partial<Coach>): Promise<Coach> {
