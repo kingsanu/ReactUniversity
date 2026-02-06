@@ -177,7 +177,7 @@ export function AvailabilitySettingsTab({
     try {
       setIsConnectingCalendar(true);
       const { disconnectCalendar } = await import("@/services/coachService");
-      await disconnectCalendar(calendarConnection.provider, user?.email);
+      await disconnectCalendar(calendarConnection.provider, user?.email || undefined);
 
       setCalendarConnection({ connected: false, provider: null });
       toast.success("Calendar disconnected successfully");
@@ -317,13 +317,12 @@ export function AvailabilitySettingsTab({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Google Calendar */}
           <div
-            className={`border rounded-xl p-4 flex items-center justify-between transition-all ${
-              calendarConnection.provider === "google"
+            className={`border rounded-xl p-4 flex items-center justify-between transition-all ${calendarConnection.provider === "google"
                 ? "border-emerald-200 bg-emerald-50/30"
                 : calendarConnection.connected
                   ? "border-gray-100 opacity-50 bg-gray-50"
                   : "border-gray-200 hover:border-gray-300 bg-white"
-            }`}
+              }`}
           >
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white rounded-lg shadow-sm flex items-center justify-center border border-gray-100">
@@ -364,13 +363,12 @@ export function AvailabilitySettingsTab({
 
           {/* Outlook Calendar */}
           <div
-            className={`border rounded-xl p-4 flex items-center justify-between transition-all ${
-              calendarConnection.provider === "outlook"
+            className={`border rounded-xl p-4 flex items-center justify-between transition-all ${calendarConnection.provider === "outlook"
                 ? "border-blue-200 bg-blue-50/30"
                 : calendarConnection.connected
                   ? "border-gray-100 opacity-50 bg-gray-50"
                   : "border-gray-200 hover:border-gray-300 bg-white"
-            }`}
+              }`}
           >
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white rounded-lg shadow-sm flex items-center justify-center border border-gray-100">
@@ -415,9 +413,8 @@ export function AvailabilitySettingsTab({
         {schedule.map((day, dayIndex) => (
           <div
             key={day.day}
-            className={`flex flex-col sm:flex-row gap-4 p-4 transition-colors border-b border-gray-50 last:border-0 items-center ${
-              day.enabled ? "bg-white" : "bg-gray-50/30"
-            }`}
+            className={`flex flex-col sm:flex-row gap-4 p-4 transition-colors border-b border-gray-50 last:border-0 items-center ${day.enabled ? "bg-white" : "bg-gray-50/30"
+              }`}
           >
             <div className="flex items-center justify-between w-full sm:w-48">
               <div
