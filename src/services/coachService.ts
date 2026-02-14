@@ -17,6 +17,8 @@ import {
   CoachSlotsResponse,
 } from "../types/coach";
 
+export type { CoachesResponse };
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 // Helper to get token

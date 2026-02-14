@@ -2,7 +2,8 @@
 
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { ActionFunction } from "@/services/benchmarkService";
+
+import { IndexData } from "@/services/benchmarkService";
 import { DollarSign, Home, ShoppingBag } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
