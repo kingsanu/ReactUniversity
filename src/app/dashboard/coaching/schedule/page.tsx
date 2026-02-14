@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, Video, User, MoreHorizontal, LayoutList } from "lucide-react";
 import { CalendarView } from "./_components/CalendarView";
+import { SessionCardSkeleton } from "@/components/skeletons/SessionCardSkeleton";
 import {
   Dialog,
   DialogContent,
@@ -299,13 +300,7 @@ export default function CoachSessionsPage() {
               {isLoading ? (
                 <div className="grid gap-4">
                   {Array.from({ length: 3 }).map((_, i) => (
-                    <Card key={i} className="animate-pulse">
-                      <CardContent className="p-6">
-                        <div className="h-4 bg-gray-200 rounded w-1/3 mb-3"></div>
-                        <div className="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
-                        <div className="h-3 bg-gray-200 rounded w-1/4"></div>
-                      </CardContent>
-                    </Card>
+                    <SessionCardSkeleton key={i} />
                   ))}
                 </div>
               ) : upcomingSessions.length > 0 ? (
@@ -331,13 +326,7 @@ export default function CoachSessionsPage() {
               {isLoading ? (
                 <div className="grid gap-4">
                   {Array.from({ length: 3 }).map((_, i) => (
-                    <Card key={i} className="animate-pulse">
-                      <CardContent className="p-6">
-                        <div className="h-4 bg-gray-200 rounded w-1/3 mb-3"></div>
-                        <div className="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
-                        <div className="h-3 bg-gray-200 rounded w-1/4"></div>
-                      </CardContent>
-                    </Card>
+                    <SessionCardSkeleton key={i} />
                   ))}
                 </div>
               ) : pastSessions.length > 0 ? (

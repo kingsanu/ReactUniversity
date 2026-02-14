@@ -9,6 +9,7 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { cn } from "@/lib/utils";
 import {
@@ -138,10 +139,27 @@ export default function StudentOnboardingPage({
   // Loading State
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-indigo-600 mx-auto mb-4" />
-          <p className="text-gray-600 font-medium">Verifying invitation...</p>
+      <div className="min-h-screen flex relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-100" />
+        <div className="flex-1 flex items-center justify-center px-4 py-12 relative z-10">
+          <div className="w-full max-w-md relative bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/40">
+            <div className="text-center mb-8 flex flex-col items-center">
+              <Skeleton className="w-16 h-16 rounded-2xl mb-6 rotate-12" />
+              <Skeleton className="h-8 w-64 mb-2" />
+              <Skeleton className="h-4 w-80" />
+            </div>
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <Skeleton className="h-5 w-32" />
+                <Skeleton className="h-12 w-full rounded-xl" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-5 w-40" />
+                <Skeleton className="h-12 w-full rounded-xl" />
+              </div>
+              <Skeleton className="h-12 w-full rounded-xl mt-8" />
+            </div>
+          </div>
         </div>
       </div>
     );

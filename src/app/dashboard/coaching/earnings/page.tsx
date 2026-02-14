@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import {
   Card,
 } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -354,14 +355,14 @@ export default function EarningsPage() {
 function LoadingState() {
   return (
     <div className="min-h-screen bg-gray-50/50 p-6 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-8 animate-pulse">
-        <div className="h-10 bg-gray-200 rounded-xl w-1/3"></div>
+      <div className="max-w-7xl mx-auto space-y-8">
+        <Skeleton className="h-10 w-1/3 rounded-xl" />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-40 bg-gray-200 rounded-3xl"></div>
+            <Skeleton key={i} className="h-40 rounded-3xl" />
           ))}
         </div>
-        <div className="h-96 bg-gray-200 rounded-3xl"></div>
+        <Skeleton className="h-96 rounded-3xl" />
       </div>
     </div>
   );

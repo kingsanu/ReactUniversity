@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import {
   EnvelopeIcon,
@@ -19,7 +19,7 @@ import {
   resendInvitationLink,
   sendBulkEmailInvitations,
 } from "@/services/evaluationService";
-import i18n from '@/lib/i18n';
+import i18n from "@/lib/i18n";
 
 interface EvaluationInvitationsProps {
   sessionId: string;
@@ -88,7 +88,7 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
   >([]);
   const [selectedEvaluators, setSelectedEvaluators] = useState<string[]>([]);
   const [customTemplate, setCustomTemplate] = useState<InvitationTemplate>(
-    defaultTemplates.parent
+    defaultTemplates.parent,
   );
   const [selectedGroup, setSelectedGroup] = useState<string>("all");
   const [loading, setLoading] = useState(true);
@@ -107,7 +107,7 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
     }>;
   } | null>(null);
   const [resendingEmails, setResendingEmails] = useState<Set<string>>(
-    new Set()
+    new Set(),
   );
 
   useEffect(() => {
@@ -157,7 +157,7 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
   const getFilteredEvaluators = () => {
     if (selectedGroup === "all") return evaluators;
     return evaluators.filter(
-      (evaluator) => evaluator.groupType === selectedGroup
+      (evaluator) => evaluator.groupType === selectedGroup,
     );
   };
 
@@ -181,17 +181,17 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
   const getStatusText = (status: string) => {
     switch (status) {
       case "pending":
-        return i18n.t('evaluation.status.notSent');
+        return i18n.t("evaluation.status.notSent");
       case "sent":
-        return i18n.t('evaluation.status.sent');
+        return i18n.t("evaluation.status.sent");
       case "opened":
-        return i18n.t('evaluation.status.opened');
+        return i18n.t("evaluation.status.opened");
       case "completed":
-        return i18n.t('evaluation.status.completed');
+        return i18n.t("evaluation.status.completed");
       case "expired":
-        return i18n.t('evaluation.status.expired');
+        return i18n.t("evaluation.status.expired");
       default:
-        return i18n.t('evaluation.status.unknown');
+        return i18n.t("evaluation.status.unknown");
     }
   };
 
@@ -214,13 +214,13 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
               prev.map((status) =>
                 status.evaluatorId === evaluatorId
                   ? { ...status, status: "sent" as const, sentAt: new Date() }
-                  : status
-              )
+                  : status,
+              ),
             );
           } catch (error) {
             console.error(
               `Failed to send invitation to ${evaluator.name}:`,
-              error
+              error,
             );
           }
         }
@@ -245,10 +245,10 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
       if (result.success && result.results) {
         // Transform the API response to match the expected state structure
         const successful = result.results.filter(
-          (r: any) => r.status === "sent"
+          (r: any) => r.status === "sent",
         ).length;
         const failed = result.results.filter(
-          (r: any) => r.status === "failed"
+          (r: any) => r.status === "failed",
         ).length;
 
         const transformedResults = {
@@ -269,13 +269,13 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
         setInvitationStatuses((prev) =>
           prev.map((status) => {
             const detail = transformedResults.details.find(
-              (d) => d.evaluatorId === status.evaluatorId
+              (d) => d.evaluatorId === status.evaluatorId,
             );
             if (detail && detail.status === "sent") {
               return { ...status, status: "sent" as const, sentAt: new Date() };
             }
             return status;
-          })
+          }),
         );
       } else {
         console.error("Failed to send bulk invitations:", result.message);
@@ -294,7 +294,7 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
 
       // Find evaluator by invitationToken to get the groupId
       const evaluator = evaluators.find(
-        (e) => e.invitationToken === invitationToken
+        (e) => e.invitationToken === invitationToken,
       );
 
       if (!evaluator) {
@@ -309,8 +309,8 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
         prev.map((status) =>
           status.evaluatorId === evaluator.id
             ? { ...status, status: "sent" as const, sentAt: new Date() }
-            : status
-        )
+            : status,
+        ),
       );
 
       // Show success message or update UI as needed
@@ -355,8 +355,8 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
                     reminderCount: status.reminderCount + 1,
                     lastReminderAt: new Date(),
                   }
-                : status
-            )
+                : status,
+            ),
           );
         }
       }
@@ -383,7 +383,7 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
     setSelectedEvaluators((prev) =>
       prev.includes(evaluatorId)
         ? prev.filter((id) => id !== evaluatorId)
-        : [...prev, evaluatorId]
+        : [...prev, evaluatorId],
     );
   };
 
@@ -422,10 +422,10 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
 
   const filteredEvaluators = getFilteredEvaluators();
   const completedCount = invitationStatuses.filter(
-    (s) => s.status === "completed"
+    (s) => s.status === "completed",
   ).length;
   const sentCount = invitationStatuses.filter((s) =>
-    ["sent", "opened", "completed"].includes(s.status)
+    ["sent", "opened", "completed"].includes(s.status),
   ).length;
 
   return (
@@ -455,7 +455,7 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <h3 className="text-sm font-medium text-gray-500">
-            {t('evaluation.totalEvaluators')}
+            {t("evaluation.totalEvaluators")}
           </h3>
           <p className="text-3xl font-bold text-blue-600 mt-2">
             {evaluators.length}
@@ -463,12 +463,14 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
         </div>
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <h3 className="text-sm font-medium text-gray-500">
-            {t('evaluation.invitationsSent')}
+            {t("evaluation.invitationsSent")}
           </h3>
           <p className="text-3xl font-bold text-green-600 mt-2">{sentCount}</p>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <h3 className="text-sm font-medium text-gray-500">{t('evaluation.completed')}</h3>
+          <h3 className="text-sm font-medium text-gray-500">
+            {t("evaluation.completed")}
+          </h3>
           <p className="text-3xl font-bold text-purple-600 mt-2">
             {completedCount}
           </p>
@@ -494,11 +496,11 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
               onChange={(e) => setSelectedGroup(e.target.value)}
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <option value="all">{t('evaluation.groups.all')}</option>
-              <option value="self">{t('evaluation.groups.self')}</option>
-              <option value="parent">{t('evaluation.groups.parents')}</option>
-              <option value="teacher">{t('evaluation.groups.teachers')}</option>
-              <option value="peer">{t('evaluation.groups.peers')}</option>
+              <option value="all">{t("evaluation.groups.all")}</option>
+              <option value="self">{t("evaluation.groups.self")}</option>
+              <option value="parent">{t("evaluation.groups.parents")}</option>
+              <option value="teacher">{t("evaluation.groups.teachers")}</option>
+              <option value="peer">{t("evaluation.groups.peers")}</option>
             </select>
 
             {/* Selection Controls */}
@@ -507,13 +509,13 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
                 onClick={selectAllFiltered}
                 className="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
               >
-                {t('common.selectAll')}
+                {t("common.selectAll")}
               </button>
               <button
                 onClick={clearSelection}
                 className="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
               >
-                {t('common.clear')}
+                {t("common.clear")}
               </button>
             </div>
           </div>
@@ -535,7 +537,7 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
               disabled={sending || selectedEvaluators.length === 0}
               className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {sending ? t('common.sending') : t('evaluation.sendReminders')}
+              {sending ? t("common.sending") : t("evaluation.sendReminders")}
             </button>
 
             <button
@@ -544,7 +546,11 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
             >
               <EnvelopeIcon className="w-4 h-4" />
-              <span>{sendingBulk ? t('common.sending') : t('evaluation.sendAllByEmail')}</span>
+              <span>
+                {sendingBulk
+                  ? t("common.sending")
+                  : t("evaluation.sendAllByEmail")}
+              </span>
             </button>
 
             <button
@@ -553,7 +559,9 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
             >
               <PaperAirplaneIcon className="w-4 h-4" />
-              <span>{sending ? t('common.sending') : t('evaluation.sendSelected')}</span>
+              <span>
+                {sending ? t("common.sending") : t("evaluation.sendSelected")}
+              </span>
             </button>
           </div>
         </div>
@@ -567,11 +575,13 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
           exit={{ opacity: 0, height: 0 }}
           className="bg-white p-6 rounded-lg shadow-sm border mb-8"
         >
-          <h3 className="text-lg font-semibold mb-4">{t('evaluation.emailTemplate')}</h3>
+          <h3 className="text-lg font-semibold mb-4">
+            {t("evaluation.emailTemplate")}
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('evaluation.template.subject')}
+                {t("evaluation.template.subject")}
               </label>
               <input
                 type="text"
@@ -587,7 +597,7 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('evaluation.template.reminderDays')}
+                {t("evaluation.template.reminderDays")}
               </label>
               <input
                 type="number"
@@ -634,7 +644,7 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
               <span className="ml-2 text-sm text-gray-700">
-                {t('evaluation.template.includeInstructions')}
+                {t("evaluation.template.includeInstructions")}
               </span>
             </label>
             <label className="flex items-center">
@@ -650,7 +660,7 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
               <span className="ml-2 text-sm text-gray-700">
-                {t('evaluation.template.enableReminders')}
+                {t("evaluation.template.enableReminders")}
               </span>
             </label>
           </div>
@@ -661,7 +671,7 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
       <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
         <div className="px-6 py-4 border-b">
           <h3 className="text-lg font-semibold">
-            {t('evaluation.evaluators', { count: filteredEvaluators.length })}
+            {t("evaluation.evaluators", { count: filteredEvaluators.length })}
           </h3>
         </div>
         <div className="overflow-x-auto">
@@ -710,7 +720,7 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredEvaluators.map((evaluator) => {
                 const status = invitationStatuses.find(
-                  (s) => s.evaluatorId === evaluator.id
+                  (s) => s.evaluatorId === evaluator.id,
                 );
                 return (
                   <tr key={evaluator.id} className="hover:bg-gray-50">
@@ -732,10 +742,10 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
                           evaluator.relationship === "Self"
                             ? "bg-purple-100 text-purple-800"
                             : evaluator.groupType === "parent"
-                            ? "bg-green-100 text-green-800"
-                            : evaluator.groupType === "teacher"
-                            ? "bg-blue-100 text-blue-800"
-                            : "bg-gray-100 text-gray-800"
+                              ? "bg-green-100 text-green-800"
+                              : evaluator.groupType === "teacher"
+                                ? "bg-blue-100 text-blue-800"
+                                : "bg-gray-100 text-gray-800"
                         }`}
                       >
                         {evaluator.groupType === "parent" &&
@@ -767,7 +777,7 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
                               handleResendEmail(evaluator.invitationToken)
                             }
                             disabled={resendingEmails.has(
-                              evaluator.invitationToken
+                              evaluator.invitationToken,
                             )}
                             className="text-green-600 hover:text-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             title={
@@ -854,7 +864,7 @@ const EvaluationInvitations: React.FC<EvaluationInvitationsProps> = ({
             onClick={() => setEmailResults(null)}
             className="mt-4 px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
           >
-            {t('evaluation.closeResults')}
+            {t("evaluation.closeResults")}
           </button>
         </div>
       )}

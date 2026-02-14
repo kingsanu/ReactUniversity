@@ -6,6 +6,7 @@ import { UniversityStatsProps } from "@/types/university";
 import { TrendingUp, Globe2, GraduationCap, MapPin, Award } from "lucide-react";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface StatCardProps {
   label: string;
@@ -36,7 +37,7 @@ function StatCard({ label, value, subValue, icon: Icon, delay = 0, trend }: Stat
             </div>
           )}
         </div>
-        
+
         <div>
           <p className="text-sm font-medium text-gray-500 mb-1">{label}</p>
           <p className="text-2xl font-bold text-gray-900 tracking-tight truncate" title={String(value)}>
@@ -59,7 +60,7 @@ export function UniversityStats({ stats, isLoading }: UniversityStatsProps) {
     return (
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="h-40 rounded-xl bg-gray-100 animate-pulse" />
+          <Skeleton key={i} className="h-40 w-full rounded-xl" />
         ))}
       </div>
     );
@@ -79,7 +80,7 @@ export function UniversityStats({ stats, isLoading }: UniversityStatsProps) {
         icon={Globe2}
         delay={0}
       />
-      
+
       <StatCard
         label={t("Top Match Score", "Mejor Puntuación")}
         value={`${stats.overview.topMatchScore}%`}

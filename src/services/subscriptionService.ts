@@ -250,6 +250,37 @@ function enhancePlanWithUIFields(plan: any) {
 // API Functions
 
 /**
+ * Create a Stripe checkout session for a subscription plan
+ */
+export interface CheckoutSessionPayload {
+  planId: string;
+  userId: string;
+  amount: number;
+  currency: string;
+  productName: string;
+  successUrl: string;
+  cancelUrl: string;
+}
+
+export interface CheckoutSessionResponse {
+  sessionUrl: string;
+  sessionId: string;
+}
+
+export async function createCheckoutSession(
+  payload: CheckoutSessionPayload
+): Promise<CheckoutSessionResponse> {
+  const response = await apiRequest<CheckoutSessionResponse>(
+    "/api/stripe/create-checkout-session",
+    {
+      method: "POST",
+      data: payload,
+    }
+  );
+  return response;
+}
+
+/**
  * Fetch subscription plans from API (with fallback to default data)
  */
 export async function fetchSubscriptionPlans(): Promise<SubscriptionData> {

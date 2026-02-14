@@ -120,7 +120,7 @@ export function CoursesCatalog() {
   // Featured Course (highest rated or newest)
   const featuredCourse = useMemo(() => {
     if (courses.length === 0) return null;
-    return courses.reduce((prev, current) => 
+    return courses.reduce((prev, current) =>
       (prev.rating > current.rating) ? prev : current
     );
   }, [courses]);
@@ -193,7 +193,7 @@ export function CoursesCatalog() {
   const handleQuickCategory = (category: string) => {
     setFilters(prev => ({
       ...prev,
-      category: prev.category?.includes(category) 
+      category: prev.category?.includes(category)
         ? prev.category.filter(c => c !== category)
         : [category]
     }));
@@ -211,47 +211,47 @@ export function CoursesCatalog() {
     <div className="space-y-10">
       {/* Featured Hero Section */}
       {featuredCourse && !filters.search && (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="relative rounded-3xl overflow-hidden bg-gray-900 text-white shadow-2xl"
         >
           <div className="absolute inset-0">
-            <Image 
-              src={featuredCourse.thumbnailUrl} 
+            <Image
+              src={featuredCourse.thumbnailUrl}
               alt={featuredCourse.title}
               fill
               className="object-cover opacity-40"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-gray-900 via-gray-900/80 to-transparent" />
           </div>
-          
+
           <div className="relative z-10 p-8 md:p-12 flex flex-col md:flex-row gap-8 items-start md:items-center">
             <div className="flex-1 space-y-6">
               <Badge className="bg-blue-500 hover:bg-blue-600 text-white border-none px-3 py-1 text-sm font-medium rounded-full">
                 <Sparkles className="w-3.5 h-3.5 mr-1.5 inline-block" />
                 {t("courses.featuredCourse")}
               </Badge>
-              
+
               <h2 className="text-3xl md:text-5xl font-bold leading-tight">
                 {featuredCourse.title}
               </h2>
-              
+
               <p className="text-gray-300 text-lg max-w-2xl leading-relaxed line-clamp-2">
                 {featuredCourse.shortDescription}
               </p>
-              
+
               <div className="flex flex-wrap gap-4 pt-2">
-                <Button 
-                  size="lg" 
+                <Button
+                  size="lg"
                   onClick={() => handleStartCourse(featuredCourse)}
                   className="bg-white text-gray-900 hover:bg-gray-100 font-bold rounded-xl h-12 px-8"
                 >
                   <PlayCircle className="w-5 h-5 mr-2" />
                   {t("courses.startLearningNow")}
                 </Button>
-                <Button 
-                  size="lg" 
+                <Button
+                  size="lg"
                   variant="outline"
                   onClick={() => handleViewDetails(featuredCourse)}
                   className="border-gray-700 text-white hover:bg-white/10 hover:text-white rounded-xl h-12 px-8"
@@ -260,7 +260,7 @@ export function CoursesCatalog() {
                 </Button>
               </div>
             </div>
-            
+
             <div className="hidden md:block w-full max-w-xs bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/10">
               <div className="space-y-4">
                 <div className="flex items-center justify-between text-sm">
@@ -356,7 +356,7 @@ export function CoursesCatalog() {
               </p>
             </div>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
             {recommendedCourses.map((course, index) => (
               <motion.div
@@ -399,7 +399,13 @@ export function CoursesCatalog() {
           </div>
         </div>
 
-        {filteredAndSortedCourses.length === 0 ? (
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <SkeletonCourseCard key={i} />
+            ))}
+          </div>
+        ) : filteredAndSortedCourses.length === 0 ? (
           <div className="text-center py-20 bg-gray-50 rounded-2xl mt-6 border border-dashed border-gray-200">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Search className="w-8 h-8 text-gray-400" />
@@ -408,8 +414,8 @@ export function CoursesCatalog() {
             <p className="text-gray-500 max-w-sm mx-auto">
               {t("courses.tryAdjustingFilters")}
             </p>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={handleClearFilters}
               className="mt-6"
             >

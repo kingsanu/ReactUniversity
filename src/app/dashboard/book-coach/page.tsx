@@ -15,6 +15,7 @@ import { Search, MapPin, Star, Filter } from "lucide-react";
 import Link from "next/link";
 import { CoachesResponse } from "@/types/coach";
 import { useTranslation } from "react-i18next";
+import { CoachCardSkeleton } from "@/components/skeletons/CoachCardSkeleton";
 
 export default function BookCoachPage() {
   const { t } = useTranslation();
@@ -87,10 +88,7 @@ export default function BookCoachPage() {
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Card key={i} className="animate-pulse">
-              <CardHeader className="h-24 bg-gray-100" />
-              <CardContent className="h-40" />
-            </Card>
+            <CoachCardSkeleton key={i} />
           ))}
         </div>
       ) : coaches.length > 0 ? (

@@ -1,11 +1,13 @@
 "use client";
 import React, { useState } from "react";
 import { getSafeStripeUrls, debugStripeUrls } from "@/utils/debugStripeUrls";
+import { createCheckoutSession } from "@/services/subscriptionService";
 
 interface StripeCheckoutProps {
   amount: number; // in cents
   productName: string;
   userId: string;
+  planId: string;
   onSuccess?: () => void;
   onError?: (error: string) => void;
   onStart?: () => void;
@@ -18,6 +20,7 @@ export default function StripeCheckout({
   amount,
   productName,
   userId,
+  planId,
   onSuccess,
   onError,
   onStart,
@@ -42,34 +45,17 @@ export default function StripeCheckout({
 
       console.log("🔗 Final Stripe URLs:", { baseUrl, successUrl, cancelUrl });
 
-      // Create checkout session
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/stripe/create-checkout-session`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({
-            userId,
-            amount,
-            currency: "usd",
-            productName,
-            successUrl,
-            cancelUrl,
-          }),
-        }
-      );
+      // Create checkout session via subscription service
+      const data = await createCheckoutSession({
+        planId,
+        userId,
+        amount,
+        currency: "usd",
+        productName,
+        successUrl,
+        cancelUrl,
+      });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.error || `HTTP error! status: ${response.status}`
-        );
-      }
-
-      const data = await response.json();
       console.log("Checkout session created:", data);
 
       if (data.sessionUrl) {

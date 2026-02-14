@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useSchoolAdminStats } from "@/hooks/useSchoolAdmin";
 import { useTranslation } from "react-i18next";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function SchoolAdminStats() {
   const { data: stats, isLoading, error } = useSchoolAdminStats();
@@ -21,7 +22,7 @@ export function SchoolAdminStats() {
     return (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-32 bg-white rounded-2xl border border-gray-100 animate-pulse" />
+          <Skeleton key={i} className="h-32 rounded-2xl" />
         ))}
       </div>
     );

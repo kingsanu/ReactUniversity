@@ -107,9 +107,9 @@ export function SubscriptionPlans({ className }: SubscriptionPlansProps) {
   const currentPlan =
     hasActiveSubscription && subscriptionStatus?.planId
       ? subscriptionService.findSubscriptionPlanById(
-          subscriptionStatus.planId,
-          billingOptions
-        )
+        subscriptionStatus.planId,
+        billingOptions
+      )
       : null;
 
   return (
@@ -161,7 +161,7 @@ export function SubscriptionPlans({ className }: SubscriptionPlansProps) {
         className="text-center space-y-4"
       >
         <Badge variant="secondary" className="px-4 py-1.5 text-sm font-medium bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-100">
-           Upgrade Your Experience
+          Upgrade Your Experience
         </Badge>
         <h2 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight">
           {subscription.name}
@@ -190,12 +190,12 @@ export function SubscriptionPlans({ className }: SubscriptionPlansProps) {
               )}
             >
               {option.popular && (
-                 <div className="absolute -top-4 left-0 right-0 flex justify-center">
-                   <Badge className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg border-0 px-4 py-1 h-auto text-sm gap-1.5">
-                     <Sparkles className="w-3.5 h-3.5 fill-current" />
-                     Most Popular
-                   </Badge>
-                 </div>
+                <div className="absolute -top-4 left-0 right-0 flex justify-center">
+                  <Badge className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg border-0 px-4 py-1 h-auto text-sm gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 fill-current" />
+                    Most Popular
+                  </Badge>
+                </div>
               )}
 
               <CardHeader className="text-center pb-8 pt-8">
@@ -209,30 +209,30 @@ export function SubscriptionPlans({ className }: SubscriptionPlansProps) {
 
               <CardContent className="flex-1 flex flex-col items-center">
                 <div className="mb-8 flex items-baseline justify-center">
-                   <span className="text-5xl font-bold tracking-tight text-gray-900">
+                  <span className="text-5xl font-bold tracking-tight text-gray-900">
                     ${option.price}
                   </span>
                   <span className="text-gray-500 ml-2 font-medium">/{option.period}</span>
                 </div>
-                
-                 {option.originalPrice && (
-                    <div className="mb-6 -mt-4 text-center">
-                         <span className="text-sm text-gray-400 line-through mr-2">
-                            ${option.originalPrice}
-                          </span>
-                           {option.discount && (
-                            <Badge variant="outline" className="text-emerald-600 border-emerald-200 bg-emerald-50 text-xs">
-                              Save {option.discount}%
-                            </Badge>
-                          )}
-                    </div>
-                 )}
+
+                {option.originalPrice && (
+                  <div className="mb-6 -mt-4 text-center">
+                    <span className="text-sm text-gray-400 line-through mr-2">
+                      ${option.originalPrice}
+                    </span>
+                    {option.discount && (
+                      <Badge variant="outline" className="text-emerald-600 border-emerald-200 bg-emerald-50 text-xs">
+                        Save {option.discount}%
+                      </Badge>
+                    )}
+                  </div>
+                )}
 
                 <div className="w-full space-y-4">
                   {option.features.map((feature, i) => (
                     <div key={i} className="flex items-start gap-3">
                       <div className="mt-1 bg-blue-50 rounded-full p-1">
-                          <Check className="w-3.5 h-3.5 text-blue-600" />
+                        <Check className="w-3.5 h-3.5 text-blue-600" />
                       </div>
                       <span className="text-gray-600 text-sm leading-relaxed">
                         {feature}
@@ -243,54 +243,55 @@ export function SubscriptionPlans({ className }: SubscriptionPlansProps) {
               </CardContent>
 
               <CardFooter className="pt-8 pb-8">
-                 {hasActiveSubscription && currentPlan?.id === option.id ? (
-                   <Button disabled variant="secondary" className="w-full h-12 text-base rounded-xl font-medium">
-                     Current Plan
-                   </Button>
-                 ) : (
-                    <StripeCheckout
-                      amount={option.price * 100}
-                      userId={userId}
-                      productName={`${option.name} - ${option.description}`}
-                       onStart={() => setProcessingPayment(option.id)}
-                       onSuccess={() => {
-                          window.location.reload();
-                       }}
-                       onError={(error: string) => {
-                          console.error("Payment failed:", error);
-                          alert(`Payment failed: ${error}`);
-                          setProcessingPayment(null);
-                        }}
+                {hasActiveSubscription && currentPlan?.id === option.id ? (
+                  <Button disabled variant="secondary" className="w-full h-12 text-base rounded-xl font-medium">
+                    Current Plan
+                  </Button>
+                ) : (
+                  <StripeCheckout
+                    amount={option.price * 100}
+                    userId={userId}
+                    planId={option.id}
+                    productName={`${option.name} - ${option.description}`}
+                    onStart={() => setProcessingPayment(option.id)}
+                    onSuccess={() => {
+                      window.location.reload();
+                    }}
+                    onError={(error: string) => {
+                      console.error("Payment failed:", error);
+                      alert(`Payment failed: ${error}`);
+                      setProcessingPayment(null);
+                    }}
+                    disabled={processingPayment !== null}
+                    className="w-full"
+                  >
+                    <Button
+                      className={cn(
+                        "w-full h-12 text-base rounded-xl font-medium shadow-sm transition-all",
+                        option.popular
+                          ? "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-200"
+                          : "bg-gray-900 hover:bg-gray-800 text-white"
+                      )}
                       disabled={processingPayment !== null}
-                      className="w-full"
                     >
-                      <Button 
-                         className={cn(
-                           "w-full h-12 text-base rounded-xl font-medium shadow-sm transition-all",
-                            option.popular 
-                              ? "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-200" 
-                              : "bg-gray-900 hover:bg-gray-800 text-white"
-                         )}
-                         disabled={processingPayment !== null}
-                      >
-                         {processingPayment === option.id ? (
-                           <>
-                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                             Processing...
-                           </>
-                         ) : (
-                           option.ctaText
-                         )}
-                      </Button>
-                    </StripeCheckout>
-                 )}
+                      {processingPayment === option.id ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        option.ctaText
+                      )}
+                    </Button>
+                  </StripeCheckout>
+                )}
               </CardFooter>
             </Card>
           </motion.div>
         ))}
       </div>
 
-       {/* FAQ Section */}
+      {/* FAQ Section */}
       <FAQ className="mt-16 max-w-4xl mx-auto" />
     </div>
   );

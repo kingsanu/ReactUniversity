@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import {
   getAdminTransactions,
   AdminTransactionsResponse,
@@ -15,6 +15,7 @@ export function useAdminTransactions(filters: AdminTransactionsFilters = {}) {
   return useQuery<AdminTransactionsResponse>({
     queryKey: ["adminTransactions", { page, limit, ...filters }],
     queryFn: () => getAdminTransactions(filters),
+    placeholderData: keepPreviousData,
     staleTime: 1 * 60 * 1000, // 1 minute
   });
 }

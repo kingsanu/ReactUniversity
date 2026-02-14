@@ -38,7 +38,9 @@ export default function CoachesPage() {
 
   // Edit State
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [editingCoach, setEditingCoach] = useState<Coach | undefined>(undefined);
+  const [editingCoach, setEditingCoach] = useState<Coach | undefined>(
+    undefined,
+  );
 
   const handleEdit = (coach: Coach) => {
     setEditingCoach(coach);
@@ -155,7 +157,9 @@ export default function CoachesPage() {
                     </TabsTrigger>
                   </TabsList>
                   <TabsContent value="single" className="mt-0">
-                    <SingleInviteForm onSuccess={() => setIsInviteOpen(false)} />
+                    <SingleInviteForm
+                      onSuccess={() => setIsInviteOpen(false)}
+                    />
                   </TabsContent>
                   <TabsContent value="bulk" className="mt-0">
                     <BulkInviteForm />
@@ -177,11 +181,13 @@ export default function CoachesPage() {
                 </DialogDescription>
               </DialogHeader>
               <div className="p-6">
-                <SingleInviteForm initialData={editingCoach} onSuccess={handleEditSuccess} />
+                <SingleInviteForm
+                  initialData={editingCoach}
+                  onSuccess={handleEditSuccess}
+                />
               </div>
             </DialogContent>
           </Dialog>
-
         </div>
 
         {/* Bento Stats Grid */}

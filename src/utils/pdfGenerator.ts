@@ -1,7 +1,4 @@
 
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
-
 /**
  * Generates a PDF from a React component by rendering it to a hidden container,
  * capturing it with html2canvas, and saving it with jsPDF.
@@ -10,6 +7,14 @@ export const generateAssessmentPDF = async (
   reportComponent: React.ReactElement,
   fileName: string = 'Assessment-Report.pdf'
 ) => {
+  // Dynamically import heavy dependencies
+  const [jsPDFModule, html2canvasModule] = await Promise.all([
+    import('jspdf'),
+    import('html2canvas')
+  ]);
+  const jsPDF = jsPDFModule.jsPDF;
+  const html2canvas = html2canvasModule.default;
+
   // 1. Create a hidden container to render the report
   const container = document.createElement('div');
   container.style.position = 'absolute';

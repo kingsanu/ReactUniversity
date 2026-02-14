@@ -4,6 +4,7 @@ import React from "react";
 import { CertData } from "@/services/benchmarkService";
 import { BadgeCheck, Clock, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface CertificationsListProps {
   data?: CertData[];
@@ -13,11 +14,11 @@ interface CertificationsListProps {
 export default function CertificationsList({ data, isLoading }: CertificationsListProps) {
   if (isLoading) {
     return (
-       <div className="space-y-3">
+      <div className="space-y-3">
         {[1, 2, 3].map(i => (
-          <div key={i} className="h-20 bg-slate-50 rounded-lg animate-pulse" />
+          <Skeleton key={i} className="h-20 rounded-lg" />
         ))}
-       </div>
+      </div>
     );
   }
 

@@ -8,10 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-// Simple local skeleton component to replace missing UI component
-const Skeleton = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn("animate-pulse rounded-md bg-gray-200", className)} {...props} />
-);
+import { Skeleton } from "@/components/ui/skeleton";
 import { useStudent } from "@/hooks/useSchoolAdmin";
 import { format } from "date-fns";
 import { StudentStatus } from "@/types/student";

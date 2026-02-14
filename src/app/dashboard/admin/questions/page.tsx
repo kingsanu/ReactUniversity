@@ -7,54 +7,55 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Loader2,
-  Plus,
-  Search,
-  Filter,
-  MoreVertical,
-  Edit,
-  Trash2,
-  CheckCircle,
-  XCircle,
-  Globe,
-  Tag,
-  Users,
-  FileText
+    Loader2,
+    Plus,
+    Search,
+    Filter,
+    MoreVertical,
+    Edit,
+    Trash2,
+    CheckCircle,
+    XCircle,
+    Globe,
+    Tag,
+    Users,
+    FileText
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DashboardSkeleton } from "@/components/skeletons/DashboardSkeleton";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Question360,
-  questions360Service,
-  getRelationTypeOptions,
-  getCommonCategories,
-  CreateQuestion360Request,
-  UpdateQuestion360Request
+    Question360,
+    questions360Service,
+    getRelationTypeOptions,
+    getCommonCategories,
+    CreateQuestion360Request,
+    UpdateQuestion360Request
 } from "@/services/questions360Service";
 
 // Types
@@ -83,7 +84,7 @@ export default function AdminQuestionsPage() {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingQuestion, setEditingQuestion] = useState<Question360 | null>(null);
     const [isSaving, setIsSaving] = useState(false);
-    
+
     // Filters
     const [searchQuery, setSearchQuery] = useState("");
     const [filterRelation, setFilterRelation] = useState("all");
@@ -132,7 +133,7 @@ export default function AdminQuestionsPage() {
         setEditingQuestion(null);
         // Find next question number for default
         const maxNum = questions.length > 0 ? Math.max(...questions.map(q => q.questionNumber)) : 0;
-        
+
         setFormData({
             questionEnglishText: "",
             questionSpanishText: "",
@@ -175,7 +176,7 @@ export default function AdminQuestionsPage() {
             };
 
             if (editingQuestion) {
-                 await questions360Service.updateQuestion(editingQuestion.id, payload as UpdateQuestion360Request);
+                await questions360Service.updateQuestion(editingQuestion.id, payload as UpdateQuestion360Request);
                 toast.success("Question updated successfully");
             } else {
                 await questions360Service.createQuestion(payload as CreateQuestion360Request);
@@ -194,7 +195,7 @@ export default function AdminQuestionsPage() {
 
     const handleDelete = async (id: string) => {
         if (!confirm("Are you sure you want to delete this question? This cannot be undone.")) return;
-        
+
         try {
             await questions360Service.deleteQuestion(id);
             toast.success("Question deleted successfully");
@@ -204,7 +205,7 @@ export default function AdminQuestionsPage() {
             toast.error("Failed to delete question");
         }
     };
-    
+
     const handleToggleActive = async (question: Question360) => {
         try {
             if (question.isActive) {
@@ -224,27 +225,23 @@ export default function AdminQuestionsPage() {
 
     // Filtering
     const filteredQuestions = questions.filter(q => {
-        const matchesSearch = q.questionEnglishText.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                              (q.questionSpanishText && q.questionSpanishText.toLowerCase().includes(searchQuery.toLowerCase()));
+        const matchesSearch = q.questionEnglishText.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (q.questionSpanishText && q.questionSpanishText.toLowerCase().includes(searchQuery.toLowerCase()));
         const matchesRelation = filterRelation === "all" || q.relationType === filterRelation;
         const matchesCategory = filterCategory === "all" || q.category === filterCategory;
-        
+
         return matchesSearch && matchesRelation && matchesCategory;
     }).sort((a, b) => a.questionNumber - b.questionNumber);
 
 
     if (authLoading || loading) {
-        return (
-            <div className="flex h-screen items-center justify-center bg-gray-50/50">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-        );
+        return <DashboardSkeleton />;
     }
 
     return (
         <div className="min-h-screen bg-gray-50/50 p-6 md:p-8 font-sans text-gray-900">
             <div className="max-w-7xl mx-auto space-y-8">
-                
+
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div className="space-y-1">
@@ -255,8 +252,8 @@ export default function AdminQuestionsPage() {
                             Manage evaluation questions for feedback cycles
                         </p>
                     </div>
-                    <Button 
-                        onClick={handleOpenCreate} 
+                    <Button
+                        onClick={handleOpenCreate}
                         className="bg-gray-900 hover:bg-gray-800 text-white rounded-xl shadow-sm h-12 px-6"
                     >
                         <Plus className="mr-2 h-5 w-5" />
@@ -282,8 +279,8 @@ export default function AdminQuestionsPage() {
                     <div className="flex flex-col md:flex-row gap-4 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                            <Input 
-                                placeholder="Search questions..." 
+                            <Input
+                                placeholder="Search questions..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="pl-10 h-11 rounded-xl border-gray-200 bg-gray-50/50 focus:bg-white transition-colors"
@@ -335,15 +332,15 @@ export default function AdminQuestionsPage() {
                                                 {question.questionNumber}
                                             </Badge>
                                             <div className="md:mt-2">
-                                                 {question.isActive ? (
+                                                {question.isActive ? (
                                                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700">
                                                         Active
                                                     </span>
-                                                 ) : (
+                                                ) : (
                                                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
                                                         Inactive
                                                     </span>
-                                                 )}
+                                                )}
                                             </div>
                                         </div>
 
@@ -362,7 +359,7 @@ export default function AdminQuestionsPage() {
                                                     </Badge>
                                                 )}
                                             </div>
-                                            
+
                                             <div className="space-y-2">
                                                 <div className="flex gap-3">
                                                     <div className="mt-1 h-5 w-5 rounded-full bg-gray-100 flex items-center justify-center shrink-0 text-xs font-bold text-gray-500">EN</div>
@@ -383,16 +380,16 @@ export default function AdminQuestionsPage() {
 
                                         {/* Actions */}
                                         <div className="flex md:flex-col items-center justify-end md:justify-start gap-2 border-t md:border-t-0 md:border-l border-gray-100 pt-4 md:pt-0 md:pl-6 min-w-[120px]">
-                                            <Button 
-                                                variant="outline" 
-                                                size="sm" 
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
                                                 className="w-full justify-start md:justify-center rounded-xl bg-white border-gray-200 hover:bg-gray-50 text-gray-700"
                                                 onClick={() => handleOpenEdit(question)}
                                             >
                                                 <Edit className="h-4 w-4 mr-2" />
                                                 Edit
                                             </Button>
-                                            
+
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" size="sm" className="w-full justify-start md:justify-center rounded-xl text-gray-400 hover:text-gray-600">
@@ -401,7 +398,7 @@ export default function AdminQuestionsPage() {
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="rounded-xl p-2 w-48">
-                                                    <DropdownMenuItem 
+                                                    <DropdownMenuItem
                                                         onClick={() => handleToggleActive(question)}
                                                         className="rounded-lg cursor-pointer"
                                                     >
@@ -417,7 +414,7 @@ export default function AdminQuestionsPage() {
                                                             </>
                                                         )}
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem 
+                                                    <DropdownMenuItem
                                                         onClick={() => handleDelete(question.id)}
                                                         className="rounded-lg text-red-600 focus:text-red-700 cursor-pointer"
                                                     >
@@ -436,7 +433,7 @@ export default function AdminQuestionsPage() {
 
                 {/* Create/Edit Dialog */}
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                     <DialogContent className="sm:max-w-2xl rounded-3xl p-0 gap-0 overflow-hidden max-h-[90vh] flex flex-col">
+                    <DialogContent className="sm:max-w-2xl rounded-3xl p-0 gap-0 overflow-hidden max-h-[90vh] flex flex-col">
                         <DialogHeader className="p-8 pb-4 shrink-0">
                             <DialogTitle className="text-2xl font-bold text-gray-900">
                                 {editingQuestion ? "Edit Question" : "Add New Question"}
@@ -447,13 +444,13 @@ export default function AdminQuestionsPage() {
                         </DialogHeader>
 
                         <div className="px-8 py-4 space-y-6 overflow-y-auto flex-1">
-                             {/* Classification */}
-                             <div className="grid grid-cols-2 gap-6">
+                            {/* Classification */}
+                            <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <Label className="text-gray-700 font-medium">Relation Type</Label>
-                                    <Select 
-                                        value={formData.relationType} 
-                                        onValueChange={(v: any) => setFormData({...formData, relationType: v})}
+                                    <Select
+                                        value={formData.relationType}
+                                        onValueChange={(v: any) => setFormData({ ...formData, relationType: v })}
                                     >
                                         <SelectTrigger className="h-11 rounded-xl border-gray-200">
                                             <SelectValue />
@@ -467,9 +464,9 @@ export default function AdminQuestionsPage() {
                                 </div>
                                 <div className="space-y-2">
                                     <Label className="text-gray-700 font-medium">Category</Label>
-                                    <Select 
-                                        value={formData.category} 
-                                        onValueChange={(v) => setFormData({...formData, category: v})}
+                                    <Select
+                                        value={formData.category}
+                                        onValueChange={(v) => setFormData({ ...formData, category: v })}
                                     >
                                         <SelectTrigger className="h-11 rounded-xl border-gray-200">
                                             <SelectValue />
@@ -481,18 +478,18 @@ export default function AdminQuestionsPage() {
                                         </SelectContent>
                                     </Select>
                                 </div>
-                             </div>
+                            </div>
 
-                             {/* Question Text */}
-                             <div className="space-y-4 p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
+                            {/* Question Text */}
+                            <div className="space-y-4 p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
                                 <div className="space-y-2">
                                     <Label className="text-gray-700 font-medium flex items-center gap-2">
                                         <Globe className="h-4 w-4 text-blue-500" />
                                         English Text <span className="text-red-500">*</span>
                                     </Label>
-                                    <Textarea 
+                                    <Textarea
                                         value={formData.questionEnglishText}
-                                        onChange={(e) => setFormData({...formData, questionEnglishText: e.target.value})}
+                                        onChange={(e) => setFormData({ ...formData, questionEnglishText: e.target.value })}
                                         className="min-h-[80px] rounded-xl border-gray-200 resize-none focus:ring-2 focus:ring-primary/20"
                                         placeholder="e.g. How effectively does this person communicate?"
                                     />
@@ -502,35 +499,35 @@ export default function AdminQuestionsPage() {
                                         <Globe className="h-4 w-4 text-orange-500" />
                                         Spanish Text (Optional)
                                     </Label>
-                                    <Textarea 
+                                    <Textarea
                                         value={formData.questionSpanishText}
-                                        onChange={(e) => setFormData({...formData, questionSpanishText: e.target.value})}
+                                        onChange={(e) => setFormData({ ...formData, questionSpanishText: e.target.value })}
                                         className="min-h-[80px] rounded-xl border-gray-200 resize-none focus:ring-2 focus:ring-orange-500/20"
                                         placeholder="e.g. ¿Con qué eficacia se comunica esta persona?"
                                     />
                                 </div>
-                             </div>
+                            </div>
 
-                             {/* Metadata */}
-                             <div className="grid grid-cols-2 gap-6">
+                            {/* Metadata */}
+                            <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <Label className="text-gray-700 font-medium">Question Number</Label>
-                                    <Input 
+                                    <Input
                                         type="number"
                                         min="1"
                                         value={formData.questionNumber}
-                                        onChange={(e) => setFormData({...formData, questionNumber: parseInt(e.target.value) || 1})}
+                                        onChange={(e) => setFormData({ ...formData, questionNumber: parseInt(e.target.value) || 1 })}
                                         className="h-11 rounded-xl border-gray-200"
                                     />
                                 </div>
                                 <div className="space-y-2">
                                     <Label className="text-gray-700 font-medium">Type</Label>
-                                    <Select 
+                                    <Select
                                         value={formData.isSubQuestion ? "sub" : "main"}
                                         onValueChange={(v) => {
                                             const isSub = v === "sub";
                                             setFormData({
-                                                ...formData, 
+                                                ...formData,
                                                 isSubQuestion: isSub,
                                                 parentQuestionId: isSub ? formData.parentQuestionId : undefined
                                             });
@@ -545,14 +542,14 @@ export default function AdminQuestionsPage() {
                                         </SelectContent>
                                     </Select>
                                 </div>
-                             </div>
+                            </div>
 
-                             {formData.isSubQuestion && (
+                            {formData.isSubQuestion && (
                                 <div className="space-y-2">
                                     <Label className="text-gray-700 font-medium">Parent Question</Label>
-                                    <Select 
+                                    <Select
                                         value={formData.parentQuestionId}
-                                        onValueChange={(v) => setFormData({...formData, parentQuestionId: v})}
+                                        onValueChange={(v) => setFormData({ ...formData, parentQuestionId: v })}
                                     >
                                         <SelectTrigger className="h-11 rounded-xl border-gray-200">
                                             <SelectValue placeholder="Select parent question" />
@@ -566,19 +563,19 @@ export default function AdminQuestionsPage() {
                                         </SelectContent>
                                     </Select>
                                 </div>
-                             )}
+                            )}
                         </div>
 
                         <DialogFooter className="p-8 pt-4 bg-gray-50/50 shrink-0">
-                             <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-xl h-11 border-gray-200 text-gray-700">
+                            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-xl h-11 border-gray-200 text-gray-700">
                                 Cancel
-                             </Button>
-                             <Button onClick={handleSave} disabled={isSaving} className="rounded-xl h-11 bg-gray-900 text-white hover:bg-gray-800">
+                            </Button>
+                            <Button onClick={handleSave} disabled={isSaving} className="rounded-xl h-11 bg-gray-900 text-white hover:bg-gray-800">
                                 {isSaving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                                 {editingQuestion ? "Save Changes" : "Create Question"}
-                             </Button>
+                            </Button>
                         </DialogFooter>
-                     </DialogContent>
+                    </DialogContent>
                 </Dialog>
 
             </div>

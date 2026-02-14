@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAdminAccess } from "@/hooks/useAdminAccess";
 import { DashboardStats } from "./_components/DashboardStats";
+import { DashboardSkeleton } from "@/components/skeletons/DashboardSkeleton";
 import {
   Users,
   GraduationCap,
@@ -33,14 +34,8 @@ export default function AdminPage() {
 
   if (loading) {
     return (
-      <div className="flex h-screen bg-gray-50 items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-          <p className="text-gray-500 font-medium animate-pulse">
-            {t("admin.verifying")}
-          </p>
-        </div>
-      </div>
+      <DashboardSkeleton />
+
     );
   }
 

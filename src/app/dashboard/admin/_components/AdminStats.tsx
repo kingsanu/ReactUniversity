@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface AdminStatsData {
   totalUsers: number;
@@ -55,9 +56,9 @@ export function AdminStats() {
               key={i}
               className="bg-white rounded-lg p-6 shadow-sm border border-gray-200"
             >
-              <div className="animate-pulse">
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+              <div className="space-y-4">
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-8 w-1/2" />
               </div>
             </div>
           ))}
@@ -122,9 +123,8 @@ export function AdminStats() {
           >
             <div className="flex items-center justify-between mb-4">
               <div
-                className={`w-12 h-12 rounded-lg flex items-center justify-center text-xl border ${
-                  colorClasses[stat.color as keyof typeof colorClasses]
-                }`}
+                className={`w-12 h-12 rounded-lg flex items-center justify-center text-xl border ${colorClasses[stat.color as keyof typeof colorClasses]
+                  }`}
               >
                 {stat.icon}
               </div>
@@ -164,8 +164,8 @@ export function AdminStats() {
                       index === 0
                         ? "#3B82F6"
                         : index === 1
-                        ? "#10B981"
-                        : "#F59E0B",
+                          ? "#10B981"
+                          : "#F59E0B",
                   }}
                 ></div>
                 <span className="text-sm font-medium text-gray-900">
@@ -182,8 +182,8 @@ export function AdminStats() {
                         index === 0
                           ? "#3B82F6"
                           : index === 1
-                          ? "#10B981"
-                          : "#F59E0B",
+                            ? "#10B981"
+                            : "#F59E0B",
                     }}
                   ></div>
                 </div>

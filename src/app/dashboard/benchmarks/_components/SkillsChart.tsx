@@ -13,6 +13,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { SkillData } from "@/services/benchmarkService";
 import { DynamicBarChart } from "@/lib/dynamic-imports";
+import { Skeleton } from "@/components/ui/skeleton";
 
 
 interface SkillsChartProps {
@@ -24,11 +25,7 @@ export default function SkillsChart({ data, isLoading }: SkillsChartProps) {
   const { t } = useTranslation();
 
   if (isLoading) {
-    return (
-      <div className="h-[300px] w-full flex items-center justify-center bg-slate-50 rounded-lg animate-pulse">
-        <span className="text-slate-400 font-medium">{t("benchmarks.loadingSkills")}</span>
-      </div>
-    );
+    return <Skeleton className="h-[300px] w-full rounded-lg" />;
   }
 
   const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899'];
@@ -49,15 +46,15 @@ export default function SkillsChart({ data, isLoading }: SkillsChartProps) {
         >
           <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#e2e8f0" />
           <XAxis type="number" hide domain={[0, 100]} />
-          <YAxis 
-            dataKey="skill" 
-            type="category" 
-            width={100} 
+          <YAxis
+            dataKey="skill"
+            type="category"
+            width={100}
             tick={{ fill: '#475569', fontSize: 13, fontWeight: 500 }}
             axisLine={false}
             tickLine={false}
           />
-          <Tooltip 
+          <Tooltip
             cursor={{ fill: '#f1f5f9' }}
             contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
             formatter={(value: number) => [`${value}% ${t("benchmarks.demand") || "demand"}`, ` ${t("benchmarks.popularity") || "Popularity"}`]}

@@ -60,6 +60,9 @@ import {
 
 import { useAdminAnalytics } from "@/hooks/useAdminAnalytics";
 import { useTelemetryAnalytics } from "@/hooks/useTelemetryAnalytics";
+import { TableRowsSkeleton } from "@/components/skeletons/TableSkeleton";
+import { DashboardSkeleton } from "@/components/skeletons/DashboardSkeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AdminUsersPage() {
   const router = useRouter();
@@ -70,7 +73,7 @@ export default function AdminUsersPage() {
   const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
-  
+
   // Add User Modal State
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -94,8 +97,10 @@ export default function AdminUsersPage() {
     status: statusFilter === "all" ? "" : statusFilter,
   });
 
-  const { data: analyticsData } = useAdminAnalytics("month");
-  const { data: telemetryData } = useTelemetryAnalytics("month");
+  const { data: analyticsData, isLoading: analyticsLoading } = useAdminAnalytics("month");
+  const { data: telemetryData, isLoading: telemetryLoading } = useTelemetryAnalytics("month");
+
+  const statsLoading = analyticsLoading || telemetryLoading;
 
   const users = data?.items || [];
   const totalPages = data ? Math.ceil(data.total / data.limit) : 1;
@@ -105,7 +110,7 @@ export default function AdminUsersPage() {
   const statsCards = [
     {
       label: "Total Users",
-      value: analyticsData?.stats.totalUsers.toLocaleString() || "0",
+      value: statsLoading ? <Skeleton className="h-9 w-24" /> : (analyticsData?.stats.totalUsers.toLocaleString() || "0"),
       growth: analyticsData?.stats.monthlyGrowth.users || 0,
       icon: Users,
       color: "text-blue-600",
@@ -115,7 +120,7 @@ export default function AdminUsersPage() {
     },
     {
       label: "Active Users (MAU)",
-      value: telemetryData?.metrics.mau.toLocaleString() || "0",
+      value: statsLoading ? <Skeleton className="h-9 w-24" /> : (telemetryData?.metrics.mau.toLocaleString() || "0"),
       growth: telemetryData?.metrics.newUsers ? (telemetryData.metrics.newUsers / (telemetryData.metrics.mau || 1)) * 100 : 0, // Approx growth based on new users
       icon: UserCheck,
       color: "text-emerald-600",
@@ -125,7 +130,7 @@ export default function AdminUsersPage() {
     },
     {
       label: "New Signups",
-      value: telemetryData?.metrics.newUsers.toLocaleString() || "0",
+      value: statsLoading ? <Skeleton className="h-9 w-24" /> : (telemetryData?.metrics.newUsers.toLocaleString() || "0"),
       growth: null, // No historical data readily available for this metric in summary
       icon: UserPlus,
       color: "text-violet-600",
@@ -135,7 +140,7 @@ export default function AdminUsersPage() {
     },
     {
       label: "Growth Rate",
-      value: `+${analyticsData?.stats.growthRate || 0}%`,
+      value: statsLoading ? <Skeleton className="h-9 w-24" /> : `+${analyticsData?.stats.growthRate || 0}%`,
       growth: analyticsData?.stats.growthRate,
       icon: TrendingUp,
       color: "text-amber-600",
@@ -196,20 +201,13 @@ export default function AdminUsersPage() {
   }, [searchTerm]);
 
   if (authLoading) {
-    return (
-      <div className="flex h-screen bg-gray-50 items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-gray-900" />
-          <p className="text-gray-500 font-medium">{t("admin.verifying")}</p>
-        </div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   return (
     <div className="min-h-screen bg-gray-50/50 p-6 md:p-8 font-sans text-gray-900">
       <div className="max-w-7xl mx-auto space-y-8">
-        
+
         {/* Header & Actions */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div className="space-y-1">
@@ -223,186 +221,185 @@ export default function AdminUsersPage() {
 
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
             {/* Search */}
-             <div className="relative w-full md:w-72">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    placeholder={t("admin.users.searchPlaceholder")}
-                    className="pl-9 h-10 bg-white border-gray-200 rounded-xl shadow-sm focus:ring-gray-900 focus:border-gray-900 transition-shadow"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
+            <div className="relative w-full md:w-72">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder={t("admin.users.searchPlaceholder")}
+                className="pl-9 h-10 bg-white border-gray-200 rounded-xl shadow-sm focus:ring-gray-900 focus:border-gray-900 transition-shadow"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
 
             {/* Filters */}
-             <div className="flex gap-3">
-                <Select value={roleFilter} onValueChange={setRoleFilter}>
+            <div className="flex gap-3">
+              <Select value={roleFilter} onValueChange={setRoleFilter}>
                 <SelectTrigger className="w-[130px] h-10 bg-white border-gray-200 rounded-xl shadow-sm text-gray-600 font-medium">
-                    <SelectValue placeholder={t("admin.users.rolePlaceholder")} />
+                  <SelectValue placeholder={t("admin.users.rolePlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="all">{t("admin.users.roles.all")}</SelectItem>
-                    <SelectItem value="student">{t("admin.users.roles.student")}</SelectItem>
-                    <SelectItem value="coach">{t("admin.users.roles.coach")}</SelectItem>
-                    <SelectItem value="admin">{t("admin.users.roles.admin")}</SelectItem>
+                  <SelectItem value="all">{t("admin.users.roles.all")}</SelectItem>
+                  <SelectItem value="student">{t("admin.users.roles.student")}</SelectItem>
+                  <SelectItem value="coach">{t("admin.users.roles.coach")}</SelectItem>
+                  <SelectItem value="admin">{t("admin.users.roles.admin")}</SelectItem>
                 </SelectContent>
-                </Select>
+              </Select>
 
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-[130px] h-10 bg-white border-gray-200 rounded-xl shadow-sm text-gray-600 font-medium">
-                    <SelectValue placeholder={t("admin.users.statusPlaceholder")} />
+                  <SelectValue placeholder={t("admin.users.statusPlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="all">{t("admin.users.status.all")}</SelectItem>
-                    <SelectItem value="active">{t("admin.users.status.active")}</SelectItem>
-                    <SelectItem value="inactive">{t("admin.users.status.inactive")}</SelectItem>
+                  <SelectItem value="all">{t("admin.users.status.all")}</SelectItem>
+                  <SelectItem value="active">{t("admin.users.status.active")}</SelectItem>
+                  <SelectItem value="inactive">{t("admin.users.status.inactive")}</SelectItem>
                 </SelectContent>
-                </Select>
+              </Select>
             </div>
-          
+
             {/* Add User Dialog */}
             <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
-                <DialogTrigger asChild>
+              <DialogTrigger asChild>
                 <Button className="h-10 rounded-xl bg-gray-900 text-white shadow-sm hover:bg-gray-800 transition-all hover:shadow-md">
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    {t("admin.users.addUser")}
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  {t("admin.users.addUser")}
                 </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px] rounded-2xl border-gray-100 shadow-2xl p-0 overflow-hidden">
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px] rounded-2xl border-gray-100 shadow-2xl p-0 overflow-hidden">
                 <div className="bg-gray-50/50 p-6 border-b border-gray-100 flex flex-col items-center text-center">
-                    <div className="h-12 w-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mb-4 ring-4 ring-white shadow-sm">
-                        <UserPlus className="h-6 w-6" />
-                    </div>
-                    <DialogTitle className="text-xl font-bold text-gray-900">{t('admin.users.dialogTitle')}</DialogTitle>
-                    <DialogDescription className="text-gray-500 mt-1 max-w-[280px]">
+                  <div className="h-12 w-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mb-4 ring-4 ring-white shadow-sm">
+                    <UserPlus className="h-6 w-6" />
+                  </div>
+                  <DialogTitle className="text-xl font-bold text-gray-900">{t('admin.users.dialogTitle')}</DialogTitle>
+                  <DialogDescription className="text-gray-500 mt-1 max-w-[280px]">
                     {t('admin.users.dialogDescription')}
-                    </DialogDescription>
+                  </DialogDescription>
                 </div>
-                
+
                 <div className="p-6 space-y-4">
-                    <div className="space-y-2">
+                  <div className="space-y-2">
                     <Label htmlFor="name" className="text-sm font-semibold text-gray-700 ml-1">{t('admin.users.nameLabel')}</Label>
                     <Input
-                        id="name"
-                        placeholder={t('admin.users.namePlaceholder')}
-                        value={newUser.name}
-                        onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
-                        className="h-11 rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-100 transition-all"
+                      id="name"
+                      placeholder={t('admin.users.namePlaceholder')}
+                      value={newUser.name}
+                      onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                      className="h-11 rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-100 transition-all"
                     />
-                    </div>
-                    <div className="space-y-2">
+                  </div>
+                  <div className="space-y-2">
                     <Label htmlFor="email" className="text-sm font-semibold text-gray-700 ml-1">Email Address</Label>
                     <Input
-                        id="email"
-                        type="email"
-                        placeholder={t('admin.users.emailPlaceholder')}
-                        value={newUser.email}
-                        onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                         className="h-11 rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-100 transition-all"
+                      id="email"
+                      type="email"
+                      placeholder={t('admin.users.emailPlaceholder')}
+                      value={newUser.email}
+                      onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                      className="h-11 rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-100 transition-all"
                     />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="role" className="text-sm font-semibold text-gray-700 ml-1">Role</Label>
+                      <Select
+                        value={newUser.role}
+                        onValueChange={(value) => setNewUser({ ...newUser, role: value })}
+                      >
+                        <SelectTrigger className="h-11 rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-100 transition-all text-gray-600">
+                          <SelectValue placeholder="Select role" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="student">Student</SelectItem>
+                          <SelectItem value="coach">Coach</SelectItem>
+                          <SelectItem value="admin">Admin</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                         <Label htmlFor="role" className="text-sm font-semibold text-gray-700 ml-1">Role</Label>
-                         <Select 
-                            value={newUser.role} 
-                            onValueChange={(value) => setNewUser({ ...newUser, role: value })}
-                         >
-                            <SelectTrigger className="h-11 rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-100 transition-all text-gray-600">
-                                <SelectValue placeholder="Select role" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="student">Student</SelectItem>
-                                <SelectItem value="coach">Coach</SelectItem>
-                                <SelectItem value="admin">Admin</SelectItem>
-                            </SelectContent>
-                         </Select>
-                        </div>
-                        <div className="space-y-2">
-                        <Label htmlFor="password" className="text-sm font-semibold text-gray-700 ml-1">{t('admin.users.passwordLabel')}</Label>
-                        <Input
-                            id="password"
-                            type="password"
-                            placeholder={t('admin.users.passwordPlaceholder')}
-                            value={newUser.password}
-                            onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                            className="h-11 rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-100 transition-all"
-                        />
-                        </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="password" className="text-sm font-semibold text-gray-700 ml-1">{t('admin.users.passwordLabel')}</Label>
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder={t('admin.users.passwordPlaceholder')}
+                        value={newUser.password}
+                        onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                        className="h-11 rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-100 transition-all"
+                      />
                     </div>
-                     <p className="text-xs text-gray-400 px-1">
-                        {t('admin.users.passwordHint')}
-                    </p>
+                  </div>
+                  <p className="text-xs text-gray-400 px-1">
+                    {t('admin.users.passwordHint')}
+                  </p>
                 </div>
 
                 <DialogFooter className="bg-gray-50/50 p-6 border-t border-gray-100 gap-3 sm:gap-0">
-                    <Button 
-                        variant="outline" 
-                        onClick={() => setIsAddUserOpen(false)} 
-                        className="rounded-xl h-11 border-gray-200 hover:bg-white hover:text-gray-900 text-gray-500 bg-white shadow-sm flex-1 sm:flex-none sm:mr-3"
-                    >
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsAddUserOpen(false)}
+                    className="rounded-xl h-11 border-gray-200 hover:bg-white hover:text-gray-900 text-gray-500 bg-white shadow-sm flex-1 sm:flex-none sm:mr-3"
+                  >
                     {t('common.cancel')}
-                    </Button>
-                    <Button 
-                        onClick={handleAddUser} 
-                        disabled={isCreating} 
-                        className="rounded-xl h-11 bg-gray-900 hover:bg-gray-800 text-white shadow-md flex-1 sm:flex-none sm:min-w-[120px]"
-                    >
+                  </Button>
+                  <Button
+                    onClick={handleAddUser}
+                    disabled={isCreating}
+                    className="rounded-xl h-11 bg-gray-900 hover:bg-gray-800 text-white shadow-md flex-1 sm:flex-none sm:min-w-[120px]"
+                  >
                     {isCreating ? (
-                        <>
+                      <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Creating...
-                        </>
+                      </>
                     ) : (
-                        <>
+                      <>
                         <UserPlus className="mr-2 h-4 w-4" />
                         {t('admin.users.createUser')}
-                        </>
+                      </>
                     )}
-                    </Button>
+                  </Button>
                 </DialogFooter>
-                </DialogContent>
+              </DialogContent>
             </Dialog>
           </div>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {statsCards.map((stat, index) => (
+          {statsCards.map((stat, index) => (
             <div
-                key={index}
-                className={`group relative overflow-hidden rounded-2xl border ${stat.border} bg-white p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1`}
+              key={index}
+              className={`group relative overflow-hidden rounded-2xl border ${stat.border} bg-white p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1`}
             >
-                <div
+              <div
                 className={`absolute right-0 top-0 h-24 w-24 translate-x-8 translate-y--8 rounded-full ${stat.blobColor} opacity-5 blur-2xl transition-transform duration-500 group-hover:scale-150`}
-                />
-                
-                <div className="relative flex items-start justify-between">
+              />
+
+              <div className="relative flex items-start justify-between">
                 <div>
-                    <p className="text-sm font-medium text-gray-500">{stat.label}</p>
-                    <h3 className="mt-2 text-3xl font-bold tracking-tight text-gray-900">
+                  <p className="text-sm font-medium text-gray-500">{stat.label}</p>
+                  <h3 className="mt-2 text-3xl font-bold tracking-tight text-gray-900">
                     {stat.value}
-                    </h3>
+                  </h3>
                 </div>
                 <div className={`rounded-xl ${stat.bg} p-3 ${stat.color} bg-opacity-50`}>
-                    <stat.icon className="h-6 w-6" />
+                  <stat.icon className="h-6 w-6" />
                 </div>
-                </div>
+              </div>
 
-                {stat.growth !== null && (
+              {stat.growth !== null && (
                 <div className="mt-4 flex items-center gap-2">
-                    <span
-                    className={`flex items-center text-sm font-medium ${
-                        Number(stat.growth) >= 0 ? "text-emerald-600" : "text-red-600"
-                    }`}
-                    >
+                  <span
+                    className={`flex items-center text-sm font-medium ${Number(stat.growth) >= 0 ? "text-emerald-600" : "text-red-600"
+                      }`}
+                  >
                     {Number(stat.growth) >= 0 ? "+" : ""}
                     {Number(stat.growth).toFixed(1)}%
-                    </span>
-                    <span className="text-sm text-gray-400">from last month</span>
+                  </span>
+                  <span className="text-sm text-gray-400">from last month</span>
                 </div>
-                )}
+              )}
             </div>
-            ))}
+          ))}
         </div>
 
 
@@ -425,20 +422,13 @@ export default function AdminUsersPage() {
             </TableHeader>
             <TableBody>
               {loading ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="h-48 text-center">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                       <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-                       <p className="text-sm text-gray-500">Loading users...</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                <TableRowsSkeleton columnCount={7} rowCount={5} showActions />
               ) : users.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="h-48 text-center text-gray-500">
                     <div className="flex flex-col items-center justify-center gap-2">
-                        <UserX className="h-8 w-8 text-gray-300" />
-                        <p>{t("admin.users.noUsersFound")}</p>
+                      <UserX className="h-8 w-8 text-gray-300" />
+                      <p>{t("admin.users.noUsersFound")}</p>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -446,27 +436,26 @@ export default function AdminUsersPage() {
                 users.map((user) => (
                   <TableRow key={user.id} className="border-gray-50 hover:bg-gray-50/50 transition-colors">
                     <TableCell className="font-medium text-gray-900 pl-6 py-4">
-                        <div className="flex items-center gap-3">
-                             <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-600">
-                                {user.name.charAt(0).toUpperCase()}
-                             </div>
-                             {user.name}
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-600">
+                          {user.name.charAt(0).toUpperCase()}
                         </div>
+                        {user.name}
+                      </div>
                     </TableCell>
                     <TableCell className="text-gray-500 py-4">{user.email}</TableCell>
                     <TableCell className="py-4">
-                         <Badge variant="outline" className="capitalize font-medium border-gray-200 text-gray-600 bg-gray-50/50">
-                            {user.role}
-                         </Badge>
+                      <Badge variant="outline" className="capitalize font-medium border-gray-200 text-gray-600 bg-gray-50/50">
+                        {user.role}
+                      </Badge>
                     </TableCell>
                     <TableCell className="py-4">
                       <Badge
                         variant={user.status === "active" ? "default" : "secondary"}
-                        className={`font-medium shadow-none border-0 ${
-                          user.status === "active"
-                            ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                        }`}
+                        className={`font-medium shadow-none border-0 ${user.status === "active"
+                          ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                          }`}
                       >
                         {user.status}
                       </Badge>
@@ -491,7 +480,7 @@ export default function AdminUsersPage() {
                             <MoreHorizontal className="h-4 w-4 text-gray-400" />
                           </Button>
                         </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-[160px] rounded-xl border-gray-100 shadow-lg">
+                        <DropdownMenuContent align="end" className="w-[160px] rounded-xl border-gray-100 shadow-lg">
                           <DropdownMenuLabel className="text-xs text-gray-400 font-normal">
                             {t("admin.users.dropdown.actions")}
                           </DropdownMenuLabel>
@@ -527,32 +516,32 @@ export default function AdminUsersPage() {
             </TableBody>
           </Table>
 
-            {/* Pagination inside Card */}
-            <div className="flex items-center justify-between border-t border-gray-100 p-4 bg-gray-50/30">
+          {/* Pagination inside Card */}
+          <div className="flex items-center justify-between border-t border-gray-100 p-4 bg-gray-50/30">
             <p className="text-sm text-gray-500">
-                Showing page <span className="font-semibold text-gray-900">{page}</span> of <span className="font-semibold text-gray-900">{totalPages || 1}</span>
+              Showing page <span className="font-semibold text-gray-900">{page}</span> of <span className="font-semibold text-gray-900">{totalPages || 1}</span>
             </p>
             <div className="flex items-center gap-2">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page === 1 || loading}
-                    className="rounded-lg border-gray-200 hover:bg-white hover:text-gray-900 text-gray-500 h-8"
-                >
-                    {t("common.previous")}
-                </Button>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={page === totalPages || loading}
-                    className="rounded-lg border-gray-200 hover:bg-white hover:text-gray-900 text-gray-500 h-8"
-                >
-                    {t("common.next")}
-                </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1 || loading}
+                className="rounded-lg border-gray-200 hover:bg-white hover:text-gray-900 text-gray-500 h-8"
+              >
+                {t("common.previous")}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages || loading}
+                className="rounded-lg border-gray-200 hover:bg-white hover:text-gray-900 text-gray-500 h-8"
+              >
+                {t("common.next")}
+              </Button>
             </div>
-            </div>
+          </div>
         </div>
       </div>
     </div>

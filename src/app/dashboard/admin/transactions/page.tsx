@@ -27,6 +27,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTranslation } from "react-i18next";
 import { useAdminAnalytics } from "@/hooks/useAdminAnalytics";
 import { formatCurrency } from "@/lib/utils";
+import { DashboardSkeleton } from "@/components/skeletons/DashboardSkeleton";
+import { TableRowsSkeleton } from "@/components/skeletons/TableSkeleton";
 
 export default function AdminTransactionsPage() {
   const router = useRouter();
@@ -76,7 +78,7 @@ export default function AdminTransactionsPage() {
       border: "border-blue-100",
       blobColor: "bg-blue-500"
     },
-     {
+    {
       label: "Pending Processing",
       value: "12", // Mocked as specific count isn't in main stats
       growth: -2.5,
@@ -124,20 +126,13 @@ export default function AdminTransactionsPage() {
   }, [searchTerm]);
 
   if (authLoading) {
-    return (
-      <div className="flex h-screen bg-gray-50 items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-gray-900" />
-          <p className="text-gray-500 font-medium">{t("admin.verifying")}</p>
-        </div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   return (
     <div className="min-h-screen bg-gray-50/50 p-6 md:p-8 font-sans text-gray-900">
       <div className="max-w-7xl mx-auto space-y-8">
-        
+
         {/* Header & Actions */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div className="space-y-1">
@@ -149,85 +144,84 @@ export default function AdminTransactionsPage() {
             </p>
           </div>
 
-             <Button onClick={handleExport} variant="outline" className="h-10 rounded-xl border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50 transition-all hover:shadow-md gap-2">
-                <Download className="w-4 h-4" />
-                {t("admin.transactions.exportReport")}
-            </Button>
+          <Button onClick={handleExport} variant="outline" className="h-10 rounded-xl border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50 transition-all hover:shadow-md gap-2">
+            <Download className="w-4 h-4" />
+            {t("admin.transactions.exportReport")}
+          </Button>
 
         </div>
 
         {/* Tabs & Search */}
         <div className="space-y-4">
-             <Tabs defaultValue="all" value={statusFilter} onValueChange={setStatusFilter} className="w-full">
-                <TabsList className="bg-white border border-gray-200 p-1 h-12 rounded-xl w-full md:w-auto justify-start overflow-x-auto">
-                    <TabsTrigger value="all" className="rounded-lg px-4 h-9 data-[state=active]:bg-gray-100 data-[state=active]:text-gray-900">
-                        All
-                    </TabsTrigger>
-                    <TabsTrigger value="completed" className="rounded-lg px-4 h-9 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
-                        Completed
-                    </TabsTrigger>
-                    <TabsTrigger value="pending" className="rounded-lg px-4 h-9 data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">
-                        Pending
-                    </TabsTrigger>
-                     <TabsTrigger value="failed" className="rounded-lg px-4 h-9 data-[state=active]:bg-red-50 data-[state=active]:text-red-700">
-                        Failed
-                    </TabsTrigger>
-                    <TabsTrigger value="refunded" className="rounded-lg px-4 h-9 data-[state=active]:bg-gray-100 data-[state=active]:text-gray-700">
-                        Refunded
-                    </TabsTrigger>
-                </TabsList>
-            </Tabs>
+          <Tabs defaultValue="all" value={statusFilter} onValueChange={setStatusFilter} className="w-full">
+            <TabsList className="bg-white border border-gray-200 p-1 h-12 rounded-xl w-full md:w-auto justify-start overflow-x-auto">
+              <TabsTrigger value="all" className="rounded-lg px-4 h-9 data-[state=active]:bg-gray-100 data-[state=active]:text-gray-900">
+                All
+              </TabsTrigger>
+              <TabsTrigger value="completed" className="rounded-lg px-4 h-9 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
+                Completed
+              </TabsTrigger>
+              <TabsTrigger value="pending" className="rounded-lg px-4 h-9 data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">
+                Pending
+              </TabsTrigger>
+              <TabsTrigger value="failed" className="rounded-lg px-4 h-9 data-[state=active]:bg-red-50 data-[state=active]:text-red-700">
+                Failed
+              </TabsTrigger>
+              <TabsTrigger value="refunded" className="rounded-lg px-4 h-9 data-[state=active]:bg-gray-100 data-[state=active]:text-gray-700">
+                Refunded
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
 
-            <div className="relative w-full">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    placeholder={t("admin.transactions.searchPlaceholder")}
-                    className="pl-9 h-11 bg-white border-gray-200 rounded-xl shadow-sm focus:ring-gray-900 focus:border-gray-900 transition-shadow"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-            </div>
+          <div className="relative w-full">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder={t("admin.transactions.searchPlaceholder")}
+              className="pl-9 h-11 bg-white border-gray-200 rounded-xl shadow-sm focus:ring-gray-900 focus:border-gray-900 transition-shadow"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
 
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {statsCards.map((stat, index) => (
+          {statsCards.map((stat, index) => (
             <div
-                key={index}
-                className={`group relative overflow-hidden rounded-2xl border ${stat.border} bg-white p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1`}
+              key={index}
+              className={`group relative overflow-hidden rounded-2xl border ${stat.border} bg-white p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1`}
             >
-                <div
+              <div
                 className={`absolute right-0 top-0 h-24 w-24 translate-x-8 translate-y--8 rounded-full ${stat.blobColor} opacity-5 blur-2xl transition-transform duration-500 group-hover:scale-150`}
-                />
-                
-                <div className="relative flex items-start justify-between">
+              />
+
+              <div className="relative flex items-start justify-between">
                 <div>
-                    <p className="text-sm font-medium text-gray-500">{stat.label}</p>
-                    <h3 className="mt-2 text-3xl font-bold tracking-tight text-gray-900">
+                  <p className="text-sm font-medium text-gray-500">{stat.label}</p>
+                  <h3 className="mt-2 text-3xl font-bold tracking-tight text-gray-900">
                     {stat.value}
-                    </h3>
+                  </h3>
                 </div>
                 <div className={`rounded-xl ${stat.bg} p-3 ${stat.color} bg-opacity-50`}>
-                    <stat.icon className="h-6 w-6" />
+                  <stat.icon className="h-6 w-6" />
                 </div>
-                </div>
+              </div>
 
-                {stat.growth !== null && (
+              {stat.growth !== null && (
                 <div className="mt-4 flex items-center gap-2">
-                    <span
-                    className={`flex items-center text-sm font-medium ${
-                        Number(stat.growth) >= 0 ? "text-emerald-600" : "text-red-600"
-                    }`}
-                    >
+                  <span
+                    className={`flex items-center text-sm font-medium ${Number(stat.growth) >= 0 ? "text-emerald-600" : "text-red-600"
+                      }`}
+                  >
                     {Number(stat.growth) >= 0 ? "+" : ""}
                     {Number(stat.growth).toFixed(1)}%
-                    </span>
-                    <span className="text-sm text-gray-400">from last month</span>
+                  </span>
+                  <span className="text-sm text-gray-400">from last month</span>
                 </div>
-                )}
+              )}
             </div>
-            ))}
+          ))}
         </div>
 
         {/* Transactions Table Card */}
@@ -246,23 +240,16 @@ export default function AdminTransactionsPage() {
             </TableHeader>
             <TableBody>
               {loading ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="h-48 text-center">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-                       <p className="text-sm text-gray-500">Loading transactions...</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                <TableRowsSkeleton columnCount={7} rowCount={5} />
               ) : transactions.length === 0 ? (
                 <TableRow>
                   <TableCell
                     colSpan={7}
                     className="h-48 text-center text-gray-500"
                   >
-                     <div className="flex flex-col items-center justify-center gap-2">
-                        <Receipt className="h-8 w-8 text-gray-300" />
-                        <p>{t("admin.transactions.noTransactions")}</p>
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <Receipt className="h-8 w-8 text-gray-300" />
+                      <p>{t("admin.transactions.noTransactions")}</p>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -276,7 +263,7 @@ export default function AdminTransactionsPage() {
                       <div className="flex flex-col">
                         <span className="font-semibold text-gray-900">{trx.userName}</span>
                         <span className="text-xs text-gray-400">
-                           ID: {trx.userId.substring(0, 8)}...
+                          ID: {trx.userId.substring(0, 8)}...
                         </span>
                       </div>
                     </TableCell>
@@ -290,16 +277,15 @@ export default function AdminTransactionsPage() {
                           trx.status === "completed"
                             ? "default"
                             : trx.status === "pending"
-                            ? "secondary"
-                            : "destructive"
+                              ? "secondary"
+                              : "destructive"
                         }
-                        className={`font-medium shadow-none border-0 ${
-                          trx.status === "completed"
-                            ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                            : trx.status === "pending"
+                        className={`font-medium shadow-none border-0 ${trx.status === "completed"
+                          ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                          : trx.status === "pending"
                             ? "bg-amber-50 text-amber-700 hover:bg-amber-100"
                             : "bg-red-50 text-red-700 hover:bg-red-100"
-                        }`}
+                          }`}
                       >
                         {t(`admin.transactions.status.${trx.status}`)}
                       </Badge>
@@ -308,45 +294,45 @@ export default function AdminTransactionsPage() {
                       {new Date(trx.date).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="text-gray-500 py-4">
-                        <div className="flex items-center gap-2">
-                            <div className="p-1.5 bg-gray-100 rounded-md">
-                                <CreditCard className="w-3.5 h-3.5 text-gray-600" />
-                            </div>
-                            <span className="text-sm">{trx.paymentMethodId || "Card"}</span>
+                      <div className="flex items-center gap-2">
+                        <div className="p-1.5 bg-gray-100 rounded-md">
+                          <CreditCard className="w-3.5 h-3.5 text-gray-600" />
                         </div>
+                        <span className="text-sm">{trx.paymentMethodId || "Card"}</span>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
               )}
             </TableBody>
           </Table>
-          
-           {/* Pagination inside Card */}
-            <div className="flex items-center justify-between border-t border-gray-100 p-4 bg-gray-50/30">
+
+          {/* Pagination inside Card */}
+          <div className="flex items-center justify-between border-t border-gray-100 p-4 bg-gray-50/30">
             <p className="text-sm text-gray-500">
-                Showing page <span className="font-semibold text-gray-900">{page}</span> of <span className="font-semibold text-gray-900">{totalPages || 1}</span>
+              Showing page <span className="font-semibold text-gray-900">{page}</span> of <span className="font-semibold text-gray-900">{totalPages || 1}</span>
             </p>
             <div className="flex items-center gap-2">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page === 1 || loading}
-                    className="rounded-lg border-gray-200 hover:bg-white hover:text-gray-900 text-gray-500 h-8"
-                >
-                    {t("common.previous")}
-                </Button>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={page === totalPages || loading}
-                    className="rounded-lg border-gray-200 hover:bg-white hover:text-gray-900 text-gray-500 h-8"
-                >
-                    {t("common.next")}
-                </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1 || loading}
+                className="rounded-lg border-gray-200 hover:bg-white hover:text-gray-900 text-gray-500 h-8"
+              >
+                {t("common.previous")}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages || loading}
+                className="rounded-lg border-gray-200 hover:bg-white hover:text-gray-900 text-gray-500 h-8"
+              >
+                {t("common.next")}
+              </Button>
             </div>
-            </div>
+          </div>
         </div>
       </div>
     </div>

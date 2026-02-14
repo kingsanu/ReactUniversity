@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { DashboardSkeleton } from "@/components/skeletons/DashboardSkeleton";
 
 /**
  * Resume Builder Root Page
@@ -26,11 +27,7 @@ export default function ResumeBuilderPage() {
   }, [router]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <div className="text-center">
-        <p className="text-gray-600 mb-2">Redirecting to resume builder...</p>
-      </div>
-    </div>
+    <DashboardSkeleton />
   );
 }
 

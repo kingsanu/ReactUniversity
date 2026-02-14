@@ -57,6 +57,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import { StudentDetailsSheet } from "./_components/StudentDetailsSheet";
+import { SessionCardSkeleton } from "@/components/skeletons/SessionCardSkeleton";
 
 export default function SessionsPage() {
   const { t } = useTranslation();
@@ -103,10 +104,10 @@ export default function SessionsPage() {
         const rawSessions = Array.isArray((sessionsData as any)?.data?.data)
           ? (sessionsData as any).data.data
           : Array.isArray((sessionsData as any)?.data)
-          ? (sessionsData as any).data
-          : Array.isArray(sessionsData)
-          ? sessionsData
-          : [];
+            ? (sessionsData as any).data
+            : Array.isArray(sessionsData)
+              ? sessionsData
+              : [];
 
         const resolveStartTs = (s: any): number | undefined => {
           const candidates = [
@@ -668,11 +669,10 @@ export default function SessionsPage() {
         {/* Sessions List */}
         <div className="space-y-6">
           {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-20 text-gray-400 space-y-4">
-              <Loader2 className="h-10 w-10 animate-spin text-blue-500" />
-              <p className="font-medium animate-pulse">
-                Loading your sessions...
-              </p>
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <SessionCardSkeleton key={i} />
+              ))}
             </div>
           ) : sortedSessions.length === 0 ? (
             <div className="text-center py-20 sm:py-32 bg-white/60 backdrop-blur-xl rounded-[2rem] border-2 border-dashed border-gray-200/60 flex flex-col items-center justify-center">
@@ -732,8 +732,8 @@ export default function SessionsPage() {
                                 session.status === "cancelled"
                                   ? "bg-gradient-to-b from-red-400 to-red-600"
                                   : session.status === "completed"
-                                  ? "bg-gradient-to-b from-green-400 to-green-600"
-                                  : "bg-gradient-to-b from-blue-400 to-blue-600"
+                                    ? "bg-gradient-to-b from-green-400 to-green-600"
+                                    : "bg-gradient-to-b from-blue-400 to-blue-600"
                               )}
                             />
 
@@ -752,8 +752,8 @@ export default function SessionsPage() {
                                       session.status === "cancelled"
                                         ? "bg-red-500"
                                         : session.status === "completed"
-                                        ? "bg-green-500"
-                                        : "bg-blue-500"
+                                          ? "bg-green-500"
+                                          : "bg-blue-500"
                                     )}
                                   />
                                   <Avatar className="h-16 w-16 border-4 border-white shadow-sm relative z-10">
@@ -805,19 +805,19 @@ export default function SessionsPage() {
                               <div className="flex items-center gap-3 w-full lg:w-auto justify-end mt-4 lg:mt-0 pt-5 lg:pt-0 border-t lg:border-t-0 border-gray-100/50">
                                 {(session.status === "confirmed" ||
                                   session.status === "rescheduled") && (
-                                  <Button
-                                    className="flex-1 lg:flex-none bg-gray-900 text-white hover:bg-black h-11 px-6 rounded-2xl text-sm font-bold shadow-xl shadow-gray-900/10 transition-all hover:scale-105 active:scale-95"
-                                    asChild
-                                  >
-                                    <a
-                                      href={session.meetingLink}
-                                      target="_blank"
-                                      rel="noreferrer"
+                                    <Button
+                                      className="flex-1 lg:flex-none bg-gray-900 text-white hover:bg-black h-11 px-6 rounded-2xl text-sm font-bold shadow-xl shadow-gray-900/10 transition-all hover:scale-105 active:scale-95"
+                                      asChild
                                     >
-                                      <Video className="w-4 h-4 mr-2" /> Join
-                                    </a>
-                                  </Button>
-                                )}
+                                      <a
+                                        href={session.meetingLink}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                      >
+                                        <Video className="w-4 h-4 mr-2" /> Join
+                                      </a>
+                                    </Button>
+                                  )}
 
                                 <Button
                                   variant="outline"
@@ -853,29 +853,29 @@ export default function SessionsPage() {
                                     </DropdownMenuItem>
                                     {(session.status === "confirmed" ||
                                       session.status === "rescheduled") && (
-                                      <>
-                                        <DropdownMenuSeparator className="bg-gray-100 my-1" />
-                                        <DropdownMenuItem
-                                          onClick={() =>
-                                            handleRescheduleClick(session)
-                                          }
-                                          className="rounded-lg p-2.5 font-medium cursor-pointer focus:bg-orange-50 focus:text-orange-700 text-gray-700"
-                                        >
-                                          <CalendarDays className="mr-2 h-4 w-4 text-orange-400" />{" "}
-                                          Reschedule
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                          onClick={() => {
-                                            setSelectedSession(session);
-                                            setIsConfirmCancelOpen(true);
-                                          }}
-                                          className="rounded-lg p-2.5 font-medium cursor-pointer focus:bg-red-50 focus:text-red-700 text-red-600"
-                                        >
-                                          <XCircle className="mr-2 h-4 w-4 text-red-500" />{" "}
-                                          Cancel Session
-                                        </DropdownMenuItem>
-                                      </>
-                                    )}
+                                        <>
+                                          <DropdownMenuSeparator className="bg-gray-100 my-1" />
+                                          <DropdownMenuItem
+                                            onClick={() =>
+                                              handleRescheduleClick(session)
+                                            }
+                                            className="rounded-lg p-2.5 font-medium cursor-pointer focus:bg-orange-50 focus:text-orange-700 text-gray-700"
+                                          >
+                                            <CalendarDays className="mr-2 h-4 w-4 text-orange-400" />{" "}
+                                            Reschedule
+                                          </DropdownMenuItem>
+                                          <DropdownMenuItem
+                                            onClick={() => {
+                                              setSelectedSession(session);
+                                              setIsConfirmCancelOpen(true);
+                                            }}
+                                            className="rounded-lg p-2.5 font-medium cursor-pointer focus:bg-red-50 focus:text-red-700 text-red-600"
+                                          >
+                                            <XCircle className="mr-2 h-4 w-4 text-red-500" />{" "}
+                                            Cancel Session
+                                          </DropdownMenuItem>
+                                        </>
+                                      )}
                                   </DropdownMenuContent>
                                 </DropdownMenu>
                               </div>

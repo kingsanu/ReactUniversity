@@ -19,6 +19,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   TimelineEvent,
   TimelineViewProps,
@@ -277,8 +278,8 @@ function TimelineEventCard({ event, isLast, onClick }: TimelineEventCardProps) {
                   event.status === "completed"
                     ? "bg-emerald-50 text-emerald-700"
                     : event.status === "in_progress"
-                    ? "bg-blue-50 text-blue-700"
-                    : "bg-gray-50 text-gray-600"
+                      ? "bg-blue-50 text-blue-700"
+                      : "bg-gray-50 text-gray-600"
                 )}
               >
                 <span
@@ -287,8 +288,8 @@ function TimelineEventCard({ event, isLast, onClick }: TimelineEventCardProps) {
                     event.status === "completed"
                       ? "bg-emerald-500"
                       : event.status === "in_progress"
-                      ? "bg-blue-500"
-                      : "bg-gray-400"
+                        ? "bg-blue-500"
+                        : "bg-gray-400"
                   )}
                   aria-hidden="true"
                 />
@@ -297,12 +298,12 @@ function TimelineEventCard({ event, isLast, onClick }: TimelineEventCardProps) {
                     ? "Completado"
                     : "Completed"
                   : event.status === "in_progress"
-                  ? language === "spanish"
-                    ? "En Progreso"
-                    : "In Progress"
-                  : language === "spanish"
-                  ? "No Iniciado"
-                  : "Not Started"}
+                    ? language === "spanish"
+                      ? "En Progreso"
+                      : "In Progress"
+                    : language === "spanish"
+                      ? "No Iniciado"
+                      : "Not Started"}
               </span>
             </div>
             <span className="text-xs text-gray-400 font-medium">
@@ -482,7 +483,7 @@ function EventMetadata({
             </span>
           </div>
         )}
-        
+
         {metadata.progress !== undefined && (
           <div className="space-y-1.5">
             <div className="flex justify-between text-xs mb-1">
@@ -492,8 +493,8 @@ function EventMetadata({
               <span className="text-gray-900 font-bold">{metadata.progress.toFixed(0)}%</span>
             </div>
             <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-teal-500 rounded-full transition-all duration-500 ease-out" 
+              <div
+                className="h-full bg-teal-500 rounded-full transition-all duration-500 ease-out"
                 style={{ width: `${metadata.progress}%` }}
               />
             </div>
@@ -579,11 +580,11 @@ export function TimelineView({
         <div key={group.date} className="relative">
           {/* Date header */}
           <div className="sticky top-0 z-20 mb-8 flex items-center justify-center pointer-events-none">
-            <div 
+            <div
               className={cn(
                 "px-4 py-1.5 rounded-full text-xs font-bold shadow-sm border backdrop-blur-md transition-all duration-300 pointer-events-auto",
-                group.isToday 
-                  ? "bg-blue-600 text-white border-blue-600 shadow-blue-100" 
+                group.isToday
+                  ? "bg-blue-600 text-white border-blue-600 shadow-blue-100"
                   : "bg-white/80 text-gray-600 border-gray-200"
               )}
             >
@@ -616,17 +617,17 @@ export function TimelineView({
  */
 function TimelineViewSkeleton() {
   return (
-    <div className="space-y-12 animate-pulse p-4">
+    <div className="space-y-12 p-4">
       {[1, 2].map((group) => (
         <div key={group}>
           <div className="flex justify-center mb-8">
-            <div className="h-8 w-32 bg-gray-100 rounded-full" />
+            <Skeleton className="h-8 w-32 rounded-full" />
           </div>
           <div className="space-y-8">
             {[1, 2, 3].map((item) => (
               <div key={item} className="flex gap-6">
-                <div className="h-12 w-12 rounded-full bg-gray-100 shrink-0" />
-                <div className="flex-1 h-32 rounded-xl bg-gray-100" />
+                <Skeleton className="h-12 w-12 rounded-full shrink-0" variant="circle" />
+                <Skeleton className="flex-1 h-32 rounded-xl" />
               </div>
             ))}
           </div>

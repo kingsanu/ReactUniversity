@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAnalyticsOverview, usePerformanceTrends, useTopPerformers } from "@/hooks/useSchoolAdmin";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AnalyticsPage() {
   const { t } = useTranslation();
@@ -111,7 +112,7 @@ export default function AnalyticsPage() {
         >
           {overviewLoading ? (
             [...Array(4)].map((_, i) => (
-              <div key={i} className="h-32 bg-white rounded-2xl border border-gray-100 animate-pulse" />
+              <Skeleton key={i} className="h-32 rounded-2xl border border-gray-100" />
             ))
           ) : (
             statCards.map((stat, index) => (

@@ -1,16 +1,39 @@
 "use client";
 
-import React from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function SkeletonCourseCard() {
   return (
-    <div className="border rounded-lg p-4 bg-white shadow-sm animate-pulse">
-      <div className="h-28 bg-gray-200 rounded-md mb-4"></div>
-      <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-      <div className="h-3 bg-gray-200 rounded w-1/2 mb-4"></div>
-      <div className="flex items-center gap-2">
-        <div className="h-8 w-24 bg-gray-200 rounded"></div>
-        <div className="h-8 w-16 bg-gray-200 rounded ml-auto"></div>
+    <div className="group relative flex flex-col h-full bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
+      {/* Thumbnail */}
+      <div className="relative h-48 w-full overflow-hidden">
+        <Skeleton className="h-full w-full" />
+      </div>
+
+      <div className="flex flex-col flex-grow p-5 space-y-4">
+        {/* Header - Rating/Badge */}
+        <div className="flex justify-between items-start">
+          <Skeleton className="h-5 w-24" />
+          <Skeleton className="h-6 w-16 rounded-full" />
+        </div>
+
+        {/* Title & Description */}
+        <div className="space-y-2 flex-grow">
+          <Skeleton className="h-7 w-full" />
+          <Skeleton className="h-4 w-3/4" />
+        </div>
+
+        {/* Metadata */}
+        <div className="flex items-center gap-4 py-2 border-t border-gray-50 mt-auto">
+          <Skeleton className="h-4 w-12" />
+          <Skeleton className="h-4 w-12" />
+          <Skeleton className="h-4 w-12" />
+        </div>
+
+        {/* Footer Actions */}
+        <div className="pt-2 flex items-center justify-between gap-3">
+          <Skeleton className="h-10 w-full rounded-xl" />
+        </div>
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { FiCamera, FiMapPin, FiLink, FiGithub, FiTwitter, FiLinkedin, FiMail } from "react-icons/fi";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -20,7 +21,7 @@ export function ProfileHeader() {
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isUploadingCover, setIsUploadingCover] = useState(false);
-  
+
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
 
@@ -149,16 +150,16 @@ export function ProfileHeader() {
         )}
         {/* Animated mesh gradient overlay effect */}
         <div className="absolute inset-0 opacity-40 mix-blend-overlay">
-             <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-             <div className="absolute top-0 -right-4 w-72 h-72 bg-yellow-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-             <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+          <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+          <div className="absolute top-0 -right-4 w-72 h-72 bg-yellow-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+          <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
         </div>
-        
+
         <div className="absolute inset-0 bg-black/20" /> {/* Subtle darkening */}
 
-        <Button 
-          variant="secondary" 
-          size="sm" 
+        <Button
+          variant="secondary"
+          size="sm"
           className="absolute top-6 right-6 bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border-white/20 border transition-all rounded-full px-4"
           onClick={() => coverInputRef.current?.click()}
           disabled={isUploadingCover}
@@ -175,7 +176,7 @@ export function ProfileHeader() {
       {/* Profile Info Content */}
       <div className="container mx-auto px-4 md:px-8 max-w-6xl">
         <div className="flex flex-col md:flex-row items-end gap-8 relative z-10 px-4">
-          
+
           {/* Avatar Area - Overlaps Banner */}
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
@@ -183,15 +184,15 @@ export function ProfileHeader() {
             className="relative shrink-0 -mt-16 md:-mt-24"
           >
             <div className="p-1.5 bg-white dark:bg-gray-950 rounded-full shadow-2xl">
-                <Avatar className="h-32 w-32 md:h-48 md:w-48 border-4 border-white dark:border-gray-900 relative bg-gray-100">
+              <Avatar className="h-32 w-32 md:h-48 md:w-48 border-4 border-white dark:border-gray-900 relative bg-gray-100">
                 <AvatarImage src={displayAvatarUrl} className="object-cover" alt={displayName} />
                 <AvatarFallback className="text-4xl bg-gradient-to-br from-indigo-100 to-white text-indigo-600">
                   {getInitials(displayName)}
                 </AvatarFallback>
-                </Avatar>
+              </Avatar>
             </div>
-            <button 
-              className="absolute bottom-4 right-4 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all border-2 border-white dark:border-gray-900 disabled:opacity-50 disabled:cursor-not-allowed" 
+            <button
+              className="absolute bottom-4 right-4 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all border-2 border-white dark:border-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label="Change profile picture"
               onClick={() => avatarInputRef.current?.click()}
               disabled={isUploadingAvatar}
@@ -214,20 +215,20 @@ export function ProfileHeader() {
             >
               <div className="space-y-2">
                 <div>
-                    <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+                  <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight">
                     {isLoading ? (
-                      <span className="animate-pulse bg-gray-200 dark:bg-gray-700 rounded h-12 w-48 inline-block"></span>
+                      <Skeleton className="h-12 w-48 rounded" />
                     ) : (
                       displayName
                     )}
-                    </h1>
-                    {displayHeadline && (
-                      <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 font-medium">
-                        {displayHeadline}
-                      </p>
-                    )}
+                  </h1>
+                  {displayHeadline && (
+                    <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 font-medium">
+                      {displayHeadline}
+                    </p>
+                  )}
                 </div>
-                
+
                 <div className="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400 font-medium pt-1">
                   {displayLocation && (
                     <span className="flex items-center px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full">
@@ -249,23 +250,23 @@ export function ProfileHeader() {
 
               {/* Actions */}
               <div className="flex gap-3 mt-4 lg:mt-0 w-full lg:w-auto">
-                 <Button asChild className="flex-1 lg:flex-none bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-200 rounded-xl px-6 h-11 font-semibold shadow-lg shadow-gray-200 dark:shadow-none">
-                    <Link href="/dashboard/profile?tab=edit">Edit Profile</Link>
-                 </Button>
-                 {displayLinkedin && (
-                   <Button variant="outline" asChild className="flex-1 lg:flex-none border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl h-11 w-11 p-0 flex items-center justify-center">
-                      <a href={displayLinkedin.startsWith("http") ? displayLinkedin : `https://${displayLinkedin}`} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Profile">
-                        <FiLinkedin size={20} className="text-blue-700" aria-hidden="true" />
-                      </a>
-                   </Button>
-                 )}
-                 {displayTwitter && (
-                   <Button variant="outline" asChild className="flex-1 lg:flex-none border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl h-11 w-11 p-0 flex items-center justify-center">
-                      <a href={displayTwitter.startsWith("http") ? displayTwitter : `https://${displayTwitter}`} target="_blank" rel="noopener noreferrer" aria-label="Twitter Profile">
-                        <FiTwitter size={20} className="text-blue-400" aria-hidden="true" />
-                      </a>
-                   </Button>
-                 )}
+                <Button asChild className="flex-1 lg:flex-none bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-200 rounded-xl px-6 h-11 font-semibold shadow-lg shadow-gray-200 dark:shadow-none">
+                  <Link href="/dashboard/profile?tab=edit">Edit Profile</Link>
+                </Button>
+                {displayLinkedin && (
+                  <Button variant="outline" asChild className="flex-1 lg:flex-none border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl h-11 w-11 p-0 flex items-center justify-center">
+                    <a href={displayLinkedin.startsWith("http") ? displayLinkedin : `https://${displayLinkedin}`} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Profile">
+                      <FiLinkedin size={20} className="text-blue-700" aria-hidden="true" />
+                    </a>
+                  </Button>
+                )}
+                {displayTwitter && (
+                  <Button variant="outline" asChild className="flex-1 lg:flex-none border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl h-11 w-11 p-0 flex items-center justify-center">
+                    <a href={displayTwitter.startsWith("http") ? displayTwitter : `https://${displayTwitter}`} target="_blank" rel="noopener noreferrer" aria-label="Twitter Profile">
+                      <FiTwitter size={20} className="text-blue-400" aria-hidden="true" />
+                    </a>
+                  </Button>
+                )}
               </div>
             </motion.div>
           </div>

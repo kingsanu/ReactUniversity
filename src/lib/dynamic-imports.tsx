@@ -4,6 +4,7 @@ import {
   DocumentSkeleton,
   ModalSkeleton,
 } from "@/components/ui/skeletons";
+import { Skeleton } from "@/components/ui/skeleton";
 
 /**
  * Dynamically imported TimelinePDF component
@@ -66,9 +67,7 @@ export const DynamicRadarChart = dynamic(
  */
 export const DynamicLottie = dynamic(() => import("react-lottie"), {
   ssr: false,
-  loading: () => (
-    <div className="w-full h-32 bg-slate-100 animate-pulse rounded-lg" />
-  ),
+  loading: () => <Skeleton className="w-full h-32 rounded-lg" />,
 });
 
 /**
@@ -107,8 +106,6 @@ export const DynamicStripeCheckout = dynamic(
   () => import("@/components/StripeCheckout"),
   {
     ssr: false,
-    loading: () => (
-      <div className="w-full h-48 bg-slate-100 animate-pulse rounded-lg" />
-    ),
+    loading: () => <Skeleton className="w-full h-48 rounded-lg" />,
   }
 );

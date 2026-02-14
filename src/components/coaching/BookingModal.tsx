@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface BookingModalProps {
   coach: Coach | null;
@@ -290,7 +291,7 @@ export function BookingModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent 
+      <DialogContent
         className="sm:max-w-[1000px] w-full p-0 overflow-hidden gap-0 bg-white text-gray-900 border-gray-200 shadow-2xl rounded-xl"
         aria-describedby={undefined}
       >
@@ -323,8 +324,8 @@ export function BookingModal({
                 {mode === "reschedule"
                   ? "Reschedule Session"
                   : slotsData?.price && slotsData.price.amount > 0
-                  ? `${slotsData.price.currency} ${slotsData.price.amount}`
-                  : "1 Hour Session"}
+                    ? `${slotsData.price.currency} ${slotsData.price.amount}`
+                    : "1 Hour Session"}
               </p>
 
               <div className="space-y-4 text-gray-600 text-sm">
@@ -483,9 +484,10 @@ export function BookingModal({
                         <p>Select a date to see available times</p>
                       </div>
                     ) : isLoadingSlots ? (
-                      <div className="flex flex-col items-center justify-center h-full text-gray-400 text-sm" role="status">
-                        <Loader2 className="h-8 w-8 animate-spin text-blue-600 mb-3" aria-hidden="true" />
-                        <p>Loading slots...</p>
+                      <div className="grid grid-cols-2 gap-2" role="status">
+                        {Array.from({ length: 8 }).map((_, i) => (
+                          <Skeleton key={i} className="h-11 w-full rounded-lg" />
+                        ))}
                       </div>
                     ) : availableTimeSlots.length === 0 ? (
                       <div className="flex flex-col items-center justify-center h-full text-gray-400 text-sm text-center px-4">

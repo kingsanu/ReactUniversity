@@ -2,8 +2,9 @@
 
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { IndexData } from "@/services/benchmarkService";
+import { ActionFunction } from "@/services/benchmarkService";
 import { DollarSign, Home, ShoppingBag } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface CostOfLivingProps {
   data?: IndexData;
@@ -15,7 +16,7 @@ export default function CostOfLiving({ data, isLoading }: CostOfLivingProps) {
 
   if (isLoading || !data) {
     return (
-       <div className="h-[200px] w-full bg-slate-50 rounded-lg animate-pulse" />
+      <Skeleton className="h-[200px] w-full rounded-lg" />
     );
   }
 
@@ -30,7 +31,7 @@ export default function CostOfLiving({ data, isLoading }: CostOfLivingProps) {
       <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-white rounded-md shadow-sm">
-             <DollarSign className="h-5 w-5 text-slate-500"/>
+            <DollarSign className="h-5 w-5 text-slate-500" />
           </div>
           <span className="text-sm font-medium text-slate-600">{t("benchmarks.costOfLivingIndex")}</span>
         </div>
@@ -39,10 +40,10 @@ export default function CostOfLiving({ data, isLoading }: CostOfLivingProps) {
         </span>
       </div>
 
-       <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+      <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-white rounded-md shadow-sm">
-             <Home className="h-5 w-5 text-slate-500"/>
+            <Home className="h-5 w-5 text-slate-500" />
           </div>
           <span className="text-sm font-medium text-slate-600">{t("benchmarks.rentIndex")}</span>
         </div>
@@ -51,10 +52,10 @@ export default function CostOfLiving({ data, isLoading }: CostOfLivingProps) {
         </span>
       </div>
 
-       <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+      <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-white rounded-md shadow-sm">
-             <ShoppingBag className="h-5 w-5 text-slate-500"/>
+            <ShoppingBag className="h-5 w-5 text-slate-500" />
           </div>
           <span className="text-sm font-medium text-slate-600">{t("benchmarks.purchasingPower")}</span>
         </div>

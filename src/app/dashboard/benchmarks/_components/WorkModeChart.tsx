@@ -4,6 +4,7 @@ import React from "react";
 import { Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { PieData } from "@/services/benchmarkService";
 import { DynamicPieChart } from "@/lib/dynamic-imports";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface WorkModeChartProps {
   data?: PieData[];
@@ -12,11 +13,7 @@ interface WorkModeChartProps {
 
 export default function WorkModeChart({ data, isLoading }: WorkModeChartProps) {
   if (isLoading) {
-    return (
-      <div className="h-[300px] w-full flex items-center justify-center bg-slate-50 rounded-lg animate-pulse">
-        <span className="text-slate-400 font-medium">Loading work modes...</span>
-      </div>
-    );
+    return <Skeleton className="h-[300px] w-full rounded-lg" />;
   }
 
   const COLORS = ['#10b981', '#3b82f6', '#f59e0b'];
@@ -38,10 +35,10 @@ export default function WorkModeChart({ data, isLoading }: WorkModeChartProps) {
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
             ))}
           </Pie>
-          <Tooltip 
-             contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+          <Tooltip
+            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
           />
-          <Legend verticalAlign="bottom" height={36}/>
+          <Legend verticalAlign="bottom" height={36} />
         </DynamicPieChart>
       </ResponsiveContainer>
     </div>

@@ -24,6 +24,8 @@ import {
   DollarSign,
   Filter
 } from "lucide-react";
+import { DashboardSkeleton } from "@/components/skeletons/DashboardSkeleton";
+import { TableRowsSkeleton } from "@/components/skeletons/TableSkeleton";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -44,7 +46,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatCurrency } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 
 export default function AdminPayoutsPage() {
   const router = useRouter();
@@ -60,13 +62,14 @@ export default function AdminPayoutsPage() {
   const { data: payoutsData, isLoading, refetch } = useQuery({
     queryKey: ["adminPayouts", page, statusFilter, searchTerm],
     queryFn: () => getAdminPayouts({
-        page,
-        limit: 10,
-        status: statusFilter === "all" ? undefined : (statusFilter as PayoutStatus),
-        // For search, we might need backend support or handling it differently if the API matches
-        // Assuming the API generally supports filtering by status and pagination
+      page,
+      limit: 10,
+      status: statusFilter === "all" ? undefined : (statusFilter as PayoutStatus),
+      // For search, we might need backend support or handling it differently if the API matches
+      // Assuming the API generally supports filtering by status and pagination
     }),
     enabled: isAdmin,
+    placeholderData: keepPreviousData,
     staleTime: 60000, // 1 minute
   });
 
@@ -121,11 +124,11 @@ export default function AdminPayoutsPage() {
   // Debounce Search - Reset Page
   useEffect(() => {
     const timer = setTimeout(() => {
-       if (isAdmin) setPage(1);
+      if (isAdmin) setPage(1);
     }, 500);
     return () => clearTimeout(timer);
   }, [searchTerm, statusFilter]);
-  
+
   // Computed Stats for Cards (Using API data + fallbacks)
   const statsCards = [
     {
@@ -155,7 +158,7 @@ export default function AdminPayoutsPage() {
       border: "border-amber-100",
       blobColor: "bg-amber-500"
     },
-     {
+    {
       label: "Failed Requests",
       value: "—", // Placeholder as detailed breakdown might need separate stats endpoint
       icon: XCircle,
@@ -168,11 +171,7 @@ export default function AdminPayoutsPage() {
 
 
   if (authLoading) {
-    return (
-      <div className="flex h-screen bg-gray-50 items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-900" />
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   return (
@@ -189,23 +188,23 @@ export default function AdminPayoutsPage() {
               {t("admin.payouts.subtitle")}
             </p>
           </div>
-          
-           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-             {/* Search */}
-             <div className="relative w-full md:w-72">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    placeholder={t("admin.payouts.searchPlaceholder")}
-                    className="pl-9 h-10 bg-white border-gray-200 rounded-xl shadow-sm focus:ring-gray-900 focus:border-gray-900 transition-shadow"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
+
+          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+            {/* Search */}
+            <div className="relative w-full md:w-72">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder={t("admin.payouts.searchPlaceholder")}
+                className="pl-9 h-10 bg-white border-gray-200 rounded-xl shadow-sm focus:ring-gray-900 focus:border-gray-900 transition-shadow"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
 
             {/* Filter */}
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-[160px] h-10 bg-white border-gray-200 rounded-xl shadow-sm text-gray-600 font-medium">
-                  <SelectValue placeholder="Filter by Status" />
+                <SelectValue placeholder="Filter by Status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
@@ -216,171 +215,164 @@ export default function AdminPayoutsPage() {
               </SelectContent>
             </Select>
             <Button onClick={() => refetch()} variant="outline" size="icon" className="h-10 w-10 rounded-xl bg-white border-gray-200 shadow-sm hover:bg-gray-50">
-                <Filter className="h-4 w-4 text-gray-500" />
+              <Filter className="h-4 w-4 text-gray-500" />
             </Button>
           </div>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {statsCards.map((stat, index) => (
+          {statsCards.map((stat, index) => (
             <div
-                key={index}
-                className={`group relative overflow-hidden rounded-2xl border ${stat.border} bg-white p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1`}
+              key={index}
+              className={`group relative overflow-hidden rounded-2xl border ${stat.border} bg-white p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1`}
             >
-                <div
+              <div
                 className={`absolute right-0 top-0 h-24 w-24 translate-x-8 translate-y--8 rounded-full ${stat.blobColor} opacity-5 blur-2xl transition-transform duration-500 group-hover:scale-150`}
-                />
-                
-                <div className="relative flex items-start justify-between">
+              />
+
+              <div className="relative flex items-start justify-between">
                 <div>
-                    <p className="text-sm font-medium text-gray-500">{stat.label}</p>
-                    <h3 className="mt-2 text-3xl font-bold tracking-tight text-gray-900">
+                  <p className="text-sm font-medium text-gray-500">{stat.label}</p>
+                  <h3 className="mt-2 text-3xl font-bold tracking-tight text-gray-900">
                     {stat.value}
-                    </h3>
+                  </h3>
                 </div>
                 <div className={`rounded-xl ${stat.bg} p-3 ${stat.color} bg-opacity-50`}>
-                    <stat.icon className="h-6 w-6" />
+                  <stat.icon className="h-6 w-6" />
                 </div>
-                </div>
+              </div>
             </div>
-            ))}
+          ))}
         </div>
 
         {/* Payouts Table */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-all duration-300">
-         <Table>
+          <Table>
             <TableHeader className="bg-gray-50/50">
-                <TableRow className="border-gray-50 hover:bg-gray-50/50">
+              <TableRow className="border-gray-50 hover:bg-gray-50/50">
                 <TableHead className="py-4 font-semibold text-gray-600 pl-6">{t("admin.payouts.table.payoutId")}</TableHead>
                 <TableHead className="py-4 font-semibold text-gray-600">{t("admin.payouts.table.coach")}</TableHead>
                 <TableHead className="py-4 font-semibold text-gray-600">{t("admin.payouts.table.period")}</TableHead>
                 <TableHead className="py-4 font-semibold text-gray-600 text-right">{t("admin.payouts.table.amount")}</TableHead>
                 <TableHead className="py-4 font-semibold text-gray-600">{t("admin.payouts.table.status")}</TableHead>
                 <TableHead className="py-4 font-semibold text-gray-600 text-right pr-6">{t("admin.payouts.table.actions")}</TableHead>
-                </TableRow>
+              </TableRow>
             </TableHeader>
             <TableBody>
-                {isLoading ? (
-                    <TableRow>
-                        <TableCell colSpan={6} className="h-48 text-center">
-                            <div className="flex flex-col items-center justify-center gap-2">
-                                <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-                                <p className="text-sm text-gray-500">Loading payouts...</p>
-                            </div>
-                        </TableCell>
+              {isLoading ? (
+                <TableRowsSkeleton columnCount={6} rowCount={5} />
+              ) : payouts.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="h-48 text-center text-gray-500">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <Wallet className="h-8 w-8 text-gray-300" />
+                      <p>{t("admin.payouts.noPending")}</p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                payouts.map((payout) => {
+                  const payoutId = (payout.id || payout.payoutId || "").toString();
+                  return (
+                    <TableRow key={payoutId || payout.coachId} className="border-gray-50 hover:bg-gray-50/50 transition-colors">
+                      <TableCell className="font-medium text-gray-500 pl-6 py-4 text-xs">
+                        {payoutId ? payoutId.substring(0, 8) + '...' : "—"}
+                      </TableCell>
+                      <TableCell className="py-4">
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-gray-900">{payout.coachName || "Unknown Coach"}</span>
+                          <span className="text-xs text-gray-400">{payout.coachEmail}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-gray-600 py-4 text-sm">
+                        {payout.periodStart ? (
+                          <div className="flex items-center gap-1">
+                            <Clock className="w-3 h-3 text-gray-400" />
+                            <span>{new Date(payout.periodStart).toLocaleDateString()}</span>
+                            {payout.periodEnd && <span> - {new Date(payout.periodEnd).toLocaleDateString()}</span>}
+                          </div>
+                        ) : "—"}
+                      </TableCell>
+                      <TableCell className="text-right font-bold text-gray-900 py-4">
+                        {formatCurrency(payout.netAmount ?? payout.amount, payout.currency)}
+                      </TableCell>
+                      <TableCell className="py-4">
+                        <Badge
+                          variant="outline"
+                          className={`font-medium shadow-none border-0 ${payout.status === 'completed'
+                            ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                            : payout.status === 'processing'
+                              ? "bg-blue-50 text-blue-700 hover:bg-blue-100"
+                              : payout.status === 'failed'
+                                ? "bg-red-50 text-red-700 hover:bg-red-100"
+                                : "bg-amber-50 text-amber-700 hover:bg-amber-100"
+                            }`}
+                        >
+                          {payout.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right pr-6 py-4">
+                        <div className="flex justify-end gap-2">
+                          {payout.status === 'pending' && (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-8 w-8 p-0 rounded-full text-red-500 hover:text-red-700 hover:bg-red-50"
+                                disabled={!payoutId || actioningId === payoutId}
+                                onClick={() => payoutId && handleReject(payoutId)}
+                                title="Reject"
+                              >
+                                {actioningId === payoutId ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-8 w-8 p-0 rounded-full text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                                disabled={!payoutId || actioningId === payoutId}
+                                onClick={() => payoutId && handleApprove(payoutId)}
+                                title="Approve"
+                              >
+                                {actioningId === payoutId ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </TableCell>
                     </TableRow>
-                ) : payouts.length === 0 ? (
-                    <TableRow>
-                        <TableCell colSpan={6} className="h-48 text-center text-gray-500">
-                             <div className="flex flex-col items-center justify-center gap-2">
-                                <Wallet className="h-8 w-8 text-gray-300" />
-                                <p>{t("admin.payouts.noPending")}</p>
-                            </div>
-                        </TableCell>
-                    </TableRow>
-                ) : (
-                    payouts.map((payout) => {
-                         const payoutId = (payout.id || payout.payoutId || "").toString();
-                         return (
-                        <TableRow key={payoutId || payout.coachId} className="border-gray-50 hover:bg-gray-50/50 transition-colors">
-                            <TableCell className="font-medium text-gray-500 pl-6 py-4 text-xs">
-                                {payoutId ? payoutId.substring(0, 8) + '...' : "—"}
-                            </TableCell>
-                            <TableCell className="py-4">
-                                <div className="flex flex-col">
-                                    <span className="font-semibold text-gray-900">{payout.coachName || "Unknown Coach"}</span>
-                                    <span className="text-xs text-gray-400">{payout.coachEmail}</span>
-                                </div>
-                            </TableCell>
-                            <TableCell className="text-gray-600 py-4 text-sm">
-                                {payout.periodStart ? (
-                                    <div className="flex items-center gap-1">
-                                        <Clock className="w-3 h-3 text-gray-400" />
-                                        <span>{new Date(payout.periodStart).toLocaleDateString()}</span>
-                                        {payout.periodEnd && <span> - {new Date(payout.periodEnd).toLocaleDateString()}</span>}
-                                    </div>
-                                ) : "—"}
-                            </TableCell>
-                            <TableCell className="text-right font-bold text-gray-900 py-4">
-                                {formatCurrency(payout.netAmount ?? payout.amount, payout.currency)}
-                            </TableCell>
-                            <TableCell className="py-4">
-                                <Badge
-                                    variant="outline"
-                                    className={`font-medium shadow-none border-0 ${
-                                    payout.status === 'completed'
-                                        ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                                        : payout.status === 'processing'
-                                        ? "bg-blue-50 text-blue-700 hover:bg-blue-100"
-                                        : payout.status === 'failed'
-                                        ? "bg-red-50 text-red-700 hover:bg-red-100"
-                                        : "bg-amber-50 text-amber-700 hover:bg-amber-100"
-                                    }`}
-                                >
-                                    {payout.status}
-                                </Badge>
-                            </TableCell>
-                            <TableCell className="text-right pr-6 py-4">
-                                <div className="flex justify-end gap-2">
-                                    {payout.status === 'pending' && (
-                                        <>
-                                            <Button
-                                                size="sm"
-                                                variant="ghost"
-                                                className="h-8 w-8 p-0 rounded-full text-red-500 hover:text-red-700 hover:bg-red-50"
-                                                disabled={!payoutId || actioningId === payoutId}
-                                                onClick={() => payoutId && handleReject(payoutId)}
-                                                title="Reject"
-                                            >
-                                                {actioningId === payoutId ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
-                                            </Button>
-                                            <Button
-                                                size="sm"
-                                                variant="ghost" 
-                                                className="h-8 w-8 p-0 rounded-full text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-                                                disabled={!payoutId || actioningId === payoutId}
-                                                onClick={() => payoutId && handleApprove(payoutId)}
-                                                title="Approve"
-                                            >
-                                                 {actioningId === payoutId ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-                                            </Button>
-                                        </>
-                                    )}
-                                </div>
-                            </TableCell>
-                        </TableRow>
-                    )})
-                )}
+                  )
+                })
+              )}
             </TableBody>
-            </Table>
-            
-            {/* Pagination */}
-            <div className="flex items-center justify-between border-t border-gray-100 p-4 bg-gray-50/30">
-                <p className="text-sm text-gray-500">
-                    Showing page <span className="font-semibold text-gray-900">{page}</span> of <span className="font-semibold text-gray-900">{totalPages || 1}</span>
-                </p>
-                <div className="flex items-center gap-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage((p) => Math.max(1, p - 1))}
-                        disabled={page === 1 || isLoading}
-                        className="rounded-lg border-gray-200 hover:bg-white hover:text-gray-900 text-gray-500 h-8"
-                    >
-                        {t("common.previous")}
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                        disabled={page === totalPages || isLoading}
-                        className="rounded-lg border-gray-200 hover:bg-white hover:text-gray-900 text-gray-500 h-8"
-                    >
-                        {t("common.next")}
-                    </Button>
-                </div>
+          </Table>
+
+          {/* Pagination */}
+          <div className="flex items-center justify-between border-t border-gray-100 p-4 bg-gray-50/30">
+            <p className="text-sm text-gray-500">
+              Showing page <span className="font-semibold text-gray-900">{page}</span> of <span className="font-semibold text-gray-900">{totalPages || 1}</span>
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1 || isLoading}
+                className="rounded-lg border-gray-200 hover:bg-white hover:text-gray-900 text-gray-500 h-8"
+              >
+                {t("common.previous")}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages || isLoading}
+                className="rounded-lg border-gray-200 hover:bg-white hover:text-gray-900 text-gray-500 h-8"
+              >
+                {t("common.next")}
+              </Button>
             </div>
+          </div>
 
         </div>
       </div>

@@ -1,5 +1,5 @@
-import { PageSkeleton } from "@/components/ui/skeletons";
+import { DashboardSkeleton } from "@/components/skeletons/DashboardSkeleton";
 
 export default function DashboardLoading() {
-  return <PageSkeleton />;
+  return <DashboardSkeleton role="student" />;
 }

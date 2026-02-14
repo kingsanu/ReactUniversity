@@ -14,6 +14,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Loader2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ModalSkeleton } from "@/components/ui/skeletons";
 
 interface PCAResultsPanelProps {
   pcaCod: string;
@@ -123,11 +125,10 @@ export default function PCAResultsPanel({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as "results" | "competences" | "analysis")}
-                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === tab.id
-                    ? "border-blue-500 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === tab.id
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  }`}
               >
                 {tab.label}
               </button>
@@ -137,12 +138,7 @@ export default function PCAResultsPanel({
 
         {/* Content */}
         <div className="p-6 overflow-y-auto flex-1 bg-gray-50/50">
-          {loading && (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-              <span className="ml-3 text-gray-600">Loading...</span>
-            </div>
-          )}
+          {loading && <ModalSkeleton />}
 
           {/* Results Tab */}
           {activeTab === "results" && !loading && (
@@ -252,38 +248,38 @@ export default function PCAResultsPanel({
                       Report Links
                     </h3>
                     <div className="flex flex-col sm:flex-row gap-4">
-                       <a
-                          href={getVal(results, "pcaLink")}
+                      <a
+                        href={getVal(results, "pcaLink")}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-100 transition-colors font-medium border border-blue-100"
+                      >
+                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Full PDF Report
+                      </a>
+
+                      {getVal(results, "pcaImg") && (
+                        <a
+                          href={getVal(results, "pcaImg")}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-100 transition-colors font-medium border border-blue-100"
+                          className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-purple-50 text-purple-700 rounded-xl hover:bg-purple-100 transition-colors font-medium border border-purple-100"
                         >
                           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
-                          Full PDF Report
+                          Visual Report Image
                         </a>
-
-                        {getVal(results, "pcaImg") && (
-                          <a
-                            href={getVal(results, "pcaImg")}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-purple-50 text-purple-700 rounded-xl hover:bg-purple-100 transition-colors font-medium border border-purple-100"
-                          >
-                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            Visual Report Image
-                          </a>
-                        )}
+                      )}
                     </div>
                   </div>
                 </div>
               ) : (
                 <div className="text-center py-12">
-                   <Loader2 className="h-8 w-8 animate-spin text-gray-300 mx-auto mb-4" />
-                   <p className="text-gray-500">Initializing results data...</p>
+                  <Loader2 className="h-8 w-8 animate-spin text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500">Initializing results data...</p>
                 </div>
               )}
             </div>
@@ -298,7 +294,7 @@ export default function PCAResultsPanel({
                 </pre>
               ) : (
                 <div className="text-center py-12">
-                   <p className="text-gray-500">No competence data available.</p>
+                  <p className="text-gray-500">No competence data available.</p>
                 </div>
               )}
             </div>
@@ -333,8 +329,8 @@ export default function PCAResultsPanel({
                 </pre>
               ) : (
                 <div className="text-center py-12">
-                   <Loader2 className="h-8 w-8 animate-spin text-gray-300 mx-auto mb-4" />
-                   <p className="text-gray-500">Analysing data against JCA...</p>
+                  <Loader2 className="h-8 w-8 animate-spin text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500">Analysing data against JCA...</p>
                 </div>
               )}
             </div>

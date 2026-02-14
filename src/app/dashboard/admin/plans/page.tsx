@@ -6,44 +6,45 @@ import { useAdminAccess } from "@/hooks/useAdminAccess";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Loader2, 
-  Plus, 
-  MoreVertical, 
-  Check, 
-  X, 
-  CreditCard,
-  Edit,
-  Trash2,
-  AlertCircle
+import {
+    Loader2,
+    Plus,
+    MoreVertical,
+    Check,
+    X,
+    CreditCard,
+    Edit,
+    Trash2,
+    AlertCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DashboardSkeleton } from "@/components/skeletons/DashboardSkeleton";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import {
     fetchSubscriptionPlans,
@@ -151,7 +152,7 @@ export default function AdminPlansPage() {
         setIsSaving(true);
         try {
             const cleanFeatures = formData.features.filter(f => f.trim().length > 0);
-            
+
             const payload = {
                 ...formData,
                 features: cleanFeatures
@@ -177,7 +178,7 @@ export default function AdminPlansPage() {
 
     const handleDelete = async (planId: string) => {
         if (!confirm("Are you sure you want to delete this plan? This cannot be undone.")) return;
-        
+
         try {
             await deleteSubscriptionPlan(planId);
             toast.success("Plan deleted successfully");
@@ -206,17 +207,13 @@ export default function AdminPlansPage() {
 
 
     if (authLoading || loading) {
-        return (
-            <div className="flex h-screen items-center justify-center bg-gray-50/50">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-        );
+        return <DashboardSkeleton />;
     }
 
     return (
         <div className="min-h-screen bg-gray-50/50 p-6 md:p-8 font-sans text-gray-900">
-             <div className="max-w-7xl mx-auto space-y-8">
-                
+            <div className="max-w-7xl mx-auto space-y-8">
+
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div className="space-y-1">
@@ -227,8 +224,8 @@ export default function AdminPlansPage() {
                             Manage subscription tiers and billing options
                         </p>
                     </div>
-                    <Button 
-                        onClick={handleOpenCreate} 
+                    <Button
+                        onClick={handleOpenCreate}
                         className="bg-gray-900 hover:bg-gray-800 text-white rounded-xl shadow-sm h-12 px-6"
                     >
                         <Plus className="mr-2 h-5 w-5" />
@@ -262,7 +259,7 @@ export default function AdminPlansPage() {
                                 >
                                     {/* Active Badge */}
                                     {plan.popular && (
-                                         <div className="absolute top-0 right-0 p-4">
+                                        <div className="absolute top-0 right-0 p-4">
                                             <Badge className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-0 shadow-sm rounded-lg px-2 py-1">
                                                 Popular
                                             </Badge>
@@ -281,7 +278,7 @@ export default function AdminPlansPage() {
                                                 </span>
                                             </div>
                                             {plan.description && (
-                                                 <p className="text-sm text-gray-500 mt-2 line-clamp-2">{plan.description}</p>
+                                                <p className="text-sm text-gray-500 mt-2 line-clamp-2">{plan.description}</p>
                                             )}
                                         </div>
 
@@ -306,30 +303,30 @@ export default function AdminPlansPage() {
 
                                     {/* Action Footer */}
                                     <div className="p-4 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
-                                         <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2">
                                             <div className={`h-2.5 w-2.5 rounded-full ${plan.isActive !== false ? "bg-emerald-500" : "bg-gray-300"}`} />
                                             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                                 {plan.isActive !== false ? "Active" : "Inactive"}
                                             </span>
-                                         </div>
-                                         <div className="flex gap-1">
-                                            <Button 
-                                                size="sm" 
-                                                variant="ghost" 
+                                        </div>
+                                        <div className="flex gap-1">
+                                            <Button
+                                                size="sm"
+                                                variant="ghost"
                                                 className="h-9 w-9 p-0 rounded-full hover:bg-white hover:shadow-sm"
                                                 onClick={() => handleOpenEdit(plan)}
                                             >
                                                 <Edit className="h-4 w-4 text-gray-600" />
                                             </Button>
-                                            <Button 
-                                                size="sm" 
-                                                variant="ghost" 
+                                            <Button
+                                                size="sm"
+                                                variant="ghost"
                                                 className="h-9 w-9 p-0 rounded-full hover:bg-white hover:text-red-600 hover:shadow-sm"
                                                 onClick={() => handleDelete(plan.id)}
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
-                                         </div>
+                                        </div>
                                     </div>
                                 </motion.div>
                             ))}
@@ -340,7 +337,7 @@ export default function AdminPlansPage() {
 
                 {/* Create/Edit Dialog */}
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                     <DialogContent className="sm:max-w-lg rounded-3xl p-0 gap-0 overflow-hidden">
+                    <DialogContent className="sm:max-w-lg rounded-3xl p-0 gap-0 overflow-hidden">
                         <DialogHeader className="p-8 pb-4">
                             <DialogTitle className="text-2xl font-bold text-gray-900">
                                 {editingPlan ? "Edit Plan" : "Create Subscription Plan"}
@@ -351,36 +348,36 @@ export default function AdminPlansPage() {
                         </DialogHeader>
 
                         <div className="px-8 space-y-6 py-4">
-                             <div className="space-y-2">
+                            <div className="space-y-2">
                                 <Label className="text-gray-700 font-medium">Plan Name</Label>
-                                <Input 
+                                <Input
                                     placeholder="e.g. Pro Monthly"
                                     value={formData.name}
-                                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     className="h-11 rounded-xl border-gray-200 focus:ring-2 focus:ring-primary/20"
                                 />
-                             </div>
+                            </div>
 
-                             <div className="grid grid-cols-2 gap-6">
+                            <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <Label className="text-gray-700 font-medium">Price</Label>
                                     <div className="relative">
                                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">$</span>
-                                        <Input 
+                                        <Input
                                             type="number"
                                             min="0"
                                             step="0.01"
                                             value={formData.price}
-                                            onChange={(e) => setFormData({...formData, price: parseFloat(e.target.value)})}
+                                            onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
                                             className="h-11 pl-7 rounded-xl border-gray-200"
                                         />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
                                     <Label className="text-gray-700 font-medium">Billing Interval</Label>
-                                    <Select 
+                                    <Select
                                         value={formData.interval}
-                                        onValueChange={(v: any) => setFormData({...formData, interval: v})}
+                                        onValueChange={(v: any) => setFormData({ ...formData, interval: v })}
                                     >
                                         <SelectTrigger className="h-11 rounded-xl border-gray-200">
                                             <SelectValue />
@@ -392,9 +389,9 @@ export default function AdminPlansPage() {
                                         </SelectContent>
                                     </Select>
                                 </div>
-                             </div>
+                            </div>
 
-                             <div className="space-y-3">
+                            <div className="space-y-3">
                                 <div className="flex items-center justify-between">
                                     <Label className="text-gray-700 font-medium">Features</Label>
                                     <Button size="sm" variant="ghost" onClick={addFeature} className="h-8 text-primary hover:text-primary">
@@ -405,7 +402,7 @@ export default function AdminPlansPage() {
                                 <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2">
                                     {formData.features.map((feature, idx) => (
                                         <div key={idx} className="flex gap-2">
-                                            <Input 
+                                            <Input
                                                 value={feature}
                                                 onChange={(e) => updateFeature(idx, e.target.value)}
                                                 className="h-10 rounded-xl border-gray-200 flex-1"
@@ -419,22 +416,22 @@ export default function AdminPlansPage() {
                                         </div>
                                     ))}
                                 </div>
-                             </div>
+                            </div>
                         </div>
 
                         <DialogFooter className="p-8 pt-4 bg-gray-50/50">
-                             <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-xl h-11 border-gray-200 text-gray-700">
+                            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-xl h-11 border-gray-200 text-gray-700">
                                 Cancel
-                             </Button>
-                             <Button onClick={handleSave} disabled={isSaving} className="rounded-xl h-11 bg-gray-900 text-white hover:bg-gray-800">
+                            </Button>
+                            <Button onClick={handleSave} disabled={isSaving} className="rounded-xl h-11 bg-gray-900 text-white hover:bg-gray-800">
                                 {isSaving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                                 {editingPlan ? "Save Changes" : "Create Plan"}
-                             </Button>
+                            </Button>
                         </DialogFooter>
-                     </DialogContent>
+                    </DialogContent>
                 </Dialog>
 
-             </div>
+            </div>
         </div>
     );
 }

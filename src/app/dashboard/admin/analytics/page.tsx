@@ -12,17 +12,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-} from "recharts";
-import {
   Users,
   DollarSign,
   BookOpen,
@@ -30,30 +19,36 @@ import {
   Activity,
   Award,
   Clock,
-  ArrowUpRight,
-  ArrowDownRight,
-  MousePointer,
   Download,
-  Filter,
 } from "lucide-react";
+import dynamic from "next/dynamic";
+import { ChartSkeleton } from "@/components/ui/skeletons";
+
+const DynamicRevenueChart = dynamic(
+  () => import("@/components/dashboard/analytics/AnalyticsRevenueChart"),
+  {
+    loading: () => <ChartSkeleton />,
+    ssr: false,
+  }
+);
+
+const DynamicUserGrowthChart = dynamic(
+  () => import("@/components/dashboard/analytics/AnalyticsUserGrowthChart"),
+  {
+    loading: () => <ChartSkeleton />,
+    ssr: false,
+  }
+);
 import { useAdminAnalytics } from "@/hooks/useAdminAnalytics";
 import { useTranslation } from "react-i18next";
 import { TelemetryDashboard } from "../_components/TelemetryDashboard";
+import { DashboardSkeleton } from "@/components/skeletons/DashboardSkeleton";
 
 export default function AnalyticsPage() {
   const { t } = useTranslation();
   const [period, setPeriod] = useState<"week" | "month" | "year">("month");
 
   const { data: analytics, isLoading, error, refetch } = useAdminAnalytics(period);
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
 
   const formatTimeAgo = (timestamp: string) => {
     const diff = Date.now() - new Date(timestamp).getTime();
@@ -65,56 +60,29 @@ export default function AnalyticsPage() {
     return `${Math.floor(hours / 24)}d ago`;
   };
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white border border-gray-100 px-3 py-2 rounded-lg  z-50">
-          <p className="font-medium text-sm mb-1 text-gray-900">{label}</p>
-          {payload.map((entry: any, index: number) => (
-            <div key={index} className="flex items-center gap-2 text-sm">
-              <div 
-                className="w-2 h-2 rounded-full" 
-                style={{ backgroundColor: entry.color }}
-              />
-              <span className="text-gray-500 capitalize">
-                {entry.name}:
-              </span>
-              <span className="font-medium text-gray-900">
-                {entry.name.toLowerCase().includes('revenue') || entry.name.toLowerCase().includes('earnings')
-                  ? formatCurrency(entry.value) 
-                  : entry.value.toLocaleString()}
-              </span>
-            </div>
-          ))}
-        </div>
-      );
-    }
-    return null;
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50/50 p-6 md:p-8 space-y-10 font-sans">
-        <div className="max-w-7xl mx-auto space-y-8 animate-pulse">
-            <div className="h-10 w-48 bg-gray-200 rounded-lg" />
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-               {[1,2,3,4].map(i => <div key={i} className="h-40 bg-gray-200 rounded-2xl" />)}
-            </div>
-        </div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   if (error || !analytics) {
     return (
       <div className="min-h-screen bg-gray-50/50 p-6 md:p-8 flex flex-col items-center justify-center">
         <div className="bg-white p-8 rounded-2xl  text-center max-w-md w-full border border-red-100">
-           <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
-              <Activity className="h-8 w-8 text-red-500" />
-           </div>
-           <h2 className="text-xl font-bold text-gray-900 mb-2">Analytics Unavailable</h2>
-           <p className="text-gray-500 mb-6">We couldn't load the dashboard data at this time.</p>
-           <Button onClick={() => refetch()} variant="outline" className="w-full">Try Again</Button>
+          <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
+            <Activity className="h-8 w-8 text-red-500" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Analytics Unavailable</h2>
+          <p className="text-gray-500 mb-6">We couldn't load the dashboard data at this time.</p>
+          <Button onClick={() => refetch()} variant="outline" className="w-full">Try Again</Button>
         </div>
       </div>
     );
@@ -178,278 +146,209 @@ export default function AnalyticsPage() {
           </div>
 
           <div className="flex items-center gap-3">
-             <div className="flex items-center gap-2 bg-white p-1 rounded-full border border-gray-200 shadow-sm">
-                <Select value={period} onValueChange={(v: any) => setPeriod(v)}>
-                    <SelectTrigger className="w-[140px] border-none shadow-none rounded-full bg-transparent hover:bg-gray-50 font-medium h-9 text-sm focus:ring-0">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="week">Last 7 Days</SelectItem>
-                      <SelectItem value="month">Last 30 Days</SelectItem>
-                      <SelectItem value="year">Last 12 Months</SelectItem>
-                    </SelectContent>
-                </Select>
-             </div>
-             
-             <Button 
-                variant="outline" 
-                size="icon" 
-                className="rounded-full w-10 h-10 bg-white border-gray-200 shadow-sm hover:bg-gray-50 hover:text-gray-900"
-                title="Download CSV report"
-              >
-                <Download className="w-4 h-4" />
-             </Button>
+            <div className="flex items-center gap-2 bg-white p-1 rounded-full border border-gray-200 shadow-sm">
+              <Select value={period} onValueChange={(v: any) => setPeriod(v)}>
+                <SelectTrigger className="w-[140px] border-none shadow-none rounded-full bg-transparent hover:bg-gray-50 font-medium h-9 text-sm focus:ring-0">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="week">Last 7 Days</SelectItem>
+                  <SelectItem value="month">Last 30 Days</SelectItem>
+                  <SelectItem value="year">Last 12 Months</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Button
+              variant="outline"
+              size="icon"
+              className="rounded-full w-10 h-10 bg-white border-gray-200 shadow-sm hover:bg-gray-50 hover:text-gray-900"
+              title="Download CSV report"
+            >
+              <Download className="w-4 h-4" />
+            </Button>
           </div>
         </div>
 
         <Tabs defaultValue="overview" className="space-y-8">
-            <div className="flex items-center">
-                <TabsList className="bg-white border border-gray-200 rounded-full p-1 h-auto gap-1 ">
-                    <TabsTrigger 
-                        value="overview" 
-                        className="rounded-full px-5 py-2.5 text-sm font-medium data-[state=active]:bg-gray-900 data-[state=active]:text-white transition-all data-[state=active]:shadow-md"
-                    >
-                        Platform Overview
-                    </TabsTrigger>
-                    <TabsTrigger 
-                        value="behavior" 
-                        className="rounded-full px-5 py-2.5 text-sm font-medium data-[state=active]:bg-gray-900 data-[state=active]:text-white transition-all data-[state=active]:shadow-md flex items-center gap-2"
-                    >
-                        User Behavior
-                    </TabsTrigger>
-                </TabsList>
+          <div className="flex items-center">
+            <TabsList className="bg-white border border-gray-200 rounded-full p-1 h-auto gap-1 ">
+              <TabsTrigger
+                value="overview"
+                className="rounded-full px-5 py-2.5 text-sm font-medium data-[state=active]:bg-gray-900 data-[state=active]:text-white transition-all data-[state=active]:shadow-md"
+              >
+                Platform Overview
+              </TabsTrigger>
+              <TabsTrigger
+                value="behavior"
+                className="rounded-full px-5 py-2.5 text-sm font-medium data-[state=active]:bg-gray-900 data-[state=active]:text-white transition-all data-[state=active]:shadow-md flex items-center gap-2"
+              >
+                User Behavior
+              </TabsTrigger>
+            </TabsList>
+          </div>
+
+          <TabsContent value="overview" className="space-y-8 animate-in fade-in-50 duration-500 slide-in-from-bottom-2">
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {statsCards.map((stat, index) => (
+                <div
+                  key={index}
+                  className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+                >
+                  <div
+                    className={`absolute right-0 top-0 h-24 w-24 translate-x-8 translate-y--8 rounded-full ${stat.blobColor} opacity-5 blur-2xl transition-transform duration-500 group-hover:scale-150`}
+                  />
+                  <div className="relative flex flex-col gap-4">
+                    <div className="flex justify-between items-start">
+                      <div
+                        className={`w-12 h-12 rounded-xl ${stat.bg} flex items-center justify-center`}
+                      >
+                        <stat.icon className={`h-6 w-6 ${stat.color}`} />
+                      </div>
+                      <Badge variant="outline" className={`${stat.growth >= 0 ? 'bg-green-50 text-green-700 border-green-100' : 'bg-red-50 text-red-700 border-red-100'} font-medium`}>
+                        {stat.growth >= 0 ? '+' : ''}{stat.growth}%
+                      </Badge>
+                    </div>
+
+                    <div>
+                      <p className="text-3xl font-bold text-gray-900 tracking-tight">
+                        {stat.value}
+                      </p>
+                      <p className="text-sm font-medium text-gray-500 mt-1">
+                        {stat.label}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
 
-            <TabsContent value="overview" className="space-y-8 animate-in fade-in-50 duration-500 slide-in-from-bottom-2">
-                {/* Stats Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {statsCards.map((stat, index) => (
-                    <div
-                      key={index}
-                      className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
-                    >
+            {/* Charts Section */}
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
+              {/* Revenue Chart */}
+              <Card className="col-span-4 rounded-2xl border-gray-100  shadow-none overflow-hidden hover:shadow-md transition-shadow">
+                <CardHeader className="border-b border-gray-50 bg-gray-50/30 py-5">
+                  <CardTitle className="text-lg font-semibold text-gray-800">Revenue Analysis</CardTitle>
+                  <CardDescription>Monthly revenue vs transaction volume</CardDescription>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <DynamicRevenueChart data={analytics.revenueData} />
+                </CardContent>
+              </Card>
+
+              {/* User Growth */}
+              <Card className="col-span-3 rounded-2xl border-gray-100 shadow-none overflow-hidden hover:shadow-md transition-shadow">
+                <CardHeader className="border-b border-gray-50 bg-gray-50/30 py-5">
+                  <CardTitle className="text-lg font-bold text-gray-900">User GrowthTrend</CardTitle>
+                  <CardDescription>New user acquisition over time</CardDescription>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <DynamicUserGrowthChart data={analytics.userGrowthData} />
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Bottom Grid */}
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
+              {/* Top Coaches Table */}
+              <Card className="col-span-4 rounded-2xl border-gray-100 shadow-none overflow-hidden hover:shadow-md transition-shadow">
+                <CardHeader className="border-b border-gray-50 bg-gray-50/30 py-5 flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle className="text-lg font-semibold text-gray-800 flex items-center gap-1.5">
+                      <Award className="h-5 w-5 text-amber-500" />
+                      Top Coaches
+                    </CardTitle>
+                    <CardDescription>Top performers by revenue & rating</CardDescription>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <div className="divide-y divide-gray-50">
+                    {analytics.topCoaches.map((coach, index) => (
                       <div
-                        className={`absolute right-0 top-0 h-24 w-24 translate-x-8 translate-y--8 rounded-full ${stat.blobColor} opacity-5 blur-2xl transition-transform duration-500 group-hover:scale-150`}
-                      />
-                      <div className="relative flex flex-col gap-4">
-                        <div className="flex justify-between items-start">
-                             <div
-                                className={`w-12 h-12 rounded-xl ${stat.bg} flex items-center justify-center`}
-                                >
-                                <stat.icon className={`h-6 w-6 ${stat.color}`} />
-                            </div>
-                            <Badge variant="outline" className={`${stat.growth >= 0 ? 'bg-green-50 text-green-700 border-green-100' : 'bg-red-50 text-red-700 border-red-100'} font-medium`}>
-                                {stat.growth >= 0 ? '+' : ''}{stat.growth}%
-                            </Badge>
+                        key={coach.id}
+                        className="flex items-center justify-between p-5 hover:bg-gray-50 transition-colors"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className={`
+                                    flex items-center justify-center w-10 h-10 rounded-full font-bold text-sm border
+                                    ${index === 0 ? "bg-amber-50 text-amber-700 border-amber-100" :
+                              index === 1 ? "bg-slate-100 text-slate-700 border-slate-200" :
+                                index === 2 ? "bg-orange-50 text-orange-800 border-orange-100" :
+                                  "bg-white text-gray-500 border-gray-100"}
+                                    `}>
+                            {index + 1}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-gray-900 text-sm">
+                              {coach.name}
+                            </p>
+                            <span className="flex items-center gap-1 text-xs text-gray-500 mt-0.5">
+                              {coach.sessions} sessions
+                            </span>
+                          </div>
                         </div>
-                        
-                        <div>
-                          <p className="text-3xl font-bold text-gray-900 tracking-tight">
-                            {stat.value}
+                        <div className="text-right">
+                          <p className="font-bold text-gray-900 text-sm">
+                            {formatCurrency(coach.earnings)}
                           </p>
-                          <p className="text-sm font-medium text-gray-500 mt-1">
-                            {stat.label}
+                          <span className="flex items-center justify-end gap-1 text-xs text-amber-600 font-medium">
+                            ★ {coach.rating}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Recent Activity */}
+              <Card className="col-span-3 rounded-2xl border-gray-100 shadow-none overflow-hidden hover:shadow-md transition-shadow">
+                <CardHeader className="border-b border-gray-50 bg-gray-50/30 py-5">
+                  <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <Clock className="h-5 w-5 text-gray-500" />
+                    Recent Activity
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="relative space-y-0 pl-3">
+                    <div className="absolute left-[28px] top-2 bottom-6 w-px bg-gray-100" />
+                    {analytics.recentActivity.map((activity, index) => (
+                      <div key={index} className="relative flex gap-5 pb-8 last:pb-0">
+                        <div
+                          className={`
+                                        relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border bg-white shadow-sm ring-4 ring-white
+                                        ${activity.type === "user" ? "border-blue-100 text-blue-600" :
+                              activity.type === "transaction" ? "border-emerald-100 text-emerald-600" :
+                                activity.type === "course" ? "border-violet-100 text-violet-600" :
+                                  "border-amber-100 text-amber-600"}
+                                        `}
+                        >
+                          {activity.type === "user" && <Users className="h-3.5 w-3.5" />}
+                          {activity.type === "transaction" && <DollarSign className="h-3.5 w-3.5" />}
+                          {activity.type === "course" && <BookOpen className="h-3.5 w-3.5" />}
+                          {activity.type === "session" && <Clock className="h-3.5 w-3.5" />}
+                        </div>
+                        <div className="flex-1 min-w-0 pt-1">
+                          <p className="text-sm font-medium text-gray-900">
+                            {activity.message}
+                          </p>
+                          <p className="text-xs text-gray-400 mt-1 font-medium">
+                            {formatTimeAgo(activity.date || activity.timestamp || '')}
                           </p>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
-                {/* Charts Section */}
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-                    {/* Revenue Chart */}
-                    <Card className="col-span-4 rounded-2xl border-gray-100  shadow-none overflow-hidden hover:shadow-md transition-shadow">
-                        <CardHeader className="border-b border-gray-50 bg-gray-50/30 py-5">
-                            <CardTitle className="text-lg font-semibold text-gray-800">Revenue Analysis</CardTitle>
-                            <CardDescription>Monthly revenue vs transaction volume</CardDescription>
-                        </CardHeader>
-                        <CardContent className="p-6">
-                            <ResponsiveContainer width="100%" height={350}>
-                            <BarChart data={analytics.revenueData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                <XAxis 
-                                dataKey="month" 
-                                stroke="#94a3b8"
-                                fontSize={12}
-                                tickLine={false}
-                                axisLine={false}
-                                dy={10}
-                                />
-                                <YAxis 
-                                stroke="#94a3b8"
-                                fontSize={12}
-                                tickLine={false}
-                                axisLine={false}
-                                tickFormatter={(value) => `$${value/1000}k`}
-                                dx={-10}
-                                />
-                                <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} />
-                                <Bar 
-                                dataKey="revenue" 
-                                name="Revenue" 
-                                fill="#2563eb" 
-                                radius={[6, 6, 0, 0]} 
-                                barSize={28}
-                                />
-                                <Bar 
-                                dataKey="transactions" 
-                                name="Transactions" 
-                                fill="#cbd5e1" 
-                                radius={[6, 6, 0, 0]} 
-                                barSize={28}
-                                />
-                            </BarChart>
-                            </ResponsiveContainer>
-                        </CardContent>
-                    </Card>
+          </TabsContent>
 
-                    {/* User Growth */}
-                    <Card className="col-span-3 rounded-2xl border-gray-100 shadow-none overflow-hidden hover:shadow-md transition-shadow">
-                         <CardHeader className="border-b border-gray-50 bg-gray-50/30 py-5">
-                            <CardTitle className="text-lg font-bold text-gray-900">User GrowthTrend</CardTitle>
-                            <CardDescription>New user acquisition over time</CardDescription>
-                        </CardHeader>
-                         <CardContent className="p-6">
-                            <ResponsiveContainer width="100%" height={350}>
-                            <AreaChart data={analytics.userGrowthData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
-                                <defs>
-                                <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.1}/>
-                                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
-                                </linearGradient>
-                                </defs>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                <XAxis 
-                                dataKey="period" 
-                                stroke="#94a3b8"
-                                fontSize={12}
-                                tickLine={false}
-                                axisLine={false}
-                                dy={10}
-                                />
-                                <YAxis 
-                                stroke="#94a3b8"
-                                fontSize={12}
-                                tickLine={false}
-                                axisLine={false}
-                                dx={-10}
-                                />
-                                <Tooltip content={<CustomTooltip />} />
-                                <Area 
-                                type="monotone" 
-                                dataKey="users" 
-                                name="Total Users"
-                                stroke="#8b5cf6" 
-                                strokeWidth={3}
-                                fill="url(#colorUsers)" 
-                                />
-                            </AreaChart>
-                            </ResponsiveContainer>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                 {/* Bottom Grid */}
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-                    {/* Top Coaches Table */}
-                     <Card className="col-span-4 rounded-2xl border-gray-100 shadow-none overflow-hidden hover:shadow-md transition-shadow">
-                        <CardHeader className="border-b border-gray-50 bg-gray-50/30 py-5 flex flex-row items-center justify-between">
-                            <div>
-                                <CardTitle className="text-lg font-semibold text-gray-800 flex items-center gap-1.5">
-                                    <Award className="h-5 w-5 text-amber-500" />
-                                    Top Coaches
-                                </CardTitle>
-                                <CardDescription>Top performers by revenue & rating</CardDescription>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="p-0">
-                            <div className="divide-y divide-gray-50">
-                            {analytics.topCoaches.map((coach, index) => (
-                                <div
-                                key={coach.id}
-                                className="flex items-center justify-between p-5 hover:bg-gray-50 transition-colors"
-                                >
-                                <div className="flex items-center gap-4">
-                                    <div className={`
-                                    flex items-center justify-center w-10 h-10 rounded-full font-bold text-sm border
-                                    ${index === 0 ? "bg-amber-50 text-amber-700 border-amber-100" : 
-                                        index === 1 ? "bg-slate-100 text-slate-700 border-slate-200" :
-                                        index === 2 ? "bg-orange-50 text-orange-800 border-orange-100" :
-                                        "bg-white text-gray-500 border-gray-100"}
-                                    `}>
-                                    {index + 1}
-                                    </div>
-                                    <div>
-                                    <p className="font-semibold text-gray-900 text-sm">
-                                        {coach.name}
-                                    </p>
-                                    <span className="flex items-center gap-1 text-xs text-gray-500 mt-0.5">
-                                        {coach.sessions} sessions
-                                    </span>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <p className="font-bold text-gray-900 text-sm">
-                                    {formatCurrency(coach.earnings)}
-                                    </p>
-                                    <span className="flex items-center justify-end gap-1 text-xs text-amber-600 font-medium">
-                                        ★ {coach.rating}
-                                    </span>
-                                </div>
-                                </div>
-                            ))}
-                            </div>
-                        </CardContent>
-                     </Card>
-
-                     {/* Recent Activity */}
-                     <Card className="col-span-3 rounded-2xl border-gray-100 shadow-none overflow-hidden hover:shadow-md transition-shadow">
-                        <CardHeader className="border-b border-gray-50 bg-gray-50/30 py-5">
-                            <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                                <Clock className="h-5 w-5 text-gray-500" />
-                                Recent Activity
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-6">
-                            <div className="relative space-y-0 pl-3">
-                                <div className="absolute left-[28px] top-2 bottom-6 w-px bg-gray-100" />
-                                {analytics.recentActivity.map((activity, index) => (
-                                    <div key={index} className="relative flex gap-5 pb-8 last:pb-0">
-                                    <div
-                                        className={`
-                                        relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border bg-white shadow-sm ring-4 ring-white
-                                        ${activity.type === "user" ? "border-blue-100 text-blue-600" : 
-                                            activity.type === "transaction" ? "border-emerald-100 text-emerald-600" : 
-                                            activity.type === "course" ? "border-violet-100 text-violet-600" : 
-                                            "border-amber-100 text-amber-600"}
-                                        `}
-                                    >
-                                        {activity.type === "user" && <Users className="h-3.5 w-3.5" />}
-                                        {activity.type === "transaction" && <DollarSign className="h-3.5 w-3.5" />}
-                                        {activity.type === "course" && <BookOpen className="h-3.5 w-3.5" />}
-                                        {activity.type === "session" && <Clock className="h-3.5 w-3.5" />}
-                                    </div>
-                                    <div className="flex-1 min-w-0 pt-1">
-                                        <p className="text-sm font-medium text-gray-900">
-                                        {activity.message}
-                                        </p>
-                                        <p className="text-xs text-gray-400 mt-1 font-medium">
-                                        {formatTimeAgo(activity.date || activity.timestamp || '')}
-                                        </p>
-                                    </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </CardContent>
-                     </Card>
-                </div>
-
-            </TabsContent>
-            
-            <TabsContent value="behavior" className="animate-in fade-in-50 duration-500">
-                <TelemetryDashboard period={period} />
-            </TabsContent>
+          <TabsContent value="behavior" className="animate-in fade-in-50 duration-500">
+            <TelemetryDashboard period={period} />
+          </TabsContent>
         </Tabs>
       </div>
     </div>

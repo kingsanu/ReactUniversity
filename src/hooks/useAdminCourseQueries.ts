@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { adminListCourses } from "@/services/courseService";
 
 export const adminCourseKeys = {
@@ -22,6 +22,7 @@ export function useAdminCourseList(params?: {
   return useQuery({
     queryKey: adminCourseKeys.list(params),
     queryFn: () => adminListCourses(params),
+    placeholderData: keepPreviousData,
     staleTime: 2 * 60 * 1000,
   });
 }

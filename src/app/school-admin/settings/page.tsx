@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Card,
   CardContent,
@@ -118,8 +119,33 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="pt-6">
               {isLoading ? (
-                <div className="flex justify-center py-8">
-                  <Loader2 className="animate-spin h-8 w-8 text-gray-400" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div>
+                      <Skeleton className="h-4 w-24 mb-2" />
+                      <Skeleton className="h-7 w-48" />
+                    </div>
+                    <div>
+                      <Skeleton className="h-4 w-24 mb-2" />
+                      <Skeleton className="h-7 w-64" />
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      <Skeleton className="w-10 h-10 rounded-lg" />
+                      <div>
+                        <Skeleton className="h-4 w-32 mb-1" />
+                        <Skeleton className="h-6 w-20" />
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <Skeleton className="w-10 h-10 rounded-lg" />
+                      <div>
+                        <Skeleton className="h-4 w-32 mb-1" />
+                        <Skeleton className="h-6 w-40" />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               ) : settings ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

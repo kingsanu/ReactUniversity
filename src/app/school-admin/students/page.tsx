@@ -55,6 +55,7 @@ import { cn } from "@/lib/utils";
 import { useStudents, useResendStudentInvite, useRemoveStudent } from "@/hooks/useSchoolAdmin";
 import { StudentInviteForm } from "@/components/school-admin/StudentInviteForm";
 import { StudentStatus } from "@/types/student";
+import { TableRowsSkeleton } from "@/components/skeletons/TableSkeleton";
 
 export default function StudentsPage() {
   const { t } = useTranslation();
@@ -250,14 +251,7 @@ export default function StudentsPage() {
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">
-                    <div className="flex justify-center items-center gap-2">
-                      <RefreshCw className="animate-spin h-5 w-5 text-gray-400" />
-                      <span className="text-gray-500">{t("schoolAdmin.common.loading", "Loading...")}</span>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                <TableRowsSkeleton columnCount={6} rowCount={5} showActions />
               ) : !students?.data || students.data.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="h-32 text-center">

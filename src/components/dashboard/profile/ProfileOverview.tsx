@@ -12,6 +12,7 @@ import { useGlobalStore } from "@/store/useGlobalStore";
 import { Loader2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
+import { ProfileSkeleton } from "@/components/skeletons/ProfileSkeleton";
 
 export function ProfileOverview() {
   const { user } = useGlobalStore();
@@ -67,26 +68,21 @@ export function ProfileOverview() {
 
   const getActivityStyle = (type: string) => {
     switch (type) {
-      case "course_completed": 
+      case "course_completed":
         return { bg: "bg-yellow-100 dark:bg-yellow-900/30", text: "text-yellow-600 dark:text-yellow-400" };
-      case "application_sent": 
+      case "application_sent":
         return { bg: "bg-blue-100 dark:bg-blue-900/30", text: "text-blue-600 dark:text-blue-400" };
-      case "session_completed": 
+      case "session_completed":
         return { bg: "bg-green-100 dark:bg-green-900/30", text: "text-green-600 dark:text-green-400" };
-      case "certificate_earned": 
+      case "certificate_earned":
         return { bg: "bg-purple-100 dark:bg-purple-900/30", text: "text-purple-600 dark:text-purple-400" };
-      default: 
+      default:
         return { bg: "bg-gray-100 dark:bg-gray-800", text: "text-gray-600 dark:text-gray-400" };
     }
   };
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-        <span className="ml-3 text-gray-500">Loading profile...</span>
-      </div>
-    );
+    return <ProfileSkeleton />;
   }
 
   // Use profile data with fallbacks
@@ -95,7 +91,7 @@ export function ProfileOverview() {
   const stats = profile?.stats || { coursesCompleted: 0, applicationsSubmitted: 0, mentorshipSessions: 0 };
 
   return (
-    <motion.div 
+    <motion.div
       variants={container}
       initial="hidden"
       animate="show"
@@ -103,12 +99,12 @@ export function ProfileOverview() {
     >
       {/* Left Column - Main Details */}
       <div className="lg:col-span-2 space-y-8">
-        
+
         {/* About Me Card - Hero Style */}
         <motion.div variants={item}>
           <Card className="border-none shadow-lg bg-white dark:bg-gray-900 rounded-3xl overflow-hidden relative group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 dark:bg-blue-900/20 rounded-bl-full transition-all group-hover:scale-110" />
-            
+
             <CardHeader className="relative px-8 pt-8 pb-4">
               <CardTitle className="text-2xl font-bold flex items-center gap-2">
                 About Me <span className="text-2xl">👋</span>
@@ -127,7 +123,7 @@ export function ProfileOverview() {
                   </Button>
                 </div>
               )}
-              
+
               {skills.length > 0 && (
                 <div className="mt-6 flex flex-wrap gap-2">
                   {skills.map(skill => (
@@ -137,7 +133,7 @@ export function ProfileOverview() {
                   ))}
                 </div>
               )}
-              
+
               {skills.length === 0 && bio && (
                 <div className="mt-6">
                   <p className="text-sm text-gray-400 italic">No skills added yet. <Link href="/dashboard/profile?tab=edit" className="text-blue-600 hover:underline">Add skills</Link></p>
@@ -150,7 +146,7 @@ export function ProfileOverview() {
 
       {/* Right Column - Stats & Activity */}
       <div className="space-y-8">
-        
+
         {/* Stats Grid - Glass Cards */}
         <motion.div variants={item} className="grid grid-cols-2 lg:grid-cols-1 gap-4">
           {[
@@ -169,7 +165,7 @@ export function ProfileOverview() {
                 </div>
               </div>
               {/* Decorative circle */}
-              <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all"/>
+              <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all" />
             </div>
           ))}
         </motion.div>
@@ -187,12 +183,12 @@ export function ProfileOverview() {
                 <div className="space-y-0 relative">
                   {/* Vertical Line */}
                   <div className="absolute left-[15px] top-4 bottom-4 w-0.5 bg-gray-200 dark:bg-gray-700" />
-                  
+
                   {activities.map((activity, i) => {
                     const Icon = getActivityIcon(activity.type);
                     const style = getActivityStyle(activity.type);
                     const timeAgo = formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true });
-                    
+
                     return (
                       <div key={activity.id || i} className="flex gap-4 p-3 rounded-xl hover:bg-white dark:hover:bg-gray-800 transition-colors relative z-10 group cursor-pointer">
                         <div className={cn("shrink-0 w-8 h-8 rounded-full flex items-center justify-center ring-4 ring-gray-50 dark:ring-gray-900", style.bg, style.text)}>
@@ -214,7 +210,7 @@ export function ProfileOverview() {
                   <p className="text-gray-400 text-sm italic">No recent activity</p>
                 </div>
               )}
-              
+
               {activities.length > 0 && (
                 <Button variant="ghost" className="w-full mt-4 text-xs font-semibold text-gray-500 hover:text-gray-900" asChild>
                   <Link href="/dashboard/activity">
