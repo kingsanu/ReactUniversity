@@ -21,20 +21,24 @@ export interface DemandStats {
 
 export interface CareerRole {
   id: string;
-  familyId?: string;
-  slug?: string;
+  familyId: string;
+  slug: string;
   title: LocalizedText;
-  shortDescription?: LocalizedText;
+  shortDescription: LocalizedText;
   longDescription?: LocalizedText;
   responsibilities?: LocalizedText[];
   skills?: Skill[];
-  educationLevel?: "HighSchool" | "Associate" | "Bachelors" | "Masters" | "PhD";
+  educationLevel?: string;
   salaryRange?: SalaryRange;
   demandStats?: DemandStats;
   industries?: string[];
   locationSupport?: string[]; // array of country/state
   iconUrl?: string;
-  remoteEligible?: boolean;
   matchScore?: number;
   published?: boolean;
+  remoteEligible?: boolean;
+  // TIMS Integration fields
+  needsBridging?: boolean;
+  bridgingReasons?: string[];
+  bridgingPaths?: any[]; // Defined in tims.ts but kept loose here or import it
 }

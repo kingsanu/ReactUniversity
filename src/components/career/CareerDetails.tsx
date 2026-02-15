@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useCareerDetails } from "@/hooks/useCareerQueries";
+import { useTimsCareerScoring } from "@/hooks/useTimsQueries";
 import { useParams, useRouter } from "next/navigation";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { motion } from "motion/react";
@@ -21,6 +22,7 @@ import {
   MapPin,
   Globe,
   Building2,
+  AlertCircle,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { CareerRole } from "@/types/career";
@@ -29,6 +31,7 @@ export default function CareerDetails() {
   const params = useParams();
   const id = Array.isArray(params?.id) ? params?.id[0] : params?.id ?? "";
   const { data, isLoading } = useCareerDetails(id);
+  const { data: timsData } = useTimsCareerScoring(); // Fetch TIMS data for score/bridging
   const { language } = useGlobalStore();
   const router = useRouter();
   const { favorites, toggleFavorite } = useFavorites();
@@ -73,7 +76,13 @@ export default function CareerDetails() {
   const longDesc =
     career.longDescription?.[language === "spanish" ? "es" : "en"] ||
     career.longDescription?.en;
-  const matchScore = Math.round(career.matchScore ?? 0);
+
+  // Merge TIMS data if available
+  const timsCareerList = timsData?.data?.careers;
+  const scored = timsCareerList?.find(c => c.programId === career.id || c.programId === career.slug);
+  const matchScore = scored ? Math.round(scored.totalScore) : Math.round(career.matchScore ?? 0);
+  const needsBridging = scored?.needsBridging;
+  const bridgingReasons = scored?.bridgingReasons;
 
   const formatCurrency = (amount?: number, currency = "USD") => {
     if (!amount) return "N/A";
@@ -156,9 +165,8 @@ export default function CareerDetails() {
                         stroke="#4f46e5"
                         strokeWidth="3"
                         strokeDasharray={`${2 * Math.PI * 14}`}
-                        strokeDashoffset={`${
-                          2 * Math.PI * 14 * (1 - matchScore / 100)
-                        }`}
+                        strokeDashoffset={`${2 * Math.PI * 14 * (1 - matchScore / 100)
+                          }`}
                         strokeLinecap="round"
                         role="presentation"
                       />
@@ -191,6 +199,29 @@ export default function CareerDetails() {
                 {longDesc}
               </p>
             </section>
+
+            {/* Bridging Section */}
+            {needsBridging && bridgingReasons && bridgingReasons.length > 0 && (
+              <section className="bg-amber-50 rounded-xl border border-amber-200 p-6" aria-labelledby="bridging-heading">
+                <h2 id="bridging-heading" className="text-xl font-bold text-amber-900 mb-4 flex items-center">
+                  <AlertCircle className="w-5 h-5 mr-2 text-amber-600" aria-hidden="true" />
+                  {t("career.bridging.title", "Bridging Required")}
+                </h2>
+                <p className="text-amber-800 mb-4 font-medium">
+                  {t("career.bridging.description", "To reach a high match score for this career, consider focusing on these areas:")}
+                </p>
+                <ul className="space-y-3">
+                  {bridgingReasons.map((reason, idx) => (
+                    <li key={idx} className="flex items-start bg-white p-3 rounded-lg border border-amber-100 shadow-sm">
+                      <div className="min-w-[20px] h-5 flex items-center justify-center mr-3 mt-0.5">
+                        <span className="flex h-2 w-2 rounded-full bg-amber-500" />
+                      </div>
+                      <span className="text-gray-700">{reason}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
 
             {/* Responsibilities */}
             {career.responsibilities && career.responsibilities.length > 0 && (
@@ -231,13 +262,12 @@ export default function CareerDetails() {
                       </span>
                       <span
                         className={`text-xs px-2 py-1 rounded-full font-medium capitalize
-                        ${
-                          skill.levelRequired === "advanced"
+                        ${skill.levelRequired === "advanced"
                             ? "bg-purple-100 text-purple-700"
                             : skill.levelRequired === "intermediate"
-                            ? "bg-blue-100 text-blue-700"
-                            : "bg-gray-200 text-gray-700"
-                        }`}
+                              ? "bg-blue-100 text-blue-700"
+                              : "bg-gray-200 text-gray-700"
+                          }`}
                       >
                         {t(`career.level.${skill.levelRequired}`, skill.levelRequired || "Not specified")}
                       </span>
@@ -286,8 +316,8 @@ export default function CareerDetails() {
                   <div className="text-2xl font-bold text-gray-900">
                     {career.demandStats?.growthPercent
                       ? `+${(career.demandStats.growthPercent * 100).toFixed(
-                          1
-                        )}%`
+                        1
+                      )}%`
                       : t("career.stable", "Stable")}
                   </div>
                   <div className="text-xs text-gray-500">{t("career.details.annualGrowth", "Annual Growth")}</div>

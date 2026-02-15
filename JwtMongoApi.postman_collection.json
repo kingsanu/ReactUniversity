@@ -896,6 +896,28 @@
           "name": "Coach Dashboard",
           "item": [
             {
+              "name": "Get My Coach Profile",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/coach/me",
+                  "protocol": "https",
+                  "host": [
+                    "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+                  ],
+                  "path": ["api", "v1", "coach", "me"]
+                },
+                "description": "Get the authenticated coach's own profile information.\n\n**Returns:**\n- Personal information (name, title, bio, specialization, location, languages, tags)\n- Profile image URL (Azure Blob Storage)\n- Pricing information (hourlyRate, currency)\n- Rating and review count\n- Availability schedule with weekly time slots\n\n**Note:** Requires authentication. Returns the profile for the currently authenticated coach user."
+              }
+            },
+            {
               "name": "Get My Sessions",
               "request": {
                 "method": "GET",
@@ -7130,7 +7152,103 @@
               ],
               "path": ["api", "report", "print", "from-url"]
             },
-            "description": "Generates a PDF from a custom URL using PuppeteerSharp. Accepts any valid URL and converts the rendered page to PDF.\n\n**Features:**\n- **Custom URL Support**: Accepts any valid HTTP/HTTPS URL\n- **URL Validation**: Validates URL format and domain whitelist\n- **PDF Generation**: Converts the rendered HTML page to PDF format\n- **Custom Filename**: Optional custom filename for the PDF\n- **Security**: Domain whitelist check for security\n- **Error Handling**: Comprehensive error handling and logging\n\n**Request Body:**\n```json\n{\n  \"url\": \"https://university.foodyqueen.com/print/nexa\",\n  \"fileName\": \"nexa_report.pdf\" // optional\n}\n```\n\n**Request Parameters:**\n- url (required): Full URL to generate PDF from (must be HTTP or HTTPS)\n- fileName (optional): Custom filename for the PDF (defaults to URL-based name)\n\n**Returns:**\n- PDF file (application/pdf)\n- Custom filename if provided\n\n**Use Case:**\n- Generate PDFs from any web page\n- Print-friendly document generation\n- Report generation from dynamic URLs\n- Document archiving from web sources\n\n**Technical Details:**\n- Method: POST\n- Content-Type: application/json\n- No authentication required\n- Uses PuppeteerSharp for browser automation\n- Waits for page to fully load before PDF generation\n- 60 second timeout for page loading\n- A4 format with margins\n- Domain whitelist: university.foodyqueen.com, foodyqueen.com\n\n**Security:**\n- URL format validation\n- Domain whitelist check\n- Only HTTP/HTTPS URLs allowed\n\n**Example:**\n```json\nPOST /api/report/print/from-url\n{\n  \"url\": \"https://university.foodyqueen.com/print/nexa\",\n  \"fileName\": \"custom_report.pdf\"\n}\n```"
+            "description": "Generates a PDF from a custom URL using PuppeteerSharp. Accepts any valid URL and converts the rendered page to PDF."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Assessments",
+      "item": [
+        {
+          "name": "Get Report Data (for PDF)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/assessments/{{userId}}/report",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "assessments", "{{userId}}", "report"]
+            },
+            "description": "Returns structured assessment report data for frontend PDF generation (GET /api/assessments/{id}/report). No server-side PDF; frontend uses this JSON to render the A4 report. Requires JWT; user can only request their own report (id = userId).\n\n**Path:** {{userId}} - Candidate/User ID\n\n**Response:** candidate (name max 30, assessmentDate), executiveSummary (text 550, summaryTitle 40, 5 steps × 90 chars), liaSubtests (5 items: title 40, description 140, iconType: glasses|gears|math|puzzle|timer), integratedDiagnosis (chartData, legend, majors), notRecommended, explorationPlan (4), operationalPlan (4), indicators, training (4), universityMapping (max 8), conclusion (text 400, nextSteps).\n\n**Variables:** {{token}} (JWT from Login), {{userId}}."
+          },
+          "response": []
+        },
+        {
+          "name": "Derive Profile from 360",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"answers\": {\n    \"19\": 5,\n    \"20\": 4,\n    \"21\": 3\n  }\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/assessment/derive-profile",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "assessment", "derive-profile"]
+            },
+            "description": "Derive interests and motivators from 360 assessment answers (TIMS derive_profile_from_360 algorithm). Uses Data/TIMS/360_assessment_questions.json for mappings.\n\n**Request Body:**\n- userId: User ID (must match JWT)\n- answers: Map of question ID (string) to answer (1-5 Likert). Only answers 4 and 5 contribute (weights 0.7 and 1.0).\n\n**Response:**\n- derivedInterests: Top 15 interests (ordered by score)\n- derivedMotivators: Top 12 motivators (ordered by score)\n- interestScores: Raw accumulated scores per interest\n- motivatorScores: Raw accumulated scores per motivator\n\n**Flow:** Call this first, then use the output with POST /api/v1/careers/score."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "TIMS / Careers",
+      "description": "TIMS career scoring and recommendations. Uses careers_database_complete.json and weighted scoring (DISC 40%, MIL 35%, Interests 15%, Motivators 10%).",
+      "item": [
+        {
+          "name": "Score Careers",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"disc\": {\n    \"D\": \"Passive\",\n    \"I\": \"Active\",\n    \"S\": \"Passive\",\n    \"C\": \"Passive\"\n  },\n  \"interests\": [\"dynamic\", \"creative\", \"analytical\"],\n  \"motivators\": [\"achievement\", \"recognition\", \"creativity\"]\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/careers/score",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "careers", "score"]
+            },
+            "description": "Score all careers against user profile and return ranked list (TIMS scoring algorithm).\n\n**Request Body:**\n- userId: Optional. If provided, MIL scores are loaded from completed PCA exam sessions.\n- disc: Required. DISC profile (D, I, S, C). Values: \"Active\" or \"Passive\".\n- mil: Optional. If omitted and userId provided, MIL is fetched from DB (PatternRecognition→Detection, VerbalReasoning→Reasoning, NumericVelocity→Numeric, WorkingMemory→Memory, VisualRotation→Orientation).\n- interests: Required. From derive-profile or manual.\n- motivators: Required. From derive-profile or manual.\n\n**Response:**\n- careers: Ranked list with programId, programTitle, cluster, totalScore, breakdown (discScore, milScore, interestsScore, motivatorsScore), needsBridging, bridgingReasons, bridgingPaths."
           },
           "response": []
         }
@@ -7286,6 +7404,168 @@
               ]
             },
             "description": "Get Benchmark Comparison report data for PDF generation.\n\n**Query Parameters:**\n- userId: Required - User ID\n- position: Required - Job position/title\n- location: Required - Location (city, state, country)\n\n**Returns:**\n- userInfo: User details\n- position: User's position\n- salaryBenchmarks: Salary benchmarks by level\n- skillGaps: Skill gap analysis\n- marketInsights: Market insights\n- roiProjection: ROI projections\n- certifications: Recommended certifications\n\n**Note:** Requires authentication"
+          }
+        }
+      ]
+    },
+    {
+      "name": "School Admin",
+      "description": "School administration endpoints for managing schools, students, and onboarding.",
+      "item": [
+        {
+          "name": "Get Onboarding Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/{{schoolInvitationToken}}/onboarding-status",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "school-admin", "{{schoolInvitationToken}}", "onboarding-status"]
+            },
+            "description": "Get the onboarding status for a school using invitation token.\n\n**Path Parameters:**\n- token: School invitation token\n\n**Returns:**\n- schoolName: Name of the school\n- adminEmail: Pre-filled admin email\n- isTokenValid: Whether token is still valid\n- tokenExpiresAt: Token expiration date"
+          }
+        },
+        {
+          "name": "Submit School Admin Onboarding",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"adminName\": \"John Smith\",\n  \"password\": \"SecurePassword123!\",\n  \"confirmPassword\": \"SecurePassword123!\",\n  \"schoolSettings\": {\n    \"notifyOnStudentSignup\": true,\n    \"notifyOnAssessmentComplete\": true,\n    \"allowStudentSelfRegistration\": false\n  }\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/{{schoolInvitationToken}}/onboarding",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "school-admin", "{{schoolInvitationToken}}", "onboarding"]
+            },
+            "description": "Complete school admin onboarding using invitation token.\n\n**Path Parameters:**\n- token: School invitation token\n\n**Body:**\n- adminName: Administrator's full name\n- password: Password (min 8 chars)\n- confirmPassword: Password confirmation\n- schoolSettings: Optional school settings\n  - notifyOnStudentSignup: Email on new student signup\n  - notifyOnAssessmentComplete: Email on assessment completion\n  - allowStudentSelfRegistration: Allow students to self-register\n\n**Returns:**\n- success: true if onboarding completed\n- redirectUrl: URL to redirect after onboarding"
+          }
+        },
+        {
+          "name": "Get Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/dashboard/stats",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "school-admin", "dashboard", "stats"]
+            },
+            "description": "Get dashboard statistics for the school admin.\n\n**Returns:**\n- totalStudents: Total number of students\n- pendingInvites: Students with pending invitations\n- acceptedStudents: Students who accepted invitations\n- activeStudents: Currently active students\n- completedAssessments: Total assessments completed\n- averageScore: Average assessment score\n\n**Note:** Requires authentication as school_admin"
+          }
+        },
+        {
+          "name": "Get Students",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/students?page=1&limit=10&search=&status=&sortBy=name&sortOrder=asc",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "school-admin", "students"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (default: 1)"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Items per page (default: 10)"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search by name or email"
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "description": "Filter by status (pending, accepted, active, inactive)"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "name",
+                  "description": "Sort field (name, email, createdAt, lastActive)"
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "asc",
+                  "description": "Sort order (asc, desc)"
+                }
+              ]
+            },
+            "description": "Get paginated list of students for the school.\n\n**Query Parameters:**\n- page: Page number (default: 1)\n- limit: Items per page (default: 10)\n- search: Search by name or email\n- status: Filter by status (pending, accepted, active, inactive)\n- sortBy: Sort field (name, email, createdAt, lastActive)\n- sortOrder: Sort order (asc, desc)\n\n**Returns:**\n- data: Array of student objects\n- total: Total count\n- page: Current page\n- limit: Items per page\n- totalPages: Total pages\n\n**Note:** Requires authentication as school_admin"
+          }
+        },
+        {
+          "name": "Invite Students",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"students\": [\n    {\n      \"email\": \"student1@example.com\",\n      \"name\": \"John Doe\"\n    },\n    {\n      \"email\": \"student2@example.com\",\n      \"name\": \"Jane Smith\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/students/invite?language=en",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "school-admin", "students", "invite"],
+              "query": [
+                {
+                  "key": "language",
+                  "value": "en",
+                  "description": "Email language (en for English, sp/es for Spanish)"
+                }
+              ]
+            },
+            "description": "Invite students to the school. Creates student accounts and sends invitation emails.\n\n**Query Parameters:**\n- language: Email language (en for English, sp/es for Spanish)\n\n**Body:**\n- students: Array of student objects (1-100 per request)\n  - email: Student email (required)\n  - name: Student name (optional)\n\n**Returns:**\n- success: true if any invitations succeeded\n- totalRequested: Number of students requested\n- successCount: Number of successful invitations\n- failedCount: Number of failed invitations\n- results: Array of individual results\n\n**Note:** Requires authentication as school_admin"
           }
         }
       ]
@@ -7451,6 +7731,11 @@
       "key": "payoutId",
       "value": "your-payout-id-here",
       "description": "Replace with actual payout ID for testing (returned from admin payouts endpoint)"
+    },
+    {
+      "key": "schoolInvitationToken",
+      "value": "your-school-invitation-token-here",
+      "description": "Replace with actual school invitation token for onboarding (generated when school is created)"
     }
   ]
 }

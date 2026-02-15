@@ -18,6 +18,7 @@ import {
   DollarSign,
   Globe,
   Briefcase,
+  BookOpen,
 } from "lucide-react";
 import { telemetry } from "@/services/telemetryService";
 
@@ -127,6 +128,15 @@ export default function CareerCard({ career }: { career: CareerRole }) {
               {t("career.highDemand", "High Demand")}
             </Badge>
           )}
+        {career.needsBridging && (
+          <Badge
+            variant="secondary"
+            className="bg-purple-50 text-purple-700 hover:bg-purple-100 border-purple-100 font-medium px-2.5 py-1"
+          >
+            <BookOpen className="h-3 w-3 mr-1 text-purple-500" aria-hidden="true" />
+            {t("career.bridgingAvailable", "Bridging Available")}
+          </Badge>
+        )}
       </div>
 
       <div className="flex items-center justify-between pt-4 border-t border-gray-50 mt-auto">
@@ -138,11 +148,10 @@ export default function CareerCard({ career }: { career: CareerRole }) {
               e.stopPropagation();
               toggleCompare(career.id);
             }}
-            className={`text-xs font-medium px-3 h-8 rounded-full transition-all ${
-              inCompare
+            className={`text-xs font-medium px-3 h-8 rounded-full transition-all ${inCompare
                 ? "bg-indigo-600 text-white hover:bg-indigo-700 hover:text-white"
                 : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100"
-            }`}
+              }`}
           >
             {inCompare
               ? t("career.added", "Added")

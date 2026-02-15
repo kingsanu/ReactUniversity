@@ -5,17 +5,39 @@ import { useGlobalStore } from "@/store/useGlobalStore";
 import { Bolt, Compass, Briefcase } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
-  useRecommendations,
   usePrefetchCareers,
 } from "@/hooks/useCareerQueries";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
+import { useTimsCareerScoring } from "@/hooks/useTimsQueries";
+import { careers } from "@/services/careerService";
 
 export function Top3Careers() {
   const { user } = useGlobalStore();
-  const { data, isLoading } = useRecommendations(user.id ?? undefined);
+  const { data: timsData, isLoading, hasAssessments } = useTimsCareerScoring();
 
-  const recs = data?.recommendations ?? [];
+  const timsCareerList = timsData?.data?.careers;
+
+  const recs = React.useMemo(() => {
+    if (timsCareerList) {
+      return timsCareerList.map(sc => {
+        const staticCareer = careers.find(c => c.id === sc.programId || c.slug === sc.programId);
+        return {
+          careerId: sc.programId,
+          matchScore: sc.totalScore,
+          explanation: {
+            en: sc.bridgingReasons?.[0] || "Based on your profile match",
+            es: sc.bridgingReasons?.[0] || "Basado en tu perfil",
+          },
+          title: staticCareer?.title || { en: sc.programTitle, es: sc.programTitle },
+          iconUrl: staticCareer?.iconUrl,
+        };
+      });
+    }
+    return [];
+  }, [timsCareerList]);
+
+  const showAssessmentPrompt = !hasAssessments;
   const prefetch = usePrefetchCareers();
 
   const router = useRouter();
@@ -26,7 +48,7 @@ export function Top3Careers() {
   const { t } = useTranslation();
 
   return (
-    <motion.section 
+    <motion.section
       className="bg-white p-6 rounded-lg shadow-sm border"
       aria-labelledby="top3-careers-heading"
     >
@@ -35,9 +57,38 @@ export function Top3Careers() {
       </h2>
       <ul className="space-y-4" role="list">
         {isLoading && (
-          <li role="status" aria-busy="true" className="text-gray-500">
+          <li role="status" aria-busy="true" className="text-gray-500 py-4 text-center">
             <span className="sr-only">Loading career matches...</span>
-            Loading...
+            <div className="animate-pulse flex space-x-4">
+              <div className="rounded-full bg-gray-200 h-10 w-10"></div>
+              <div className="flex-1 space-y-6 py-1">
+                <div className="h-2 bg-gray-200 rounded"></div>
+                <div className="space-y-3">
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="h-2 bg-gray-200 rounded col-span-2"></div>
+                    <div className="h-2 bg-gray-200 rounded col-span-1"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+        )}
+
+        {!isLoading && showAssessmentPrompt && recs.length === 0 && (
+          <li className="text-center py-6 text-gray-500">
+            <p className="mb-3">{t("dashboard.completeAssessmentsForCareers", "Complete your assessments to see your top career matches!")}</p>
+            <button
+              onClick={() => router.push("/dashboard/assessments")}
+              className="text-sm bg-indigo-50 text-indigo-600 px-4 py-2 rounded-lg font-medium hover:bg-indigo-100 transition"
+            >
+              {t("dashboard.goToAssessments", "Go to Assessments")}
+            </button>
+          </li>
+        )}
+
+        {!isLoading && !showAssessmentPrompt && recs.length === 0 && (
+          <li className="text-center py-6 text-gray-500">
+            {t("dashboard.noMatchesFound", "No career matches found yet. Try completing more sections of your profile.")}
           </li>
         )}
         {recs.slice(0, 3).map((r, i) => (
@@ -46,7 +97,7 @@ export function Top3Careers() {
             className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition"
           >
             <div className="flex items-center space-x-3">
-              <div 
+              <div
                 className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-pink-600 rounded-lg flex items-center justify-center text-white text-sm font-bold"
                 aria-hidden="true"
               >
@@ -59,7 +110,7 @@ export function Top3Careers() {
                     className="font-medium text-gray-900"
                     onMouseEnter={() => prefetch.prefetchCareer?.(r.careerId)}
                   >
-                    {r.careerId}
+                    {r.title?.[language === "spanish" ? "es" : "en"] || r.careerId}
                   </h3>
                 </div>
                 <p className="text-sm text-gray-500">

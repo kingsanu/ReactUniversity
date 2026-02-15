@@ -1,6 +1,6 @@
 import { CareerRole } from "@/types/career";
 
-const careers: CareerRole[] = [
+export const careers: CareerRole[] = [
   {
     id: "career_data_analyst",
     familyId: "family_data",
