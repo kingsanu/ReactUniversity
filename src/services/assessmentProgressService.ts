@@ -373,7 +373,7 @@ export async function getAssessmentReportData(
     const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net";
 
     const response = await fetch(
-      `${baseUrl}/api/assessments/${assessmentId}/report`,
+      `/api/assessments/${assessmentId}/report`,
       {
         method: "GET",
         headers: {

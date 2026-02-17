@@ -58,6 +58,7 @@ export default function StudentOnboardingPage({
   const [isLoading, setIsLoading] = useState(true);
   const [isValid, setIsValid] = useState(false);
   const [studentName, setStudentName] = useState("");
+  const [userId, setUserId] = useState("");
   const [errorObj, setErrorObj] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -84,13 +85,20 @@ export default function StudentOnboardingPage({
       try {
         setIsLoading(true);
         const result = await verifyStudentToken(token);
+        console.log("🔍 Page received verification result:", result);
 
-        if (result.isValid) {
+        // Handle potential string/boolean mismatch from API
+        const isValidToken = result.isValid === true || result.isValid === "true";
+
+        if (isValidToken) {
           setIsValid(true);
           setStudentName(result.student?.name || "Student");
+          setUserId(result.student?.id || "");
         } else {
           setIsValid(false);
-          setErrorObj(result.message || "Invalid invitation link");
+          // show more details for debugging if available
+          const debugMsg = JSON.stringify(result, null, 2);
+          setErrorObj(result.message || `Invalid invitation link (Debug: ${debugMsg})`);
         }
       } catch (err) {
         setIsValid(false);
@@ -106,27 +114,38 @@ export default function StudentOnboardingPage({
   const onSubmit = async (data: PasswordFormData) => {
     setIsSubmitting(true);
     try {
-      const result = await completeStudentOnboarding(token, data.password);
+      if (!userId) {
+        throw new Error("Student ID not found. Please refresh the page.");
+      }
+      const result = await completeStudentOnboarding(token, data.password, data.confirmPassword, userId);
 
-      if (result.success && result.token) {
-        // Auto-login logic
-        localStorage.setItem("token", result.token);
+      if (result.success) {
+        if (result.token) {
+          // Auto-login logic
+          localStorage.setItem("token", result.token);
 
-        // Update global store
-        setUser({
-          id: result.user.id,
-          name: result.user.name,
-          email: result.user.email,
-          role: result.user.role?.name,
-          isAuthenticated: true,
-        });
+          // Update global store
+          setUser({
+            id: result.user.id,
+            name: result.user.name,
+            email: result.user.email,
+            role: result.user.role?.name,
+            isAuthenticated: true,
+          });
 
-        toast.success("Account activated successfully!");
+          toast.success("Account activated successfully!");
 
-        // Small delay for user to see success state
-        setTimeout(() => {
-          router.push("/dashboard");
-        }, 1500);
+          // Small delay for user to see success state
+          setTimeout(() => {
+            router.push("/dashboard");
+          }, 1500);
+        } else {
+          // Success but no token - redirect to login
+          toast.success("Account activated! Please log in.");
+          setTimeout(() => {
+            router.push("/login");
+          }, 2000);
+        }
       } else {
         throw new Error(result.message || "Activation failed");
       }

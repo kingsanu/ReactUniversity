@@ -137,13 +137,18 @@ export async function getStudent(studentId: string): Promise<Student> {
 
 export async function inviteStudent(
   data: StudentInvitePayload
-): Promise<{ success: boolean; message: string; student?: Student }> {
+): Promise<{ success: boolean; totalRequested: number; successCount: number; failedCount: number; results: any[] }> {
+  // The API expects { students: [ ... ] } even for a single invite
+  const payload = {
+    students: [data]
+  };
+
   const response = await fetch(
     buildUrl("/api/v1/school-admin/students/invite"),
     {
       method: "POST",
       headers: getHeaders(),
-      body: JSON.stringify(data),
+      body: JSON.stringify(payload),
     }
   );
 
@@ -159,7 +164,7 @@ export async function bulkInviteStudents(
   data: BulkStudentInvitePayload
 ): Promise<{ success: boolean; invited: number; failed: number; results: any[] }> {
   const response = await fetch(
-    buildUrl("/api/v1/school-admin/students/bulk-invite"),
+    buildUrl("/api/v1/school-admin/students/invite"),
     {
       method: "POST",
       headers: getHeaders(),
@@ -172,7 +177,15 @@ export async function bulkInviteStudents(
     throw new Error(errorData.message || "Failed to bulk invite students");
   }
 
-  return response.json();
+  const result = await response.json();
+
+  // Map API response to expected return type
+  return {
+    success: result.success,
+    invited: result.successCount || 0,
+    failed: result.failedCount || 0,
+    results: result.results || []
+  };
 }
 
 export async function resendStudentInvite(

@@ -55,6 +55,42 @@ export default function ComparePage() {
       .filter((c): c is NonNullable<typeof c> => c !== null);
   }, [compareList, careersData, timsData]);
 
+  // Check if any selected career has data for specific fields to conditionally render rows
+  const rows = [
+    {
+      label: t("career.compare.table.match"),
+      render: (c: typeof selected[0]) => (
+        <span className="font-bold text-indigo-600">
+          {c.matchScore ? `${c.matchScore}%` : "--"}
+        </span>
+      ),
+      hasData: (c: typeof selected[0]) => c.matchScore !== undefined,
+    },
+    {
+      label: t("career.compare.table.education"),
+      render: (c: typeof selected[0]) => c.educationLevel || "--",
+      hasData: (c: typeof selected[0]) => !!c.educationLevel && c.educationLevel !== "--",
+    },
+    {
+      label: t("career.compare.table.salary"),
+      render: (c: typeof selected[0]) =>
+        c.salaryRange?.median
+          ? `$${(c.salaryRange.median / 1000).toFixed(0)}k`
+          : "--",
+      hasData: (c: typeof selected[0]) => !!c.salaryRange?.median,
+    },
+    {
+      label: t("career.compare.table.skills"),
+      render: (c: typeof selected[0]) =>
+        (c.skills || []).map((sk: any) => sk.name.en).join(", ") || "--",
+      hasData: (c: typeof selected[0]) => !!c.skills && c.skills.length > 0,
+    },
+  ];
+
+  const visibleRows = rows.filter((row) =>
+    selected.some((c) => row.hasData(c))
+  );
+
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar isOpen={false} onClose={() => { }} />
@@ -88,50 +124,18 @@ export default function ComparePage() {
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td className="p-2 font-semibold bg-gray-50">
-                          {t("career.compare.table.match")}
-                        </td>
-                        {selected.map((s) => (
-                          <td key={s.id} className="p-2 font-bold text-indigo-600">
-                            {s.matchScore ? `${s.matchScore}%` : "--"}
+                      {visibleRows.map((row, idx) => (
+                        <tr key={idx}>
+                          <td className="p-2 font-semibold bg-gray-50">
+                            {row.label}
                           </td>
-                        ))}
-                      </tr>
-                      <tr>
-                        <td className="p-2 font-semibold bg-gray-50">
-                          {t("career.compare.table.education")}
-                        </td>
-                        {selected.map((s) => (
-                          <td key={s.id} className="p-2">
-                            {s.educationLevel || "--"}
-                          </td>
-                        ))}
-                      </tr>
-                      <tr>
-                        <td className="p-2 font-semibold bg-gray-50">
-                          {t("career.compare.table.salary")}
-                        </td>
-                        {selected.map((s) => (
-                          <td key={s.id} className="p-2">
-                            {s.salaryRange?.median
-                              ? `$${(s.salaryRange.median / 1000).toFixed(0)}k`
-                              : "--"}
-                          </td>
-                        ))}
-                      </tr>
-                      <tr>
-                        <td className="p-2 font-semibold bg-gray-50">
-                          {t("career.compare.table.skills")}
-                        </td>
-                        {selected.map((s) => (
-                          <td key={s.id} className="p-2 text-sm text-gray-600">
-                            {(s.skills || [])
-                              .map((sk: any) => sk.name.en)
-                              .join(", ") || "--"}
-                          </td>
-                        ))}
-                      </tr>
+                          {selected.map((s) => (
+                            <td key={s.id} className="p-2">
+                              {row.render(s)}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
@@ -142,5 +146,6 @@ export default function ComparePage() {
       </div>
     </div>
   );
+
 }
 

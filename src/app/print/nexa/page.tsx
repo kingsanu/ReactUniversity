@@ -1,37 +1,96 @@
 import React from "react";
 import { Glasses, Settings, Calculator, Puzzle, Timer } from "lucide-react";
+import type { AssessmentReportData } from "@/types/assessmentReport";
 
-// Mock Data for Visual Dev
-const mockData = {
-  candidateName: "Maria Paula Mendoza",
-  date: "Septiembre 23/2025",
-  executiveSummary:
-    "Maria Paula shows two exceptional cognitive markers: Detection of Characteristics = 96% (Exceptional) and Spatial Orientation / Visualization = Exceptional (78%). Her PCA shows high Influence, a service orientation, a strong concern for quality, and low Dominance. In simple terms: she has a keen eye for detail, can visualize in 2D/3D with ease, and relates very well to others — making her an ideal candidate for Architecture, Industrial Design, and programs that combine design with technical precision.",
-  steps: [
-    {
-      number: 1,
-      text: "Translate LIA and PCA results into clear study recommendations.",
-    },
-    {
-      number: 2,
-      text: "Prioritize majors (Top-10) with cognitive behavioral justification.",
-    },
-    {
-      number: 3,
-      text: "Provide an exploration and decision plan (0–12 months) for a student.",
-    },
-    {
-      number: 4,
-      text: "Deliver an immediate operational plan (8 weeks) and tracking KPIs.",
-    },
-    {
-      number: 5,
-      text: "Map recommended universities and facilitate immediate application actions.",
-    },
+// Default mock data used for standalone preview at /print/nexa
+const defaultMockData: AssessmentReportData = {
+  candidate: {
+    name: "Maria Paula Mendoza",
+    assessmentDate: "Septiembre 23/2025",
+  },
+  executiveSummary: {
+    text: "Maria Paula shows two exceptional cognitive markers: Detection of Characteristics = 96% (Exceptional) and Spatial Orientation / Visualization = Exceptional (78%). Her PCA shows high Influence, a service orientation, a strong concern for quality, and low Dominance. In simple terms: she has a keen eye for detail, can visualize in 2D/3D with ease, and relates very well to others — making her an ideal candidate for Architecture, Industrial Design, and programs that combine design with technical precision.",
+    summaryTitle: "Influence / Technical precision",
+    steps: [
+      { number: 1, text: "Translate LIA and PCA results into clear study recommendations." },
+      { number: 2, text: "Prioritize majors (Top-10) with cognitive behavioral justification." },
+      { number: 3, text: "Provide an exploration and decision plan (0–12 months) for a student." },
+      { number: 4, text: "Deliver an immediate operational plan (8 weeks) and tracking KPIs." },
+      { number: 5, text: "Map recommended universities and facilitate immediate application actions." },
+    ],
+  },
+  liaSubtests: [
+    { title: "Detection of characteristics", description: "Identifies errors, patterns and details; agile learning and precise execution — key for quality control and project review.", iconType: "glasses" },
+    { title: "Reasoning", description: "verbal fluency and logical analysis: Useful for argumentation, problem solving and presenting proposals.", iconType: "gears" },
+    { title: "Numerical speed and accuracy", description: "Agility for practical calculations; sufficient for basic technical tasks.", iconType: "math" },
+    { title: "Working memory", description: "Retention and manipulation of information; for Sara it is adequate, and it is advisable to support it with tools.", iconType: "puzzle" },
+    { title: "Orientation / General visualization", description: "Mental rotation, interpretation of plans and 3D prototyping — a differentiating ability for spatially oriented majors.", iconType: "timer" },
   ],
+  integratedDiagnosis: {
+    chartData: [
+      { label: "F", value: 14, color: "#1a1a2e" },
+      { label: "A", value: 35, color: "#0f172a" },
+      { label: "B", value: 25, color: "#006d77" },
+      { label: "C", value: 9, color: "#99e2e8" },
+      { label: "D", value: 17, color: "#22d3ee" },
+    ],
+    legend: [
+      { label: "A", title: "Strengths:", description: "She quickly detects details and communicates very well with others.", bg: "#0f172a", borderColor: "#0f172a" },
+      { label: "B", title: "Opportunities:", description: "Her reasoning and verbal skills are good and can grow even more.", bg: "#006d77", borderColor: "#008996" },
+      { label: "C", title: "Stable Areas:", description: "Her memory works well when information is clear and organized.", bg: "#99e2e8", borderColor: "#22d3ee" },
+      { label: "D", title: "Risks:", description: "She may struggle to make firm decisions in difficult situations.", bg: "#22d3ee", borderColor: "#22d3ee" },
+      { label: "F", title: "Needs:", description: "She benefits from checklists and step-by-step tasks to stay on track.", bg: "#1a1a2e", borderColor: "#008996" },
+    ],
+    majors: {
+      perfectFit: [
+        { id: 1, title: "Architecture", description: "Spatial visualization + portfolio from the start; client interaction." },
+        { id: 2, title: "Industrial Design / Product Design", description: "3D prototyping, testing and product improvement." },
+        { id: 3, title: "Civil Engineering", description: "plan reading, site control and technical management.", extra: "(project design and supervision)" },
+      ],
+      highlyRecommended: [
+        { id: 4, title: "Interior Architecture / Interior Design" },
+        { id: 5, title: "Mechanical Engineering", extra: "(design and prototyping)" },
+        { id: 6, title: "Materials Engineering / Materials Science" },
+      ],
+      complementary: [
+        "Naval Engineering / Naval Architecture",
+        "UX/UI with physical prototyping / 3D product focus",
+        "Technical Quality Control / Quality Engineering",
+      ],
+    },
+  },
+  notRecommended: [
+    { category: "Programs that rely exclusively on repetitive routines with little visualization", reason: "(e.g., some pure branches of accounting without a technical component)." },
+    { category: "Programs that demand high dominance or aggressive sales without support", reason: "(due to low dominance)." },
+  ],
+  explorationPlan: [
+    { phase: "Month 0–1", title: "Quick confirmation", activities: "Intensive SketchUp, AutoCAD course (20–40 h); drawing workshop (10–20 h); 1-day job-shadowing at a studio/workshop.", kpi: "enjoy at least 2 of the 3 activities.", kpiLabel: "KPI:" },
+    { phase: "Month 1–3", title: "Minimum portfolio", activities: "Create 2 projects, (A) plan + elevation + 3D view of a space; (B) documented object/prototype.", kpi: "from 2 professionals", kpiLabel: "Request feedback:" },
+    { phase: "Month 3–6", title: "Technical validation", activities: "Intermediate courses (BIM / SolidWorks); micro-internship 2–4 weeks.", kpi: "improved portfolio and positive feedback from 1 professional.", kpiLabel: "KPI:" },
+    { phase: "Month 6–12", title: "Decision and admission", activities: "Select 2–4 programs (1–2 reach schools, 1–2 safe options). Prepare final portfolio, letters and admission tests.", kpi: "submitted to at least 2 programs.", kpiLabel: "KPI:" },
+  ],
+  operationalPlan: [
+    { phase: "Week 1–2", text: "Enroll in a basic CAD course; define the portfolio project" },
+    { phase: "Week 3–4", text: "Execute the first draft; feedback session with a mentor." },
+    { phase: "Week 5–6", text: "3D modeling; second feedback and adjustment." },
+    { phase: "Week 7–8", text: "Present portfolio version 1; list target universities; prepare admission steps." },
+  ],
+  indicators: [],
+  training: [],
+  universityMapping: [],
+  conclusion: { text: "", nextSteps: [] },
 };
 
-export default function NexaValuesPage() {
+interface NexaReportProps {
+  data?: AssessmentReportData;
+}
+
+export default function NexaValuesPage({ data }: NexaReportProps = {}) {
+  // Merge provided data with defaults — use provided data if available, otherwise fallback
+  const d = data || defaultMockData;
+  const candidateName = d.candidate.name;
+  const candidateDate = d.candidate.assessmentDate;
+  const firstName = candidateName.split(" ")[0];
   return (
     <div className="min-h-screen bg-gray-100 py-8 flex flex-col items-center gap-8 print:py-0 print:gap-0 print:bg-white">
       <style type="text/css" media="print">
@@ -77,15 +136,14 @@ export default function NexaValuesPage() {
             {/* Date - Top Right */}
             <div className="absolute top-[12mm] right-10 z-10">
               <span className="text-sm font-bold text-slate-700 tracking-wide font-montserrat">
-                September 23/2025
+                {candidateDate}
               </span>
             </div>
 
             {/* Name - Centered in Teal Bar */}
-            {/* Name - Centered in Teal Bar */}
             <div className="absolute top-[22mm] h-[40%] right-0 w-[60%] flex items-center justify-start pl-4 z-10">
               <h1 className="text-white font-bold text-3xl tracking-wide whitespace-nowrap font-montserrat">
-                Maria Paula Mendoza
+                {candidateName}
               </h1>
             </div>
           </div>
@@ -135,7 +193,7 @@ export default function NexaValuesPage() {
                 {/* Pill */}
                 <div className="mt-[-54px] z-10 bg-[#008996] rounded-full py-2.5 px-10 text-center shadow-none ">
                   <span className="text-white font-bold text-xs tracking-wide font-antonio">
-                    Influence / Technical precision
+                    {d.executiveSummary.summaryTitle || "Influence / Technical precision"}
                   </span>
                 </div>
               </div>
@@ -147,11 +205,11 @@ export default function NexaValuesPage() {
                 Executive Summary
               </h2>
               <p className="text-[#1e293b] text-md leading-6 mb-12 text-justify font-medium font-roboto">
-                {mockData.executiveSummary}
+                {d.executiveSummary.text}
               </p>
 
               <div className="space-y-8">
-                {mockData.steps.map((step) => (
+                {d.executiveSummary.steps.map((step) => (
                   <div
                     key={step.number}
                     className="flex flex-row items-center gap-2"
@@ -187,10 +245,10 @@ export default function NexaValuesPage() {
         {/* Header Text Row */}
         <div className="flex flex-row justify-between items-end px-10 mb-10 pt-4">
           <h2 className="text-slate-800 text-sm font-bold font-montserrat">
-            Maria Paula Mendoza
+            {candidateName}
           </h2>
           <span className="text-slate-800 text-sm font-montserrat">
-            Septiembre 23/2025
+            {candidateDate}
           </span>
         </div>
 
@@ -203,137 +261,46 @@ export default function NexaValuesPage() {
           </p>
 
           <div className="flex flex-col gap-5">
-            {[
-              {
-                text: (
-                  <>
-                    <span className="font-bold">
-                      Detection of characteristics:
-                    </span>{" "}
-                    Identifies errors, patterns and details; agile learning and
-                    precise execution — key for quality control and project
-                    review.
-                  </>
-                ),
-                icon: (
-                  <Glasses
-                    size={40}
-                    className="text-[#008996]"
-                    strokeWidth={2}
-                  />
-                ),
-              },
-              {
-                text: (
-                  <>
-                    <span className="font-bold">Reasoning:</span> verbal fluency
-                    and logical analysis: Useful for argumentation, problem
-                    solving and presenting proposals.
-                  </>
-                ),
-                icon: (
+            {d.liaSubtests.map((subtest, i) => {
+              const iconMap: Record<string, React.ReactNode> = {
+                glasses: <Glasses size={40} className="text-[#008996]" strokeWidth={2} />,
+                gears: (
                   <div className="relative w-10 h-10">
-                    <Settings
-                      size={28}
-                      className="text-[#008996] absolute top-[-2px] left-[-2px]"
-                      strokeWidth={2}
-                    />
-                    <Settings
-                      size={22}
-                      className="text-[#008996] absolute bottom-[-2px] right-[-2px]"
-                      strokeWidth={2}
-                    />
+                    <Settings size={28} className="text-[#008996] absolute top-[-2px] left-[-2px]" strokeWidth={2} />
+                    <Settings size={22} className="text-[#008996] absolute bottom-[-2px] right-[-2px]" strokeWidth={2} />
                   </div>
                 ),
-              },
-              {
-                text: (
-                  <>
-                    <span className="font-bold">
-                      Numerical speed and accuracy:
-                    </span>{" "}
-                    Agility for practical calculations; sufficient for basic
-                    technical tasks.
-                  </>
-                ),
-                icon: (
+                math: (
                   <div className="text-[#008996] font-bold text-3xl leading-none flex flex-col items-center justify-center gap-1">
-                    <div className="flex gap-2">
-                      <span>+</span>
-                      <span>-</span>
-                    </div>
-                    <div className="flex gap-2">
-                      <span>×</span>
-                      <span>÷</span>
-                    </div>
+                    <div className="flex gap-2"><span>+</span><span>-</span></div>
+                    <div className="flex gap-2"><span>×</span><span>÷</span></div>
                   </div>
                 ),
-              },
-              {
-                text: (
-                  <>
-                    <span className="font-bold">Working memory:</span> Retention
-                    and manipulation of information; for Sara it is adequate,
-                    and it is advisable to support it with tools.
-                  </>
-                ),
-                icon: (
+                puzzle: (
                   <div className="grid grid-cols-2 gap-0.5 w-9 h-9">
-                    <Puzzle
-                      size={18}
-                      className="text-[#008996] rotate-90"
-                      strokeWidth={2}
-                    />
-                    <Puzzle
-                      size={18}
-                      className="text-[#008996] rotate-180"
-                      strokeWidth={2}
-                    />
-                    <Puzzle
-                      size={18}
-                      className="text-[#008996]"
-                      strokeWidth={2}
-                    />
-                    <Puzzle
-                      size={18}
-                      className="text-[#008996] -rotate-90"
-                      strokeWidth={2}
-                    />
+                    <Puzzle size={18} className="text-[#008996] rotate-90" strokeWidth={2} />
+                    <Puzzle size={18} className="text-[#008996] rotate-180" strokeWidth={2} />
+                    <Puzzle size={18} className="text-[#008996]" strokeWidth={2} />
+                    <Puzzle size={18} className="text-[#008996] -rotate-90" strokeWidth={2} />
                   </div>
                 ),
-              },
-              {
-                text: (
-                  <>
-                    <span className="font-bold">
-                      Orientation / General visualization:
-                    </span>{" "}
-                    Mental rotation, interpretation of plans and 3D prototyping
-                    — a differentiating ability for spatially oriented majors.
-                  </>
-                ),
-                icon: (
-                  <Timer size={40} className="text-[#008996]" strokeWidth={2} />
-                ),
-              },
-            ].map((item, i) => (
-              <div
-                key={i}
-                className="flex flex-row items-center bg-[#f3f4f6] rounded-[100px] p-4 pr-8 gap-6 min-h-[125px]"
-              >
-                <div className="w-24 h-24 rounded-full bg-white flex items-center justify-center shrink-0 shadow-none ml-1.5">
-                  {/* Icon Container */}
-                  <div className="w-16 h-16 rounded-full flex items-center justify-center">
-                    {item.icon}
+                timer: <Timer size={40} className="text-[#008996]" strokeWidth={2} />,
+              };
+              return (
+                <div key={i} className="flex flex-row items-center bg-[#f3f4f6] rounded-[100px] p-4 pr-8 gap-6 min-h-[125px]">
+                  <div className="w-24 h-24 rounded-full bg-white flex items-center justify-center shrink-0 shadow-none ml-1.5">
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center">
+                      {iconMap[subtest.iconType] || <Glasses size={40} className="text-[#008996]" strokeWidth={2} />}
+                    </div>
+                  </div>
+                  <div className="flex flex-col flex-1">
+                    <p className="text-[rgb(0,59,89)] text-[0.95rem] leading-snug font-roboto font-medium px-1">
+                      <span className="font-bold">{subtest.title}:</span>{" "}{subtest.description}
+                    </p>
                   </div>
                 </div>
-                <div className="flex flex-col flex-1">
-                  <p className="text-[rgb(0,59,89)] text-[0.95rem] leading-snug font-roboto font-medium px-1">
-                    {item.text}
-                  </p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
@@ -350,8 +317,8 @@ export default function NexaValuesPage() {
 
         {/* Header Text Row */}
         <div className="flex flex-row justify-between items-end px-10 mb-10 pt-4">
-          <h2 className="text-slate-800 text-sm font-bold font-montserrat">Maria Paula Mendoza</h2>
-          <span className="text-slate-800 text-sm font-montserrat">Septiembre 23/2025</span>
+          <h2 className="text-slate-800 text-sm font-bold font-montserrat">{candidateName}</h2>
+          <span className="text-slate-800 text-sm font-montserrat">{candidateDate}</span>
         </div>
 
         <div className="px-10 pb-12">
@@ -367,13 +334,7 @@ export default function NexaValuesPage() {
             {(() => {
               // Chart Data - ORDER: Starting from TOP going CLOCKWISE
               // Reference shows: 14% (dark) at top, then 35% (navy), 25% (teal), 9% (light cyan), 17% (cyan)
-              const chartData = [
-                { label: "F", value: 14, color: "#1a1a2e" },    // Dark - Needs (TOP)
-                { label: "A", value: 35, color: "#0f172a" },    // Navy - Strengths
-                { label: "B", value: 25, color: "#006d77" },    // Dark Teal - Opportunities
-                { label: "C", value: 9, color: "#99e2e8" },     // Light Cyan - Stable Areas
-                { label: "D", value: 17, color: "#22d3ee" },    // Cyan - Risks
-              ];
+              const chartData = d.integratedDiagnosis.chartData;
 
               // Calculate total to normalize
               const total = chartData.reduce((sum, item) => sum + item.value, 0);
@@ -542,60 +503,27 @@ export default function NexaValuesPage() {
 
             {/* Legend List - Compact with title and desc on same line */}
             <div className="flex flex-col flex-1 gap-0">
-              {[
-                {
-                  l: "A",
-                  title: "Strengths:",
-                  desc: "She quickly detects details and communicates very well with others.",
-                  bg: "#0f172a",
-                  borderColor: "#0f172a"
-                },
-                {
-                  l: "B",
-                  title: "Opportunities:",
-                  desc: "Her reasoning and verbal skills are good and can grow even more.",
-                  bg: "#006d77",
-                  borderColor: "#008996"
-                },
-                {
-                  l: "C",
-                  title: "Stable Areas:",
-                  desc: "Her memory works well when information is clear and organized.",
-                  bg: "#99e2e8",
-                  borderColor: "#22d3ee"
-                },
-                {
-                  l: "D",
-                  title: "Risks:",
-                  desc: "She may struggle to make firm decisions in difficult situations.",
-                  bg: "#22d3ee",
-                  borderColor: "#22d3ee"
-                },
-                {
-                  l: "F",
-                  title: "Needs:",
-                  desc: "She benefits from checklists and step-by-step tasks to stay on track.",
-                  bg: "#1a1a2e",
-                  borderColor: "#008996"
-                },
-              ].map((item, i) => (
-                <div
-                  key={i}
-                  className="flex flex-row items-stretch py-1.5"
-                  style={{ borderBottom: `3px solid ${item.borderColor}` }}
-                >
+              {/* Legend List - Compact with title and desc on same line */}
+              <div className="flex flex-col flex-1 gap-0">
+                {d.integratedDiagnosis.legend.map((item, i) => (
                   <div
-                    className="w-10 flex items-center justify-center text-white font-bold text-lg mr-3 shrink-0 rounded-[6px] self-stretch"
-                    style={{ backgroundColor: item.bg, color: item.bg === "#99e2e8" ? "#006d77" : "white" }}
+                    key={i}
+                    className="flex flex-row items-stretch py-1.5"
+                    style={{ borderBottom: `3px solid ${item.borderColor}` }}
                   >
-                    {item.l}
+                    <div
+                      className="w-10 flex items-center justify-center text-white font-bold text-lg mr-3 shrink-0 rounded-[6px] self-stretch"
+                      style={{ backgroundColor: item.bg, color: item.bg === "#99e2e8" ? "#006d77" : "white" }}
+                    >
+                      {item.label}
+                    </div>
+                    <p className="text-[13px] leading-snug self-center">
+                      <span className="font-bold text-[#0f172a]">{item.title}</span>{" "}
+                      <span className="text-slate-500 font-roboto">{item.description}</span>
+                    </p>
                   </div>
-                  <p className="text-[13px] leading-snug self-center">
-                    <span className="font-bold text-[#0f172a]">{item.title}</span>{" "}
-                    <span className="text-slate-500 font-roboto">{item.desc}</span>
-                  </p>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
 
@@ -614,15 +542,11 @@ export default function NexaValuesPage() {
                 <div className="h-[1px] bg-[#008996] flex-1"></div>
               </div>
               <ul className="space-y-1 pl-8">
-                {[
-                  { id: 1, title: "Architecture", desc: "Spatial visualization + portfolio from the start; client interaction." },
-                  { id: 2, title: "Industrial Design / Product Design", desc: "3D prototyping, testing and product improvement." },
-                  { id: 3, title: "Civil Engineering", extra: "(project design and supervision)", desc: "plan reading, site control and technical management." }
-                ].map((item) => (
+                {d.integratedDiagnosis.majors.perfectFit.map((item) => (
                   <li key={item.id} className="text-[#0f172a] text-sm font-roboto">
                     <span className="font-bold">{item.id}. {item.title}</span>
                     {item.extra && <span className="italic text-slate-500"> {item.extra}</span>}
-                    <span className="text-slate-600">: {item.desc}</span>
+                    {item.description && <span className="text-slate-600">: {item.description}</span>}
                   </li>
                 ))}
               </ul>
@@ -635,11 +559,7 @@ export default function NexaValuesPage() {
                 <div className="h-[1px] bg-[#008996] flex-1"></div>
               </div>
               <ul className="space-y-1 pl-8">
-                {[
-                  { id: 4, title: "Interior Architecture / Interior Design" },
-                  { id: 5, title: "Mechanical Engineering", extra: "(design and prototyping)" },
-                  { id: 6, title: "Materials Engineering / Materials Science" }
-                ].map((item) => (
+                {d.integratedDiagnosis.majors.highlyRecommended.map((item) => (
                   <li key={item.id} className="text-[#0f172a] text-sm font-roboto">
                     <span className="font-bold">{item.id}. {item.title}</span>
                     {item.extra && <span className="text-slate-500"> {item.extra}</span>}
@@ -655,11 +575,7 @@ export default function NexaValuesPage() {
                 <div className="h-[1px] bg-[#008996] flex-1"></div>
               </div>
               <ul className="space-y-1 pl-8">
-                {[
-                  "Naval Engineering / Naval Architecture",
-                  "UX/UI with physical prototyping / 3D product focus",
-                  "Technical Quality Control / Quality Engineering"
-                ].map((item, i) => (
+                {d.integratedDiagnosis.majors.complementary.map((item, i) => (
                   <li key={i} className="text-[#0f172a] text-sm font-bold font-roboto">
                     {item}
                   </li>
@@ -691,24 +607,22 @@ export default function NexaValuesPage() {
         <div className="px-10 pb-6 pt-12 flex-1">
           {/* Header */}
           <div className="flex justify-between items-center mb-6 ">
-            <span className=" text-sm font-roboto">Maria Paula Mendoza</span>
-            <span className=" text-sm font-roboto  tracking-wide">Septiembre 23/2025</span>
+            <span className=" text-sm font-roboto">{candidateName}</span>
+            <span className=" text-sm font-roboto  tracking-wide">{candidateDate}</span>
           </div>
 
           {/* Section 4: Majors NOT recommended */}
           <h2 className="text-[#008996] text-[22px] font-bold mb-6 font-montserrat  mt-[44px]">
-            4. Majors NOT recommended for Maria Paula
+            4. Majors NOT recommended for {firstName}
           </h2>
 
           <div className="space-y-6 mb-12">
-            <p className="text-[#0f172a] text-[13px] font-roboto leading-snug">
-              <span className="font-bold block mb-1 tracking-wide text-">Programs that rely exclusively on repetitive routines with little visualization</span>
-              <span className="text-slate-500 italic font-medium">(e.g., some pure branches of accounting without a technical component).</span>
-            </p>
-            <p className="text-[#0f172a] text-[13px] font-roboto leading-snug">
-              <span className="font-bold block mb-1">Programs that demand high dominance or aggressive sales without support</span>
-              <span className="text-slate-500 italic font-medium">(due to low dominance).</span>
-            </p>
+            {d.notRecommended.map((item, i) => (
+              <p key={i} className="text-[#0f172a] text-[13px] font-roboto leading-snug">
+                <span className="font-bold block mb-1 tracking-wide text-">{item.category}</span>
+                <span className="text-slate-500 italic font-medium">{item.reason}</span>
+              </p>
+            ))}
           </div>
 
           {/* Section 5: Exploration and decision plan */}
@@ -739,69 +653,31 @@ export default function NexaValuesPage() {
 
             {/* Timeline headers - rectangular style */}
             <div className="flex w-full h-[38px] font-montserrat text-[13px] font-bold mb-6">
-              {/* Month 0-1 - Dark navy */}
-              <div className="flex-1 bg-[#0f3443] text-white flex items-center justify-center rounded-l-md font-bold">
-                Month 0–1
-              </div>
-              {/* Month 1-3 - Teal */}
-              <div className="flex-1 bg-[#008996] text-white flex items-center justify-center font-bold">
-                Month 1–3
-              </div>
-              {/* Month 3-6 - Cyan */}
-              <div className="flex-1 bg-[#22d3ee] text-white flex items-center justify-center font-bold">
-                Month 3–6
-              </div>
-              {/* Month 6-12 - Light cyan */}
-              <div className="flex-1 bg-[#b2f0f5] text-[#006d77] flex items-center justify-center rounded-r-md font-bold">
-                Month 6–12
-              </div>
+              {d.explorationPlan.map((phase, i, arr) => {
+                const bg = ["bg-[#0f3443]", "bg-[#008996]", "bg-[#22d3ee]", "bg-[#b2f0f5]"][i] || "bg-gray-200";
+                const text = i === 3 ? "text-[#006d77]" : "text-white";
+                const round = i === 0 ? "rounded-l-md" : i === arr.length - 1 ? "rounded-r-md" : "";
+                return (
+                  <div key={i} className={`flex-1 ${bg} ${text} flex items-center justify-center ${round} font-bold`}>
+                    {phase.phase}
+                  </div>
+                );
+              })}
             </div>
 
             {/* Timeline content */}
             <div className="flex bg-white pt-2 w-[90%]">
-              {/* Month 0-1 */}
-              <div className="flex-1 p-2 pr-3 border-r border-slate-100 last:border-0">
-                <h4 className="font-bold text-[18px] text-[#008996] mb-1 leading-tight">Quick confirmation</h4>
-                <p className="text-[14px] text-slate-600 font-medium leading-snug mb-4">
-                  Intensive SketchUp, AutoCAD course (20–40 h); drawing workshop (10–20 h); 1-day job-shadowing at a studio/workshop.
-                </p>
-                <p className="text-[14px] text-slate-700">
-                  <span className="font-bold">KPI:</span> enjoy at least 2 of the 3 activities.
-                </p>
-              </div>
-
-              {/* Month 1-3 */}
-              <div className="flex-1 p-2 pr-3 border-r border-slate-100 last:border-0">
-                <h4 className="font-bold text-[18px] text-[#008996] mb-1 leading-tight">Minimum portfolio</h4>
-                <p className="text-[14px] text-slate-600 font-medium leading-snug mb-4">
-                  Create 2 projects, (A) plan + elevation + 3D view of a space; (B) documented object/prototype.
-                </p>
-                <p className="text-[14px] text-slate-700">
-                  <span className="font-bold">Request feedback:</span> from 2 professionals
-                </p>
-              </div>
-
-              {/* Month 3-6 */}
-              <div className="flex-1 p-2 pr-3 border-r border-slate-100 last:border-0">
-                <h4 className="font-bold text-[18px] text-[#008996] mb-1 leading-tight">Technical validation</h4>
-                <p className="text-[14px] text-slate-600 font-medium leading-snug mb-4">
-                  Intermediate courses (BIM / SolidWorks); micro-internship 2–4 weeks.
-                </p>
-                <p className="text-[14px] text-slate-700">
-                  <span className="font-bold">KPI:</span> improved portfolio and positive feedback from 1 professional.
-                </p>
-              </div>
-
-              {/* Month 6-12 */}
-              <div className="flex-1 p-2 pr-0">
-                <h4 className="font-bold text-[18px] text-[#008996] mb-1 leading-tight">Decision and admission</h4>
-                <p className="text-[14px] text-slate-600 font-medium leading-snug mb-4">
-                  Select 2–4 programs (1–2 reach schools, 1–2 safe options). Prepare final portfolio, letters and admission tests.
-                </p>
-                <p className="text-[14px] text-slate-700">
-                  <span className="font-bold">Plan B:</span> technical cycle or intensive courses.
-                </p>
-              </div>
+              {d.explorationPlan.map((phase, i, arr) => (
+                <div key={i} className={`flex-1 p-2 ${i === arr.length - 1 ? 'pr-0' : 'pr-3 border-r border-slate-100'}`}>
+                  <h4 className="font-bold text-[18px] text-[#008996] mb-1 leading-tight">{phase.title}</h4>
+                  <p className="text-[14px] text-slate-600 font-medium leading-snug mb-4">
+                    {phase.activities}
+                  </p>
+                  <p className="text-[14px] text-slate-700">
+                    <span className="font-bold">{phase.kpiLabel}</span> {phase.kpi}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -832,70 +708,39 @@ export default function NexaValuesPage() {
 
             {/* Timeline headers with checkmarks - arrow style */}
             <div className="flex w-full h-[38px] font-montserrat text-[13px] font-bold relative mb-6">
-              {/* Week 1-2 - Dark navy */}
-              <div
-                className="flex-1 bg-[#0f172a] text-white flex items-center justify-center gap-2 rounded-l-md font-bold z-40 relative"
-                style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%)' }}
-              >
-                Week 1–2
-                <svg className="w-4 h-4" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="#22c55e" /><path d="M5,8 L7,10 L11,6" stroke="white" strokeWidth="1.5" fill="none" /></svg>
-              </div>
-              {/* Week 3-4 - Teal */}
-              <div
-                className="flex-1 bg-[#008996] text-white flex items-center justify-center gap-2 -ml-[15px] z-30 relative font-bold"
-                style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%)', paddingLeft: '15px' }}
-              >
-                Week 3–4
-                <svg className="w-4 h-4" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="#22c55e" /><path d="M5,8 L7,10 L11,6" stroke="white" strokeWidth="1.5" fill="none" /></svg>
-              </div>
-              {/* Week 5-6 - Cyan */}
+              {d.operationalPlan.map((phase, i, arr) => {
+                const styles = [
+                  { bg: "bg-[#0f172a]", text: "text-white", z: "z-40", ml: "", clip: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%)', pl: '' },
+                  { bg: "bg-[#008996]", text: "text-white", z: "z-30", ml: "-ml-[15px]", clip: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%)', pl: '15px' },
+                  { bg: "bg-[#22d3ee]", text: "text-white", z: "z-20", ml: "-ml-[15px]", clip: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%)', pl: '15px' },
+                  { bg: "bg-[#b2f0f5]", text: "text-[#006d77]", z: "z-10", ml: "-ml-[15px]", clip: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)', pl: '15px' }
+                ];
+                const s = styles[i] || styles[styles.length - 1];
+                // For last item, use close polygon
+                const clip = i === arr.length - 1 ? 'polygon(0 0, 100% 0, 100% 100%, 0 100%)' : s.clip;
 
-              <div
-                className="flex-1 bg-[#22d3ee] text-white flex items-center justify-center gap-2 -ml-[15px] z-20 relative font-bold"
-                style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%)', paddingLeft: '15px' }}
-              >
-                Week 5–6
-                <svg className="w-4 h-4" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="#22c55e" /><path d="M5,8 L7,10 L11,6" stroke="white" strokeWidth="1.5" fill="none" /></svg>
-              </div>
-              {/* Week 7-8 - Light cyan */}
-              <div
-                className="flex-1 bg-[#b2f0f5] text-[#006d77] flex items-center justify-center gap-2 -ml-[15px] z-10 relative rounded-r-md font-bold"
-                style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)', paddingLeft: '15px' }}
-              >
-                Week 7–8
-                <svg className="w-4 h-4" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="#22c55e" /><path d="M5,8 L7,10 L11,6" stroke="white" strokeWidth="1.5" fill="none" /></svg>
-              </div>
+                return (
+                  <div
+                    key={i}
+                    className={`flex-1 ${s.bg} ${s.text} flex items-center justify-center gap-2 ${i === 0 ? "rounded-l-md" : ""} ${i === arr.length - 1 ? "rounded-r-md" : ""} ${s.ml} ${s.z} relative font-bold`}
+                    style={{ clipPath: clip, paddingLeft: s.pl }}
+                  >
+                    {phase.phase}
+                    <svg className="w-4 h-4" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="#22c55e" /><path d="M5,8 L7,10 L11,6" stroke="white" strokeWidth="1.5" fill="none" /></svg>
+                  </div>
+                );
+              })}
             </div>
 
             {/* Timeline content */}
             <div className="flex bg-white pt-2 w-[90%]">
-              {/* Week 1-2 */}
-              <div className="flex-1 p-2 pr-3 border-r border-slate-100 last:border-0">
-                <p className="text-[14px] text-slate-600 leading-snug font-medium mb-4">
-                  Enroll in a basic CAD course; define the portfolio project
-                </p>
-              </div>
-
-              {/* Week 3-4 */}
-              <div className="flex-1 p-2 pr-3 border-r border-slate-100 last:border-0">
-                <p className="text-[14px] text-slate-600 leading-snug font-medium mb-4">
-                  Execute the first draft; feedback session with a mentor.
-                </p>
-              </div>
-
-              {/* Week 5-6 */}
-              <div className="flex-1 p-2 pr-3 border-r border-slate-100 last:border-0">
-                <p className="text-[14px] text-slate-600 leading-snug font-medium mb-4">
-                  3D modeling; second feedback and adjustment.
-                </p>
-              </div>
-
-              {/* Week 7-8 */}
-              <div className="flex-1 p-2 pr-0">
-                <p className="text-[14px] text-slate-600 leading-snug font-medium mb-4">
-                  Present portfolio version 1; list target universities; prepare admission steps.
-                </p>
-              </div>
+              {d.operationalPlan.map((phase, i, arr) => (
+                <div key={i} className={`flex-1 p-2 ${i === arr.length - 1 ? 'pr-0' : 'pr-3 border-r border-slate-100'}`}>
+                  <p className="text-[14px] text-slate-600 leading-snug font-medium mb-4">
+                    {phase.text}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         </div>

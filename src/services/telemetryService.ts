@@ -367,7 +367,7 @@ class TelemetryService {
   ): void {
     // Only track search terms that aren't too short/empty
     if (!query || query.length < 2) return;
-    
+
     this.track("search", {
       query: query.slice(0, 100), // Limit query length
       category,
@@ -435,7 +435,19 @@ class TelemetryService {
     } catch (error) {
       // On failure, add events back to queue for retry
       console.error("[Telemetry] Failed to send events:", error);
-      this.eventQueue = [...eventsToSend, ...this.eventQueue];
+
+      // If 401/403 (unauthorized), stop trying and clear queue to prevent loops
+      if (error instanceof Response && (error.status === 401 || error.status === 403)) {
+        this.eventQueue = [];
+        return;
+      }
+
+      // For other errors, keep events for retry (up to a limit)
+      if (this.eventQueue.length < 100) {
+        this.eventQueue = [...eventsToSend, ...this.eventQueue];
+      } else {
+        this.eventQueue = []; // Clear if too many
+      }
     }
   }
 

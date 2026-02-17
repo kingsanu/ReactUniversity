@@ -37,7 +37,7 @@ export default function DashboardPage() {
 
   // Otherwise, render the student dashboard content
   return (
-    <div className="p-4 md:p-8 space-y-8 bg-gradient-to-br from-slate-50 via-white to-blue-50/30 min-h-full">
+    <div className="p-4 md:p-8 space-y-8 bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
       <h1 className="sr-only">{t("dashboard.title")}</h1>
       {/* Action Cards */}
       <ActionCards />

@@ -119,23 +119,30 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+  }
   body {
     @apply bg-background text-foreground;
   }
-  
+
   /* Enhanced focus styles for keyboard accessibility */
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-indigo-500;
   }
-  
+
   /* Skip to main link styles */
   [href="#main-content"]:focus {
     @apply not-sr-only fixed top-4 left-4 z-[9999] px-4 py-2 bg-indigo-600 text-white rounded-md;
   }
-  
+
   /* Reduced motion preference */
   @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
+    *,
+    *::before,
+    *::after {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
@@ -149,10 +156,10 @@
   &::-webkit-scrollbar {
     display: none;
   }
-  
+
   /* Hide scrollbar for IE, Edge and Firefox */
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 /* Optional: Custom scrollbar for when you want a styled one */
@@ -161,11 +168,11 @@
     width: 6px;
     height: 6px;
   }
-  
+
   &::-webkit-scrollbar-track {
     @apply bg-gray-100 rounded-full;
   }
-  
+
   &::-webkit-scrollbar-thumb {
     @apply bg-gray-300 rounded-full hover:bg-gray-400;
   }

@@ -29,8 +29,8 @@ export default function CareerExplorer() {
     sort: filters.sort as any,
   });
 
-  // Loading is true when both sources haven't loaded yet
-  const isLoading = timsLoading && listLoading;
+  // Loading should be true if EITHER is loading, to prevent showing fallback data while waiting for API
+  const isLoading = timsLoading || listLoading;
 
   const timsCareerList = timsData?.data?.careers;
 
@@ -86,13 +86,13 @@ export default function CareerExplorer() {
       return list;
     }
 
-    // Fallback: TIMS data not available yet, use static list
-    if (listData?.careers) {
+    // Fallback: TIMS data not available yet (or failed), use static list
+    if (!isLoading && listData?.careers) {
       return [...listData.careers];
     }
 
     return [];
-  }, [listData, timsCareerList, filters.sort]);
+  }, [listData, timsCareerList, filters.sort, isLoading]);
 
   // Virtual List Logic
   const parentRef = React.useRef<HTMLDivElement>(null);
@@ -210,8 +210,7 @@ export default function CareerExplorer() {
           </div>
         </div>
       )}
-
-      <CareerCompareBar />
     </div>
   );
 }
+

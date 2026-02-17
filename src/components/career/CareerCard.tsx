@@ -40,10 +40,6 @@ export default function CareerCard({ career }: { career: CareerRole }) {
   const { t } = useTranslation();
   const prefetch = usePrefetchCareers();
 
-  const { toggleCompare, compareList } = useCareersStore();
-
-  const inCompare = compareList.includes(career.id);
-
   const matchScore = career.matchScore ?? 0;
 
   // Determine match color and label
@@ -141,22 +137,7 @@ export default function CareerCard({ career }: { career: CareerRole }) {
 
       <div className="flex items-center justify-between pt-4 border-t border-gray-50 mt-auto">
         <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleCompare(career.id);
-            }}
-            className={`text-xs font-medium px-3 h-8 rounded-full transition-all ${inCompare
-                ? "bg-indigo-600 text-white hover:bg-indigo-700 hover:text-white"
-                : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100"
-              }`}
-          >
-            {inCompare
-              ? t("career.added", "Added")
-              : t("career.compareLabel", "Compare")}
-          </Button>
+          {/* Compare button removed as per user request */}
         </div>
 
         <div className="flex items-center gap-1">
