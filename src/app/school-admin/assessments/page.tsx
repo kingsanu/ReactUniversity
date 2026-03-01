@@ -41,7 +41,17 @@ export default function AssessmentConfigPage() {
   const [items, setItems] = useState<AssessmentConfigItem[]>([]);
 
   useEffect(() => {
-    if (config) setItems(config.configs);
+    if (config?.configs && config.configs.length > 0) {
+      setItems(config.configs);
+    } else if (config) {
+      // Fallback defaults if the API returns an empty array or undefined configs
+      setItems([
+        { assessmentType: "MIL", isEnabled: false, description: "" },
+        { assessmentType: "PCA", isEnabled: false, description: "" },
+        { assessmentType: "360", isEnabled: false, description: "" },
+        { assessmentType: "TIMS", isEnabled: false, description: "" },
+      ]);
+    }
   }, [config]);
 
   const toggleAssessment = (type: string) => {
