@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { FiLock, FiBell, FiMoon, FiGlobe } from "react-icons/fi";
 import { useState } from "react";
 import { toast } from "sonner"; // Assuming sonner
+import { StudentInviteParentPanel } from "./StudentInviteParentPanel";
 
 export function ProfileSettings() {
   const [emailNotifs, setEmailNotifs] = useState(true);
@@ -75,12 +76,16 @@ export function ProfileSettings() {
             </div>
             <Switch id="public-profile" checked={publicProfile} onCheckedChange={setPublicProfile} />
           </div>
+
+          <div className="border-t border-gray-100 dark:border-gray-700/50 my-2 pt-6 pb-2">
+            <StudentInviteParentPanel />
+          </div>
         </CardContent>
       </Card>
 
       <div className="flex justify-end">
         <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700">
-            Save Preference
+          Save Preference
         </Button>
       </div>
     </motion.div>

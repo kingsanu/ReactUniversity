@@ -14,6 +14,10 @@ import {
   markAllParentNotificationsRead,
   verifyParentInviteToken,
   completeParentOnboarding,
+  getMyParents,
+  inviteMyParent,
+  revokeMyParentAccess,
+  resendMyParentInvite,
   type ParentOnboardingPayload,
 } from "@/services/parentPortalService";
 import type { ParentInviteRequest } from "@/types/parentPortal";
@@ -28,6 +32,7 @@ export const parentKeys = {
     [...parentKeys.all, "pending-evaluations"] as const,
   studentParents: (studentId: string) =>
     [...parentKeys.all, "student-parents", studentId] as const,
+  myParents: () => [...parentKeys.all, "my-parents"] as const,
   notifications: () => [...parentKeys.all, "notifications"] as const,
 };
 
@@ -96,6 +101,48 @@ export function useResendParentInvite() {
   return useMutation({
     mutationFn: ({ studentId, parentLinkId }: { studentId: string; parentLinkId: string }) =>
       resendParentInvite(studentId, parentLinkId),
+    onSuccess: () => toast.success("Invite resent"),
+    onError: (err: Error) => toast.error(err.message || "Failed to resend invite"),
+  });
+}
+
+// ─── Student Self-Invitation (called by student) ─────────────────────────────
+
+export function useMyParents() {
+  return useQuery({
+    queryKey: parentKeys.myParents(),
+    queryFn: getMyParents,
+    staleTime: 2 * 60 * 1000,
+  });
+}
+
+export function useInviteMyParent() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: Omit<ParentInviteRequest, "studentId">) => inviteMyParent(payload),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: parentKeys.myParents() });
+      toast.success("Invite sent successfully");
+    },
+    onError: (err: Error) => toast.error(err.message || "Failed to send invite"),
+  });
+}
+
+export function useRevokeMyParentAccess() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (parentLinkId: string) => revokeMyParentAccess(parentLinkId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: parentKeys.myParents() });
+      toast.success("Access revoked");
+    },
+    onError: (err: Error) => toast.error(err.message || "Failed to revoke access"),
+  });
+}
+
+export function useResendMyParentInvite() {
+  return useMutation({
+    mutationFn: (parentLinkId: string) => resendMyParentInvite(parentLinkId),
     onSuccess: () => toast.success("Invite resent"),
     onError: (err: Error) => toast.error(err.message || "Failed to resend invite"),
   });

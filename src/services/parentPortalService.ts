@@ -129,6 +129,56 @@ export async function resendParentInvite(
   return handleResponse<void>(res);
 }
 
+// ─── Student Self-Invitation (called by student) ─────────────────────────────
+
+// List all parents/guardians linked to the current student
+export async function getMyParents(): Promise<StudentParentLink[]> {
+  const res = await fetch(`${API_BASE}/api/v1/student/parents`, {
+    headers: getHeaders(),
+  });
+  return handleResponse<StudentParentLink[]>(res);
+}
+
+// Invite a parent/guardian to the current student's portal
+export async function inviteMyParent(
+  payload: Omit<ParentInviteRequest, "studentId">
+): Promise<{ inviteId: string; message: string }> {
+  const res = await fetch(`${API_BASE}/api/v1/student/parents/invite`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<{ inviteId: string; message: string }>(res);
+}
+
+// Revoke a parent's access from the current student
+export async function revokeMyParentAccess(
+  parentLinkId: string
+): Promise<void> {
+  const res = await fetch(
+    `${API_BASE}/api/v1/student/parents/${parentLinkId}`,
+    {
+      method: "DELETE",
+      headers: getHeaders(),
+    }
+  );
+  return handleResponse<void>(res);
+}
+
+// Resend a pending invite for the current student
+export async function resendMyParentInvite(
+  parentLinkId: string
+): Promise<void> {
+  const res = await fetch(
+    `${API_BASE}/api/v1/student/parents/${parentLinkId}/resend`,
+    {
+      method: "POST",
+      headers: getHeaders(),
+    }
+  );
+  return handleResponse<void>(res);
+}
+
 // ─── Parent Notifications ────────────────────────────────────────────────────
 
 export async function getParentNotifications(): Promise<ParentNotification[]> {
