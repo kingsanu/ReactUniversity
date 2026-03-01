@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
 import {
   Card,
   CardContent,
@@ -22,6 +24,7 @@ import {
   Calendar,
   Users,
   Loader2,
+  Beaker,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useSchoolSettings } from "@/hooks/useSchoolAdmin";
@@ -35,6 +38,7 @@ export default function SettingsPage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [profileLoading, setProfileLoading] = useState(false);
+  const [useMockData, setUseMockData] = useState(false);
 
   // Password form
   const [currentPassword, setCurrentPassword] = useState("");
@@ -87,20 +91,50 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="min-h-screen bg-gray-50/50 p-6 md:p-8 space-y-10 font-sans">
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="space-y-1"
+          className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6"
         >
-          <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-            {t("schoolAdmin.settings.title", "Settings")}
-          </h1>
-          <p className="text-lg text-gray-500 font-medium">
-            {t("schoolAdmin.settings.subtitle", "Manage your account and school settings.")}
-          </p>
+          <div className="space-y-2">
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 leading-tight">
+              {t("schoolAdmin.settings.title", "Settings")}
+            </h1>
+            <p className="text-lg text-gray-500 font-medium max-w-2xl leading-relaxed">
+              {t("schoolAdmin.settings.subtitle", "Manage your account and school settings.")}
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
+            {process.env.NODE_ENV === "development" && (
+              <div className="flex items-center gap-3 bg-white/60 backdrop-blur-md pl-4 pr-5 py-3 rounded-full border border-gray-200 shadow-sm shrink-0 hover:shadow-md transition-all duration-300">
+                <div className={cn(
+                  "flex items-center justify-center p-2 rounded-full transition-colors duration-300",
+                  useMockData ? "bg-amber-100 text-amber-600" : "bg-teal-100 text-teal-600"
+                )}>
+                  <Beaker className="w-4 h-4" />
+                </div>
+                <div className="flex flex-col justify-center">
+                  <Label htmlFor="mock-data-toggle" className="font-bold text-[11px] uppercase tracking-wider text-gray-800 cursor-pointer">
+                    {useMockData ? "Preview Mode" : "Live Mode"}
+                  </Label>
+                  <span className="text-[10px] text-gray-500 font-medium leading-none mt-0.5">
+                    {useMockData ? "Using mock data" : "Using real data"}
+                  </span>
+                </div>
+                <div className="ml-2 pl-3 border-l h-6 flex items-center">
+                  <Switch
+                    id="mock-data-toggle"
+                    checked={useMockData}
+                    onCheckedChange={setUseMockData}
+                    className="data-[state=checked]:bg-amber-500"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         </motion.div>
 
         {/* School Info Card */}
@@ -109,7 +143,7 @@ export default function SettingsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Card className="border-0 shadow-lg">
+          <Card className="overflow-hidden shadow-sm flex flex-col">
             <CardHeader className="bg-gradient-to-r from-teal-50 to-cyan-50 border-b border-gray-100">
               <CardTitle className="flex items-center gap-2">
                 <School className="h-5 w-5 text-teal-600" />
@@ -197,7 +231,7 @@ export default function SettingsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Card className="border-0 shadow-lg">
+          <Card className="overflow-hidden shadow-sm flex flex-col">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="h-5 w-5 text-teal-600" />
@@ -250,7 +284,7 @@ export default function SettingsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <Card className="border-0 shadow-lg">
+          <Card className="overflow-hidden shadow-sm flex flex-col">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Lock className="h-5 w-5 text-teal-600" />

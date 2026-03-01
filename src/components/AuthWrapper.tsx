@@ -9,7 +9,8 @@ interface AuthWrapperProps {
   children: React.ReactNode;
 }
 
-const protectedRoutes = ["/dashboard", "/subscribe", "/school-admin"];
+const protectedRoutes = ["/dashboard", "/subscribe", "/school-admin", "/parent", "/counselor"];
+const publicOnboardingRoutes = ["/parent/onboarding", "/counselor/onboarding"];
 const authRoutes = ["/login", "/signup"];
 
 export function AuthWrapper({ children }: AuthWrapperProps) {
@@ -33,6 +34,9 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
   useEffect(() => {
     // Don't redirect while still initializing
     if (isInitializing) return;
+
+    // Public onboarding pages — always accessible regardless of auth
+    if (publicOnboardingRoutes.some((p) => pathname.startsWith(p))) return;
 
     const isProtectedRoute = protectedRoutes.some((route) =>
       pathname.startsWith(route)
@@ -65,11 +69,13 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
     const userRole = user.role?.toLowerCase() || "";
     const isSuperAdmin = userRole.includes("super") || userRole === "superadmin" || userRole === "super_admin" || userRole === "admin";
     const isSchoolAdmin = userRole.includes("school") || userRole === "schooladmin" || userRole === "school_admin";
+    const isCounselor = userRole === "counselor";
+    const isParent = userRole === "parent";
     const isStudent =
       !userRole ||
       userRole === "student" ||
       userRole === "user" ||
-      (!userRole.includes("admin") && !userRole.includes("coach") && !isSchoolAdmin && !isSuperAdmin);
+      (!userRole.includes("admin") && !userRole.includes("coach") && !isSchoolAdmin && !isSuperAdmin && !isCounselor && !isParent);
 
     // Super Admin Route Protection
     // Redirect super admins to admin dashboard if they try to access student dashboard
@@ -93,6 +99,26 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
 
     // Redirect students away from admin routes
     if (user.isAuthenticated && !isSchoolAdmin && !isSuperAdmin && pathname.startsWith("/school-admin")) {
+      router.push("/dashboard");
+      return;
+    }
+
+    // ─── Parent Role Routing ─────────────────────────────────────────────────
+    // Redirect parents to /parent portal — they must not access student/admin routes
+    if (user.isAuthenticated && isParent) {
+      if (!pathname.startsWith("/parent")) {
+        router.push("/parent");
+        return;
+      }
+    }
+    // Redirect non-parents away from /parent routes
+    // Super admins are allowed through so they can preview the parent portal
+    if (
+      user.isAuthenticated &&
+      !isParent &&
+      !isSuperAdmin &&
+      pathname.startsWith("/parent")
+    ) {
       router.push("/dashboard");
       return;
     }
@@ -150,12 +176,14 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
 
     // If user is authenticated and trying to access auth routes, redirect appropriately
     if (user.isAuthenticated && isAuthRoute) {
-      // Super admins go to student dashboard by default
       if (isSuperAdmin) {
         router.push("/dashboard");
       } else if (isSchoolAdmin) {
-        // School admins go to school-admin dashboard
         router.push("/school-admin");
+      } else if (isCounselor) {
+        router.push("/counselor");
+      } else if (isParent) {
+        router.push("/parent");
       } else {
         router.push("/dashboard");
       }

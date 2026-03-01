@@ -242,6 +242,30 @@ export const sidebarData = {
       path: "/dashboard/resumes",
     },
     {
+      id: "portfolio",
+      name: "dashboard.portfolio",
+      icon: "assessments",
+      path: "/dashboard/portfolio",
+    },
+    {
+      id: "course-plan",
+      name: "dashboard.coursePlan",
+      icon: "learning",
+      path: "/dashboard/course-plan",
+    },
+    {
+      id: "graduation",
+      name: "dashboard.graduation",
+      icon: "career",
+      path: "#",
+      submenu: [
+        {
+          name: "dashboard.communityService",
+          path: "/dashboard/community-service",
+        },
+      ],
+    },
+    {
       id: "coaching",
       name: "dashboard.coaching",
       icon: "opportunities",

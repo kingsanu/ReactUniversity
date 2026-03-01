@@ -16,6 +16,20 @@ import {
   Menu,
   X,
   ChevronRight,
+  Building2,
+  UserCog,
+  CalendarDays,
+  BookOpen,
+  Library,
+  GitBranch,
+  GraduationCap,
+  ClipboardCheck,
+  ArrowLeftRight,
+  Plug,
+  UserCheck,
+  TrendingDown,
+  Bell,
+  Radar,
 } from "lucide-react";
 
 interface SchoolAdminLayoutProps {
@@ -23,11 +37,31 @@ interface SchoolAdminLayoutProps {
 }
 
 const navItems = [
-  { key: "dashboard", path: "/school-admin", icon: LayoutDashboard, label: "Dashboard" },
+  // Main
+  { key: "dashboard", path: "/school-admin", icon: LayoutDashboard, label: "Dashboard", section: "Main" },
   { key: "students", path: "/school-admin/students", icon: Users, label: "Students" },
   { key: "analytics", path: "/school-admin/analytics", icon: BarChart3, label: "Analytics" },
   { key: "results", path: "/school-admin/results", icon: FileText, label: "Results" },
-  { key: "settings", path: "/school-admin/settings", icon: Settings, label: "Settings" },
+  // School Setup
+  { key: "profile", path: "/school-admin/profile", icon: Building2, label: "School Profile", section: "School Setup" },
+  { key: "users", path: "/school-admin/users", icon: UserCog, label: "Users & Roles" },
+  { key: "calendar", path: "/school-admin/calendar", icon: CalendarDays, label: "Calendar" },
+  // Academics
+  { key: "curriculum", path: "/school-admin/curriculum", icon: BookOpen, label: "Curriculum", section: "Academics" },
+  { key: "courses", path: "/school-admin/courses", icon: Library, label: "Courses" },
+  { key: "courseSequences", path: "/school-admin/course-sequences", icon: GitBranch, label: "Sequences" },
+  { key: "graduation", path: "/school-admin/graduation", icon: GraduationCap, label: "Graduation" },
+  // Data & Assessment
+  { key: "assessments", path: "/school-admin/assessments", icon: ClipboardCheck, label: "Assessments", section: "Data & Assessment" },
+  { key: "dataMappings", path: "/school-admin/data-mappings", icon: ArrowLeftRight, label: "Data Mappings" },
+  { key: "integrations", path: "/school-admin/integrations", icon: Plug, label: "Integrations" },
+  // Counselor
+  { key: "counselorStudents", path: "/school-admin/counselor-students", icon: UserCheck, label: "My Students", section: "Counselor" },
+  { key: "academicGaps", path: "/school-admin/academic-gaps", icon: TrendingDown, label: "Academic Gaps" },
+  { key: "evaluations", path: "/school-admin/evaluations", icon: Radar, label: "360° Evaluations" },
+  { key: "alerts", path: "/school-admin/alerts", icon: Bell, label: "Alerts" },
+  // System
+  { key: "settings", path: "/school-admin/settings", icon: Settings, label: "Settings", section: "System" },
 ];
 
 export function SchoolAdminLayout({ children }: SchoolAdminLayoutProps) {
@@ -90,24 +124,31 @@ export function SchoolAdminLayout({ children }: SchoolAdminLayoutProps) {
 
         {/* Navigation */}
         <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-          {navItems.map((item) => {
+          {navItems.map((item, index) => {
             const active = isActive(item.path);
+            const showSection = item.section && (index === 0 || navItems[index - 1]?.section !== item.section);
             return (
-              <Link
-                key={item.path}
-                href={item.path}
-                onClick={() => setSidebarOpen(false)}
-                className={cn(
-                  "flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group",
-                  active
-                    ? "bg-white/15 text-white shadow-lg backdrop-blur-sm"
-                    : "text-teal-100 hover:bg-white/10 hover:text-white"
+              <div key={item.path}>
+                {showSection && index > 0 && (
+                  <div className="pt-4 pb-2 px-4">
+                    <p className="text-xs font-semibold text-teal-400/70 uppercase tracking-wider">{item.section}</p>
+                  </div>
                 )}
-              >
-                <item.icon className={cn("mr-3 h-5 w-5 transition-transform group-hover:scale-110", active ? "text-cyan-300" : "text-teal-300")} />
-                <span className="flex-1">{t(`schoolAdmin.nav.${item.key}`, item.label)}</span>
-                {active && <ChevronRight className="w-4 h-4 text-cyan-300" />}
-              </Link>
+                <Link
+                  href={item.path}
+                  onClick={() => setSidebarOpen(false)}
+                  className={cn(
+                    "flex items-center px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group",
+                    active
+                      ? "bg-white/15 text-white shadow-lg backdrop-blur-sm"
+                      : "text-teal-100 hover:bg-white/10 hover:text-white"
+                  )}
+                >
+                  <item.icon className={cn("mr-3 h-4 w-4 transition-transform group-hover:scale-110", active ? "text-cyan-300" : "text-teal-300")} />
+                  <span className="flex-1">{t(`schoolAdmin.nav.${item.key}`, item.label)}</span>
+                  {active && <ChevronRight className="w-4 h-4 text-cyan-300" />}
+                </Link>
+              </div>
             );
           })}
         </nav>

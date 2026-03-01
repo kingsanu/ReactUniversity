@@ -14,6 +14,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -49,6 +51,7 @@ import {
   Clock,
   UserCheck,
   Filter,
+  Beaker,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -67,6 +70,7 @@ export default function StudentsPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteName, setDeleteName] = useState("");
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [useMockData, setUseMockData] = useState(false);
   const limit = 10;
 
   const { data: students, isLoading, refetch } = useStudents({
@@ -128,7 +132,7 @@ export default function StudentsPage() {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="min-h-screen bg-gray-50/50 p-6 md:p-8 space-y-10 font-sans">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <motion.div
@@ -137,41 +141,69 @@ export default function StudentsPage() {
           className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6"
         >
           <div className="space-y-1">
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900">
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 leading-tight">
               {t("schoolAdmin.students.title", "Students")}
             </h1>
-            <p className="text-lg text-gray-500 font-medium">
-              {t("schoolAdmin.students.subtitle", "Manage and invite students to your school.")}
+            <p className="text-lg text-gray-500 font-medium max-w-2xl leading-relaxed">
+              {t("schoolAdmin.students.subtitle", "Manage and engage students in your school platform.")}
             </p>
           </div>
 
-          <Dialog open={isInviteOpen} onOpenChange={setIsInviteOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-6 h-12 text-sm font-semibold">
-                <UserPlus className="mr-2 h-4 w-4" />
-                {t("schoolAdmin.students.inviteButton", "Invite Student")}
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-xl rounded-2xl p-0 overflow-hidden gap-0">
-              <DialogHeader className="p-6 bg-gradient-to-r from-teal-50 to-cyan-50 border-b border-gray-100">
-                <DialogTitle className="text-xl flex items-center gap-2">
-                  <div className="p-2 bg-white rounded-lg border border-gray-100 shadow-sm">
-                    <UserPlus className="h-5 w-5 text-teal-600" />
-                  </div>
-                  {t("schoolAdmin.students.inviteTitle", "Invite Students")}
-                </DialogTitle>
-                <DialogDescription className="text-base pt-1">
-                  {t("schoolAdmin.students.inviteDescription", "Send invitations to students to join your school.")}
-                </DialogDescription>
-              </DialogHeader>
-              <div className="p-6">
-                <StudentInviteForm onSuccess={() => {
-                  setIsInviteOpen(false);
-                  refetch();
-                }} />
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
+            {process.env.NODE_ENV === "development" && (
+              <div className="flex items-center gap-3 bg-white/60 backdrop-blur-md pl-4 pr-5 py-3 rounded-full border border-gray-200 shadow-sm shrink-0 hover:shadow-md transition-all duration-300">
+                <div className={cn(
+                  "flex items-center justify-center p-2 rounded-full transition-colors duration-300",
+                  useMockData ? "bg-amber-100 text-amber-600" : "bg-teal-100 text-teal-600"
+                )}>
+                  <Beaker className="w-4 h-4" />
+                </div>
+                <div className="flex flex-col justify-center">
+                  <Label htmlFor="mock-data-toggle" className="font-bold text-[11px] uppercase tracking-wider text-gray-800 cursor-pointer">
+                    {useMockData ? "Preview Mode" : "Live Mode"}
+                  </Label>
+                  <span className="text-[10px] text-gray-500 font-medium leading-none mt-0.5">
+                    {useMockData ? "Using mock data" : "Using real data"}
+                  </span>
+                </div>
+                <div className="ml-2 pl-3 border-l h-6 flex items-center">
+                  <Switch
+                    id="mock-data-toggle"
+                    checked={useMockData}
+                    onCheckedChange={setUseMockData}
+                    className="data-[state=checked]:bg-amber-500"
+                  />
+                </div>
               </div>
-            </DialogContent>
-          </Dialog>
+            )}
+            <Dialog open={isInviteOpen} onOpenChange={setIsInviteOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-gray-900 text-white hover:bg-black shadow-xl hover:shadow-2xl transition-all duration-300 rounded-full px-6 h-12 text-sm font-semibold tracking-wide">
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  {t("schoolAdmin.students.inviteButton", "Invite Student")}
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-xl rounded-2xl p-0 overflow-hidden gap-0">
+                <DialogHeader className="p-6 bg-gradient-to-r from-teal-50 to-cyan-50 border-b border-gray-100">
+                  <DialogTitle className="text-xl flex items-center gap-2">
+                    <div className="p-2 bg-white rounded-lg border border-gray-100 shadow-sm">
+                      <UserPlus className="h-5 w-5 text-teal-600" />
+                    </div>
+                    {t("schoolAdmin.students.inviteTitle", "Invite Students")}
+                  </DialogTitle>
+                  <DialogDescription className="text-base pt-1">
+                    {t("schoolAdmin.students.inviteDescription", "Send invitations to students to join your school.")}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="p-6">
+                  <StudentInviteForm onSuccess={() => {
+                    setIsInviteOpen(false);
+                    refetch();
+                  }} />
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
         </motion.div>
 
         {/* Quick Stats */}
@@ -199,13 +231,32 @@ export default function StudentsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="flex flex-col sm:flex-row gap-4 bg-white p-4 rounded-xl border border-gray-100"
+          className="sticky top-4 z-20 bg-white/80 backdrop-blur-xl border border-gray-200/50 shadow-sm rounded-2xl p-2 flex flex-col md:flex-row justify-between items-center gap-4"
         >
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <div className="flex items-center gap-2 w-full md:w-auto">
+            <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1); }}>
+              <SelectTrigger className="w-full md:w-[200px] h-11 bg-gray-50/50 border-transparent focus:bg-white focus:border-blue-500/20 focus:ring-4 focus:ring-blue-500/10 rounded-xl transition-all">
+                <Filter className="mr-2 h-4 w-4 text-gray-400" />
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t("schoolAdmin.students.allStatuses", "All Statuses")}</SelectItem>
+                <SelectItem value="active">{t("schoolAdmin.students.status.active", "Active")}</SelectItem>
+                <SelectItem value="pending">{t("schoolAdmin.students.status.pending", "Pending")}</SelectItem>
+                <SelectItem value="accepted">{t("schoolAdmin.students.status.accepted", "Accepted")}</SelectItem>
+                <SelectItem value="inactive">{t("schoolAdmin.students.status.inactive", "Inactive")}</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button variant="outline" size="icon" className="h-11 w-11 rounded-xl" onClick={() => refetch()}>
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <div className="relative w-full md:w-80 group">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
             <Input
               placeholder={t("schoolAdmin.students.searchPlaceholder", "Search students...")}
-              className="pl-10"
+              className="pl-10 h-11 bg-gray-50/50 border-transparent focus:bg-white focus:border-blue-500/20 focus:ring-4 focus:ring-blue-500/10 rounded-xl transition-all"
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -213,22 +264,6 @@ export default function StudentsPage() {
               }}
             />
           </div>
-          <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1); }}>
-            <SelectTrigger className="w-full sm:w-48">
-              <Filter className="mr-2 h-4 w-4 text-gray-400" />
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t("schoolAdmin.students.allStatuses", "All Statuses")}</SelectItem>
-              <SelectItem value="active">{t("schoolAdmin.students.status.active", "Active")}</SelectItem>
-              <SelectItem value="pending">{t("schoolAdmin.students.status.pending", "Pending")}</SelectItem>
-              <SelectItem value="accepted">{t("schoolAdmin.students.status.accepted", "Accepted")}</SelectItem>
-              <SelectItem value="inactive">{t("schoolAdmin.students.status.inactive", "Inactive")}</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button variant="outline" size="icon" onClick={() => refetch()}>
-            <RefreshCw className="h-4 w-4" />
-          </Button>
         </motion.div>
 
         {/* Table */}
@@ -236,17 +271,17 @@ export default function StudentsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-white rounded-xl border border-gray-100 overflow-hidden"
+          className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden"
         >
           <Table>
             <TableHeader>
-              <TableRow className="bg-gray-50/50">
-                <TableHead>{t("schoolAdmin.students.table.student", "Student")}</TableHead>
-                <TableHead>{t("schoolAdmin.students.table.status", "Status")}</TableHead>
-                <TableHead>{t("schoolAdmin.students.table.progress", "Progress")}</TableHead>
-                <TableHead>{t("schoolAdmin.students.table.avgScore", "Avg. Score")}</TableHead>
-                <TableHead>{t("schoolAdmin.students.table.lastActive", "Last Active")}</TableHead>
-                <TableHead className="text-right">{t("schoolAdmin.students.table.actions", "Actions")}</TableHead>
+              <TableRow className="bg-gray-50/50 hover:bg-gray-50/50 border-b border-gray-100">
+                <TableHead className="py-4 pl-6 font-semibold text-gray-900">{t("schoolAdmin.students.table.student", "Student")}</TableHead>
+                <TableHead className="font-semibold text-gray-900">{t("schoolAdmin.students.table.status", "Status")}</TableHead>
+                <TableHead className="font-semibold text-gray-900">{t("schoolAdmin.students.table.progress", "Progress")}</TableHead>
+                <TableHead className="font-semibold text-gray-900">{t("schoolAdmin.students.table.avgScore", "Avg. Score")}</TableHead>
+                <TableHead className="font-semibold text-gray-900">{t("schoolAdmin.students.table.lastActive", "Last Active")}</TableHead>
+                <TableHead className="pr-6 text-right font-semibold text-gray-900">{t("schoolAdmin.students.table.actions", "Actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

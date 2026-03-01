@@ -4044,6 +4044,49 @@
       ]
     },
     {
+      "name": "Student Onboarding",
+      "item": [
+        {
+          "name": "Verify Student Onboarding",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/student/onboarding/verify/{{userId}}",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "student", "onboarding", "verify", "{{userId}}"]
+            },
+            "description": "Verify student invitation and get onboarding info. Called when student lands on /onboarding/student/{userId}.\n\n**Returns:**\n- userId, email, name, schoolId, schoolName\n- isValid: true if valid\n- status: 'pending' (needs onboarding) or 'completed'\n- needsOnboarding: true if password not set\n\n**Note:** No authentication required. Use userId from invitation URL."
+          }
+        },
+        {
+          "name": "Complete Student Onboarding",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"password\": \"YourPassword123\",\n  \"confirmPassword\": \"YourPassword123\"\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/student/onboarding/complete",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "student", "onboarding", "complete"]
+            },
+            "description": "Complete student onboarding by setting password. Called after verify when student submits the form.\n\n**Body:**\n- userId: Student user ID (from verify)\n- password: Min 6 chars, uppercase, lowercase, number\n- confirmPassword: Must match password\n\n**Note:** No authentication required."
+          }
+        }
+      ]
+    },
+    {
       "name": "PCAModule",
       "item": [
         {
@@ -7413,6 +7456,26 @@
       "description": "School administration endpoints for managing schools, students, and onboarding.",
       "item": [
         {
+          "name": "Verify School Admin (Invitation Token)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/verify?token={{schoolInvitationToken}}&language=en",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "school-admin", "verify"],
+              "query": [
+                {"key": "token", "value": "{{schoolInvitationToken}}", "description": "Invitation token"},
+                {"key": "language", "value": "en", "description": "en or sp/es for Spanish messages"}
+              ]
+            },
+            "description": "Verify school admin invitation token before onboarding.\n\n**Query Parameters:**\n- token: Invitation token (required)\n- language: en (default) or sp/es for Spanish messages\n\n**Returns:**\n- isValid: true/false\n- status: valid | invalid | expired\n- schoolName, email, needsOnboarding (when valid)"
+          }
+        },
+        {
           "name": "Get Onboarding Status",
           "request": {
             "method": "GET",
@@ -7474,6 +7537,92 @@
               "path": ["api", "v1", "school-admin", "dashboard", "stats"]
             },
             "description": "Get dashboard statistics for the school admin.\n\n**Returns:**\n- totalStudents: Total number of students\n- pendingInvites: Students with pending invitations\n- acceptedStudents: Students who accepted invitations\n- activeStudents: Currently active students\n- completedAssessments: Total assessments completed\n- averageScore: Average assessment score\n\n**Note:** Requires authentication as school_admin"
+          }
+        },
+        {
+          "name": "Get School Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/school/profile",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "school-admin", "school", "profile"]
+            },
+            "description": "Get full school profile (SCRUM-130).\n\n**Returns:**\n- id, name, logo, address (street, city, state, country, postalCode)\n- phone, email, website, timezone\n- maxStudents, currentStudents\n- contractStart, contractEnd, status\n\n**Note:** Requires authentication as school_admin"
+          }
+        },
+        {
+          "name": "Update School Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"CDS International School\",\n  \"address\": {\n    \"street\": \"123 Main St\",\n    \"city\": \"San José\",\n    \"state\": \"San José\",\n    \"country\": \"Costa Rica\",\n    \"postalCode\": \"10101\"\n  },\n  \"phone\": \"+506 2222-3333\",\n  \"email\": \"admin@cds.ed.cr\",\n  \"website\": \"https://cds.ed.cr\",\n  \"timezone\": \"America/Costa_Rica\"\n}"
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/school/profile",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "school-admin", "school", "profile"]
+            },
+            "description": "Update school profile (SCRUM-130).\n\n**Body:**\n- name, address, phone, email, website, timezone (all optional)\n\n**Note:** Requires authentication as school_admin"
+          }
+        },
+        {
+          "name": "Upload School Logo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": [],
+                  "description": "PNG/JPG/SVG image, max 2 MB"
+                }
+              ]
+            },
+            "url": {
+              "raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/school/logo",
+              "protocol": "https",
+              "host": [
+                "careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"
+              ],
+              "path": ["api", "v1", "school-admin", "school", "logo"]
+            },
+            "description": "Upload school logo (SCRUM-130). PNG/JPG/SVG, max 2 MB.\n\n**Returns:**\n- success: true\n- logoUrl: CDN URL of uploaded logo\n\n**Note:** Requires authentication as school_admin"
           }
         },
         {
@@ -7566,6 +7715,932 @@
               ]
             },
             "description": "Invite students to the school. Creates student accounts and sends invitation emails.\n\n**Query Parameters:**\n- language: Email language (en for English, sp/es for Spanish)\n\n**Body:**\n- students: Array of student objects (1-100 per request)\n  - email: Student email (required)\n  - name: Student name (optional)\n\n**Returns:**\n- success: true if any invitations succeeded\n- totalRequested: Number of students requested\n- successCount: Number of successful invitations\n- failedCount: Number of failed invitations\n- results: Array of individual results\n\n**Note:** Requires authentication as school_admin"
+          }
+        },
+        {
+          "name": "Get Curriculum Frameworks",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/curriculum/frameworks", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "curriculum", "frameworks"]},
+            "description": "SCRUM-131: Get all curriculum frameworks (AP, IB, NATIONAL, CUSTOM) with enabled status."
+          }
+        },
+        {
+          "name": "Update Curriculum Frameworks",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"},
+              {"key": "Content-Type", "value": "application/json", "type": "text"}
+            ],
+            "body": {"mode": "raw", "raw": "{\n  \"frameworks\": [\n    {\"type\": \"AP\", \"enabled\": true},\n    {\"type\": \"IB\", \"enabled\": false},\n    {\"type\": \"NATIONAL\", \"enabled\": true},\n    {\"type\": \"CUSTOM\", \"enabled\": false}\n  ]\n}"},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/curriculum/frameworks", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "curriculum", "frameworks"]},
+            "description": "SCRUM-131: Toggle framework on/off."
+          }
+        },
+        {
+          "name": "Get Academic Years",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/calendar/academic-years", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "calendar", "academic-years"]},
+            "description": "SCRUM-133: List academic years with terms."
+          }
+        },
+        {
+          "name": "Create Academic Year",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"},
+              {"key": "Content-Type", "value": "application/json", "type": "text"}
+            ],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"2026-2027\",\n  \"startDate\": \"2026-08-10\",\n  \"endDate\": \"2027-06-13\",\n  \"terms\": [\n    {\"name\": \"Semester 1\", \"startDate\": \"2026-08-10\", \"endDate\": \"2026-12-18\"},\n    {\"name\": \"Semester 2\", \"startDate\": \"2027-01-11\", \"endDate\": \"2027-06-13\"}\n  ]\n}"},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/calendar/academic-years", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "calendar", "academic-years"]},
+            "description": "SCRUM-133: Create academic year with terms."
+          }
+        },
+        {
+          "name": "Get Graduation Rules",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/graduation/rules", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "graduation", "rules"]},
+            "description": "SCRUM-132: Get graduation rules for current academic year."
+          }
+        },
+        {
+          "name": "Get Graduation Progress",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/graduation/progress/{{studentId}}", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "graduation", "progress", "{{studentId}}"]},
+            "description": "SCRUM-132: Get student graduation progress (real credits from StudentGrade)."
+          }
+        },
+        {
+          "name": "Get Gap Analysis",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/graduation/gap-analysis/{{studentId}}", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "graduation", "gap-analysis", "{{studentId}}"]},
+            "description": "SCRUM-139: Gap analysis with course recommendations."
+          }
+        },
+        {
+          "name": "Check Prerequisites (Eligibility)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/prerequisites/check/{{studentId}}/{{courseId}}", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "prerequisites", "check", "{{studentId}}", "{{courseId}}"]},
+            "description": "SCRUM-137: Check if student meets prerequisites for a course. courseId can be ID or code."
+          }
+        },
+        {
+          "name": "Get Eligible Courses",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/prerequisites/eligible/{{studentId}}?gradeLevel=&department=", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "prerequisites", "eligible", "{{studentId}}"], "query": [{"key": "gradeLevel", "value": ""}, {"key": "department", "value": ""}]},
+            "description": "SCRUM-137: List courses student is eligible to take (prerequisites satisfied)."
+          }
+        },
+        {
+          "name": "Get Missing Prerequisites",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/prerequisites/missing/{{studentId}}/{{courseId}}", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "prerequisites", "missing", "{{studentId}}", "{{courseId}}"]},
+            "description": "SCRUM-137: List missing prerequisites for a student and course."
+          }
+        },
+        {
+          "name": "Get School Users",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/users?page=1&limit=20", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "users"], "query": [{"key": "page", "value": "1"}, {"key": "limit", "value": "20"}]},
+            "description": "SCRUM-134: List users (students, counselors, staff) with filters."
+          }
+        },
+        {
+          "name": "Update User Grade Level",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"},
+              {"key": "Content-Type", "value": "application/json", "type": "text"}
+            ],
+            "body": {"mode": "raw", "raw": "{\n  \"gradeLevel\": 10\n}"},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/users/{{studentId}}/grade-level", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "users", "{{studentId}}", "grade-level"]},
+            "description": "Set student grade level (9-12) for Prerequisites Engine."
+          }
+        },
+        {
+          "name": "Invite Staff",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"},
+              {"key": "Content-Type", "value": "application/json", "type": "text"}
+            ],
+            "body": {"mode": "raw", "raw": "{\n  \"email\": \"counselor@school.edu\",\n  \"name\": \"Jane Doe\",\n  \"role\": \"counselor\"\n}"},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/staff/invite", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "staff", "invite"]},
+            "description": "SCRUM-134: Invite counselor or staff."
+          }
+        },
+        {
+          "name": "Import Courses (CSV)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "body": {"mode": "formdata", "formdata": [{"key": "file", "type": "file", "src": [], "description": "CSV: course_code, name, department, credits, grade_levels"}]},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/courses/import", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "courses", "import"]},
+            "description": "SCRUM-135: Upload course CSV. Returns 202 with jobId."
+          }
+        },
+        {
+          "name": "Get Course Import Job Status",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/courses/import/{{jobId}}", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "courses", "import", "{{jobId}}"]},
+            "description": "SCRUM-135: Poll course import job status."
+          }
+        },
+        {
+          "name": "Download Course Import Failures",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/courses/import/{{jobId}}/download-failures", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "courses", "import", "{{jobId}}", "download-failures"]},
+            "description": "SCRUM-135: Download failed rows CSV."
+          }
+        },
+        {
+          "name": "Get Courses",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/courses?page=1&limit=20", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "courses"]},
+            "description": "SCRUM-135: List school course catalog."
+          }
+        },
+        {
+          "name": "Add Course",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"},
+              {"key": "Content-Type", "value": "application/json", "type": "text"}
+            ],
+            "body": {"mode": "raw", "raw": "{\n  \"code\": \"MATH-101\",\n  \"name\": \"Algebra I\",\n  \"department\": \"Mathematics\",\n  \"credits\": 1.0,\n  \"gradeLevels\": [9, 10],\n  \"prerequisites\": []\n}"},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/courses", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "courses"]},
+            "description": "SCRUM-135: Add course manually."
+          }
+        },
+        {
+          "name": "Update Course",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"},
+              {"key": "Content-Type", "value": "application/json", "type": "text"}
+            ],
+            "body": {"mode": "raw", "raw": "{\n  \"code\": \"MATH-101\",\n  \"name\": \"Algebra I\",\n  \"department\": \"Mathematics\",\n  \"credits\": 1.0,\n  \"gradeLevels\": [9, 10],\n  \"prerequisites\": []\n}"},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/courses/{{courseId}}", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "courses", "{{courseId}}"]},
+            "description": "SCRUM-135: Update course."
+          }
+        },
+        {
+          "name": "Delete Course",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/courses/{{courseId}}", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "courses", "{{courseId}}"]},
+            "description": "SCRUM-135: Soft-delete course."
+          }
+        },
+        {
+          "name": "Import Grades (CSV)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "body": {"mode": "formdata", "formdata": [{"key": "file", "type": "file", "src": [], "description": "CSV: student_id, student_email, course_code, semester, grade, credits, status"}]},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/grades/import", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "grades", "import"]},
+            "description": "SCRUM-141: Upload grade CSV. Returns 202 with jobId."
+          }
+        },
+        {
+          "name": "Get Grade Import Job Status",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/grades/import/{{jobId}}", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "grades", "import", "{{jobId}}"]},
+            "description": "SCRUM-141: Poll grade import job status."
+          }
+        },
+        {
+          "name": "Download Grade Import Failures",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/grades/import/{{jobId}}/download-failures", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "grades", "import", "{{jobId}}", "download-failures"]},
+            "description": "SCRUM-141: Download failed rows CSV."
+          }
+        },
+        {
+          "name": "Save iSAMS Config",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"},
+              {"key": "Content-Type", "value": "application/json", "type": "text"}
+            ],
+            "body": {"mode": "raw", "raw": "{\n  \"apiUrl\": \"https://api.isams.com\",\n  \"apiKey\": \"your-api-key\",\n  \"schoolCode\": \"CDS\"\n}"},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/integrations/isams", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "integrations", "isams"]},
+            "description": "SCRUM-141: Save iSAMS integration config."
+          }
+        },
+        {
+          "name": "Get iSAMS Status",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/integrations/isams/status", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "integrations", "isams", "status"]},
+            "description": "SCRUM-141: Get iSAMS connection status."
+          }
+        },
+        {
+          "name": "Trigger iSAMS Sync",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/integrations/isams/sync", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "integrations", "isams", "sync"]},
+            "description": "SCRUM-141: Trigger iSAMS sync. Returns 202 with jobId."
+          }
+        },
+        {
+          "name": "Get Data Mappings",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/data-mappings", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "data-mappings"]},
+            "description": "SCRUM-142: List course code mappings."
+          }
+        },
+        {
+          "name": "Create Data Mapping",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"},
+              {"key": "Content-Type", "value": "application/json", "type": "text"}
+            ],
+            "body": {"mode": "raw", "raw": "{\n  \"externalCode\": \"SCI301\",\n  \"externalName\": \"Science Advanced\",\n  \"externalSource\": \"iSAMS\",\n  \"internalCourseId\": \"{{courseId}}\"\n}"},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/data-mappings", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "data-mappings"]},
+            "description": "SCRUM-142: Create manual mapping."
+          }
+        },
+        {
+          "name": "Update Data Mapping",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"},
+              {"key": "Content-Type", "value": "application/json", "type": "text"}
+            ],
+            "body": {"mode": "raw", "raw": "{\n  \"externalCode\": \"SCI301\",\n  \"externalName\": \"Science Advanced\",\n  \"internalCourseId\": \"{{courseId}}\"\n}"},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/data-mappings/{{mappingId}}", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "data-mappings", "{{mappingId}}"]},
+            "description": "SCRUM-142: Update mapping."
+          }
+        },
+        {
+          "name": "Delete Data Mapping",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/data-mappings/{{mappingId}}", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "data-mappings", "{{mappingId}}"]},
+            "description": "SCRUM-142: Delete mapping."
+          }
+        },
+        {
+          "name": "AI Suggest Data Mappings",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"},
+              {"key": "Content-Type", "value": "application/json", "type": "text"}
+            ],
+            "body": {"mode": "raw", "raw": "{\n  \"unmappedCodes\": [\n    {\"externalCode\": \"SCI301\", \"externalName\": \"Science Advanced\"},\n    {\"externalCode\": \"MATH201\", \"externalName\": \"Algebra II\"}\n  ]\n}"},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/data-mappings/ai-suggest", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "data-mappings", "ai-suggest"]},
+            "description": "SCRUM-142: Get AI-suggested mappings (rule-based fallback)."
+          }
+        },
+        {
+          "name": "Bulk Approve Data Mappings",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"},
+              {"key": "Content-Type", "value": "application/json", "type": "text"}
+            ],
+            "body": {"mode": "raw", "raw": "{\n  \"mappingIds\": [\"id1\", \"id2\"]\n}"},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/data-mappings/bulk-approve", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "data-mappings", "bulk-approve"]},
+            "description": "SCRUM-142: Bulk approve mappings."
+          }
+        },
+        {
+          "name": "Assign Students to Counselor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"},
+              {"key": "Content-Type", "value": "application/json", "type": "text"}
+            ],
+            "body": {"mode": "raw", "raw": "{\n  \"studentIds\": [\"{{studentId}}\"]\n}"},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/counselors/{{counselorId}}/assign-students", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "counselors", "{{counselorId}}", "assign-students"]},
+            "description": "SCRUM-134: Assign students to a counselor. Body: studentIds array."
+          }
+        },
+        {
+          "name": "Unassign Students from Counselor",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"},
+              {"key": "Content-Type", "value": "application/json", "type": "text"}
+            ],
+            "body": {"mode": "raw", "raw": "{\n  \"studentIds\": [\"{{studentId}}\"]\n}"},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/counselors/{{counselorId}}/assign-students", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "counselors", "{{counselorId}}", "assign-students"]},
+            "description": "SCRUM-134: Unassign students from a counselor."
+          }
+        },
+        {
+          "name": "Get Counselor's Students",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/counselors/{{counselorId}}/students?page=1&limit=20", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "counselors", "{{counselorId}}", "students"], "query": [{"key": "page", "value": "1"}, {"key": "limit", "value": "20"}, {"key": "search", "value": ""}]},
+            "description": "SCRUM-134: List students assigned to a counselor."
+          }
+        },
+        {
+          "name": "Get Course Sequence",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/course-sequence/{{studentId}}?academicYearId=", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "course-sequence", "{{studentId}}"], "query": [{"key": "academicYearId", "value": "", "description": "Optional: filter by academic year"}]},
+            "description": "SCRUM-138: Get student's planned course sequence. Optional academicYearId filter."
+          }
+        },
+        {
+          "name": "Update Course Sequence",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"},
+              {"key": "Content-Type", "value": "application/json", "type": "text"}
+            ],
+            "body": {"mode": "raw", "raw": "{\n  \"items\": [\n    {\n      \"academicYearId\": \"{{academicYearId}}\",\n      \"term\": \"Fall\",\n      \"courseId\": \"{{courseId}}\",\n      \"status\": \"planned\",\n      \"sortOrder\": 0,\n      \"notes\": \"\"\n    }\n  ]\n}"},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/course-sequence/{{studentId}}", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "course-sequence", "{{studentId}}"]},
+            "description": "SCRUM-138: Create or update student's course sequence. Items: academicYearId, term, courseId, status (planned|in_progress|completed), sortOrder, notes."
+          }
+        },
+        {
+          "name": "List Course Sequence Templates",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/course-sequences", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "course-sequences"]},
+            "description": "Phase 4: List course sequence templates (visual builder). Returns id, name, description, gradeRange, nodeCount, createdAt."
+          }
+        },
+        {
+          "name": "Create Course Sequence Template",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"},
+              {"key": "Content-Type", "value": "application/json", "type": "text"}
+            ],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"Math Progression\",\n  \"description\": \"Grade 9-12 math sequence\",\n  \"gradeRange\": \"9-12\",\n  \"nodes\": [\n    {\"courseId\": \"{{courseId}}\", \"courseCode\": \"MATH9\", \"courseName\": \"Math 9\", \"gradeLevel\": 9, \"positionX\": 100, \"positionY\": 50}\n  ],\n  \"edges\": [\n    {\"sourceNodeId\": \"node1\", \"targetNodeId\": \"node2\", \"label\": \"prerequisite\"}\n  ]\n}"},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/course-sequences", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "course-sequences"]},
+            "description": "Phase 4: Create course sequence template with nodes and edges."
+          }
+        },
+        {
+          "name": "Get Course Sequence Template",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/course-sequences/{{sequenceId}}", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "course-sequences", "{{sequenceId}}"]},
+            "description": "Phase 4: Get course sequence template with nodes and edges."
+          }
+        },
+        {
+          "name": "Update Course Sequence Template",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"},
+              {"key": "Content-Type", "value": "application/json", "type": "text"}
+            ],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"Math Progression Updated\",\n  \"description\": \"Grade 9-12 math sequence\",\n  \"gradeRange\": \"9-12\",\n  \"nodes\": [\n    {\"id\": \"{{nodeId}}\", \"courseId\": \"{{courseId}}\", \"courseCode\": \"MATH9\", \"courseName\": \"Math 9\", \"gradeLevel\": 9, \"positionX\": 100, \"positionY\": 50}\n  ],\n  \"edges\": [\n    {\"sourceNodeId\": \"node1\", \"targetNodeId\": \"node2\", \"label\": \"prerequisite\"}\n  ]\n}"},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/course-sequences/{{sequenceId}}", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "course-sequences", "{{sequenceId}}"]},
+            "description": "Phase 4: Update course sequence template, nodes, and edges."
+          }
+        },
+        {
+          "name": "Delete Course Sequence Template",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/course-sequences/{{sequenceId}}", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "course-sequences", "{{sequenceId}}"]},
+            "description": "Phase 4: Delete course sequence template and related nodes/edges."
+          }
+        },
+        {
+          "name": "Get Alerts",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/alerts?page=1&limit=50", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "alerts"], "query": [{"key": "page", "value": "1"}, {"key": "limit", "value": "50"}, {"key": "studentId", "value": ""}, {"key": "type", "value": ""}, {"key": "severity", "value": ""}, {"key": "unreadOnly", "value": "false"}]},
+            "description": "SCRUM-151: List alerts. Filters: studentId, type, severity, unreadOnly."
+          }
+        },
+        {
+          "name": "Create Alert",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"},
+              {"key": "Content-Type", "value": "application/json", "type": "text"}
+            ],
+            "body": {"mode": "raw", "raw": "{\n  \"studentId\": \"{{studentId}}\",\n  \"type\": \"graduation_at_risk\",\n  \"severity\": \"warning\",\n  \"message\": \"Student is at risk of not meeting graduation requirements\",\n  \"details\": \"Needs 2 more credits in Mathematics\"\n}"},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/alerts", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "alerts"]},
+            "description": "SCRUM-146: Create alert. Types: graduation_at_risk, missing_prerequisites, gap_analysis, course_sequence, assessment_due, other. Severity: info, warning, high, critical."
+          }
+        },
+        {
+          "name": "Mark Alert as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/alerts/{{alertId}}/read", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "alerts", "{{alertId}}", "read"]},
+            "description": "SCRUM-146: Mark alert as read."
+          }
+        },
+        {
+          "name": "Get Assessment Config",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/assessments/config", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "assessments", "config"]},
+            "description": "SCRUM-143: Get assessment config (PCA, 360, MIL, TIMS) with enabled status."
+          }
+        },
+        {
+          "name": "Update Assessment Config",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"},
+              {"key": "Content-Type", "value": "application/json", "type": "text"}
+            ],
+            "body": {"mode": "raw", "raw": "{\n  \"configs\": [\n    {\"assessmentType\": \"PCA\", \"isEnabled\": true, \"description\": \"Cognitive assessments\"},\n    {\"assessmentType\": \"360\", \"isEnabled\": true},\n    {\"assessmentType\": \"MIL\", \"isEnabled\": true},\n    {\"assessmentType\": \"TIMS\", \"isEnabled\": true}\n  ]\n}"},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/assessments/config", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "assessments", "config"]},
+            "description": "SCRUM-143: Update assessment config. Types: PCA, 360, MIL, TIMS."
+          }
+        },
+        {
+          "name": "List Counselor Notes",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/students/{{studentId}}/notes?type=&page=1&limit=20", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "students", "{{studentId}}", "notes"], "query": [{"key": "type", "value": ""}, {"key": "page", "value": "1"}, {"key": "limit", "value": "20"}]},
+            "description": "BACKEND_CONTRACT: List counselor notes for student."
+          }
+        },
+        {
+          "name": "Create Counselor Note",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}, {"key": "Content-Type", "value": "application/json", "type": "text"}],
+            "body": {"mode": "raw", "raw": "{\n  \"type\": \"meeting\",\n  \"content\": \"Discussed AP course load.\",\n  \"isPrivate\": false,\n  \"followUpDate\": \"2026-03-10\",\n  \"tags\": [\"career-planning\"]\n}"},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/students/{{studentId}}/notes", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "students", "{{studentId}}", "notes"]},
+            "description": "BACKEND_CONTRACT: Create counselor note."
+          }
+        },
+        {
+          "name": "Get Student Course Plan (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/students/{{studentId}}/course-plan", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "students", "{{studentId}}", "course-plan"]},
+            "description": "BACKEND_CONTRACT: Get student course plan."
+          }
+        },
+        {
+          "name": "Graduation Batch Progress",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/graduation/progress?page=1&limit=20&status=&sortBy=", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "graduation", "progress"], "query": [{"key": "page", "value": "1"}, {"key": "limit", "value": "20"}, {"key": "status", "value": ""}, {"key": "sortBy", "value": ""}]},
+            "description": "BACKEND_CONTRACT: Batch graduation progress."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Counselor",
+      "description": "Counselor-specific endpoints (SCRUM-145). Requires counselor role.",
+      "item": [
+        {
+          "name": "Get My Students",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/counselor/me/students?page=1&limit=20", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "counselor", "me", "students"], "query": [{"key": "page", "value": "1"}, {"key": "limit", "value": "20"}, {"key": "search", "value": ""}, {"key": "gradeLevel", "value": ""}]},
+            "description": "SCRUM-145: Get my assigned students. Requires counselor role."
+          }
+        },
+        {
+          "name": "Get Student Details",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/counselor/me/students/{{studentId}}", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "counselor", "me", "students", "{{studentId}}"]},
+            "description": "SCRUM-145: Get assigned student details."
+          }
+        },
+        {
+          "name": "Get Student Course Sequence",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/counselor/me/students/{{studentId}}/course-sequence?academicYearId=", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "counselor", "me", "students", "{{studentId}}", "course-sequence"], "query": [{"key": "academicYearId", "value": "", "description": "Optional"}]},
+            "description": "SCRUM-138: View assigned student's course sequence."
+          }
+        },
+        {
+          "name": "Get My Alerts",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/counselor/me/alerts?page=1&limit=50", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "counselor", "me", "alerts"], "query": [{"key": "page", "value": "1"}, {"key": "limit", "value": "50"}, {"key": "studentId", "value": ""}, {"key": "unreadOnly", "value": "false"}]},
+            "description": "SCRUM-146: Get alerts for my assigned students."
+          }
+        },
+        {
+          "name": "Mark Alert as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/counselor/me/alerts/{{alertId}}/read", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "counselor", "me", "alerts", "{{alertId}}", "read"]},
+            "description": "SCRUM-146: Mark alert as read (counselor)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Student (Auth Required)",
+      "description": "Student-facing endpoints. Requires Bearer token (student role).",
+      "item": [
+        {
+          "name": "Get My Course Plan",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/student/course-plan", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "student", "course-plan"]},
+            "description": "BACKEND_CONTRACT: Get own course plan."
+          }
+        },
+        {
+          "name": "Get Course Recommendations",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/student/course-plan/recommendations?gradeLevel=&area=", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "student", "course-plan", "recommendations"], "query": [{"key": "gradeLevel", "value": ""}, {"key": "area", "value": ""}]},
+            "description": "BACKEND_CONTRACT: Get course recommendations."
+          }
+        },
+        {
+          "name": "Add Course to Plan",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}, {"key": "Content-Type", "value": "application/json", "type": "text"}],
+            "body": {"mode": "raw", "raw": "{\n  \"courseId\": \"{{courseId}}\",\n  \"gradeLevel\": 11,\n  \"semester\": \"Fall 2026\"\n}"},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/student/course-plan/courses", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "student", "course-plan", "courses"]},
+            "description": "BACKEND_CONTRACT: Add course to plan."
+          }
+        },
+        {
+          "name": "Remove Course from Plan",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/student/course-plan/courses/{{courseId}}", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "student", "course-plan", "courses", "{{courseId}}"]},
+            "description": "BACKEND_CONTRACT: Remove planned course."
+          }
+        },
+        {
+          "name": "List Portfolio",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/student/portfolio?type=&page=1&limit=20", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "student", "portfolio"], "query": [{"key": "type", "value": ""}, {"key": "page", "value": "1"}, {"key": "limit", "value": "20"}]},
+            "description": "BACKEND_CONTRACT: List portfolio items."
+          }
+        },
+        {
+          "name": "Get Portfolio Summary",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/student/portfolio/summary", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "student", "portfolio", "summary"]},
+            "description": "BACKEND_CONTRACT: Get portfolio summary."
+          }
+        },
+        {
+          "name": "Create Portfolio Item",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}, {"key": "Content-Type", "value": "application/json", "type": "text"}],
+            "body": {"mode": "raw", "raw": "{\n  \"type\": \"extracurricular\",\n  \"title\": \"Model UN Club\",\n  \"organization\": \"Lincoln High\",\n  \"startDate\": \"2024-09\",\n  \"endDate\": null,\n  \"isCurrent\": true,\n  \"description\": \"Debate team captain.\",\n  \"hoursPerWeek\": 4,\n  \"skills\": [\"Leadership\", \"Public Speaking\"]\n}"},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/student/portfolio", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "student", "portfolio"]},
+            "description": "BACKEND_CONTRACT: Create portfolio item."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Unified Alerts",
+      "item": [
+        {
+          "name": "Get Alerts",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/alerts?page=1&limit=20", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "alerts"], "query": [{"key": "page", "value": "1"}, {"key": "limit", "value": "20"}, {"key": "type", "value": ""}, {"key": "priority", "value": ""}, {"key": "status", "value": ""}]},
+            "description": "Role-scoped: school_admin sees all; counselor sees assigned students only. Filters: type, priority (low/medium/high/critical), status (active/read/dismissed)."
+          }
+        },
+        {
+          "name": "Get Alerts Summary",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/alerts/summary", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "alerts", "summary"]},
+            "description": "Returns counts: total, critical, high, medium, low, unread (non-dismissed alerts only)."
+          }
+        },
+        {
+          "name": "Update Alert Status",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}, {"key": "Content-Type", "value": "application/json", "type": "text"}],
+            "body": {"mode": "raw", "raw": "{\n  \"status\": \"read\"\n}"},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/alerts/{{alertId}}", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "alerts", "{{alertId}}"]},
+            "description": "Update alert status. Body: {\"status\": \"read\"} or {\"status\": \"dismissed\"}."
+          }
+        },
+        {
+          "name": "Bulk Alert Action",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}, {"key": "Content-Type", "value": "application/json", "type": "text"}],
+            "body": {"mode": "raw", "raw": "{\n  \"alertIds\": [\"{{alertId}}\"],\n  \"action\": \"mark_read\"\n}"},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/alerts/bulk-action", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "alerts", "bulk-action"]},
+            "description": "Bulk action. Body: {\"alertIds\": [\"id1\", \"id2\"], \"action\": \"mark_read\" or \"dismiss\"}."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Counselor Onboarding (Public)",
+      "item": [
+        {
+          "name": "Verify Counselor Invite",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/counselor/onboarding/verify?token={{counselorInviteToken}}", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "counselor", "onboarding", "verify"], "query": [{"key": "token", "value": "{{counselorInviteToken}}"}]},
+            "description": "Public. Verify counselor invitation token."
+          }
+        },
+        {
+          "name": "Complete Counselor Onboarding",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json", "type": "text"}],
+            "body": {"mode": "raw", "raw": "{\n  \"token\": \"{{counselorInviteToken}}\",\n  \"password\": \"Password123\",\n  \"name\": \"Jane Counselor\"\n}"},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/counselor/onboarding/complete", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "counselor", "onboarding", "complete"]},
+            "description": "Public. Complete onboarding. Returns JWT and user."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Counselor Dashboard",
+      "item": [
+        {
+          "name": "Get Counselor Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/counselor/dashboard", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "counselor", "dashboard"]},
+            "description": "Returns assignedCount, followUps, pendingFollowUpsList."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Academic Gaps",
+      "item": [
+        {
+          "name": "Get Academic Gaps Summary",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/academic-gaps/summary", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "academic-gaps", "summary"]},
+            "description": "Aggregated gaps by area."
+          }
+        },
+        {
+          "name": "Get Student Academic Gaps",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/students/{{studentId}}/academic-gaps", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "students", "{{studentId}}", "academic-gaps"]},
+            "description": "Student gaps, graduationRisk, overallCompletionRate."
+          }
+        },
+        {
+          "name": "Get Course Recommendations",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/students/{{studentId}}/course-recommendations", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "students", "{{studentId}}", "course-recommendations"]},
+            "description": "Rule-based course recommendations."
+          }
+        }
+      ]
+    },
+    {
+      "name": "School Analytics",
+      "item": [
+        {
+          "name": "Get Analytics Overview",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/analytics/overview", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "analytics", "overview"]},
+            "description": "totalStudents, assessmentCompletionRate, studentsAtRisk, counselorCoverage."
+          }
+        },
+        {
+          "name": "Get Analytics Trends",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/analytics/trends?metric=completion_rate&range=30d", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "analytics", "trends"], "query": [{"key": "metric", "value": "completion_rate"}, {"key": "range", "value": "30d"}]},
+            "description": "Placeholder trends."
+          }
+        },
+        {
+          "name": "Get Top Performers",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/analytics/top-performers?limit=10", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "analytics", "top-performers"], "query": [{"key": "limit", "value": "10"}]},
+            "description": "Top students by GPA."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Parent Invitation",
+      "item": [
+        {
+          "name": "List Parents",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/students/{{studentId}}/parents", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "students", "{{studentId}}", "parents"]},
+            "description": "List parents linked to student."
+          }
+        },
+        {
+          "name": "Invite Parent",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}, {"key": "Content-Type", "value": "application/json", "type": "text"}],
+            "body": {"mode": "raw", "raw": "{\n  \"email\": \"parent@example.com\",\n  \"name\": \"Jane Parent\",\n  \"relationship\": \"Parent\"\n}"},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/students/{{studentId}}/parents/invite", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "students", "{{studentId}}", "parents", "invite"]},
+            "description": "Send parent invite."
+          }
+        },
+        {
+          "name": "Revoke Parent",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/students/{{studentId}}/parents/{{parentLinkId}}", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "students", "{{studentId}}", "parents", "{{parentLinkId}}"]},
+            "description": "Revoke parent access."
+          }
+        },
+        {
+          "name": "Resend Parent Invite",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/school-admin/students/{{studentId}}/parents/{{parentLinkId}}/resend", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "school-admin", "students", "{{studentId}}", "parents", "{{parentLinkId}}", "resend"]},
+            "description": "Resend invitation."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Parent Onboarding (Public)",
+      "item": [
+        {
+          "name": "Verify Parent Invite",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/parent/onboarding/verify?token={{parentInviteToken}}", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "parent", "onboarding", "verify"], "query": [{"key": "token", "value": "{{parentInviteToken}}"}]},
+            "description": "Public. Verify parent invitation token."
+          }
+        },
+        {
+          "name": "Complete Parent Onboarding",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json", "type": "text"}],
+            "body": {"mode": "raw", "raw": "{\n  \"token\": \"{{parentInviteToken}}\",\n  \"password\": \"Password123\",\n  \"name\": \"Jane Parent\"\n}"},
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/parent/onboarding/complete", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "parent", "onboarding", "complete"]},
+            "description": "Public. Complete onboarding."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Parent Portal",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/parent/profile", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "parent", "profile"]},
+            "description": "Parent profile + linked children."
+          }
+        },
+        {
+          "name": "Get Child Progress",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/parent/children/{{studentId}}/progress", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "parent", "children", "{{studentId}}", "progress"]},
+            "description": "Academic progress for linked child."
+          }
+        },
+        {
+          "name": "Get Pending Evaluations",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/parent/evaluations/pending", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "parent", "evaluations", "pending"]},
+            "description": "Pending 360° evaluations."
+          }
+        },
+        {
+          "name": "Get Notifications",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/parent/notifications", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "parent", "notifications"]},
+            "description": "Notifications list."
+          }
+        },
+        {
+          "name": "Mark Notification Read",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/parent/notifications/{{notificationId}}/read", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "parent", "notifications", "{{notificationId}}", "read"]},
+            "description": "Mark one as read."
+          }
+        },
+        {
+          "name": "Mark All Notifications Read",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text"}],
+            "url": {"raw": "https://careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net/api/v1/parent/notifications/read-all", "protocol": "https", "host": ["careerproject-eucbddf3h4h0ekfx.canadacentral-01.azurewebsites.net"], "path": ["api", "v1", "parent", "notifications", "read-all"]},
+            "description": "Mark all as read."
           }
         }
       ]
@@ -7688,6 +8763,11 @@
       "description": "Replace with actual course ID for testing"
     },
     {
+      "key": "studentId",
+      "value": "your-student-id-here",
+      "description": "Replace with actual student/user ID for prerequisites (SCRUM-137)"
+    },
+    {
       "key": "enrollmentId",
       "value": "your-enrollment-id-here",
       "description": "Replace with actual enrollment ID for testing (returned from enroll endpoint)"
@@ -7696,6 +8776,11 @@
       "key": "jobId",
       "value": "your-job-id-here",
       "description": "Replace with actual import job ID for testing (returned from import endpoint)"
+    },
+    {
+      "key": "mappingId",
+      "value": "your-mapping-id-here",
+      "description": "Replace with actual data mapping ID for testing"
     },
     {
       "key": "coachId",
@@ -7736,6 +8821,41 @@
       "key": "schoolInvitationToken",
       "value": "your-school-invitation-token-here",
       "description": "Replace with actual school invitation token for onboarding (generated when school is created)"
+    },
+    {
+      "key": "counselorId",
+      "value": "your-counselor-id-here",
+      "description": "Replace with counselor user ID for assign/unassign students (SCRUM-134)"
+    },
+    {
+      "key": "alertId",
+      "value": "your-alert-id-here",
+      "description": "Replace with alert ID for mark-as-read (SCRUM-146)"
+    },
+    {
+      "key": "academicYearId",
+      "value": "your-academic-year-id-here",
+      "description": "Replace with academic year ID for course sequence (from Get Academic Years)"
+    },
+    {
+      "key": "counselorInviteToken",
+      "value": "your-counselor-invite-token-here",
+      "description": "Token from staff/invite response (invitationToken) for counselor onboarding"
+    },
+    {
+      "key": "parentLinkId",
+      "value": "your-parent-link-id-here",
+      "description": "ID from List Parents for revoke/resend"
+    },
+    {
+      "key": "parentInviteToken",
+      "value": "your-parent-invite-token-here",
+      "description": "Token from Invite Parent for parent onboarding"
+    },
+    {
+      "key": "notificationId",
+      "value": "your-notification-id-here",
+      "description": "ID from Get Notifications for mark read"
     }
   ]
 }

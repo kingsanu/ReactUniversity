@@ -17,9 +17,10 @@ import { AssessmentReportData } from '@/types/assessmentReport';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const userId = params.id;
+  const resolvedParams = await params;
+  const userId = resolvedParams.id;
 
   // Get the Authorization header from the incoming request
   const authHeader = request.headers.get('Authorization');

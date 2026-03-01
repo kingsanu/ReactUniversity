@@ -59,38 +59,28 @@ export async function testLogin(
 export async function getCurrentUser(): Promise<UserProfile> {
   const token = localStorage.getItem("token");
 
-  // Try common user profile endpoints
-  const possibleEndpoints = [
-    "/authapi/profile",
-    "/authapi/me",
-    "/authapi/user",
-    "/api/user/profile",
-    "/api/auth/profile",
-  ];
+  if (token) {
+    // To prevent 404 console spam on Azure where the profile endpoint is missing,
+    // we extract the user profile directly from the JWT token first.
+    const decoded = decodeJWTToken(token);
 
-  for (const endpoint of possibleEndpoints) {
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}${endpoint}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
+    if (decoded) {
+      return {
+        id: decoded.id || decoded.sub || "fallback-id",
+        name: decoded.name || "User",
+        email: decoded.email || "user@example.com",
+        roleId: decoded.roleId || "role-id",
+        role: {
+          id: decoded.roleId || "role-id",
+          name: decoded.role?.name || decoded.roleName || decoded.role || "staff",
+          description: "Role extracted from token",
+          isActive: true
         }
-      );
-
-      if (response.ok) {
-        const userData = await response.json();
-        console.log(`✅ Found user data at ${endpoint}:`, userData);
-        return userData;
-      }
-    } catch (error) {
-      console.log(`❌ ${endpoint} failed:`, error);
+      };
     }
   }
 
-  throw new Error("No user profile endpoint found");
+  throw new Error("User profile not found in token");
 }
 
 // Decode JWT token to see what's inside (client-side only for inspection)

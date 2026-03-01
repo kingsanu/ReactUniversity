@@ -30,6 +30,7 @@ import {
 import {
   Search,
   FileText,
+  FilePlus,
   Download,
   Eye,
   RefreshCw,
@@ -43,6 +44,7 @@ import { cn } from "@/lib/utils";
 import { useStudentResults, useStudentDetailResult } from "@/hooks/useSchoolAdmin";
 import { exportResults } from "@/services/schoolAdminService";
 import { toast } from "sonner";
+import GradeImportForm from "@/components/school-admin/GradeImportForm";
 
 export default function ResultsPage() {
   const { t } = useTranslation();
@@ -51,6 +53,7 @@ export default function ResultsPage() {
   const [page, setPage] = useState(1);
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
   const limit = 10;
 
   const { data: results, isLoading, refetch } = useStudentResults({
@@ -109,6 +112,10 @@ export default function ResultsPage() {
           </div>
 
           <div className="flex items-center gap-3">
+            <Button variant="outline" onClick={() => setIsImportOpen(true)}>
+              <FilePlus className="mr-2 h-4 w-4" />
+              {t("schoolAdmin.results.importGrades", "Import Grades")}
+            </Button>
             <Button variant="outline" onClick={() => handleExport("csv")}>
               <Download className="mr-2 h-4 w-4" />
               {t("schoolAdmin.results.exportCSV", "Export CSV")}
@@ -376,6 +383,13 @@ export default function ResultsPage() {
               <p>{t("schoolAdmin.results.detail.noAssessments", "No details available")}</p>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Grade Import Dialog */}
+      <Dialog open={isImportOpen} onOpenChange={setIsImportOpen}>
+        <DialogContent className="sm:max-w-3xl rounded-2xl max-h-[90vh] overflow-y-auto">
+          <GradeImportForm onClose={() => setIsImportOpen(false)} />
         </DialogContent>
       </Dialog>
     </div>
