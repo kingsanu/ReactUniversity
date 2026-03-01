@@ -50,7 +50,7 @@ const navItems = [
   { key: "curriculum", path: "/school-admin/curriculum", icon: BookOpen, label: "Curriculum", section: "Academics" },
   { key: "courses", path: "/school-admin/courses", icon: Library, label: "Courses" },
   { key: "courseSequences", path: "/school-admin/course-sequences", icon: GitBranch, label: "Sequences" },
-  { key: "graduation", path: "/school-admin/graduation", icon: GraduationCap, label: "Graduation" },
+  // { key: "graduation", path: "/school-admin/graduation", icon: GraduationCap, label: "Graduation" },
   // Data & Assessment
   { key: "assessments", path: "/school-admin/assessments", icon: ClipboardCheck, label: "Assessments", section: "Data & Assessment" },
   { key: "dataMappings", path: "/school-admin/data-mappings", icon: ArrowLeftRight, label: "Data Mappings" },

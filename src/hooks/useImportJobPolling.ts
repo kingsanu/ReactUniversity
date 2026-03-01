@@ -21,6 +21,10 @@ function isTerminal(status: string) {
   return status === "completed" || status === "failed";
 }
 
+import { useEffect } from "react";
+
+import { curriculumKeys } from "./useCurriculumQueries";
+
 /** Poll a grade or course import job until it reaches a terminal state. */
 export function useImportJobPolling(
   type: ImportType,
@@ -28,7 +32,7 @@ export function useImportJobPolling(
 ) {
   const qc = useQueryClient();
 
-  return useQuery<ImportJobStatus>({
+  const queryReq = useQuery<ImportJobStatus>({
     queryKey: ["import-job", type, jobId],
     queryFn: () =>
       type === "grades"
@@ -42,6 +46,19 @@ export function useImportJobPolling(
     },
     staleTime: 0,
   });
+
+  useEffect(() => {
+    if (queryReq.data?.status === "completed") {
+      if (type === "courses") {
+        qc.invalidateQueries({ queryKey: curriculumKeys.schoolCourses() });
+      }
+      if (type === "grades") {
+        qc.invalidateQueries({ queryKey: ["school-admin", "results"] });
+      }
+    }
+  }, [queryReq.data?.status, type, qc]);
+
+  return queryReq;
 }
 
 /** Download the failure report CSV for a completed import job. */

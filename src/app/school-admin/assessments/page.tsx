@@ -82,7 +82,7 @@ export default function AssessmentConfigPage() {
       </motion.div>
 
       {/* Status Overview — renders only once backend implements /assessments/status */}
-      {status && (
+      {status?.summary && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {Object.entries(status.summary).map(([type, s]) => (
@@ -104,7 +104,7 @@ export default function AssessmentConfigPage() {
 
       {/* Assessment Cards */}
       <div className="space-y-4">
-        {items.map((assessment, idx) => (
+        {items?.map((assessment, idx) => (
           <motion.div key={assessment.assessmentType} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + idx * 0.05 }}>
             <Card className={`border-0 shadow-lg ${assessment.isEnabled ? "" : "opacity-60"}`}>
               <CardHeader className="bg-gradient-to-r from-teal-50 to-cyan-50 border-b border-gray-100">

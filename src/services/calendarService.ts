@@ -30,7 +30,14 @@ const handleResponse = async <T>(res: Response): Promise<T> => {
     throw new Error(err.error?.message || err.message || "Request failed");
   }
   const json = await res.json();
-  return json.data ?? json;
+
+  // The API sometimes returns { data: { data: [...] } }
+  // We need to unwrap it fully to get the inner payload.
+  if (json.data && json.data.data !== undefined) {
+    return json.data.data as T;
+  }
+
+  return (json.data ?? json) as T;
 };
 
 // ============================================

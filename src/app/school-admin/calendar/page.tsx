@@ -82,13 +82,33 @@ export default function CalendarPage() {
   const [holidayType, setHolidayType] = useState<"national" | "school" | "custom">("school");
 
   const handleCreateYear = () => {
-    createYear.mutate(yearForm, {
+    if (!yearForm.name || !yearForm.startDate || !yearForm.endDate) {
+      toast.error("Please fill out all fields");
+      return;
+    }
+
+    const payload = {
+      ...yearForm,
+      terms: [
+        {
+          name: "Semester 1",
+          startDate: yearForm.startDate,
+          endDate: yearForm.endDate,
+        },
+      ],
+    };
+
+    createYear.mutate(payload, {
       onSuccess: () => { toast.success("Academic year created"); setYearOpen(false); },
       onError: () => toast.error("Failed to create"),
     });
   };
 
   const handleCreatePeriod = () => {
+    if (!periodForm.name || !periodForm.startDate || !periodForm.endDate || !periodForm.termId) {
+      toast.error("Please fill out all required fields");
+      return;
+    }
     createPeriod.mutate(periodForm, {
       onSuccess: () => { toast.success("Assessment period created"); setPeriodOpen(false); },
       onError: () => toast.error("Failed to create"),
@@ -96,6 +116,10 @@ export default function CalendarPage() {
   };
 
   const handleCreateHoliday = () => {
+    if (!holidayName || !holidayDate) {
+      toast.error("Please fill out holiday name and date");
+      return;
+    }
     createHoliday.mutate(
       { holidays: [{ name: holidayName, date: holidayDate, type: holidayType }] },
       {
@@ -109,6 +133,10 @@ export default function CalendarPage() {
   if (isLoading) {
     return (<div className="space-y-6"><Skeleton className="h-10 w-64" /><Skeleton className="h-[500px] w-full" /></div>);
   }
+
+  const safeYears = Array.isArray(years) ? years : [];
+  const safePeriods = Array.isArray(periods) ? periods : [];
+  const safeHolidays = Array.isArray(holidays) ? holidays : [];
 
   return (
     <div className="space-y-8">
@@ -153,7 +181,7 @@ export default function CalendarPage() {
           </CardHeader>
           <CardContent className="pt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {years?.map((y) => (
+              {safeYears.map((y) => (
                 <div key={y.id} className={`p-4 rounded-lg border-2 ${y.isCurrent ? "border-teal-400 bg-teal-50" : "border-gray-200"}`}>
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
@@ -179,7 +207,7 @@ export default function CalendarPage() {
                   )}
                 </div>
               ))}
-              {(!years || years.length === 0) && <p className="text-gray-400 col-span-2 text-center py-6">No academic years configured</p>}
+              {safeYears.length === 0 && <p className="text-gray-400 col-span-2 text-center py-6">No academic years configured</p>}
             </div>
           </CardContent>
         </Card>
@@ -217,12 +245,12 @@ export default function CalendarPage() {
                     <div className="space-y-2"><Label>Start</Label><Input type="date" value={periodForm.startDate} onChange={(e) => setPeriodForm({ ...periodForm, startDate: e.target.value })} /></div>
                     <div className="space-y-2"><Label>End</Label><Input type="date" value={periodForm.endDate} onChange={(e) => setPeriodForm({ ...periodForm, endDate: e.target.value })} /></div>
                   </div>
-                  {years && years.length > 0 && (
+                  {safeYears.length > 0 && (
                     <div className="space-y-2">
                       <Label>Term</Label>
                       <Select value={periodForm.termId} onValueChange={(v) => setPeriodForm({ ...periodForm, termId: v })}>
                         <SelectTrigger><SelectValue placeholder="Select term" /></SelectTrigger>
-                        <SelectContent>{years.flatMap((y) => y.terms).map((term) => <SelectItem key={term.id} value={term.id}>{term.name}</SelectItem>)}</SelectContent>
+                        <SelectContent>{safeYears.flatMap((y) => y.terms).map((term) => <SelectItem key={term.id} value={term.id}>{term.name}</SelectItem>)}</SelectContent>
                       </Select>
                     </div>
                   )}
@@ -238,7 +266,7 @@ export default function CalendarPage() {
           </CardHeader>
           <CardContent className="pt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {periods?.map((p) => (
+              {safePeriods.map((p) => (
                 <div key={p.id} className="p-4 rounded-lg border space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -252,7 +280,7 @@ export default function CalendarPage() {
                   <p className="text-xs text-gray-500">{new Date(p.startDate).toLocaleDateString()} — {new Date(p.endDate).toLocaleDateString()}</p>
                 </div>
               ))}
-              {(!periods || periods.length === 0) && <p className="text-gray-400 col-span-3 text-center py-6">No assessment periods configured</p>}
+              {safePeriods.length === 0 && <p className="text-gray-400 col-span-3 text-center py-6">No assessment periods configured</p>}
             </div>
           </CardContent>
         </Card>
@@ -298,7 +326,7 @@ export default function CalendarPage() {
           </CardHeader>
           <CardContent className="pt-6">
             <div className="flex flex-wrap gap-3">
-              {holidays?.map((h) => (
+              {safeHolidays.map((h) => (
                 <Badge key={h.id} variant="secondary" className="px-3 py-1.5 text-sm flex items-center gap-2">
                   {h.name} ({new Date(h.date).toLocaleDateString()})
                   <button onClick={() => deleteHolidayMut.mutate(h.id, { onSuccess: () => toast.success("Removed") })} className="ml-1 text-red-400 hover:text-red-600">
@@ -306,7 +334,7 @@ export default function CalendarPage() {
                   </button>
                 </Badge>
               ))}
-              {(!holidays || holidays.length === 0) && <p className="text-gray-400 text-center w-full py-6">No holidays defined</p>}
+              {safeHolidays.length === 0 && <p className="text-gray-400 text-center w-full py-6">No holidays defined</p>}
             </div>
           </CardContent>
         </Card>

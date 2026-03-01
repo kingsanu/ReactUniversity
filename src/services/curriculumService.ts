@@ -48,7 +48,22 @@ const handleResponse = async <T>(res: Response): Promise<T> => {
     throw new Error(err.error?.message || err.message || "Request failed");
   }
   const json = await res.json();
-  return json.data ?? json;
+
+  // The API sometimes returns deeply nested { data: { data: [...], total: 2, page: 1 } }
+  // If json.data exists and has its own inner 'data' array
+  if (json.data && json.data.data !== undefined) {
+    // If the endpoint expects a paginated response (like SchoolCoursesResponse),
+    // it needs the full outer wrapper (the object containing total, page, etc)
+    // We check if 'total' exists on the inner json.data to see if it's paginated.
+    if ("total" in json.data || "page" in json.data) {
+      return json.data as T;
+    }
+
+    // Otherwise, for simple array endpoints, extract the inner array directly.
+    return json.data.data as T;
+  }
+
+  return (json.data ?? json) as T;
 };
 
 // ============================================

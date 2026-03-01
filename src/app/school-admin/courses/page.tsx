@@ -41,6 +41,7 @@ import {
 } from "@/components/ui/select";
 import { BookOpen, Plus, Search, Upload, Loader2, Trash2, Sparkles, Wand2 } from "lucide-react";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   useSchoolCourses,
   useCreateSchoolCourse,
@@ -48,12 +49,14 @@ import {
   useImportSchoolCourses,
   useRecognizeAllUnmapped,
   useApplyAIMapping,
+  curriculumKeys,
 } from "@/hooks/useCurriculumQueries";
 import type { SchoolCoursePayload, AIMappingAction, FrameworkType } from "@/types/curriculum";
 import ImportJobStatusPanel from "@/components/school-admin/ImportJobStatusPanel";
 
 export default function CoursesPage() {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [department, setDepartment] = useState("");
   const [page, setPage] = useState(1);
@@ -159,18 +162,16 @@ export default function CoursesPage() {
           </DialogContent>
         </Dialog>
 
-        <div>
+        <div className="flex items-center gap-2">
           <input ref={fileRef} type="file" accept=".csv" onChange={handleImport} hidden />
           <Button variant="outline" onClick={() => fileRef.current?.click()} disabled={importCourses.isPending}>
             {importCourses.isPending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Upload className="h-4 w-4 mr-1" />}
             CSV Import
           </Button>
+          <Button variant="ghost" size="sm" asChild className="text-gray-500 hover:text-gray-700">
+            <a href="/assets/sample-courses.csv" download>Download Template</a>
+          </Button>
         </div>
-
-        <Button variant="outline" onClick={handleAIRecognize} disabled={recognizeAll.isPending}>
-          {recognizeAll.isPending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Sparkles className="h-4 w-4 mr-1" />}
-          AI Recognize
-        </Button>
       </motion.div>
 
       {/* Import Job Polling Panel */}
@@ -178,7 +179,11 @@ export default function CoursesPage() {
         <ImportJobStatusPanel
           type="courses"
           jobId={importCourseJobId}
-          onDone={() => setImportCourseJobId(null)}
+          onDone={() => {
+            setImportCourseJobId(null);
+            // Force refetch courses table after import completes
+            queryClient.invalidateQueries({ queryKey: curriculumKeys.schoolCourses() });
+          }}
         />
       )}
       {/* Courses Table */}

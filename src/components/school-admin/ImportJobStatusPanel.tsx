@@ -19,12 +19,18 @@ export default function ImportJobStatusPanel({ type, jobId, onDone }: Props) {
 
   const status = data?.status ?? "pending";
   const isTerminal = status === "completed" || status === "failed";
-  const progressValue =
-    data && data.totalRows > 0
-      ? Math.round(((data.successCount + data.failureCount) / data.totalRows) * 100)
+  const successCount = data?.successCount ?? 0;
+  const failureCount = data?.failureCount ?? 0;
+  const totalRows = data?.totalRows ?? 0;
+
+  let progressValue =
+    totalRows > 0
+      ? Math.round(((successCount + failureCount) / totalRows) * 100)
       : status === "completed"
-      ? 100
-      : 0;
+        ? 100
+        : 0;
+
+  if (isNaN(progressValue)) progressValue = 0;
 
   const StatusIcon = () => {
     if (isLoading || !data) return <Loader2 className="h-4 w-4 animate-spin text-gray-400" />;
@@ -44,15 +50,14 @@ export default function ImportJobStatusPanel({ type, jobId, onDone }: Props) {
           </span>
         </div>
         <Badge
-          className={`text-xs border-0 capitalize ${
-            status === "completed"
-              ? "bg-green-100 text-green-700"
-              : status === "failed"
+          className={`text-xs border-0 capitalize ${status === "completed"
+            ? "bg-green-100 text-green-700"
+            : status === "failed"
               ? "bg-red-100 text-red-700"
               : status === "processing"
-              ? "bg-blue-100 text-blue-700"
-              : "bg-yellow-100 text-yellow-700"
-          }`}
+                ? "bg-blue-100 text-blue-700"
+                : "bg-yellow-100 text-yellow-700"
+            }`}
         >
           {status.replace("_", " ")}
         </Badge>
@@ -67,12 +72,12 @@ export default function ImportJobStatusPanel({ type, jobId, onDone }: Props) {
       )}
 
       {/* Counts */}
-      {data && data.totalRows > 0 && (
+      {totalRows > 0 && (
         <div className="flex items-center gap-4 text-xs text-gray-600">
-          <span>Total rows: <strong>{data.totalRows}</strong></span>
-          <span className="text-green-600">✓ {data.successCount} imported</span>
-          {data.failureCount > 0 && (
-            <span className="text-red-600">✗ {data.failureCount} failed</span>
+          <span>Total rows: <strong>{totalRows}</strong></span>
+          <span className="text-green-600">✓ {successCount} imported</span>
+          {failureCount > 0 && (
+            <span className="text-red-600">✗ {failureCount} failed</span>
           )}
         </div>
       )}

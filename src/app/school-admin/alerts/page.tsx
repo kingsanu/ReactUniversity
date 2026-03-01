@@ -57,16 +57,16 @@ const typeIcons: Record<AlertType, React.ReactNode> = {
 export default function SchoolAdminAlertsPage() {
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
-  const [typeFilter, setTypeFilter] = useState("");
-  const [priorityFilter, setPriorityFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [priorityFilter, setPriorityFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<string[]>([]);
 
   const { data: alerts, isLoading } = useAlerts({
-    type: (typeFilter || undefined) as AlertType | undefined,
-    priority: (priorityFilter || undefined) as AlertPriority | undefined,
-    status: (statusFilter || undefined) as AlertStatus | undefined,
+    type: (typeFilter !== "all" ? typeFilter : undefined) as AlertType | undefined,
+    priority: (priorityFilter !== "all" ? priorityFilter : undefined) as AlertPriority | undefined,
+    status: (statusFilter !== "all" ? statusFilter : undefined) as AlertStatus | undefined,
     page,
     limit: 20,
   });
@@ -174,7 +174,7 @@ export default function SchoolAdminAlertsPage() {
                 <Select value={typeFilter} onValueChange={setTypeFilter}>
                   <SelectTrigger className="w-44 h-9"><SelectValue placeholder="Alert Type" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Types</SelectItem>
+                    <SelectItem value="all">All Types</SelectItem>
                     <SelectItem value="grade_drop">Grade Drop</SelectItem>
                     <SelectItem value="missing_assessment">Missing Assessment</SelectItem>
                     <SelectItem value="credit_gap">Credit Gap</SelectItem>
@@ -185,7 +185,7 @@ export default function SchoolAdminAlertsPage() {
                 <Select value={priorityFilter} onValueChange={setPriorityFilter}>
                   <SelectTrigger className="w-36 h-9"><SelectValue placeholder="Priority" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Priorities</SelectItem>
+                    <SelectItem value="all">All Priorities</SelectItem>
                     <SelectItem value="critical">Critical</SelectItem>
                     <SelectItem value="high">High</SelectItem>
                     <SelectItem value="medium">Medium</SelectItem>
@@ -195,7 +195,7 @@ export default function SchoolAdminAlertsPage() {
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
                   <SelectTrigger className="w-36 h-9"><SelectValue placeholder="Status" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Statuses</SelectItem>
+                    <SelectItem value="all">All Statuses</SelectItem>
                     <SelectItem value="unread">Unread</SelectItem>
                     <SelectItem value="read">Read</SelectItem>
                     <SelectItem value="dismissed">Dismissed</SelectItem>
