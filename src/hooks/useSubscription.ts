@@ -10,11 +10,17 @@ import {
 /**
  * Hook to fetch current subscription status
  */
-export function useSubscriptionStatus() {
-  return useQuery<SubscriptionStatus>({
+export function useSubscriptionStatus(
+  options?: Omit<
+    import("@tanstack/react-query").UseQueryOptions<SubscriptionStatus, Error>,
+    "queryKey" | "queryFn"
+  >
+) {
+  return useQuery<SubscriptionStatus, Error>({
     queryKey: ["subscriptionStatus"],
     queryFn: getSubscriptionStatus,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    ...options,
   });
 }
 

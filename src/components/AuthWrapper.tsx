@@ -23,6 +23,43 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
   // Monitor token expiry in background - auto-logout when expired
   useTokenMonitor(5); // Warn 5 minutes before expiry
 
+  // Check if current user requires subscription check
+  const userRole = user.role?.toLowerCase() || "";
+  const isSuperAdmin = userRole.includes("super") || userRole === "superadmin" || userRole === "super_admin" || userRole === "admin";
+  const isSchoolAdmin = userRole.includes("school") || userRole === "schooladmin" || userRole === "school_admin";
+  const isCounselor = userRole === "counselor";
+  const isParent = userRole === "parent";
+  const isStudent =
+    !userRole ||
+    userRole === "student" ||
+    userRole === "user" ||
+    (!userRole.includes("admin") && !userRole.includes("coach") && !isSchoolAdmin && !isSuperAdmin && !isCounselor && !isParent);
+
+  // Determine if on subscription or onboarding page to avoid query fetching and redirect loops
+  const isSubscriptionPage =
+    pathname.startsWith("/dashboard/subscriptions") ||
+    pathname.startsWith("/dashboard/admin/plans") ||
+    pathname.startsWith("/payment-success") ||
+    pathname.startsWith("/payment-cancelled") ||
+    pathname.startsWith("/subscribe");
+
+  const isOnboardingPage = pathname.startsWith("/onboarding");
+  const isProtectedRoute = protectedRoutes.some((route) =>
+    pathname.startsWith(route)
+  );
+
+  const shouldCheckSubscription =
+    user.isAuthenticated &&
+    isProtectedRoute &&
+    isStudent &&
+    !isSubscriptionPage &&
+    !isOnboardingPage;
+
+  // Fetch subscription status dynamically using React Query hook
+  const { data: subscriptionStatus, isLoading: statusLoading } = useSubscriptionStatus({
+    enabled: !!shouldCheckSubscription,
+  });
+
   useEffect(() => {
     // Initialize authentication state from localStorage
     const initialize = async () => {
@@ -39,9 +76,6 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
     // Public onboarding pages — always accessible regardless of auth
     if (publicOnboardingRoutes.some((p) => pathname.startsWith(p))) return;
 
-    const isProtectedRoute = protectedRoutes.some((route) =>
-      pathname.startsWith(route)
-    );
     const isAuthRoute = authRoutes.includes(pathname);
 
     // If user is not authenticated and trying to access protected route
@@ -49,34 +83,6 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
       router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
       return;
     }
-
-    // Subscription Enforcement for Students
-    // After registration, new students must purchase a subscription to access the platform
-    // Skip check for:
-    // 1. Non-protected routes
-    // 2. Subscription/Payment related pages (to avoid infinite loops)
-    // 3. Admin/Coach users (they don't need subscriptions)
-    // 4. Onboarding pages
-    const isSubscriptionPage =
-      pathname.startsWith("/dashboard/subscriptions") ||
-      pathname.startsWith("/dashboard/admin/plans") ||
-      pathname.startsWith("/payment-success") ||
-      pathname.startsWith("/payment-cancelled") ||
-      pathname.startsWith("/subscribe");
-
-    const isOnboardingPage = pathname.startsWith("/onboarding");
-
-    // Check if user is a student (default role for regular users)
-    const userRole = user.role?.toLowerCase() || "";
-    const isSuperAdmin = userRole.includes("super") || userRole === "superadmin" || userRole === "super_admin" || userRole === "admin";
-    const isSchoolAdmin = userRole.includes("school") || userRole === "schooladmin" || userRole === "school_admin";
-    const isCounselor = userRole === "counselor";
-    const isParent = userRole === "parent";
-    const isStudent =
-      !userRole ||
-      userRole === "student" ||
-      userRole === "user" ||
-      (!userRole.includes("admin") && !userRole.includes("coach") && !isSchoolAdmin && !isSuperAdmin && !isCounselor && !isParent);
 
     // Super Admin Route Protection
     // Redirect super admins to admin dashboard if they try to access student dashboard
@@ -123,9 +129,6 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
       router.push("/dashboard");
       return;
     }
-
-    // Fetch subscription status dynamically using React Query hook
-    const { data: subscriptionStatus, isLoading: statusLoading } = useSubscriptionStatus();
 
     // Enforce subscription for students
     if (
@@ -204,6 +207,8 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
     pathname,
     router,
     isInitializing,
+    subscriptionStatus,
+    statusLoading,
   ]);
 
   // Show loading spinner while initializing
