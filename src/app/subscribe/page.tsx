@@ -65,7 +65,7 @@ export default function SubscribePage() {
   }, [searchParams]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 relative">
+    <div className="h-[100dvh] overflow-y-auto w-full bg-gradient-to-br from-indigo-50 via-white to-purple-50 relative">
       {/* Background Decor */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
         <div className="absolute -top-[20%] -right-[10%] w-[50%] h-[50%] rounded-full bg-purple-200/20 blur-3xl animate-pulse" />
