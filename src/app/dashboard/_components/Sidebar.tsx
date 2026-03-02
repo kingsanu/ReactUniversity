@@ -22,8 +22,21 @@ import {
   Target,
   Users,
   Receipt,
+  MoreVertical,
+  Globe,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuPortal,
+  DropdownMenuSubContent,
+} from "@/components/ui/dropdown-menu";
 
 // Icon mapping
 const IconMap: Record<string, any> = {
@@ -53,7 +66,7 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
   const { logout, user } = useGlobalStore();
   const router = useRouter();
   const pathname = usePathname();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   // Select sidebar data based on current path, then role
   const role = user.role?.toLowerCase();
@@ -130,7 +143,7 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
         </div>
 
         {/* Navigation */}
-        <nav 
+        <nav
           className="flex-1 px-4 py-6 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent"
           aria-label={t("accessibility.navigation")}
         >
@@ -206,7 +219,7 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
 
                 {/* Submenu */}
                 {hasSubmenu && isExpanded && (
-                  <div 
+                  <div
                     id={`submenu-${item.id}`}
                     className="ml-4 mt-1 pl-4 border-l border-slate-800 space-y-1"
                     role="group"
@@ -238,32 +251,63 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
         </nav>
 
         {/* User Profile & Logout */}
-        <div className="p-4 border-t border-slate-800/50 bg-slate-950/30">
-          <div className="flex items-center gap-3 mb-4 px-2">
-            <Avatar className="h-10 w-10 border border-slate-700">
-              <AvatarImage src={user?.avatar || user?.image || undefined} alt="" />
-              <AvatarFallback className="bg-slate-800 text-slate-300">
-                {user?.name?.charAt(0).toUpperCase() || "U"}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">
-                {user?.name || "User"}
-              </p>
-              <p className="text-xs text-slate-500 truncate capitalize">
-                {user?.role || "Member"}
-              </p>
-            </div>
-          </div>
+        <div className="p-4 border-t border-slate-800/50 bg-slate-950/30 overflow-visible relative">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div className="flex items-center gap-3 px-2 w-full justify-between cursor-pointer group hover:bg-slate-800/50 p-2 rounded-xl transition-colors outline-none focus:ring-2 focus:ring-blue-500">
+                <div className="flex items-center gap-3 min-w-0">
+                  <Avatar className="h-10 w-10 border border-slate-700">
+                    <AvatarImage src={user?.avatar || user?.image || undefined} alt="" />
+                    <AvatarFallback className="bg-slate-800 text-slate-300">
+                      {user?.name?.charAt(0).toUpperCase() || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0 text-left">
+                    <p className="text-sm font-medium text-white truncate">
+                      {user?.name || "User"}
+                    </p>
+                    <p className="text-xs text-slate-500 truncate capitalize">
+                      {user?.role || "Member"}
+                    </p>
+                  </div>
+                </div>
+                <button className="text-slate-400 group-hover:text-white transition-colors">
+                  <MoreVertical className="w-5 h-5" />
+                </button>
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" side="top" className="w-60 bg-slate-900 border-slate-800 text-slate-200 mb-2">
+              <DropdownMenuItem onClick={() => router.push('/dashboard/profile')} className="hover:bg-slate-800 focus:bg-slate-800 cursor-pointer">
+                <User className="mr-2 h-4 w-4 text-blue-400" />
+                <span>{t("nav.viewProfile", "View Profile")}</span>
+              </DropdownMenuItem>
 
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="flex items-center justify-center w-full px-4 py-2.5 text-sm font-medium text-red-400 hover:text-white hover:bg-red-500/10 rounded-xl transition-all duration-200 border border-transparent hover:border-red-500/20 focus:outline-none focus:ring-2 focus:ring-red-500"
-          >
-            <LogOut className="w-4 h-4 mr-2" aria-hidden="true" />
-            <span>{t("common.logout")}</span>
-          </button>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className="hover:bg-slate-800 focus:bg-slate-800 cursor-pointer">
+                  <Globe className="mr-2 h-4 w-4 text-emerald-400" />
+                  <span>{t("language.switchLanguage", "Language")}</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent className="bg-slate-900 border-slate-800 text-slate-200 ml-2">
+                    <DropdownMenuItem onClick={() => i18n.changeLanguage('en')} className="hover:bg-slate-800 focus:bg-slate-800 cursor-pointer">
+                      <span className="mr-2">🇺🇸</span> English
+                      {i18n.language === 'en' && <span className="ml-auto text-blue-400">✓</span>}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => i18n.changeLanguage('es')} className="hover:bg-slate-800 focus:bg-slate-800 cursor-pointer">
+                      <span className="mr-2">🇪🇸</span> Español
+                      {i18n.language === 'es' && <span className="ml-auto text-blue-400">✓</span>}
+                    </DropdownMenuItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
+
+              <DropdownMenuSeparator className="bg-slate-800" />
+              <DropdownMenuItem onClick={handleLogout} className="text-red-400 hover:text-red-300 hover:bg-red-500/10 focus:text-red-300 focus:bg-red-500/10 cursor-pointer">
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>{t("common.logout", "Logout")}</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </aside>
     </>
