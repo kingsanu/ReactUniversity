@@ -138,12 +138,8 @@ export async function getStudent(studentId: string): Promise<Student> {
 
 export async function inviteStudent(
   data: StudentInvitePayload
-): Promise<{ success: boolean; totalRequested: number; successCount: number; failedCount: number; results: any[] }> {
-  // The API expects { students: [ ... ] } even for a single invite
-  const payload = {
-    students: [data]
-  };
-
+): Promise<{ success: boolean; message: string; student?: any }> {
+  const payload = { students: [data] };
   const response = await fetch(
     buildUrl("/api/v1/school-admin/students/invite"),
     {
@@ -155,17 +151,21 @@ export async function inviteStudent(
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || "Failed to invite student");
+    throw new Error(errorData.message || errorData.error?.message || "Failed to invite student");
   }
 
-  return response.json();
+  const result = await response.json();
+  if (!result.success) {
+    throw new Error(result.message || result.error?.message || "Failed to invite student");
+  }
+  return result;
 }
 
 export async function bulkInviteStudents(
   data: BulkStudentInvitePayload
 ): Promise<{ success: boolean; invited: number; failed: number; results: any[] }> {
   const response = await fetch(
-    buildUrl("/api/v1/school-admin/students/invite"),
+    buildUrl("/api/v1/school-admin/students/bulk-invite"),
     {
       method: "POST",
       headers: getHeaders(),
@@ -175,16 +175,20 @@ export async function bulkInviteStudents(
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || "Failed to bulk invite students");
+    throw new Error(errorData.message || errorData.error?.message || "Failed to bulk invite students");
   }
 
   const result = await response.json();
 
+  if (!result.success && !result.results) {
+    throw new Error(result.message || result.error?.message || "Failed to bulk invite students");
+  }
+
   // Map API response to expected return type
   return {
     success: result.success,
-    invited: result.successCount || 0,
-    failed: result.failedCount || 0,
+    invited: result.invited !== undefined ? result.invited : (result.successCount || 0),
+    failed: result.failed !== undefined ? result.failed : (result.failedCount || 0),
     results: result.results || []
   };
 }

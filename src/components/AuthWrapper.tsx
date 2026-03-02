@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { LoadingSpinner } from "./LoadingSpinner";
+import { useSubscriptionStatus } from "@/hooks/useSubscription";
 import { useTokenMonitor } from "@/hooks/useTokenMonitor";
 
 interface AuthWrapperProps {
@@ -123,30 +124,37 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
       return;
     }
 
+    // Fetch subscription status dynamically using React Query hook
+    const { data: subscriptionStatus, isLoading: statusLoading } = useSubscriptionStatus();
+
     // Enforce subscription for students
-    // Note: subscriptionStatus can be null/undefined for new users or 'none' if never subscribed
     if (
       user.isAuthenticated &&
       isProtectedRoute &&
       isStudent &&
       !isSubscriptionPage &&
-      !isOnboardingPage &&
-      (!user.subscriptionStatus ||
-        user.subscriptionStatus === "none" ||
-        user.subscriptionStatus === "canceled" ||
-        user.subscriptionStatus === "past_due")
+      !isOnboardingPage
     ) {
-      // New users and users without active subscriptions must subscribe
-      console.log(
-        "🔒 Subscription required. Redirecting to subscription page...",
-        {
-          subscriptionStatus: user.subscriptionStatus,
-          role: user.role,
-          pathname,
-        }
-      );
-      router.push("/subscribe");
-      return;
+      if (statusLoading) {
+        // Wait for status to load before redirecting
+        return;
+      }
+
+      const missingOrInactive = !subscriptionStatus?.hasActiveSubscription;
+
+      if (missingOrInactive) {
+        // New users and users without active subscriptions must subscribe
+        console.log(
+          "🔒 Subscription required or expired. Redirecting to subscription page...",
+          {
+            subscriptionStatus,
+            role: user.role,
+            pathname,
+          }
+        );
+        router.push("/subscribe");
+        return;
+      }
     }
 
     // Coach Route Protection
