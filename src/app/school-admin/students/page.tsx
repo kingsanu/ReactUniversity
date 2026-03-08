@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -52,6 +53,8 @@ import {
   UserCheck,
   Filter,
   Beaker,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -59,6 +62,7 @@ import { useStudents, useResendStudentInvite, useRemoveStudent } from "@/hooks/u
 import { StudentInviteForm } from "@/components/school-admin/StudentInviteForm";
 import { StudentStatus } from "@/types/student";
 import { TableRowsSkeleton } from "@/components/skeletons/TableSkeleton";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function StudentsPage() {
   const { t } = useTranslation();
@@ -106,6 +110,11 @@ export default function StudentsPage() {
       await removeStudent.mutateAsync(deleteId);
       toast.success(t("schoolAdmin.students.removeSuccess", "Student removed successfully"));
       setIsDeleteOpen(false);
+      if (students?.data.length === 1 && page > 1) {
+        setPage(page - 1);
+      } else {
+        refetch();
+      }
     } catch (error) {
       toast.error(t("schoolAdmin.students.removeError", "Failed to remove student"));
     }
@@ -117,23 +126,46 @@ export default function StudentsPage() {
 
   const getStatusBadge = (status: StudentStatus) => {
     const styles = {
-      active: "bg-emerald-100 text-emerald-700",
-      pending: "bg-amber-100 text-amber-700",
-      accepted: "bg-blue-100 text-blue-700",
-      inactive: "bg-gray-100 text-gray-700",
+      active: { bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200" },
+      pending: { bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200" },
+      accepted: { bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-200" },
+      inactive: { bg: "bg-gray-50", text: "text-gray-700", border: "border-gray-200" },
     };
     return styles[status] || styles.inactive;
   };
 
+  const getInitials = (name: string) => {
+    if (!name) return "ST";
+    return name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
+  };
+
+  // Pagination helper
+  const getPageNumbers = () => {
+    if (!students) return [];
+    const totalPages = students.totalPages;
+    const current = page;
+    const pages = [];
+
+    for (let i = 1; i <= totalPages; i++) {
+      if (i === 1 || i === totalPages || (i >= current - 1 && i <= current + 1)) {
+        pages.push(i);
+      } else if (i === current - 2 || i === current + 2) {
+        pages.push("...");
+      }
+    }
+
+    return pages.filter((item, index) => item !== "..." || pages[index - 1] !== "...");
+  };
+
   const stats = [
-    { label: t("schoolAdmin.stats.totalStudents", "Total"), value: students?.total || 0, icon: Users, color: "text-teal-600", bg: "bg-teal-50" },
-    { label: t("schoolAdmin.students.status.pending", "Pending"), value: students?.data?.filter(s => s.status === 'pending').length || 0, icon: Clock, color: "text-amber-600", bg: "bg-amber-50" },
-    { label: t("schoolAdmin.students.status.active", "Active"), value: students?.data?.filter(s => s.status === 'active').length || 0, icon: UserCheck, color: "text-emerald-600", bg: "bg-emerald-50" },
+    { label: t("schoolAdmin.stats.totalStudents", "Total Students"), value: students?.total || 0, icon: Users, color: "text-indigo-600", bg: "bg-indigo-50", gradient: "from-indigo-500 to-violet-600" },
+    { label: t("schoolAdmin.students.status.pending", "Pending Invites"), value: students?.data?.filter((s: any) => s.status === 'pending').length || 0, icon: Clock, color: "text-amber-600", bg: "bg-amber-50", gradient: "from-amber-400 to-orange-500" },
+    { label: t("schoolAdmin.students.status.active", "Active Students"), value: students?.data?.filter((s: any) => s.status === 'active').length || 0, icon: UserCheck, color: "text-emerald-600", bg: "bg-emerald-50", gradient: "from-emerald-400 to-teal-500" },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6 md:p-8 space-y-10 font-sans">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen space-y-8 max-w-7xl mx-auto pb-12">
+      <div className="space-y-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -141,20 +173,20 @@ export default function StudentsPage() {
           className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6"
         >
           <div className="space-y-1">
-            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 leading-tight">
-              {t("schoolAdmin.students.title", "Students")}
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 leading-tight">
+              {t("schoolAdmin.students.title", "Student Roster")}
             </h1>
             <p className="text-lg text-gray-500 font-medium max-w-2xl leading-relaxed">
-              {t("schoolAdmin.students.subtitle", "Manage and engage students in your school platform.")}
+              {t("schoolAdmin.students.subtitle", "Manage all students, track their progress, and send invitations.")}
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 shrink-0">
             {process.env.NODE_ENV === "development" && (
-              <div className="flex items-center gap-3 bg-white/60 backdrop-blur-md pl-4 pr-5 py-3 rounded-full border border-gray-200 shadow-sm shrink-0 hover:shadow-md transition-all duration-300">
+              <div className="flex items-center gap-3 bg-white/60 backdrop-blur-md pl-4 pr-5 py-2.5 rounded-full border border-gray-200/50 shadow-sm shrink-0 hover:shadow-md transition-all duration-300">
                 <div className={cn(
                   "flex items-center justify-center p-2 rounded-full transition-colors duration-300",
-                  useMockData ? "bg-amber-100 text-amber-600" : "bg-teal-100 text-teal-600"
+                  useMockData ? "bg-amber-100 text-amber-600" : "bg-indigo-100 text-indigo-600"
                 )}>
                   <Beaker className="w-4 h-4" />
                 </div>
@@ -178,24 +210,24 @@ export default function StudentsPage() {
             )}
             <Dialog open={isInviteOpen} onOpenChange={setIsInviteOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-gray-900 text-white hover:bg-black shadow-xl hover:shadow-2xl transition-all duration-300 rounded-full px-6 h-12 text-sm font-semibold tracking-wide">
+                <Button className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all duration-300 rounded-xl px-6 h-12 text-sm font-bold tracking-wide border-0">
                   <UserPlus className="mr-2 h-4 w-4" />
                   {t("schoolAdmin.students.inviteButton", "Invite Student")}
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-xl rounded-2xl p-0 overflow-hidden gap-0">
-                <DialogHeader className="p-6 bg-gradient-to-r from-teal-50 to-cyan-50 border-b border-gray-100">
-                  <DialogTitle className="text-xl flex items-center gap-2">
-                    <div className="p-2 bg-white rounded-lg border border-gray-100 shadow-sm">
-                      <UserPlus className="h-5 w-5 text-teal-600" />
+              <DialogContent className="sm:max-w-xl rounded-2xl p-0 overflow-hidden gap-0 border border-gray-200">
+                <DialogHeader className="p-6 bg-gradient-to-r from-indigo-50 to-violet-50 border-b border-indigo-100/50">
+                  <DialogTitle className="text-xl flex items-center gap-2 font-bold text-gray-900">
+                    <div className="p-2 bg-white rounded-xl shadow-sm border border-indigo-100">
+                      <UserPlus className="h-5 w-5 text-indigo-600" />
                     </div>
                     {t("schoolAdmin.students.inviteTitle", "Invite Students")}
                   </DialogTitle>
-                  <DialogDescription className="text-base pt-1">
-                    {t("schoolAdmin.students.inviteDescription", "Send invitations to students to join your school.")}
+                  <DialogDescription className="text-base text-gray-600 pt-1 font-medium">
+                    {t("schoolAdmin.students.inviteDescription", "Send invitations so students can join your school platform.")}
                   </DialogDescription>
                 </DialogHeader>
-                <div className="p-6">
+                <div className="p-6 bg-white">
                   <StudentInviteForm onSuccess={() => {
                     setIsInviteOpen(false);
                     refetch();
@@ -211,16 +243,19 @@ export default function StudentsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid grid-cols-3 gap-4"
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6"
         >
-          {stats.map((stat) => (
-            <div key={stat.label} className="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-4">
-              <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center", stat.bg)}>
-                <stat.icon className={cn("w-5 h-5", stat.color)} />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                <p className="text-sm text-gray-500">{stat.label}</p>
+          {stats.map((stat, i) => (
+            <div key={stat.label} className="relative overflow-hidden bg-white/60 backdrop-blur-xl border border-gray-200/50 shadow-lg shadow-gray-200/20 rounded-3xl p-6 group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className={`absolute -right-6 -top-6 w-32 h-32 rounded-full opacity-10 bg-gradient-to-br ${stat.gradient} group-hover:scale-150 transition-transform duration-700`} />
+              <div className="relative z-10 flex items-center gap-5">
+                <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm border border-white shrink-0", stat.bg)}>
+                  <stat.icon className={cn("w-7 h-7", stat.color)} />
+                </div>
+                <div>
+                  <p className="text-4xl font-black tracking-tight text-gray-900">{stat.value}</p>
+                  <p className="text-sm font-bold text-gray-500 uppercase tracking-wider mt-1">{stat.label}</p>
+                </div>
               </div>
             </div>
           ))}
@@ -231,15 +266,17 @@ export default function StudentsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="sticky top-4 z-20 bg-white/80 backdrop-blur-xl border border-gray-200/50 shadow-sm rounded-2xl p-2 flex flex-col md:flex-row justify-between items-center gap-4"
+          className="sticky top-4 z-20 bg-white/80 backdrop-blur-xl border border-gray-200/50 shadow-sm rounded-2xl p-3 flex flex-col md:flex-row justify-between items-center gap-4"
         >
           <div className="flex items-center gap-2 w-full md:w-auto">
             <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1); }}>
-              <SelectTrigger className="w-full md:w-[200px] h-11 bg-gray-50/50 border-transparent focus:bg-white focus:border-blue-500/20 focus:ring-4 focus:ring-blue-500/10 rounded-xl transition-all">
-                <Filter className="mr-2 h-4 w-4 text-gray-400" />
-                <SelectValue placeholder="Filter by status" />
+              <SelectTrigger className="w-full md:w-[200px] h-11 bg-white border-gray-200 focus:ring-4 focus:ring-indigo-500/10 rounded-xl transition-all font-semibold text-gray-700 shadow-sm">
+                <div className="flex items-center gap-2">
+                  <Filter className="h-4 w-4 text-gray-400" />
+                  <SelectValue placeholder="Filter by status" />
+                </div>
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="rounded-xl border-gray-200">
                 <SelectItem value="all">{t("schoolAdmin.students.allStatuses", "All Statuses")}</SelectItem>
                 <SelectItem value="active">{t("schoolAdmin.students.status.active", "Active")}</SelectItem>
                 <SelectItem value="pending">{t("schoolAdmin.students.status.pending", "Pending")}</SelectItem>
@@ -247,16 +284,16 @@ export default function StudentsPage() {
                 <SelectItem value="inactive">{t("schoolAdmin.students.status.inactive", "Inactive")}</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="outline" size="icon" className="h-11 w-11 rounded-xl" onClick={() => refetch()}>
-              <RefreshCw className="h-4 w-4" />
+            <Button variant="outline" size="icon" className="h-11 w-11 rounded-xl border-gray-200 bg-white shadow-sm hover:bg-gray-50 shrink-0" onClick={() => refetch()} title="Refresh Data">
+              <RefreshCw className="h-4 w-4 text-gray-500" />
             </Button>
           </div>
 
-          <div className="relative w-full md:w-80 group">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+          <div className="relative w-full md:w-96 group">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-indigo-500 transition-colors" />
             <Input
-              placeholder={t("schoolAdmin.students.searchPlaceholder", "Search students...")}
-              className="pl-10 h-11 bg-gray-50/50 border-transparent focus:bg-white focus:border-blue-500/20 focus:ring-4 focus:ring-blue-500/10 rounded-xl transition-all"
+              placeholder={t("schoolAdmin.students.searchPlaceholder", "Search students by name or email...")}
+              className="pl-11 h-11 bg-white border-gray-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 rounded-xl transition-all shadow-sm"
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -266,159 +303,204 @@ export default function StudentsPage() {
           </div>
         </motion.div>
 
-        {/* Table */}
+        {/* Premium Table Container */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden"
+          className="bg-white/80 backdrop-blur-xl border border-gray-200/50 rounded-3xl shadow-xl overflow-hidden flex flex-col min-h-[600px]"
         >
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-gray-50/50 hover:bg-gray-50/50 border-b border-gray-100">
-                <TableHead className="py-4 pl-6 font-semibold text-gray-900">{t("schoolAdmin.students.table.student", "Student")}</TableHead>
-                <TableHead className="font-semibold text-gray-900">{t("schoolAdmin.students.table.status", "Status")}</TableHead>
-                <TableHead className="font-semibold text-gray-900">{t("schoolAdmin.students.table.progress", "Progress")}</TableHead>
-                <TableHead className="font-semibold text-gray-900">{t("schoolAdmin.students.table.avgScore", "Avg. Score")}</TableHead>
-                <TableHead className="font-semibold text-gray-900">{t("schoolAdmin.students.table.lastActive", "Last Active")}</TableHead>
-                <TableHead className="pr-6 text-right font-semibold text-gray-900">{t("schoolAdmin.students.table.actions", "Actions")}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableRowsSkeleton columnCount={6} rowCount={5} showActions />
-              ) : !students?.data || students.data.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="h-32 text-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <Users className="w-12 h-12 text-gray-300" />
-                      <p className="text-gray-500 font-medium">{t("schoolAdmin.students.noStudents", "No students found")}</p>
-                      <p className="text-gray-400 text-sm">{t("schoolAdmin.students.noStudentsDesc", "Invite students to get started")}</p>
-                    </div>
-                  </TableCell>
+          <div className="overflow-x-auto flex-1">
+            <Table>
+              <TableHeader className="bg-transparent border-b border-gray-100">
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="py-5 pl-6 font-semibold text-gray-700">{t("schoolAdmin.students.table.student", "Student Profile")}</TableHead>
+                  <TableHead className="font-semibold text-gray-700 w-32">{t("schoolAdmin.students.table.status", "Status")}</TableHead>
+                  <TableHead className="font-semibold text-gray-700 w-48">{t("schoolAdmin.students.table.progress", "Progress")}</TableHead>
+                  <TableHead className="font-semibold text-gray-700 w-32">{t("schoolAdmin.students.table.avgScore", "Avg. Score")}</TableHead>
+                  <TableHead className="font-semibold text-gray-700 w-32">{t("schoolAdmin.students.table.lastActive", "Last Active")}</TableHead>
+                  <TableHead className="pr-6 text-right font-semibold text-gray-700 w-24">{t("schoolAdmin.students.table.actions", "Actions")}</TableHead>
                 </TableRow>
-              ) : (
-                students.data.map((student) => (
-                  <TableRow key={student.id} className="hover:bg-gray-50/50 transition-colors">
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center text-white font-medium">
-                          {student.name.charAt(0).toUpperCase()}
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  <TableRowsSkeleton columnCount={6} rowCount={5} showActions />
+                ) : !students?.data || students.data.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-64 text-center border-b-0">
+                      <div className="flex flex-col items-center justify-center space-y-3">
+                        <div className="p-4 bg-gray-50 rounded-full mb-2 border border-gray-100 shadow-inner">
+                          <Users className="w-10 h-10 text-gray-300" />
                         </div>
-                        <div>
-                          <p className="font-medium text-gray-900">{student.name}</p>
-                          <p className="text-sm text-gray-500">{student.email}</p>
-                        </div>
+                        <p className="text-xl font-bold text-gray-900">{t("schoolAdmin.students.noStudents", "No students found")}</p>
+                        <p className="text-gray-500 font-medium max-w-sm mx-auto">
+                          {search || statusFilter !== "all"
+                            ? "Try adjusting your search criteria or status filters."
+                            : t("schoolAdmin.students.noStudentsDesc", "Start by inviting students to join your school platform.")}
+                        </p>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className={cn("px-2.5 py-1 rounded-full text-xs font-medium", getStatusBadge(student.status))}>
-                        {t(`schoolAdmin.students.status.${student.status}`, student.status.charAt(0).toUpperCase() + student.status.slice(1))}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <div className="w-24 bg-gray-100 rounded-full h-2">
-                          <div
-                            className="bg-teal-500 h-2 rounded-full"
-                            style={{ width: `${student.progress}%` }}
-                          />
-                        </div>
-                        <span className="text-xs text-gray-500">{student.progress}%</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className="font-medium">{student.averageScore.toFixed(1)}%</span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm text-gray-500">
-                        {student.lastActive ? new Date(student.lastActive).toLocaleDateString() : t("schoolAdmin.students.neverActive", "Never")}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleViewDetails(student.id)}>
-                            <Eye className="mr-2 h-4 w-4" />
-                            {t("schoolAdmin.students.actions.viewDetails", "View Details")}
-                          </DropdownMenuItem>
-                          {student.status === 'pending' && (
-                            <DropdownMenuItem onClick={() => handleResendInvite(student.id, student.name)}>
-                              <Mail className="mr-2 h-4 w-4" />
-                              {t("schoolAdmin.students.actions.resendInvite", "Resend Invite")}
-                            </DropdownMenuItem>
-                          )}
-                          <DropdownMenuItem
-                            className="text-red-600 w-full cursor-pointer"
-                            onSelect={(e) => {
-                              e.preventDefault();
-                              confirmRemoveStudent(student.id, student.name);
-                            }}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            {t("schoolAdmin.students.actions.removeStudent", "Remove Student")}
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : (
+                  students.data.map((student: any) => {
+                    const statusStyles = getStatusBadge(student.status as StudentStatus);
+                    return (
+                      <TableRow key={student.id} className="group hover:bg-indigo-50/30 transition-colors border-b border-gray-50 cursor-default">
+                        <TableCell className="pl-6 py-4">
+                          <div className="flex items-center gap-4">
+                            <Avatar className="h-10 w-10 ring-2 ring-white shadow-sm shrink-0">
+                              <AvatarFallback className="bg-gradient-to-br from-indigo-100 to-violet-100 text-indigo-700 font-bold border border-indigo-200">
+                                {getInitials(student.name)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="min-w-0">
+                              <p className="font-bold text-gray-900 text-base truncate">{student.name}</p>
+                              <p className="text-xs text-gray-500 font-medium truncate">{student.email}</p>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge className={`${statusStyles.bg} ${statusStyles.text} ${statusStyles.border} shadow-none font-bold capitalize px-2.5 py-0.5 border`}>
+                            {t(`schoolAdmin.students.status.${student.status}`, student.status.charAt(0).toUpperCase() + student.status.slice(1))}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <div className="flex-1 max-w-[120px] bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                              <div
+                                className="bg-indigo-500 h-full rounded-full transition-all duration-500 ease-out"
+                                style={{ width: `${student.progress}%` }}
+                              />
+                            </div>
+                            <span className="text-xs font-bold text-gray-600">{student.progress}%</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="secondary" className="bg-gray-100 text-gray-700 font-bold border-none shadow-none">
+                            {student.averageScore.toFixed(1)}%
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-sm text-gray-600 font-medium">
+                            {student.lastActive ? new Date(student.lastActive).toLocaleDateString() : <span className="text-gray-400 italic">{t("schoolAdmin.students.neverActive", "Never")}</span>}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-right pr-6">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 focus-visible:ring-1 focus-visible:ring-indigo-500">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="rounded-xl border border-gray-200 shadow-xl overflow-hidden w-48">
+                              <DropdownMenuItem onClick={() => handleViewDetails(student.id)} className="cursor-pointer py-2 focus:bg-indigo-50 text-gray-700 font-medium">
+                                <Eye className="mr-2 h-4 w-4 text-indigo-500" />
+                                {t("schoolAdmin.students.actions.viewDetails", "Examine Profile")}
+                              </DropdownMenuItem>
+                              {student.status === 'pending' && (
+                                <DropdownMenuItem onClick={() => handleResendInvite(student.id, student.name)} className="cursor-pointer py-2 focus:bg-amber-50 text-gray-700 font-medium">
+                                  <Mail className="mr-2 h-4 w-4 text-amber-500" />
+                                  {t("schoolAdmin.students.actions.resendInvite", "Resend Invite")}
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuItem
+                                className="text-red-600 focus:text-red-700 focus:bg-red-50 cursor-pointer py-2 font-medium"
+                                onSelect={(e) => {
+                                  e.preventDefault();
+                                  confirmRemoveStudent(student.id, student.name);
+                                }}
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                {t("schoolAdmin.students.actions.removeStudent", "Expel Student")}
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
+          </div>
 
-          {/* Pagination */}
+          {/* Premium Pagination Footer */}
           {students && students.totalPages > 1 && (
-            <div className="flex items-center justify-between p-4 border-t border-gray-100">
-              <p className="text-sm text-gray-500">
-                Showing {((page - 1) * limit) + 1} to {Math.min(page * limit, students.total)} of {students.total}
-              </p>
-              <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row items-center justify-between border-t border-gray-100 bg-gray-50/50 px-6 py-4 mt-auto gap-4">
+              <div className="text-sm text-gray-500 text-center sm:text-left">
+                Displaying <span className="font-bold text-gray-900">{((page - 1) * limit) + (students.data.length > 0 ? 1 : 0)}</span> – <span className="font-bold text-gray-900">{Math.min(page * limit, students.total)}</span> of <span className="font-bold text-gray-900">{students.total}</span> students
+              </div>
+              <div className="flex items-center gap-1.5 w-full justify-center sm:w-auto sm:justify-end">
                 <Button
                   variant="outline"
-                  size="sm"
+                  size="icon"
+                  className="h-9 w-9 rounded-xl border-gray-200 bg-white hover:bg-gray-50 shadow-sm"
+                  disabled={page <= 1 || isLoading}
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page === 1 || isLoading}
                 >
-                  {t("common.previous", "Previous")}
+                  <ChevronLeft className="h-4 w-4 text-gray-600" />
                 </Button>
-                <span className="text-sm text-gray-500">
-                  {t("common.page", "Page")} {page} {t("common.of", "of")} {students.totalPages}
-                </span>
+
+                {getPageNumbers().map((pageNum, idx) => (
+                  pageNum === "..." ? (
+                    <span key={`dots-${idx}`} className="px-3 text-gray-400 font-medium">...</span>
+                  ) : (
+                    <Button
+                      key={`page-${pageNum}`}
+                      variant={page === pageNum ? "default" : "outline"}
+                      size="sm"
+                      className={`h-9 w-9 rounded-xl font-bold shadow-sm ${page === pageNum ? 'bg-indigo-600 hover:bg-indigo-700 text-white border-transparent' : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+                      onClick={() => setPage(pageNum as number)}
+                      disabled={isLoading}
+                    >
+                      {pageNum}
+                    </Button>
+                  )
+                ))}
+
                 <Button
                   variant="outline"
-                  size="sm"
-                  onClick={() => setPage((p) => p + 1)}
+                  size="icon"
+                  className="h-9 w-9 rounded-xl border-gray-200 bg-white hover:bg-gray-50 shadow-sm"
                   disabled={page >= students.totalPages || isLoading}
+                  onClick={() => setPage((p) => Math.min(students.totalPages, p + 1))}
                 >
-                  {t("common.next", "Next")}
+                  <ChevronRight className="h-4 w-4 text-gray-600" />
                 </Button>
               </div>
             </div>
           )}
         </motion.div>
 
+        {/* Delete Modal */}
         <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{t("schoolAdmin.students.deleteTitle", "Delete Student")}</DialogTitle>
-              <DialogDescription>
-                {t("schoolAdmin.students.deleteConfirm", "Are you sure you want to delete")} <span className="font-semibold text-gray-900">{deleteName}</span>? {t("schoolAdmin.students.deleteWarning", "This action cannot be undone.")}
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
+          <DialogContent className="sm:max-w-md rounded-2xl p-0 overflow-hidden border-red-100">
+            <div className="p-6 bg-red-50 flex items-start gap-4 border-b border-red-100">
+              <div className="p-3 bg-white rounded-full shadow-sm">
+                <Trash2 className="h-6 w-6 text-red-500" />
+              </div>
+              <div>
+                <DialogTitle className="text-xl font-bold text-red-900">{t("schoolAdmin.students.deleteTitle", "Expel Student")}</DialogTitle>
+                <DialogDescription className="text-red-700/80 mt-1 font-medium">
+                  {t("schoolAdmin.students.deleteWarning", "This action is permanent and cannot be reversed.")}
+                </DialogDescription>
+              </div>
+            </div>
+            <div className="p-6 bg-white space-y-4">
+              <p className="text-gray-700">
+                Are you absolutely sure you want to completely remove
+                <span className="font-bold text-gray-900 mx-1">{deleteName}</span>
+                from the institution? All of their records, courses, and data will be permanently wiped.
+              </p>
+            </div>
+            <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
               <DialogClose asChild>
-                <Button variant="outline">{t("common.cancel", "Cancel")}</Button>
+                <Button variant="outline" className="rounded-xl font-semibold border-gray-200 bg-white hover:bg-gray-100">{t("common.cancel", "Cancel")}</Button>
               </DialogClose>
-              <Button variant="destructive" onClick={handleRemoveStudent}>
-                {t("common.delete", "Delete")}
+              <Button variant="destructive" onClick={handleRemoveStudent} className="rounded-xl font-bold bg-red-600 hover:bg-red-700 shadow-sm shadow-red-500/20">
+                {t("common.delete", "Yes, Expel Student")}
               </Button>
-            </DialogFooter>
+            </div>
           </DialogContent>
         </Dialog>
       </div>

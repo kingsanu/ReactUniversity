@@ -104,6 +104,15 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
       }
     }
 
+    // Counselor Route Protection
+    // Redirect counselors away from student dashboard to their own dashboard
+    if (user.isAuthenticated && isCounselor) {
+      if (pathname.startsWith("/dashboard")) {
+        router.push("/counselor");
+        return;
+      }
+    }
+
     // Redirect students away from admin routes
     if (user.isAuthenticated && !isSchoolAdmin && !isSuperAdmin && pathname.startsWith("/school-admin")) {
       router.push("/dashboard");

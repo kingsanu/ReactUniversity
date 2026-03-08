@@ -236,6 +236,18 @@ export async function removeStudent(
 export async function getAnalyticsOverview(
   period: "week" | "month" | "quarter" | "year" = "month"
 ): Promise<AnalyticsOverview> {
+  const defaultData: AnalyticsOverview = {
+    studentEngagement: { active: 0, inactive: 0, trend: 0 },
+    assessmentCompletion: {
+      completed: 0,
+      inProgress: 0,
+      notStarted: 0,
+      completionRate: 0,
+    },
+    averagePerformance: { score: 0, trend: 0 },
+    timeSpent: { averageHours: 0, totalHours: 0, trend: 0 },
+  };
+
   try {
     const response = await fetch(
       buildUrl("/api/v1/school-admin/analytics/overview", { period }),
@@ -243,20 +255,17 @@ export async function getAnalyticsOverview(
     );
     if (!response.ok) throw new Error("Failed to fetch analytics");
     const json = await response.json();
-    return json.data || json;
+    const data = json.data || json;
+
+    return {
+      studentEngagement: { ...defaultData.studentEngagement, ...(data.studentEngagement || {}) },
+      assessmentCompletion: { ...defaultData.assessmentCompletion, ...(data.assessmentCompletion || {}) },
+      averagePerformance: { ...defaultData.averagePerformance, ...(data.averagePerformance || {}) },
+      timeSpent: { ...defaultData.timeSpent, ...(data.timeSpent || {}) },
+    };
   } catch (error) {
     console.warn("getAnalyticsOverview API failed, returning mock data");
-    return {
-      studentEngagement: { active: 0, inactive: 0, trend: 0 },
-      assessmentCompletion: {
-        completed: 0,
-        inProgress: 0,
-        notStarted: 0,
-        completionRate: 0,
-      },
-      averagePerformance: { score: 0, trend: 0 },
-      timeSpent: { averageHours: 0, totalHours: 0, trend: 0 },
-    };
+    return defaultData;
   }
 }
 
@@ -264,6 +273,11 @@ export async function getPerformanceTrends(
   period: "week" | "month" | "quarter" | "year" = "month",
   metric: "score" | "completion" | "time" = "score"
 ): Promise<PerformanceTrendData> {
+  const defaultData: PerformanceTrendData = {
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+    datasets: [{ label: "Average Score", data: [0, 0, 0, 0, 0, 0] }],
+  };
+
   try {
     const response = await fetch(
       buildUrl("/api/v1/school-admin/analytics/performance-trends", { period, metric }),
@@ -271,13 +285,15 @@ export async function getPerformanceTrends(
     );
     if (!response.ok) throw new Error("Failed to fetch trends");
     const json = await response.json();
-    return json.data || json;
+    const data = json.data || json;
+
+    return {
+      labels: data.labels || defaultData.labels,
+      datasets: data.datasets || defaultData.datasets,
+    };
   } catch (error) {
     console.warn("getPerformanceTrends API failed, returning mock data");
-    return {
-      labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-      datasets: [{ label: "Average Score", data: [0, 0, 0, 0, 0, 0] }],
-    };
+    return defaultData;
   }
 }
 

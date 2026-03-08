@@ -189,9 +189,10 @@ export function InviteParentPanel({ studentId, studentName }: Props) {
     setOpen(false);
   };
 
-  const parentList = parents ?? [];
-  const acceptedCount = parentList.filter((p) => p.status === "accepted").length;
-  const pendingCount = parentList.filter((p) => p.status === "pending").length;
+  // Fallback if data is missing, or if the hook returns an object with a data array
+  const parentList: any[] = Array.isArray(parents) ? parents : ((parents as any)?.data ?? []);
+  const acceptedCount = parentList.filter((p: any) => p.status === "accepted").length;
+  const pendingCount = parentList.filter((p: any) => p.status === "pending").length;
 
   return (
     <div className="space-y-4">
@@ -314,7 +315,7 @@ export function InviteParentPanel({ studentId, studentName }: Props) {
             </p>
           </div>
         ) : (
-          parentList.map((parent) => (
+          parentList.map((parent: any) => (
             <ParentRow key={parent.id} parent={parent} studentId={studentId} />
           ))
         )}

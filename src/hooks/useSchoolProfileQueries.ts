@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getSchoolProfile,
   updateSchoolProfile,
@@ -84,6 +84,7 @@ export function useSchoolUsers(params?: {
     queryKey: schoolProfileKeys.userList(params),
     queryFn: () => getSchoolUsers(params),
     staleTime: 1000 * 60 * 5,
+    placeholderData: keepPreviousData,
   });
 }
 
@@ -163,6 +164,7 @@ export function useCounselorStudents(
     queryFn: () => getCounselorStudents(counselorId, params),
     enabled: !!counselorId,
     staleTime: 1000 * 60 * 5,
+    placeholderData: keepPreviousData,
   });
 }
 
@@ -178,6 +180,7 @@ export function useMyCounselorStudents(params?: {
     queryKey: schoolProfileKeys.myCounselorStudents(params),
     queryFn: () => getMyCounselorStudents(params),
     staleTime: 1000 * 60 * 2,
+    placeholderData: keepPreviousData,
   });
 }
 
