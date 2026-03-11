@@ -162,7 +162,7 @@ export default function SchoolAdminAlertsPage() {
     if (!alerts) return [];
     const totalPages = alerts.totalPages;
     const current = page;
-    const pages = [];
+    const pages: (number | string)[] = [];
 
     for (let i = 1; i <= totalPages; i++) {
       if (i === 1 || i === totalPages || (i >= current - 1 && i <= current + 1)) {

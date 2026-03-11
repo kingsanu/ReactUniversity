@@ -120,7 +120,7 @@ export default function UsersPage() {
     if (!data) return [];
     const totalPages = data.totalPages;
     const current = page;
-    const pages = [];
+    const pages: (number | string)[] = [];
 
     // Always show first, last, and pages around current
     for (let i = 1; i <= totalPages; i++) {

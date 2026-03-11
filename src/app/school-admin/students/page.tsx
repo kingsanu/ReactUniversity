@@ -144,7 +144,7 @@ export default function StudentsPage() {
     if (!students) return [];
     const totalPages = students.totalPages;
     const current = page;
-    const pages = [];
+    const pages: (number | string)[] = [];
 
     for (let i = 1; i <= totalPages; i++) {
       if (i === 1 || i === totalPages || (i >= current - 1 && i <= current + 1)) {
@@ -361,7 +361,7 @@ export default function StudentsPage() {
                         </TableCell>
                         <TableCell>
                           <Badge className={`${statusStyles.bg} ${statusStyles.text} ${statusStyles.border} shadow-none font-bold capitalize px-2.5 py-0.5 border`}>
-                            {t(`schoolAdmin.students.status.${student.status}`, student.status.charAt(0).toUpperCase() + student.status.slice(1))}
+                            {String(t(`schoolAdmin.students.status.${student.status}`, student.status.charAt(0).toUpperCase() + student.status.slice(1)))}
                           </Badge>
                         </TableCell>
                         <TableCell>

@@ -74,7 +74,7 @@ export default function CurriculumPage() {
     if (!courses) return [];
     const totalPages = courses.totalPages;
     const current = coursePage;
-    const pages = [];
+    const pages: (number | string)[] = [];
 
     for (let i = 1; i <= totalPages; i++) {
       if (i === 1 || i === totalPages || (i >= current - 1 && i <= current + 1)) {
