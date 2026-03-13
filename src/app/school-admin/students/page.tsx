@@ -139,6 +139,12 @@ export default function StudentsPage() {
     return name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
   };
 
+  const normalizePercent = (value: unknown) => {
+    const numericValue = typeof value === "number" ? value : Number(value);
+    if (!Number.isFinite(numericValue)) return 0;
+    return Math.min(100, Math.max(0, numericValue));
+  };
+
   // Pagination helper
   const getPageNumbers = () => {
     if (!students) return [];
@@ -318,16 +324,17 @@ export default function StudentsPage() {
                   <TableHead className="font-semibold text-gray-700 w-32">{t("schoolAdmin.students.table.status", "Status")}</TableHead>
                   <TableHead className="font-semibold text-gray-700 w-48">{t("schoolAdmin.students.table.progress", "Progress")}</TableHead>
                   <TableHead className="font-semibold text-gray-700 w-32">{t("schoolAdmin.students.table.avgScore", "Avg. Score")}</TableHead>
+                  <TableHead className="font-semibold text-gray-700 w-32">{t("schoolAdmin.students.table.requests", "Requests")}</TableHead>
                   <TableHead className="font-semibold text-gray-700 w-32">{t("schoolAdmin.students.table.lastActive", "Last Active")}</TableHead>
                   <TableHead className="pr-6 text-right font-semibold text-gray-700 w-24">{t("schoolAdmin.students.table.actions", "Actions")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
-                  <TableRowsSkeleton columnCount={6} rowCount={5} showActions />
+                  <TableRowsSkeleton columnCount={7} rowCount={5} showActions />
                 ) : !students?.data || students.data.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="h-64 text-center border-b-0">
+                    <TableCell colSpan={7} className="h-64 text-center border-b-0">
                       <div className="flex flex-col items-center justify-center space-y-3">
                         <div className="p-4 bg-gray-50 rounded-full mb-2 border border-gray-100 shadow-inner">
                           <Users className="w-10 h-10 text-gray-300" />
@@ -344,6 +351,9 @@ export default function StudentsPage() {
                 ) : (
                   students.data.map((student: any) => {
                     const statusStyles = getStatusBadge(student.status as StudentStatus);
+                    const progressValue = normalizePercent(student.progress);
+                    const averageScoreValue = normalizePercent(student.averageScore);
+
                     return (
                       <TableRow key={student.id} className="group hover:bg-indigo-50/30 transition-colors border-b border-gray-50 cursor-default">
                         <TableCell className="pl-6 py-4">
@@ -369,16 +379,31 @@ export default function StudentsPage() {
                             <div className="flex-1 max-w-[120px] bg-gray-100 rounded-full h-1.5 overflow-hidden">
                               <div
                                 className="bg-indigo-500 h-full rounded-full transition-all duration-500 ease-out"
-                                style={{ width: `${student.progress}%` }}
+                                style={{ width: `${progressValue}%` }}
                               />
                             </div>
-                            <span className="text-xs font-bold text-gray-600">{student.progress}%</span>
+                            <span className="text-xs font-bold text-gray-600">{Math.round(progressValue)}%</span>
                           </div>
                         </TableCell>
                         <TableCell>
                           <Badge variant="secondary" className="bg-gray-100 text-gray-700 font-bold border-none shadow-none">
-                            {student.averageScore.toFixed(1)}%
+                            {averageScoreValue.toFixed(1)}%
                           </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {student.pendingRequests && student.pendingRequests > 0 ? (
+                            <div className="flex items-center">
+                              <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 shadow-sm font-bold flex items-center gap-1.5 w-max">
+                                <span className="relative flex h-2 w-2">
+                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                  <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                                </span>
+                                {student.pendingRequests} New
+                              </Badge>
+                            </div>
+                          ) : (
+                            <span className="text-gray-400 text-sm font-medium pl-4">-</span>
+                          )}
                         </TableCell>
                         <TableCell>
                           <span className="text-sm text-gray-600 font-medium">
@@ -425,7 +450,7 @@ export default function StudentsPage() {
           </div>
 
           {/* Premium Pagination Footer */}
-          {students && students.totalPages > 1 && (
+          {students && students.total > 0 && (
             <div className="flex flex-col sm:flex-row items-center justify-between border-t border-gray-100 bg-gray-50/50 px-6 py-4 mt-auto gap-4">
               <div className="text-sm text-gray-500 text-center sm:text-left">
                 Displaying <span className="font-bold text-gray-900">{((page - 1) * limit) + (students.data.length > 0 ? 1 : 0)}</span> – <span className="font-bold text-gray-900">{Math.min(page * limit, students.total)}</span> of <span className="font-bold text-gray-900">{students.total}</span> students

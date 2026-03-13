@@ -14,6 +14,7 @@ import {
   Send,
   X,
   LoaderCircle,
+  Search,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ import {
 } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { useAvailableCourses } from "@/hooks/useCurriculumQueries";
 import type {
   StudentCoursePlanResponse,
   StudentCourseEnrollment,
@@ -214,20 +216,28 @@ export function SequenceBuilder({
     gradeLevel: number;
     semester: string;
   }>({ open: false, gradeLevel: 9, semester: "Fall" });
-  const [addForm, setAddForm] = useState<AddCourseForm>({
-    courseId: "",
-    courseCode: "",
-    courseName: "",
-    credits: 1,
+  const [addForm, setAddForm] = useState<{
+    selectedCourses: { id: string; code: string; name: string; credits: number }[];
+    gradeLevel: number;
+    semester: string;
+    studentNote: string;
+  }>({
+    selectedCourses: [],
     gradeLevel: 9,
     semester: "Fall",
     studentNote: "",
   });
+  const [courseSearch, setCourseSearch] = useState("");
+  const [prereqError, setPrereqError] = useState<string | null>(null);
   const [removeNoteDialog, setRemoveNoteDialog] = useState<{
     open: boolean;
     course: StudentCourseEnrollment | null;
     note: string;
   }>({ open: false, course: null, note: "" });
+
+  // Fetch available courses from the school catalog
+  const { data: catalogData } = useAvailableCourses({ limit: 200, search: courseSearch || undefined });
+  const availableCourses = catalogData?.data ?? [];
 
   const plan = planData?.plan;
   const gradProg = plan?.graduationProgress;
@@ -239,17 +249,44 @@ export function SequenceBuilder({
       .map((r) => r.courseId)
   );
 
-  // Group enrollments by gradeLevel+semester
+  // Group enrollments by gradeLevel+semester AND inject pending adds
   const getBySemester = (
     grade: number,
     semester: string
   ): StudentCourseEnrollment[] => {
-    if (!plan?.enrollments) return [];
-    return plan.enrollments.filter(
+    const semPrefix = semester.toLowerCase().substring(0, 3);
+    
+    // 1. Get official enrollments
+    const enrolled = plan?.enrollments?.filter(
       (e) =>
         e.gradeLevel === grade &&
-        e.semester.toLowerCase().startsWith(semester.toLowerCase())
-    );
+        e.semester.toLowerCase().startsWith(semPrefix)
+    ) ?? [];
+
+    // 2. Inject pending add requests for student mode
+    if (mode === "student" && pendingRequests) {
+      const pendingAdds = pendingRequests.filter(
+        (r) => 
+          r.action === "add" && 
+          r.status === "pending" && 
+          r.gradeLevel === grade && 
+          r.semester.toLowerCase().startsWith(semPrefix)
+      ).map(r => ({
+        id: `pending-${r.id}`,
+        courseId: r.courseId,
+        courseCode: r.courseCode,
+        courseName: r.courseName,
+        category: "", // pending requests don't strictly need a known category at display level, but typing requires it
+        credits: r.credits,
+        gradeLevel: r.gradeLevel,
+        semester: r.semester,
+        status: "pending_add" as const,
+        grade: undefined
+      }));
+      return [...enrolled, ...pendingAdds];
+    }
+    
+    return enrolled;
   };
 
   const toggleGrade = (g: number) =>
@@ -267,37 +304,68 @@ export function SequenceBuilder({
   // ── Handle add ────────────────────────────────────────────────────────────
   const openAddDialog = (gradeLevel: number, semester: string) => {
     setAddForm({
-      courseId: "",
-      courseCode: "",
-      courseName: "",
-      credits: 1,
+      selectedCourses: [],
       gradeLevel,
       semester,
       studentNote: "",
     });
+    setCourseSearch("");
+    setPrereqError(null);
     setAddDialog({ open: true, gradeLevel, semester });
   };
 
   const handleAdd = () => {
-    if (!addForm.courseName.trim()) return;
-    const payload = {
-      courseId: addForm.courseId.trim() || crypto.randomUUID(),
-      courseCode: addForm.courseCode.trim(),
-      courseName: addForm.courseName.trim(),
-      credits: addForm.credits,
-      gradeLevel: addForm.gradeLevel,
-      semester: addForm.semester,
-    };
-    if (mode === "counselor") {
-      onCounselorAdd?.(payload);
-    } else {
-      onSubmitRequest?.({
-        ...payload,
-        action: "add",
-        studentNote: addForm.studentNote.trim() || undefined,
-      });
+    if (addForm.selectedCourses.length === 0) return;
+
+    // Prerequisite checks for all selected courses
+    let hasError = false;
+    for (const course of addForm.selectedCourses) {
+       const selectedCourseData = availableCourses.find((c) => c.id === course.id);
+       if (selectedCourseData?.prerequisites?.length) {
+         const enrolledPrereqs = plan?.enrollments?.filter(
+            (e) =>
+              e.status === "completed" ||
+              (e.gradeLevel < addForm.gradeLevel) ||
+              (e.gradeLevel === addForm.gradeLevel && e.semester !== addForm.semester)
+         ).map(e => e.courseCode.toLowerCase()) || [];
+
+         const missing = selectedCourseData.prerequisites.filter(
+            (pr) => !enrolledPrereqs.includes(pr.toLowerCase())
+         );
+         
+         if (missing.length > 0) {
+            setPrereqError(`Prerequisites not met for ${course.name}: Requires ${missing.join(", ")}`);
+            hasError = true;
+            break;
+         }
+       }
     }
+
+    if (hasError) return;
+
+    // Submit all
+    addForm.selectedCourses.forEach(course => {
+      const payload = {
+        courseId: course.id,
+        courseCode: course.code,
+        courseName: course.name,
+        credits: course.credits,
+        gradeLevel: addForm.gradeLevel,
+        semester: addForm.semester,
+      };
+      if (mode === "counselor") {
+        onCounselorAdd?.(payload);
+      } else {
+        onSubmitRequest?.({
+          ...payload,
+          action: "add",
+          studentNote: addForm.studentNote.trim() || undefined,
+        });
+      }
+    });
+
     setAddDialog({ open: false, gradeLevel: 9, semester: "Fall" });
+    setPrereqError(null);
   };
 
   // ── Handle remove ─────────────────────────────────────────────────────────
@@ -456,7 +524,7 @@ export function SequenceBuilder({
       {mode === "student" && pendingRequests && pendingRequests.length > 0 && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 space-y-3">
           <h3 className="text-sm font-semibold text-amber-800">
-            Pending Change Requests ({pendingRequests.filter((r) => r.status === "pending").length})
+            Change Requests ({pendingRequests.length})
           </h3>
           <div className="space-y-2">
             {pendingRequests.map((req) => (
@@ -547,41 +615,75 @@ export function SequenceBuilder({
               </div>
             </div>
 
+            {/* Course search & selection */}
             <div className="space-y-1.5">
-              <Label className="text-xs">Course Name *</Label>
-              <Input
-                value={addForm.courseName}
-                onChange={(e) =>
-                  setAddForm((f) => ({ ...f, courseName: e.target.value }))
-                }
-                placeholder="e.g. Pre-Calculus"
-              />
+              <Label className="text-xs">Select a Course *</Label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                <Input
+                  value={courseSearch}
+                  onChange={(e) => setCourseSearch(e.target.value)}
+                  placeholder="Search available courses..."
+                  className="pl-9"
+                />
+              </div>
+              <div className="max-h-[200px] overflow-y-auto border rounded-lg divide-y">
+                {availableCourses.length === 0 ? (
+                  <p className="text-xs text-gray-400 text-center py-6">No courses found</p>
+                ) : (
+                  availableCourses.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => {
+                        setAddForm((f) => {
+                          const exists = f.selectedCourses.some(sc => sc.id === c.id);
+                          const updatedCourses = exists 
+                            ? f.selectedCourses.filter(sc => sc.id !== c.id)
+                            : [...f.selectedCourses, { id: c.id, code: c.code, name: c.name, credits: c.credits }];
+                          return { ...f, selectedCourses: updatedCourses };
+                        });
+                      }}
+                      className={cn(
+                        "w-full flex items-center justify-between px-3 py-2.5 text-left text-xs hover:bg-teal-50 transition-colors",
+                        addForm.selectedCourses.some(sc => sc.id === c.id) && "bg-teal-50 ring-1 ring-inset ring-teal-200"
+                      )}
+                    >
+                      <div className="min-w-0">
+                        <p className="font-medium text-gray-800 truncate">{c.name}</p>
+                        <p className="text-[10px] text-gray-500">{c.code} · {c.credits} cr · {c.department || "General"}</p>
+                      </div>
+                      {addForm.selectedCourses.some(sc => sc.id === c.id) && (
+                        <CheckCircle2 className="h-4 w-4 text-teal-600 flex-shrink-0 ml-2" />
+                      )}
+                    </button>
+                  ))
+                )}
+              </div>
+              {addForm.selectedCourses.length > 0 && (
+                <div className="text-xs text-teal-700 bg-teal-50 rounded-md px-3 py-2 mt-2 max-h-[80px] overflow-y-auto">
+                  <span className="font-semibold block mb-1">Selected ({addForm.selectedCourses.length}):</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {addForm.selectedCourses.map(sc => (
+                       <Badge key={sc.id} variant="secondary" className="bg-teal-100 text-teal-800 hover:bg-teal-200 border-none font-medium flex items-center gap-1">
+                          {sc.name}
+                          <X className="h-3 w-3 cursor-pointer" onClick={(e) => {
+                             e.stopPropagation();
+                             setAddForm(f => ({ ...f, selectedCourses: f.selectedCourses.filter(s => s.id !== sc.id) }));
+                          }}/>
+                       </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label className="text-xs">Course Code</Label>
-                <Input
-                  value={addForm.courseCode}
-                  onChange={(e) =>
-                    setAddForm((f) => ({ ...f, courseCode: e.target.value }))
-                  }
-                  placeholder="e.g. MATH-301"
-                />
+            {prereqError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 text-xs px-3 py-2 rounded-md flex items-start gap-2">
+                <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                <p>{prereqError}</p>
               </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs">Credits</Label>
-                <Input
-                  type="number"
-                  min={0.5}
-                  step={0.5}
-                  value={addForm.credits}
-                  onChange={(e) =>
-                    setAddForm((f) => ({ ...f, credits: Number(e.target.value) }))
-                  }
-                />
-              </div>
-            </div>
+            )}
 
             {mode === "student" && (
               <div className="space-y-1.5">
@@ -610,7 +712,7 @@ export function SequenceBuilder({
               size="sm"
               onClick={handleAdd}
               disabled={
-                !addForm.courseName.trim() ||
+                addForm.selectedCourses.length === 0 ||
                 isSubmitPending ||
                 isCounselorAddPending
               }

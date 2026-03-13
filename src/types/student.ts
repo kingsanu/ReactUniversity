@@ -12,6 +12,7 @@ export interface Student {
   completedAssessments: number;
   averageScore: number;
   progress: number;
+  pendingRequests?: number;
 }
 
 export interface StudentInvitePayload {

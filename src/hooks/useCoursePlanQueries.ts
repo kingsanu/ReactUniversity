@@ -179,7 +179,10 @@ export function useReviewChangeRequest(studentId: string) {
     }) => reviewChangeRequest(studentId, requestId, payload),
     onSuccess: (_, vars) => {
       qc.invalidateQueries({ queryKey: coursePlanKeys.studentRequests(studentId) });
+      qc.invalidateQueries({ queryKey: coursePlanKeys.studentRequests(studentId, "pending") });
       qc.invalidateQueries({ queryKey: coursePlanKeys.studentPlan(studentId) });
+      // Also refresh the counselor dashboard change-requests panel
+      qc.invalidateQueries({ queryKey: ["counselor", "dashboard-change-requests"] });
       toast.success(
         vars.payload.status === "approved" ? "Request approved" : "Request rejected"
       );

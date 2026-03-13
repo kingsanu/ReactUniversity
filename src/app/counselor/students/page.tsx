@@ -31,7 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Users, Search, Bell, GraduationCap, BookOpen, ChevronRight } from "lucide-react";
+import { Users, Search, Bell, GraduationCap, BookOpen, ChevronRight, ChevronLeft, MoreHorizontal } from "lucide-react";
 import { useMyCounselorStudents } from "@/hooks/useSchoolProfileQueries";
 
 const assessmentStatusColors: Record<string, string> = {
@@ -54,7 +54,7 @@ export default function CounselorStudentsPage() {
     sortBy,
     sortOrder: "asc",
     page,
-    limit: 20,
+    limit: 10,
   });
 
   if (isLoading) {
@@ -137,25 +137,25 @@ export default function CounselorStudentsPage() {
                     <TableCell>
                       <Badge variant="secondary">{s.gradeLevel}</Badge>
                     </TableCell>
-                    <TableCell className="font-semibold">{s.gpa.toFixed(2)}</TableCell>
+                    <TableCell className="font-semibold">{s.gpa ? s.gpa.toFixed(2) : "—"}</TableCell>
                     <TableCell>
                       <div className="space-y-1 min-w-[120px]">
-                        <Progress value={s.creditProgress.percentage} className="h-2" />
-                        <p className="text-xs text-gray-500">{s.creditProgress.earned}/{s.creditProgress.required}</p>
+                        <Progress value={s.creditProgress?.percentage ?? 0} className="h-2" />
+                        <p className="text-xs text-gray-500">{s.creditProgress?.earned ?? 0}/{s.creditProgress?.required ?? 120}</p>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-1 flex-wrap">
-                        {Object.entries(s.assessmentStatus).map(([type, assessStatus]) => (
-                          <Badge key={type} className={`text-xs ${assessmentStatusColors[assessStatus]}`}>
+                        {s.assessmentStatus ? Object.entries(s.assessmentStatus).map(([type, assessStatus]) => (
+                          <Badge key={type} className={`text-xs ${assessmentStatusColors[assessStatus as string] || "bg-gray-100 text-gray-600"}`}>
                             {type}
                           </Badge>
-                        ))}
+                        )) : <span className="text-gray-400">—</span>}
                       </div>
                     </TableCell>
                     <TableCell className="text-sm">{s.careerPath || "—"}</TableCell>
                     <TableCell>
-                      {s.alertCount > 0 ? (
+                      {s.alertCount && s.alertCount > 0 ? (
                         <Badge className="bg-red-100 text-red-700">
                           <Bell className="h-3 w-3 mr-1" />{s.alertCount}
                         </Badge>
@@ -164,7 +164,7 @@ export default function CounselorStudentsPage() {
                       )}
                     </TableCell>
                     <TableCell className="text-xs text-gray-500">
-                      {new Date(s.lastActive).toLocaleDateString()}
+                      {s.lastActive ? new Date(s.lastActive).toLocaleDateString() : (s.createdAt ? new Date(s.createdAt).toLocaleDateString() : "—")}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -181,11 +181,41 @@ export default function CounselorStudentsPage() {
         </Card>
       </motion.div>
 
-      {data && data.totalPages > 1 && (
-        <div className="flex justify-center gap-2">
-          <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>Previous</Button>
-          <span className="text-sm text-gray-500 self-center">{page} / {data.totalPages}</span>
-          <Button variant="outline" size="sm" disabled={page >= data.totalPages} onClick={() => setPage((p) => p + 1)}>Next</Button>
+      {/* Premium Pagination Footer */}
+      {data && data.total > 0 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between border-t border-gray-100 bg-gray-50/50 px-6 py-4 mt-auto gap-4 rounded-b-xl">
+          <div className="text-sm text-gray-500 text-center sm:text-left">
+            Displaying <span className="font-bold text-gray-900">{((page - 1) * 10) + (data.data.length > 0 ? 1 : 0)}</span> – <span className="font-bold text-gray-900">{Math.min(page * 10, data.total)}</span> of <span className="font-bold text-gray-900">{data.total}</span> students
+          </div>
+          <div className="flex items-center gap-1.5 w-full justify-center sm:w-auto sm:justify-end">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(page - 1)}
+              disabled={page === 1}
+              className="h-8 shadow-sm hover:shadow border-gray-200 text-gray-600 hover:text-indigo-600 hover:border-indigo-300 transition-all font-medium rounded-lg px-3"
+            >
+              <ChevronLeft className="h-4 w-4 mr-1" />
+              {t("common.pagination.previous", "Previous")}
+            </Button>
+            
+            <div className="flex items-center px-2">
+              <span className="text-sm font-semibold text-gray-900">{page}</span>
+              <span className="text-sm text-gray-400 mx-1.5">/</span>
+              <span className="text-sm text-gray-600 font-medium">{data.totalPages || 1}</span>
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(page + 1)}
+              disabled={page >= (data.totalPages || 1)}
+              className="h-8 shadow-sm hover:shadow border-gray-200 text-gray-600 hover:text-indigo-600 hover:border-indigo-300 transition-all font-medium rounded-lg px-3"
+            >
+              {t("common.pagination.next", "Next")}
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          </div>
         </div>
       )}
     </div>

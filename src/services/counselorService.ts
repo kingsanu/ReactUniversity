@@ -30,6 +30,14 @@ export async function getCounselorDashboard(): Promise<any> {
   return handleResponse<any>(res);
 }
 
+// Counselor dashboard: pending change requests across all assigned students
+export async function getCounselorDashboardChangeRequests(): Promise<any> {
+  const res = await fetch(`${API_BASE}/api/v1/counselor/dashboard/change-requests?limit=30`, {
+    headers: getHeaders(),
+  });
+  return handleResponse<any>(res);
+}
+
 // ============================================
 // Counselor Onboarding
 // ============================================

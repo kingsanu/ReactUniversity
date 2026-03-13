@@ -120,31 +120,31 @@ export default function AlertsPage() {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <Card className="border-0 shadow-md">
               <CardContent className="pt-6 text-center">
-                <p className="text-3xl font-bold text-gray-900">{summary.total}</p>
+                <p className="text-3xl font-bold text-gray-900">{summary.total ?? 0}</p>
                 <p className="text-sm text-gray-500">Total</p>
               </CardContent>
             </Card>
             <Card className="border-0 shadow-md">
               <CardContent className="pt-6 text-center">
-                <p className="text-3xl font-bold text-red-600">{summary.byPriority.critical ?? 0}</p>
+                <p className="text-3xl font-bold text-red-600">{summary.byPriority?.critical ?? 0}</p>
                 <p className="text-sm text-gray-500">Critical</p>
               </CardContent>
             </Card>
             <Card className="border-0 shadow-md">
               <CardContent className="pt-6 text-center">
-                <p className="text-3xl font-bold text-orange-600">{summary.byPriority.high ?? 0}</p>
+                <p className="text-3xl font-bold text-orange-600">{summary.byPriority?.high ?? 0}</p>
                 <p className="text-sm text-gray-500">High</p>
               </CardContent>
             </Card>
             <Card className="border-0 shadow-md">
               <CardContent className="pt-6 text-center">
-                <p className="text-3xl font-bold text-blue-600">{summary.newSinceLastLogin}</p>
+                <p className="text-3xl font-bold text-blue-600">{summary.newSinceLastLogin ?? 0}</p>
                 <p className="text-sm text-gray-500">New</p>
               </CardContent>
             </Card>
             <Card className="border-0 shadow-md">
               <CardContent className="pt-6 text-center">
-                <p className="text-3xl font-bold text-green-600">{summary.byPriority.low ?? 0}</p>
+                <p className="text-3xl font-bold text-green-600">{summary.byPriority?.low ?? 0}</p>
                 <p className="text-sm text-gray-500">Low</p>
               </CardContent>
             </Card>

@@ -7,6 +7,7 @@ import {
   getFrameworkCourses,
   updateFrameworkCourse,
   getSchoolCourses,
+  getAvailableCourses,
   createSchoolCourse,
   updateSchoolCourse,
   deleteSchoolCourse,
@@ -38,6 +39,8 @@ export const curriculumKeys = {
   schoolCourses: () => [...curriculumKeys.all, "school-courses"] as const,
   schoolCourseList: (params?: object) =>
     [...curriculumKeys.schoolCourses(), "list", params] as const,
+  availableCourses: (params?: object) =>
+    [...curriculumKeys.all, "available-courses", params] as const,
   prerequisites: (courseId: string) =>
     [...curriculumKeys.all, "prerequisites", courseId] as const,
   prerequisiteChain: (courseId: string) =>
@@ -114,6 +117,20 @@ export function useSchoolCourses(params?: {
   return useQuery({
     queryKey: curriculumKeys.schoolCourseList(params),
     queryFn: () => getSchoolCourses(params),
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+/** Student/public-accessible course list (no admin role required) */
+export function useAvailableCourses(params?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  department?: string;
+}) {
+  return useQuery({
+    queryKey: curriculumKeys.availableCourses(params),
+    queryFn: () => getAvailableCourses(params),
     staleTime: 1000 * 60 * 5,
   });
 }

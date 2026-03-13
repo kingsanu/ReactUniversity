@@ -18,6 +18,7 @@ import {
   Send,
   Trash2,
   Target,
+  LoaderCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -196,7 +197,7 @@ export default function CounselorStudentDetailPage() {
             <Award className="h-4 w-4 text-amber-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{student.gpa.toFixed(2)}</div>
+            <div className="text-2xl font-bold">{student.gpa ? student.gpa.toFixed(2) : "—"}</div>
           </CardContent>
         </Card>
 
@@ -419,6 +420,9 @@ export default function CounselorStudentDetailPage() {
                         }
                         disabled={reviewRequest.isPending}
                       >
+                        {reviewRequest.isPending && reviewRequest.variables?.requestId === req.id && reviewRequest.variables?.payload.status === "approved" ? (
+                          <LoaderCircle className="mr-1.5 h-3 w-3 animate-spin" />
+                        ) : null}
                         Approve
                       </Button>
                       <Button
@@ -433,6 +437,9 @@ export default function CounselorStudentDetailPage() {
                         }
                         disabled={reviewRequest.isPending}
                       >
+                        {reviewRequest.isPending && reviewRequest.variables?.requestId === req.id && reviewRequest.variables?.payload.status === "rejected" ? (
+                          <LoaderCircle className="mr-1.5 h-3 w-3 animate-spin" />
+                        ) : null}
                         Reject
                       </Button>
                     </div>

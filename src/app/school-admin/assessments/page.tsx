@@ -29,7 +29,6 @@ const assessmentIcons: Record<string, React.ReactNode> = {
   MIL: <ClipboardCheck className="h-5 w-5" />,
   PCA: <ClipboardCheck className="h-5 w-5" />,
   "360": <RotateCcw className="h-5 w-5" />,
-  TIMS: <Shield className="h-5 w-5" />,
 };
 
 export default function AssessmentConfigPage() {
@@ -49,7 +48,6 @@ export default function AssessmentConfigPage() {
         { assessmentType: "MIL", isEnabled: false, description: "" },
         { assessmentType: "PCA", isEnabled: false, description: "" },
         { assessmentType: "360", isEnabled: false, description: "" },
-        { assessmentType: "TIMS", isEnabled: false, description: "" },
       ]);
     }
   }, [config]);

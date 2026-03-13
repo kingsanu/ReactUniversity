@@ -128,6 +128,20 @@ export async function getSchoolCourses(params?: {
   return handleResponse<SchoolCoursesResponse>(res);
 }
 
+/** Student/public-facing course listing (no school-admin role required) */
+export async function getAvailableCourses(params?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  department?: string;
+}): Promise<SchoolCoursesResponse> {
+  const res = await fetch(
+    buildUrl("/api/v1/courses", params as Record<string, string | number>),
+    { headers: getHeaders() }
+  );
+  return handleResponse<SchoolCoursesResponse>(res);
+}
+
 export async function createSchoolCourse(payload: SchoolCoursePayload): Promise<SchoolCourse> {
   const res = await fetch(buildUrl("/api/v1/school-admin/courses"), {
     method: "POST",

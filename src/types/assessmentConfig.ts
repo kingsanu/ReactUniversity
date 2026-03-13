@@ -42,6 +42,8 @@ export interface CounselorStudent {
   alertCount: number;
   careerPath: string;
   lastActive: string;
+  createdAt?: string;
+  joinedAt?: string;
 }
 
 export interface CounselorStudentsResponse {

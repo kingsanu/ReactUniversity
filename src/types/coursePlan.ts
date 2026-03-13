@@ -2,7 +2,7 @@
 // Student Course Plan Types (Student-facing trajectory)
 // ============================================
 
-export type CourseEnrollmentStatus = "completed" | "in_progress" | "planned" | "dropped";
+export type CourseEnrollmentStatus = "completed" | "in_progress" | "planned" | "dropped" | "pending_add" | "pending_remove";
 
 export interface StudentCourseEnrollment {
   id: string;

@@ -16,6 +16,8 @@ import {
   type EdgeChange,
   type NodeTypes,
   Panel,
+  Handle,
+  Position,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useParams, useRouter } from "next/navigation";
@@ -50,7 +52,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useCourseSequenceDetail, useUpdateCourseSequence } from "@/hooks/useCourseSequenceQueries";
-import { useSchoolCourses } from "@/hooks/useCurriculumQueries";
+import { useSchoolCourses, useUpdatePrerequisites } from "@/hooks/useCurriculumQueries";
 import type { CourseSequenceNode, CourseSequenceEdge, SchoolCourse } from "@/types/curriculum";
 
 // ============================================
@@ -77,6 +79,11 @@ const statusColors = {
 function CourseNode({ id, data }: { id: string; data: CourseNodeData }) {
   return (
     <div className="bg-white/95 backdrop-blur-md border border-slate-200/80 rounded-2xl shadow-sm hover:shadow-xl hover:border-teal-300 min-w-[200px] max-w-[260px] group transition-all duration-300 overflow-hidden ring-1 ring-black/5">
+      <Handle
+        type="target"
+        position={Position.Top}
+        className="w-3 h-3 bg-slate-400 border-2 border-white"
+      />
       <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 px-4 py-3 border-b border-slate-100 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <BookOpen className="h-3.5 w-3.5 text-teal-600" />
@@ -101,6 +108,11 @@ function CourseNode({ id, data }: { id: string; data: CourseNodeData }) {
           </Badge>
         </div>
       </div>
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        className="w-3 h-3 bg-teal-500 border-2 border-white"
+      />
     </div>
   );
 }
@@ -129,6 +141,7 @@ export default function CourseSequenceBuilderPage() {
   const { data: detail, isLoading: detailLoading } = useCourseSequenceDetail(sequenceId);
   const { data: coursesData } = useSchoolCourses({ limit: 200, search: search || undefined });
   const updateSequence = useUpdateCourseSequence();
+  const updatePrerequisites = useUpdatePrerequisites();
 
   // Initialize nodes/edges from saved data
   if (detail && !initialized) {
@@ -258,14 +271,47 @@ export default function CourseSequenceBuilderPage() {
         },
       },
       {
-        onSuccess: () => toast.success("Sequence saved"),
+        onSuccess: async () => {
+          toast.success("Sequence saved visually");
+          
+          // Now sync the actual prerequisites to the courses via backend
+          const syncPromises: Promise<any>[] = [];
+          
+          // For each node in the builder:
+          seqNodes.forEach(node => {
+            const courseId = node.data.courseId;
+            // Find all incoming edges (other nodes pointing TO this node)
+            const incomingEdges = seqEdges.filter(e => e.target === node.id);
+            // Get the course IDs of the source nodes
+            const requiredCourseIds = incomingEdges
+              .map(e => seqNodes.find(n => n.id === e.source)?.data.courseId)
+              .filter(Boolean) as string[];
+              
+            // Send update if there are prerequisites OR if we effectively need to clear them (if we wanted full sync, but right now we only add/set)
+            if (requiredCourseIds.length >= 0) {
+              const promise = new Promise<void>((res, rej) => {
+                updatePrerequisites.mutate(
+                  { courseId, payload: { prerequisiteRules: [{ type: "AND", courseIds: requiredCourseIds }], corequisites: [] } },
+                  { onSuccess: () => res(), onError: (err) => res() } // Try to sync all even if one fails
+                );
+              });
+              syncPromises.push(promise);
+            }
+          });
+          
+          if (syncPromises.length > 0) {
+            toast.loading("Syncing course rules to backend...", { id: "prereq-sync" });
+            await Promise.all(syncPromises);
+            toast.success("Sequence and prerequisites synced successfully!", { id: "prereq-sync" });
+          }
+        },
         onError: () => toast.error("Failed to save sequence"),
       }
     );
   };
 
   const courses = (coursesData?.data ?? []).filter(
-    (c) => gradeFilter === "all" || c.gradeLevels?.includes(parseInt(gradeFilter))
+    (c) => (gradeFilter === "all" || c.gradeLevels?.includes(parseInt(gradeFilter))) && !nodes.some((n) => n.data.courseId === c.id)
   );
 
   if (detailLoading) {
@@ -279,51 +325,6 @@ export default function CourseSequenceBuilderPage() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-64px)] bg-[#f8fafc]">
-      {/* Top Navigation Bar */}
-      <div className="flex items-center gap-4 px-6 py-4 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 shadow-sm z-20">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-slate-500 hover:text-slate-800 hover:bg-slate-100/50"
-          onClick={() => router.push("/school-admin/course-sequences")}
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" /> Back to Sequences
-        </Button>
-        <div className="h-6 w-px bg-slate-200 mx-2" />
-        <div className="flex items-center gap-3 flex-1">
-          <div className="p-2 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-lg shadow-inner ring-1 ring-white/20">
-            <Network className="h-5 w-5 text-white" />
-          </div>
-          <Input
-            value={sequenceName}
-            onChange={(e) => setSequenceName(e.target.value)}
-            className="h-10 w-80 font-bold text-lg bg-transparent border-transparent hover:border-slate-200 focus:bg-white focus:border-teal-400 focus:ring-4 focus:ring-teal-500/10 transition-all rounded-xl px-3 -ml-3"
-            placeholder="Enter sequence name..."
-          />
-        </div>
-        <div className="ml-auto flex items-center gap-3">
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-10 w-10 border-slate-200 text-slate-500 hover:text-teal-600 hover:border-teal-200 hover:bg-teal-50 rounded-xl transition-all"
-            title="Drag courses from the left panel onto the canvas. Connect two courses by dragging the edge dot to another node."
-          >
-            <Info className="h-5 w-5" />
-          </Button>
-          <Button
-            onClick={handleSave}
-            disabled={updateSequence.isPending}
-            className="h-10 px-6 rounded-xl bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 hover:to-cyan-500 text-white shadow-md hover:shadow-lg hover:shadow-teal-500/20 transition-all active:scale-[0.98] border-0"
-          >
-            {updateSequence.isPending ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            ) : (
-              <Save className="h-4 w-4 mr-2" />
-            )}
-            <span className="font-semibold">Save Sequence</span>
-          </Button>
-        </div>
-      </div>
 
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden relative">
@@ -458,14 +459,61 @@ export default function CourseSequenceBuilderPage() {
                   <div className="flex items-center gap-4 text-slate-500 font-medium text-xs">
                     <span><strong className="text-slate-700">{nodes.length}</strong> courses</span>
                     <span className="w-1 h-1 rounded-full bg-slate-300" />
-                    <span><strong className="text-slate-700">{edges.length}</strong> links</span>
+                    <span><strong className="text-slate-700">{edges.length}</strong> prerequisite paths</span>
                   </div>
                 </CardContent>
               </Card>
             </Panel>
 
+            <Panel position="top-left" className="m-6 z-50">
+              <div className="flex items-center gap-4 px-4 py-3 bg-white/80 backdrop-blur-xl border border-slate-200/60 shadow-xl rounded-2xl">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-slate-500 hover:text-slate-800 hover:bg-slate-100/50"
+                  onClick={() => router.push("/school-admin/course-sequences")}
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+                <div className="h-6 w-px bg-slate-200" />
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-md shadow-inner">
+                    <Network className="h-4 w-4 text-white" />
+                  </div>
+                  <Input
+                    value={sequenceName}
+                    onChange={(e) => setSequenceName(e.target.value)}
+                    className="h-8 w-64 font-bold text-base bg-transparent border-transparent hover:border-slate-200 focus:bg-white focus:border-teal-400 focus:ring-2 focus:ring-teal-500/10 transition-all rounded-lg px-2 -ml-2"
+                    placeholder="Sequence Name..."
+                  />
+                </div>
+                <div className="flex items-center gap-2 ml-4">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8 border-slate-200 text-slate-500 hover:text-teal-600 hover:border-teal-200 hover:bg-teal-50 rounded-lg transition-all"
+                    title="Drag courses from the left panel onto the canvas. Connect two courses by dragging the edge dot from the bottom of a prerequisite course to another."
+                  >
+                    <Info className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    onClick={handleSave}
+                    disabled={updateSequence.isPending}
+                    className="h-8 px-4 rounded-lg bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 hover:to-cyan-500 text-white shadow-md active:scale-[0.98] border-0 text-sm"
+                  >
+                    {updateSequence.isPending ? (
+                      <Loader2 className="h-3 w-3 mr-1.5 animate-spin" />
+                    ) : (
+                      <Save className="h-3 w-3 mr-1.5" />
+                    )}
+                    <span className="font-semibold">Save</span>
+                  </Button>
+                </div>
+              </div>
+            </Panel>
+
             {nodes.length === 0 && (
-              <Panel position="top-center" className="mt-12">
+              <Panel position="top-center" style={{ top: "140px" }} className="z-0">
                 <motion.div
                   initial={{ opacity: 0, y: -20, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -474,9 +522,9 @@ export default function CourseSequenceBuilderPage() {
                   <div className="h-16 w-16 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Network className="h-8 w-8 text-teal-500" />
                   </div>
-                  <h2 className="text-lg font-bold text-slate-800 tracking-tight">Empty Canvas</h2>
+                  <h2 className="text-lg font-bold text-slate-800 tracking-tight">Empty Sequence Map</h2>
                   <p className="text-sm font-medium text-slate-500 mt-2 leading-relaxed">
-                    Start building your sequence by dragging courses from the library on the left.
+                    Drag courses from the library to the canvas. Connect courses by dragging lines from the bottom of a prerequisite course to the top of the next course.
                   </p>
                 </motion.div>
               </Panel>

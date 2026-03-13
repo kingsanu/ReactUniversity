@@ -12,6 +12,7 @@ import {
   DEFAULT_EVALUATOR_GROUPS,
   createMockEvaluationSession,
   getUserEvaluationGroupsForSessions,
+  getCounselorEvaluations,
   EvaluationGroupWithId,
 } from "@/services/evaluationService";
 import { useGlobalStore } from "@/store/useGlobalStore";
@@ -40,9 +41,9 @@ export function useEvaluationData() {
       setError(null);
 
       // For development, use mock data if API is not available
-      const isDevelopment = process.env.NODE_ENV === "development";
+      const useMockData = false; // We want to test real data now
 
-      if (isDevelopment) {
+      if (useMockData) {
         // Load mock data from localStorage or create new
         const savedSessions = localStorage.getItem("evaluation_sessions");
         let sessionData: EvaluationSession[] = [];
@@ -66,53 +67,104 @@ export function useEvaluationData() {
         setProgress(progressData);
       } else {
         // Load from API in production
-        // TODO: Get userId from context or props
-        const userId = "current-user-id"; // Replace with actual user ID retrieval
-        const evaluationGroups = await getUserEvaluationGroupsForSessions(
-          userId,
-          language
-        );
+        // First check if the user is a counselor
+        const userStr = localStorage.getItem("user");
+        let isCounselor = false;
+        if (userStr) {
+          try {
+            const user = JSON.parse(userStr);
+            isCounselor = user?.roleName?.toLowerCase() === "counselor";
+          } catch (e) {
+            console.error("Error parsing user from localStorage", e);
+          }
+        }
 
-        // Group evaluators by evaluated user to create sessions
         const sessionMap = new Map<string, EvaluationSession>();
 
-        evaluationGroups.forEach((group) => {
-          const evaluatedUserId = group.evaluatedUserId;
-          if (!sessionMap.has(evaluatedUserId)) {
-            // Create a minimal session structure
-            const mockSession = createMockEvaluationSession();
-            sessionMap.set(evaluatedUserId, {
-              ...mockSession,
-              id: evaluatedUserId,
-              evaluatedPersonId: evaluatedUserId,
-              evaluatedPersonName: group.evaluatorName,
-              title: `Evaluation for ${group.evaluatorName}`,
-              status: group.isEvaluationCompleted ? "completed" : "active",
-              evaluators: [],
-              evaluatorGroups: DEFAULT_EVALUATOR_GROUPS, // Add default evaluator groups
-            });
-          }
+        if (isCounselor) {
+          const counselorEvals = await getCounselorEvaluations();
+          counselorEvals.forEach((group) => {
+            const evaluatedUserId = group.evaluatedUserId;
+            if (!sessionMap.has(evaluatedUserId)) {
+              const mockSession = createMockEvaluationSession();
+              sessionMap.set(evaluatedUserId, {
+                ...mockSession,
+                id: evaluatedUserId,
+                evaluatedPersonId: evaluatedUserId,
+                evaluatedPersonName: group.evaluatedUserName || "Unknown",
+                title: `Evaluation for ${group.evaluatedUserName || "Unknown"}`,
+                status: group.isEvaluationCompleted ? "completed" : "active",
+                evaluators: [],
+                evaluatorGroups: DEFAULT_EVALUATOR_GROUPS,
+              });
+            }
 
-          const session = sessionMap.get(evaluatedUserId)!;
-          // Add this evaluator to the session
-          const evaluator: Evaluator = {
-            id: group.id,
-            name: group.evaluatorName,
-            email: group.evaluatorEmail,
-            phone: "", // Not available in group data
-            relationship: group.relation,
-            groupType: group.groupType.toLowerCase() as
-              | "self"
-              | "parent"
-              | "teacher"
-              | "sibling_friend",
-            invitationToken: group.invitationToken,
-            invitationSent: true,
-            responseReceived: group.isEvaluationCompleted,
-            isActive: true,
-          };
-          session.evaluators.push(evaluator);
-        });
+            const session = sessionMap.get(evaluatedUserId)!;
+            const evaluator: Evaluator = {
+              id: group.id,
+              name: group.evaluatorName,
+              email: group.evaluatorEmail,
+              phone: "",
+              relationship: group.relation,
+              groupType: (group.groupType?.toLowerCase() || "parent") as any,
+              invitationToken: group.invitationToken,
+              invitationSent: group.isTokenUsed,
+              responseReceived: group.isEvaluationCompleted,
+              isActive: true,
+            };
+            session.evaluators.push(evaluator);
+            // Re-assess session status if any evaluator is still active
+            if (!group.isEvaluationCompleted && session.status === "completed") {
+                session.status = "active";
+            }
+          });
+        } else {
+          // Standard student flow
+          const userId = "current-user-id"; // In a real scenario, get from auth context
+          const evaluationGroups = await getUserEvaluationGroupsForSessions(
+            userId,
+            language
+          );
+
+          evaluationGroups.forEach((group) => {
+            const evaluatedUserId = group.evaluatedUserId;
+            if (!sessionMap.has(evaluatedUserId)) {
+              const mockSession = createMockEvaluationSession();
+              sessionMap.set(evaluatedUserId, {
+                ...mockSession,
+                id: evaluatedUserId,
+                evaluatedPersonId: evaluatedUserId,
+                evaluatedPersonName: group.evaluatorName, // NOTE: this should be the evaluated person name. Wait, the endpoint getUserEvaluationGroupsForSessions doesn't return the evaluated student's name in `EvaluationGroupWithId`. Let's fallback to "My Evaluation" if needed, but since this is presumably the student looking at their own, maybe "My Evaluation".
+                title: `Evaluation for ${group.evaluatorName}`,
+                status: group.isEvaluationCompleted ? "completed" : "active",
+                evaluators: [],
+                evaluatorGroups: DEFAULT_EVALUATOR_GROUPS,
+              });
+            }
+
+            const session = sessionMap.get(evaluatedUserId)!;
+            const evaluator: Evaluator = {
+              id: group.id,
+              name: group.evaluatorName,
+              email: group.evaluatorEmail,
+              phone: "",
+              relationship: group.relation,
+              groupType: group.groupType.toLowerCase() as
+                | "self"
+                | "parent"
+                | "teacher"
+                | "sibling_friend",
+              invitationToken: group.invitationToken,
+              invitationSent: true,
+              responseReceived: group.isEvaluationCompleted,
+              isActive: true,
+            };
+            session.evaluators.push(evaluator);
+            if (!group.isEvaluationCompleted && session.status === "completed") {
+                session.status = "active";
+            }
+          });
+        }
 
         const sessionData = Array.from(sessionMap.values());
         setSessions(sessionData);

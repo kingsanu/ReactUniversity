@@ -65,6 +65,23 @@ export interface EvaluatorRequirement {
   peer: { minimum: number; maximum: number };
 }
 
+export interface CounselorEvaluationGroupResponse {
+  id: string;
+  evaluatedUserId: string;
+  evaluatedUserName: string;
+  evaluatedUserGradeLevel?: number;
+  evaluatorName: string;
+  evaluatorEmail: string;
+  relation: string;
+  groupType: string;
+  invitationToken: string;
+  tokenExpiryDate: string;
+  invitationUrl: string;
+  isTokenUsed: boolean;
+  isEvaluationCompleted: boolean;
+  createdDate: string;
+}
+
 export interface Evaluator {
   id: string;
   name: string;
@@ -557,6 +574,34 @@ export async function getUserEvaluationGroups(
     return result.data || [];
   } catch (error) {
     console.error("Error fetching user evaluation groups:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get all evaluations for students assigned to the logged-in counselor
+ */
+export async function getCounselorEvaluations(): Promise<CounselorEvaluationGroupResponse[]> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/v1/counselor/evaluations`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch counselor evaluations");
+    }
+
+    const result = await response.json();
+    return result.data || [];
+  } catch (error) {
+    console.error("Error fetching counselor evaluations:", error);
     throw error;
   }
 }

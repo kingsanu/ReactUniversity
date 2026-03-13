@@ -53,11 +53,9 @@ const navItems = [
   // { key: "graduation", path: "/school-admin/graduation", icon: GraduationCap, label: "Graduation" },
   // Data & Assessment
   { key: "assessments", path: "/school-admin/assessments", icon: ClipboardCheck, label: "Assessments", section: "Data & Assessment" },
-  { key: "dataMappings", path: "/school-admin/data-mappings", icon: ArrowLeftRight, label: "Data Mappings" },
   { key: "integrations", path: "/school-admin/integrations", icon: Plug, label: "Integrations" },
   // Counselor
-  { key: "counselorStudents", path: "/school-admin/counselor-students", icon: UserCheck, label: "My Students", section: "Counselor" },
-  { key: "academicGaps", path: "/school-admin/academic-gaps", icon: TrendingDown, label: "Academic Gaps" },
+  { key: "academicGaps", path: "/school-admin/academic-gaps", icon: TrendingDown, label: "Academic Gaps", section: "Counselor" },
   { key: "evaluations", path: "/school-admin/evaluations", icon: Radar, label: "360° Evaluations" },
   { key: "alerts", path: "/school-admin/alerts", icon: Bell, label: "Alerts" },
   // System
