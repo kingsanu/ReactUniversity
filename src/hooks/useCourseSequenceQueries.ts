@@ -9,6 +9,7 @@ import {
   deleteCourseSequence,
   assignSequenceToStudents,
   getStudentCourseSequence,
+  generateCourseSequenceAI,
 } from "@/services/courseSequenceService";
 import type { CourseSequencePayload } from "@/types/curriculum";
 
@@ -44,7 +45,7 @@ export function useCourseSequenceDetail(id: string) {
   return useQuery({
     queryKey: courseSequenceKeys.detail(id),
     queryFn: () => getCourseSequenceDetail(id),
-    enabled: !!id,
+    enabled: !!id && id !== "new",
     staleTime: 1000 * 60 * 5,
   });
 }
@@ -102,5 +103,11 @@ export function useStudentCourseSequence(studentId: string) {
     queryFn: () => getStudentCourseSequence(studentId),
     enabled: !!studentId,
     staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useGenerateCourseSequenceAI() {
+  return useMutation({
+    mutationFn: (payload: { file?: File; prompt?: string }) => generateCourseSequenceAI(payload),
   });
 }

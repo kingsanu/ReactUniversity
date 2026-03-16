@@ -15,7 +15,9 @@ import {
   Bell,
   Radar,
   Users,
-  Compass
+  Compass,
+  Settings,
+  CalendarDays,
 } from "lucide-react";
 
 interface CounselorLayoutProps {
@@ -28,6 +30,8 @@ const navItems = [
   { key: "academicGaps", path: "/counselor/academic-gaps", icon: TrendingDown, label: "Academic Gaps" },
   { key: "evaluations", path: "/counselor/evaluations", icon: Radar, label: "360° Evaluations" },
   { key: "alerts", path: "/counselor/alerts", icon: Bell, label: "Alerts" },
+  { key: "sessions", path: "/counselor/sessions", icon: CalendarDays, label: "Sessions", section: "Scheduling" },
+  { key: "settings", path: "/counselor/settings", icon: Settings, label: "Settings", section: "Preferences" },
 ];
 
 export function CounselorLayout({ children }: CounselorLayoutProps) {

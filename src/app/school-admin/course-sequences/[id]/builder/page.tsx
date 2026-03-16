@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import {
   ReactFlow,
   Background,
@@ -20,7 +20,7 @@ import {
   Position,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,7 +51,7 @@ import {
   Network,
 } from "lucide-react";
 import { toast } from "sonner";
-import { useCourseSequenceDetail, useUpdateCourseSequence } from "@/hooks/useCourseSequenceQueries";
+import { useCourseSequenceDetail, useUpdateCourseSequence, useCreateCourseSequence } from "@/hooks/useCourseSequenceQueries";
 import { useSchoolCourses, useUpdatePrerequisites } from "@/hooks/useCurriculumQueries";
 import type { CourseSequenceNode, CourseSequenceEdge, SchoolCourse } from "@/types/curriculum";
 
@@ -128,6 +128,7 @@ const nodeTypes: NodeTypes = {
 export default function CourseSequenceBuilderPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const sequenceId = params.id as string;
 
   const [nodes, setNodes] = useState<Node[]>([]);
@@ -141,35 +142,107 @@ export default function CourseSequenceBuilderPage() {
   const { data: detail, isLoading: detailLoading } = useCourseSequenceDetail(sequenceId);
   const { data: coursesData } = useSchoolCourses({ limit: 200, search: search || undefined });
   const updateSequence = useUpdateCourseSequence();
+  const createSequence = useCreateCourseSequence();
   const updatePrerequisites = useUpdatePrerequisites();
 
-  // Initialize nodes/edges from saved data
-  if (detail && !initialized) {
-    setSequenceName(detail.name);
-    if (detail.nodes?.length) {
-      setNodes(
-        detail.nodes.map((n: CourseSequenceNode) => ({
-          id: n.id,
-          type: "courseNode",
-          position: n.position,
-          data: { ...n.data },
-        }))
-      );
+  // Initialize nodes/edges from saved data or AI generation
+  const handleDeleteNode = useCallback((nodeId: string) => {
+    setNodes((nds) => nds.filter((n) => n.id !== nodeId));
+    setEdges((eds) => eds.filter((e) => e.source !== nodeId && e.target !== nodeId));
+  }, []);
+
+  useEffect(() => {
+    if (initialized) return;
+
+    if (detail) {
+      setSequenceName(detail.name);
+      if (detail.nodes?.length) {
+        setNodes(
+          detail.nodes.map((n: CourseSequenceNode) => ({
+            id: n.id,
+            type: "courseNode",
+            position: n.position,
+            data: { ...n.data, onDelete: handleDeleteNode },
+          }))
+        );
+      }
+      if (detail.edges?.length) {
+        setEdges(
+          detail.edges.map((e: CourseSequenceEdge) => ({
+            id: e.id,
+            source: e.source,
+            target: e.target,
+            type: e.type ?? "smoothstep",
+            animated: e.animated ?? true,
+            style: { stroke: "#0d9488", strokeWidth: 2 },
+          }))
+        );
+      }
+      setInitialized(true);
+    } else if (sequenceId === "new") {
+      if (searchParams.get("source") === "ai") {
+        const aiDataJson = localStorage.getItem("ai_sequence_blueprint");
+        if (aiDataJson) {
+          try {
+            const aiData = JSON.parse(aiDataJson);
+            setSequenceName(aiData.name || "AI Generated Sequence");
+            
+            // Map the Nodes
+            const generatedNodes: Node[] = [];
+            const nodeIdRemap: Record<number, string> = {};
+            
+            if (aiData.nodes) {
+              aiData.nodes.forEach((n: any, idx: number) => {
+                const newId = `node-${n.courseId}-${Date.now()}-${idx}`;
+                nodeIdRemap[idx] = newId;
+                generatedNodes.push({
+                  id: newId,
+                  type: "courseNode",
+                  position: { x: Number(n.positionX) || 0, y: Number(n.positionY) || 0 },
+                  data: {
+                    courseId: n.courseId,
+                    courseCode: n.courseCode,
+                    courseName: n.courseName,
+                    gradeLevel: n.gradeLevel || 9,
+                    credits: n.credits || 0,
+                    semester: "Fall",
+                    status: "recommended", // default AI status
+                    onDelete: handleDeleteNode,
+                  }
+                });
+              });
+              setNodes(generatedNodes);
+            }
+            
+            // Map the Edges
+            if (aiData.edges) {
+              const generatedEdges: Edge[] = aiData.edges.map((e: any, idx: number) => {
+                const sourceId = nodeIdRemap[e.sourceIndex] || e.sourceNodeId;
+                const targetId = nodeIdRemap[e.targetIndex] || e.targetNodeId;
+                return {
+                  id: `edge-ai-${idx}-${Date.now()}`,
+                  source: sourceId,
+                  target: targetId,
+                  type: "smoothstep",
+                  animated: true,
+                  style: { stroke: "#a855f7", strokeWidth: 2 }, // Purple for AI generated edges
+                  label: e.label,
+                };
+              }).filter((e: Edge) => e.source && e.target);
+              
+              setEdges(generatedEdges);
+            }
+
+            // Clean up to prevent re-triggering
+            localStorage.removeItem("ai_sequence_blueprint");
+          } catch (e) {
+            console.error("Failed to parse AI sequence view", e);
+          }
+        }
+      }
+      setInitialized(true);
     }
-    if (detail.edges?.length) {
-      setEdges(
-        detail.edges.map((e: CourseSequenceEdge) => ({
-          id: e.id,
-          source: e.source,
-          target: e.target,
-          type: e.type ?? "smoothstep",
-          animated: e.animated ?? true,
-          style: { stroke: "#0d9488", strokeWidth: 2 },
-        }))
-      );
-    }
-    setInitialized(true);
-  }
+  }, [initialized, detail, sequenceId, searchParams, handleDeleteNode]);
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)),
@@ -195,10 +268,7 @@ export default function CourseSequenceBuilderPage() {
     []
   );
 
-  const handleDeleteNode = useCallback((nodeId: string) => {
-    setNodes((nds) => nds.filter((n) => n.id !== nodeId));
-    setEdges((eds) => eds.filter((e) => e.source !== nodeId && e.target !== nodeId));
-  }, []);
+
 
   // Drag a course from the sidebar panel onto the canvas
   const onDragOver = useCallback((event: React.DragEvent) => {
@@ -259,55 +329,66 @@ export default function CourseSequenceBuilderPage() {
       animated: (e.animated as boolean | undefined) ?? true,
     }));
 
-    updateSequence.mutate(
-      {
-        id: sequenceId,
-        payload: {
-          name: sequenceName,
-          description: detail?.description,
-          nodes: seqNodes,
-          edges: seqEdges,
-          columns: detail?.columns ?? [],
-        },
-      },
-      {
-        onSuccess: async () => {
-          toast.success("Sequence saved visually");
+    const payload = {
+      name: sequenceName,
+      description: detail?.description,
+      nodes: seqNodes,
+      edges: seqEdges,
+      columns: detail?.columns ?? [],
+    };
+
+    const syncPrereqs = async () => {
+      const syncPromises: Promise<any>[] = [];
+      
+      seqNodes.forEach(node => {
+        const courseId = node.data.courseId;
+        const incomingEdges = seqEdges.filter(e => e.target === node.id);
+        const requiredCourseIds = incomingEdges
+          .map(e => seqNodes.find(n => n.id === e.source)?.data.courseId)
+          .filter(Boolean) as string[];
           
-          // Now sync the actual prerequisites to the courses via backend
-          const syncPromises: Promise<any>[] = [];
-          
-          // For each node in the builder:
-          seqNodes.forEach(node => {
-            const courseId = node.data.courseId;
-            // Find all incoming edges (other nodes pointing TO this node)
-            const incomingEdges = seqEdges.filter(e => e.target === node.id);
-            // Get the course IDs of the source nodes
-            const requiredCourseIds = incomingEdges
-              .map(e => seqNodes.find(n => n.id === e.source)?.data.courseId)
-              .filter(Boolean) as string[];
-              
-            // Send update if there are prerequisites OR if we effectively need to clear them (if we wanted full sync, but right now we only add/set)
-            if (requiredCourseIds.length >= 0) {
-              const promise = new Promise<void>((res, rej) => {
-                updatePrerequisites.mutate(
-                  { courseId, payload: { prerequisiteRules: [{ type: "AND", courseIds: requiredCourseIds }], corequisites: [] } },
-                  { onSuccess: () => res(), onError: (err) => res() } // Try to sync all even if one fails
-                );
-              });
-              syncPromises.push(promise);
-            }
+        if (requiredCourseIds.length >= 0) {
+          const promise = updatePrerequisites.mutateAsync({
+            courseId, 
+            payload: { prerequisiteRules: [{ type: "AND", courseIds: requiredCourseIds }], corequisites: [] }
+          }).catch(err => {
+            console.error("Prerequisite sync failed for course", courseId, err);
           });
-          
-          if (syncPromises.length > 0) {
-            toast.loading("Syncing course rules to backend...", { id: "prereq-sync" });
-            await Promise.all(syncPromises);
-            toast.success("Sequence and prerequisites synced successfully!", { id: "prereq-sync" });
-          }
-        },
-        onError: () => toast.error("Failed to save sequence"),
+          syncPromises.push(promise);
+        }
+      });
+      
+      if (syncPromises.length > 0) {
+        toast.loading("Syncing course rules to backend...", { id: "prereq-sync" });
+        await Promise.allSettled(syncPromises);
+        toast.success("Sequence and prerequisites synced successfully!", { id: "prereq-sync" });
       }
-    );
+    };
+
+    if (sequenceId === "new") {
+      createSequence.mutate(payload, {
+        onSuccess: async (data) => {
+          toast.success("Sequence created visually");
+          await syncPrereqs();
+          router.replace(`/school-admin/course-sequences/${data.id}/builder`);
+        },
+        onError: () => toast.error("Failed to create sequence"),
+      });
+    } else {
+      updateSequence.mutate(
+        {
+          id: sequenceId,
+          payload,
+        },
+        {
+          onSuccess: async () => {
+            toast.success("Sequence saved visually");
+            await syncPrereqs();
+          },
+          onError: () => toast.error("Failed to save sequence"),
+        }
+      );
+    }
   };
 
   const courses = (coursesData?.data ?? []).filter(

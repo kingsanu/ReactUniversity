@@ -9,6 +9,7 @@ import { FiLock, FiBell, FiMoon, FiGlobe } from "react-icons/fi";
 import { useState } from "react";
 import { toast } from "sonner"; // Assuming sonner
 import { StudentInviteParentPanel } from "./StudentInviteParentPanel";
+import { CalendarIntegrationPanel } from "@/components/shared/CalendarIntegrationPanel";
 
 export function ProfileSettings() {
   const [emailNotifs, setEmailNotifs] = useState(true);
@@ -69,6 +70,10 @@ export function ProfileSettings() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="border-b border-gray-100 dark:border-gray-700/50 pb-6 mb-6">
+            <CalendarIntegrationPanel />
+          </div>
+
           <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
             <div className="space-y-1">
               <Label className="text-base cursor-pointer" htmlFor="public-profile">Public Profile</Label>

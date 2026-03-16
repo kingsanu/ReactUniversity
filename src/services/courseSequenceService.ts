@@ -107,3 +107,18 @@ export async function getStudentCourseSequence(studentId: string): Promise<Cours
   });
   return handleResponse<CourseSequenceDetail>(res);
 }
+
+export async function generateCourseSequenceAI(payload: { file?: File; prompt?: string }): Promise<CourseSequencePayload> {
+  const formData = new FormData();
+  if (payload.file) formData.append("file", payload.file);
+  if (payload.prompt) formData.append("prompt", payload.prompt);
+
+  const res = await fetch(buildUrl("/api/v1/school-admin/course-sequences/import-ai"), {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+    },
+    body: formData,
+  });
+  return handleResponse<CourseSequencePayload>(res);
+}

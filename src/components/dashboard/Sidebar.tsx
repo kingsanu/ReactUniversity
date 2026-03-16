@@ -55,6 +55,7 @@ export function Sidebar() {
       { name: t("nav.internships", "Internship Opportunities"), path: "/dashboard/internships" },
       { name: t("nav.mentorship", "Mentorship Matches"), path: "/dashboard/mentorship" },
       { name: t("nav.coaching", "Coaching Sessions"), path: "/dashboard/coaching" },
+      { name: t("nav.sessions", "My Sessions"), path: "/dashboard/my-sessions" },
     ],
   };
 

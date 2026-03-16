@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
@@ -45,10 +45,21 @@ import {
 import { useCounselorDashboard, useCounselorPendingChangeRequests } from "@/hooks/useCounselorDashboard";
 import { useMyCounselorStudents } from "@/hooks/useSchoolProfileQueries";
 import { useReviewChangeRequest } from "@/hooks/useCoursePlanQueries";
+import { getMyCounselorSessions } from "@/services/counselorSessionService";
+import type { CounselorSession } from "@/services/counselorSessionService";
 
 export default function CounselorDashboardPage() {
   const [search, setSearch] = useState("");
   const [rightTab, setRightTab] = useState<"followups" | "requests">("followups");
+  const [upcomingSessions, setUpcomingSessions] = useState<CounselorSession[]>([]);
+  const [loadingSessions, setLoadingSessions] = useState(true);
+
+  useEffect(() => {
+    getMyCounselorSessions({ status: "confirmed", limit: 3 })
+      .then(res => setUpcomingSessions(res.data))
+      .catch(() => {})
+      .finally(() => setLoadingSessions(false));
+  }, []);
 
   const { data: dashData, isLoading: dashLoading } = useCounselorDashboard();
   const { data: studentsData, isLoading: studentsLoading } =
@@ -185,6 +196,69 @@ export default function CounselorDashboardPage() {
           </Link>
         ))}
       </motion.div>
+
+      {/* Upcoming Counselor Sessions */}
+      {(upcomingSessions.length > 0 || loadingSessions) && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.18 }}
+        >
+          <Card className="border-0 shadow-lg">
+            <CardHeader className="pb-3 flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <CalendarClock className="h-4 w-4 text-blue-600" />
+                Upcoming Counseling Sessions
+              </CardTitle>
+              <Link href="/counselor/sessions">
+                <Button variant="ghost" size="sm" className="text-xs text-blue-600 hover:bg-blue-50">
+                  Manage Sessions →
+                </Button>
+              </Link>
+            </CardHeader>
+            <CardContent>
+              {loadingSessions ? (
+                <div className="flex gap-4">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <Skeleton key={i} className="h-20 flex-1 rounded-xl" />
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {upcomingSessions.map((session) => (
+                    <div
+                      key={session.id}
+                      className="flex flex-col p-3 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow transition-shadow relative overflow-hidden"
+                    >
+                      <div className="absolute top-0 right-0 p-3 opacity-10">
+                        <Users className="w-12 h-12" />
+                      </div>
+                      <div className="flex items-start gap-3 relative z-10">
+                        <Avatar className="h-10 w-10 border shadow-sm">
+                          <AvatarFallback className="bg-blue-50 text-blue-700 font-semibold text-xs">
+                            {session.studentName?.charAt(0) || "S"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-semibold text-gray-900 truncate">{session.studentName}</p>
+                          <p className="text-xs text-gray-500 truncate">{session.topic}</p>
+                        </div>
+                      </div>
+                      <div className="mt-3 flex items-center justify-between relative z-10 text-xs text-gray-600 font-medium">
+                        <div className="flex items-center gap-1.5 bg-slate-50 px-2 py-1 rounded-md">
+                          <Clock className="w-3.5 h-3.5 text-blue-500" />
+                          {new Date(session.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                        <span className="text-blue-600">{new Date(session.startTime).toLocaleDateString([], { month: 'short', day: 'numeric' })}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
 
       {/* Students + Right Panel */}
       <motion.div
