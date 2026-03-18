@@ -98,9 +98,14 @@ export default function BookCounselorPage() {
     setLoadingSlots(true);
     setSelectedSlot(null);
     try {
-      const dateStr = format(date, "yyyy-MM-dd");
+      // Format using UTC date parts so the date string always matches the server's UTC-based slot generation,
+      // regardless of the student's local browser timezone.
+      const utcYear = date.getUTCFullYear();
+      const utcMonth = String(date.getUTCMonth() + 1).padStart(2, "0");
+      const utcDay = String(date.getUTCDate()).padStart(2, "0");
+      const dateStr = `${utcYear}-${utcMonth}-${utcDay}`;
       const result = await getCounselorSlots(selectedCounselorId, dateStr);
-      setSlots(result.slots);
+      setSlots(result.slots || []);
     } catch {
       setSlots([]);
     } finally {

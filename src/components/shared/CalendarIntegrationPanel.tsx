@@ -97,7 +97,7 @@ export function CalendarIntegrationPanel() {
     return (
       <div className="space-y-4">
         <div>
-          <h3 className="text-lg font-medium text-white mb-1">Calendar Integration</h3>
+          <h3 className="text-lg font-medium text-black mb-1">Calendar Integration</h3>
           <p className="text-sm text-gray-400">Loading calendar settings...</p>
         </div>
       </div>
