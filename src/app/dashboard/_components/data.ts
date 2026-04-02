@@ -163,8 +163,8 @@ export const dashboardData = {
 
 export const sidebarData = {
   logo: {
-    icon: "V",
-    text: "UNIV.365",
+    icon: "N",
+    text: "Nexa Univ",
   },
 
   navigation: [
@@ -267,13 +267,13 @@ export const sidebarData = {
     // },
     {
       id: "sessions",
-      name: "Counseling & Coaching",
+      name: "dashboard.counselingCoaching",
       icon: "opportunities",
       path: "/dashboard/my-sessions",
       submenu: [
-        { name: "My Sessions", path: "/dashboard/my-sessions" },
-        { name: "Book Counselor Session", path: "/dashboard/book-counselor" },
-        { name: "Find Coach", path: "/dashboard/book-coach" },
+        { name: "dashboard.mySessions", path: "/dashboard/my-sessions" },
+        { name: "dashboard.bookCounselorSession", path: "/dashboard/book-counselor" },
+        { name: "dashboard.findCoach", path: "/dashboard/book-coach" },
       ],
     },
     // {

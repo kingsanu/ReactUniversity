@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { montserrat, roboto, geistSans, geistMono, antonio } from "./fonts";
+import { geistSans } from "./fonts";
 import "./globals.css";
 import { AuthWrapper } from "@/components/AuthWrapper";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -12,8 +12,8 @@ import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: {
-    default: "TimCare - Career Development Platform",
-    template: "%s | TimCare",
+    default: "Nexa Univ - Career Development Platform",
+    template: "%s | Nexa Univ",
   },
   description:
     "Accelerate your career with personalized learning paths, skill assessments, and market insights.",
@@ -24,19 +24,19 @@ export const metadata: Metadata = {
     "job market",
     "resume builder",
   ],
-  authors: [{ name: "TimCare" }],
-  creator: "TimCare",
+  authors: [{ name: "Nexa Univ" }],
+  creator: "Nexa Univ",
   openGraph: {
     type: "website",
     locale: "en_US",
-    siteName: "TimCare",
-    title: "TimCare - Career Development Platform",
+    siteName: "Nexa Univ",
+    title: "Nexa Univ - Career Development Platform",
     description:
       "Accelerate your career with personalized learning paths, skill assessments, and market insights.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "TimCare - Career Development Platform",
+    title: "Nexa Univ - Career Development Platform",
     description:
       "Accelerate your career with personalized learning paths, skill assessments, and market insights.",
   },
@@ -63,7 +63,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} ${antonio.variable} ${roboto.variable} antialiased`}
+        className={`${geistSans.variable} font-sans bg-slate-50 text-slate-800 antialiased`}
       >
         <SkipToMain mainId="main-content" />
         <ErrorBoundary>

@@ -6,6 +6,7 @@ import { useTimsCareerScoring } from "@/hooks/useTimsQueries";
 import { careers } from "@/services/careerService";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { useRouter } from "next/navigation";
+import { Card } from "@/components/ui/card";
 
 interface CareerMatchesProps {
   className?: string;
@@ -38,23 +39,16 @@ export function CareerMatches({ className }: CareerMatchesProps) {
   });
 
   const showAssessmentPrompt = !hasAssessments;
-  // If we have no data and assessments are not done, show placeholder or prompt
-  // If we have no data but assessments ARE done, show "No matches"
-
-  // For the purpose of this component (likely a list on dashboard), if loading, show partial skeleton
-  // If no data, empty state.
 
   return (
     <motion.section
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={cn(
-        "bg-white rounded-lg border border-gray-200 p-6",
-        className
-      )}
+      className="h-full"
       aria-labelledby="career-matches-heading"
     >
-      <h2 id="career-matches-heading" className="text-lg font-semibold text-gray-900 mb-6">
+      <Card className={cn("p-6 h-full", className)}>
+      <h2 id="career-matches-heading" className="text-xl font-serif font-semibold text-slate-900 mb-6">
         {t("dashboard.top3CareerMatch")}
       </h2>
 
@@ -62,19 +56,19 @@ export function CareerMatches({ className }: CareerMatchesProps) {
         {timsLoading && (
           <div className="space-y-4 animate-pulse">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-16 bg-gray-100 rounded-lg"></div>
+              <div key={i} className="h-16 bg-slate-100/50 rounded-xl"></div>
             ))}
           </div>
         )}
 
         {!timsLoading && showAssessmentPrompt && matches.length === 0 && (
-          <div className="text-center py-6">
-            <p className="text-sm text-gray-500 mb-2">{t("dashboard.completeToSeeMatches", "Complete assessments to see matches")}</p>
+          <div className="text-center py-8">
+            <p className="text-sm font-medium text-slate-500 mb-2">{t("dashboard.completeToSeeMatches", "Complete assessments to see matches")}</p>
           </div>
         )}
 
         {!timsLoading && matches.length === 0 && !showAssessmentPrompt && (
-          <div className="text-center py-6 text-gray-500 text-sm">
+          <div className="text-center py-8 text-slate-500 text-sm font-medium">
             {t("dashboard.noMatches", "No specific matches found.")}
           </div>
         )}
@@ -85,26 +79,26 @@ export function CareerMatches({ className }: CareerMatchesProps) {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
+            className="flex items-center justify-between p-3 rounded-xl border border-slate-100 hover:bg-slate-50/50 transition-colors cursor-pointer"
             onClick={() => router.push(`/careers/${match.id}`)}
           >
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-4">
               {/* Industry Icon Placeholder */}
               <div
-                className="w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600"
+                className="w-10 h-10 rounded-lg flex items-center justify-center bg-indigo-50 text-indigo-600"
                 aria-hidden="true"
               >
-                <span className="text-white font-bold text-sm uppercase">
+                <span className="font-bold text-sm uppercase">
                   {(match.industry || "C").charAt(0)}
                 </span>
               </div>
 
               {/* Job Info */}
               <div>
-                <h3 className="font-medium text-gray-900 text-sm line-clamp-1">
+                <h3 className="font-semibold text-slate-900 text-sm line-clamp-1">
                   {match.title}
                 </h3>
-                <p className="text-xs text-gray-500">{match.industry}</p>
+                <p className="text-[11px] font-medium tracking-wide uppercase text-slate-500 mt-0.5">{match.industry}</p>
               </div>
             </div>
 
@@ -122,7 +116,7 @@ export function CareerMatches({ className }: CareerMatchesProps) {
                     cy="20"
                     r="16"
                     fill="transparent"
-                    stroke="#e5e7eb"
+                    stroke="#f1f5f9"
                     strokeWidth="3"
                   />
                   <motion.circle
@@ -130,7 +124,7 @@ export function CareerMatches({ className }: CareerMatchesProps) {
                     cy="20"
                     r="16"
                     fill="transparent"
-                    stroke={match.progress > 80 ? "#10b981" : match.progress > 60 ? "#f59e0b" : "#3b82f6"}
+                    stroke={match.progress > 80 ? "#10b981" : match.progress > 60 ? "#f59e0b" : "#4f46e5"}
                     strokeWidth="3"
                     strokeDasharray={`${2 * Math.PI * 16}`}
                     strokeDashoffset={`${2 * Math.PI * 16 * (1 - match.progress / 100)
@@ -144,7 +138,7 @@ export function CareerMatches({ className }: CareerMatchesProps) {
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
-                  <span className="text-xs font-medium text-gray-700">
+                  <span className="text-[10px] font-bold text-slate-700">
                     {match.progress}%
                   </span>
                 </div>
@@ -153,11 +147,11 @@ export function CareerMatches({ className }: CareerMatchesProps) {
               {/* Arrow Button */}
               <button
                 type="button"
-                className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center hover:bg-slate-200 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 aria-label={`View ${match.title} details`}
               >
                 <svg
-                  className="w-4 h-4 text-gray-600"
+                  className="w-4 h-4 text-slate-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -179,10 +173,11 @@ export function CareerMatches({ className }: CareerMatchesProps) {
       <button
         type="button"
         onClick={() => router.push("/careers")}
-        className="w-full text-sm text-blue-600 hover:text-blue-700 mt-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
+        className="w-full text-sm font-medium text-indigo-600 hover:text-indigo-700 mt-6 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-md transition-colors"
       >
         {t("dashboard.showMore")}
       </button>
+      </Card>
     </motion.section>
   );
 }

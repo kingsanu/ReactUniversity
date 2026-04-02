@@ -7,9 +7,10 @@ import { useGlobalStore } from "@/store/useGlobalStore";
 import { useTranslation } from "react-i18next";
 import { Sidebar as DashboardSidebar } from "./_components/Sidebar";
 import { TopNav } from "./_components/TopNav";
+// removed GlassBackground
 import { Button } from "@/components/ui/button";
 import { usePageViewTracking } from "@/hooks/usePageViewTracking";
-import { Bell, Menu, User } from "lucide-react";
+import { Bell, List as Menu, User } from "@phosphor-icons/react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -46,12 +47,12 @@ export default function DashboardLayout({
 
   if (isCoach) {
     return (
-      <div className="flex h-screen bg-gray-50">
-        <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <div className="flex bg-slate-50 lg:gap-6 transition-colors duration-300 h-[100dvh] lg:p-6 overflow-hidden">
+        <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} className="h-full lg:rounded-[2.5rem] lg:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05),inset_0_1px_1px_rgba(255,255,255,1)] lg:ring-1 lg:ring-slate-100 border-r lg:border-none bg-white z-50 flex-shrink-0" />
 
-        <div className="flex-1 flex flex-col overflow-hidden lg:ml-0 transition-all duration-300">
+        <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden transition-all duration-300 relative lg:rounded-[2.5rem] lg:bg-transparent">
           {/* Mobile header */}
-          <div className="bg-white border-b px-4 py-3 flex items-center justify-between sticky top-0 z-40 lg:hidden">
+          <div className="bg-white/80 backdrop-blur-md border-b px-4 py-3 flex items-center justify-between sticky top-0 z-40 lg:hidden rounded-b-3xl">
             <Button
               variant="ghost"
               size="icon"
@@ -117,8 +118,10 @@ export default function DashboardLayout({
             </div>
           </div>
 
-          <main id="main-content" tabIndex={-1} className="flex-1 overflow-y-auto bg-gray-50 focus:outline-none">
-            {children}
+          <main id="main-content" tabIndex={-1} className="flex-1 overflow-y-auto bg-transparent focus:outline-none w-full h-full lg:px-4">
+            <div className="max-w-[1400px] mx-auto h-full pb-10">
+              {children}
+            </div>
           </main>
         </div>
       </div>
@@ -127,14 +130,17 @@ export default function DashboardLayout({
 
   // Student Layout
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-      <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+    <div className="flex h-[100dvh] bg-slate-50 lg:gap-6 transition-colors duration-300 lg:p-6 overflow-hidden relative">
 
-      <div className="flex-1 flex flex-col overflow-hidden lg:ml-0 transition-all duration-300">
-        {/* <TopNav onMenuClick={() => setSidebarOpen(true)} /> */}
+      <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} className="h-full z-50 flex-shrink-0" />
 
-        <main id="main-content" tabIndex={-1} className="flex-1 overflow-y-auto focus:outline-none">
-          {children}
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden transition-all duration-300 relative bg-transparent z-10 gap-6">
+        <TopNav onMenuClick={() => setSidebarOpen(true)} className="flex-shrink-0" />
+
+        <main id="main-content" tabIndex={-1} className="flex-1 overflow-y-auto focus:outline-none w-full h-full lg:px-4 isolate pt-24 lg:pt-28">
+          <div className="max-w-[1400px] mx-auto h-full pb-10">
+            {children}
+          </div>
         </main>
       </div>
     </div>

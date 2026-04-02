@@ -13,7 +13,7 @@ export function ActivityChart({ className }: ActivityChartProps) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={cn("bg-white rounded-lg border border-gray-200 p-6", className)}
+      className={cn("bg-transparent backdrop-blur-md rounded-lg border border-gray-200 p-6", className)}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-6">

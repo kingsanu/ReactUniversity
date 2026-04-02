@@ -7,24 +7,27 @@ import { cn } from "@/lib/utils";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { useTranslation } from "react-i18next";
 import {
-  LayoutDashboard,
-  BarChart2,
-  Briefcase,
+  SquaresFour as LayoutDashboard,
+  ChartBar as BarChart2,
+  SuitcaseSimple as Briefcase,
   GraduationCap,
   CreditCard,
-  Calendar,
+  CalendarBlank as Calendar,
   FileText,
-  Settings,
-  LogOut,
-  ChevronDown,
+  GearSix as Settings,
+  SignOut as LogOut,
+  CaretDown as ChevronDown,
   User,
   BookOpen,
   Target,
   Users,
   Receipt,
-  MoreVertical,
+  DotsThreeVertical as MoreVertical,
   Globe,
-} from "lucide-react";
+  Lightning as Zap,
+  X as XIconComponent
+} from "@phosphor-icons/react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -111,22 +114,34 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed lg:static inset-y-0 left-0 z-50 w-72 bg-gradient-to-b from-slate-900 to-slate-950 text-white h-screen flex flex-col transform transition-transform duration-300 ease-in-out border-r border-slate-800 shadow-2xl",
+          "fixed lg:static inset-y-0 left-0 z-50 w-[280px] flex flex-col transform transition-transform duration-300 ease-in-out",
+          "lg:bg-transparent bg-white border-r lg:border-none border-slate-200/60 shadow-sm lg:shadow-none lg:p-4 lg:pr-0",
           isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
           className
         )}
         aria-label={t("accessibility.navigation")}
       >
+        <div className="flex flex-col h-full bg-white lg:rounded-[1.5rem] shadow-sm lg:border lg:border-slate-200 relative overflow-hidden">
         {/* Logo */}
-        <div className="p-6 border-b border-slate-800/50">
-          <div className="flex items-center justify-between">
+        <div className="p-6 pt-8 pb-6 border-b border-slate-100/40 relative overflow-hidden group">
+          {/* Subtle logo liquid background */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-[#eff6ff] to-white opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+          <div className="flex items-center justify-between relative z-10">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-                <span className="text-white font-bold text-lg" aria-hidden="true">
+              <div className="relative w-10 h-10 bg-[#2563EB] rounded-[16px] flex items-center justify-center overflow-hidden shadow-[0_8px_16px_-4px_rgba(37,99,235,0.4)] text-white">
+                {/* Rotating subtle effect behind logo icon */}
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 24, repeat: Infinity, ease: "linear" }}
+                  className="absolute -inset-4 bg-[conic-gradient(from_90deg_at_50%_50%,#1d4ed8_0%,#60a5fa_50%,#1d4ed8_100%)] opacity-[0.4]"
+                />
+                <span className="font-bold text-lg font-sans relative z-10" aria-hidden="true">
                   {currentSidebarData.logo.icon}
                 </span>
+                {/* Top liquid shine */}
+                <div className="absolute top-0 right-0 left-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
               </div>
-              <span className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
+              <span className="text-xl font-sans font-bold tracking-tighter text-slate-900 leading-none">
                 {currentSidebarData.logo.text}
               </span>
             </div>
@@ -134,17 +149,17 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
             <button
               type="button"
               onClick={onClose}
-              className="lg:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="lg:hidden p-2 rounded-xl text-slate-400 hover:text-slate-900 hover:bg-slate-100/80 transition-colors focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
               aria-label={t("accessibility.closeMenu")}
             >
-              <XIcon className="w-6 h-6" aria-hidden="true" />
+              <XIconComponent className="w-5 h-5" aria-hidden="true" />
             </button>
           </div>
         </div>
 
         {/* Navigation */}
         <nav
-          className="flex-1 px-4 py-6 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent"
+          className="flex-1 px-4 py-6 space-y-[2px] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent relative"
           aria-label={t("accessibility.navigation")}
         >
           {currentSidebarData.navigation.map((item) => {
@@ -156,37 +171,54 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
             const Icon = IconMap[item.icon as keyof typeof IconMap] || FileText;
 
             return (
-              <div key={item.id} className="mb-1">
+              <div key={item.id} className="relative z-10">
                 {/* Main Menu Item */}
                 {hasSubmenu ? (
                   <button
                     type="button"
                     className={cn(
-                      "group flex items-center justify-between w-full px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 border border-transparent text-left focus:outline-none focus:ring-2 focus:ring-blue-500",
+                      "group relative flex items-center justify-between w-full px-3 py-3 rounded-[14px] text-sm font-medium transition-all duration-300 text-left focus:outline-none",
                       isActive
-                        ? "bg-white/10 backdrop-blur-sm text-white border-white/5 shadow-sm"
-                        : "text-slate-400 hover:bg-slate-800/50 hover:text-white hover:border-slate-700/50"
+                        ? "text-white font-semibold shadow-[0_2px_10px_-2px_rgba(37,99,235,0.4)]"
+                        : "text-slate-500 hover:text-slate-900"
                     )}
                     onClick={() => toggleExpanded(item.id)}
                     aria-expanded={isExpanded}
                     aria-controls={`submenu-${item.id}`}
                   >
+                    {isActive && (
+                      <motion.div
+                        layoutId="active-sidebar-indicator"
+                        className="absolute inset-0 bg-[#2563EB] rounded-[14px] -z-10"
+                        transition={{ type: "spring", stiffness: 250, damping: 25 }}
+                      >
+                        <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                      </motion.div>
+                    )}
+                    {!isActive && (
+                      <div className="absolute inset-0 bg-slate-50/0 group-hover:bg-[#6275AF]/10 rounded-[14px] -z-10 transition-colors duration-300 pointer-events-none" />
+                    )}
+
                     <span className="flex items-center flex-1">
                       <Icon
                         className={cn(
-                          "w-5 h-5 mr-3 transition-colors",
+                          "w-5 h-5 mr-3 transition-all duration-300",
                           isActive
-                            ? "text-blue-400"
-                            : "text-slate-500 group-hover:text-slate-300"
+                            ? "text-white drop-shadow-sm"
+                            : "text-[#6275AF] group-hover:text-[#2563EB] group-hover:scale-110"
                         )}
+                        weight={isActive ? "fill" : "duotone"}
                         aria-hidden="true"
                       />
-                      <span>{t(item.name)}</span>
+                      <span className="relative">
+                        {t(item.name)}
+                      </span>
                     </span>
                     <ChevronDown
                       className={cn(
-                        "w-4 h-4 text-slate-500 transition-transform duration-200",
-                        isExpanded ? "rotate-180 text-slate-300" : ""
+                        "w-4 h-4 transition-transform duration-300",
+                        isActive ? "text-white/80" : "text-slate-400 group-hover:text-[#2563EB]",
+                        isExpanded ? "rotate-180" : ""
                       )}
                       aria-hidden="true"
                     />
@@ -195,21 +227,35 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
                   <Link
                     href={item.path}
                     className={cn(
-                      "group flex items-center justify-between px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500",
+                      "group relative flex items-center justify-between px-3 py-3 rounded-[14px] text-sm font-medium transition-all duration-300 focus:outline-none",
                       isActive
-                        ? "bg-white/10 backdrop-blur-sm text-white border-white/5 shadow-sm"
-                        : "text-slate-400 hover:bg-slate-800/50 hover:text-white hover:border-slate-700/50"
+                        ? "text-white font-semibold shadow-[0_2px_10px_-2px_rgba(37,99,235,0.4)]"
+                        : "text-slate-500 hover:text-slate-900"
                     )}
                     aria-current={isActive ? "page" : undefined}
                   >
+                    {isActive && (
+                      <motion.div
+                        layoutId="active-sidebar-indicator"
+                        className="absolute inset-0 bg-[#2563EB] rounded-[14px] -z-10"
+                        transition={{ type: "spring", stiffness: 250, damping: 25 }}
+                      >
+                        <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                      </motion.div>
+                    )}
+                    {!isActive && (
+                      <div className="absolute inset-0 bg-slate-50/0 group-hover:bg-[#6275AF]/10 rounded-[14px] -z-10 transition-colors duration-300 pointer-events-none" />
+                    )}
+
                     <span className="flex items-center flex-1">
                       <Icon
                         className={cn(
-                          "w-5 h-5 mr-3 transition-colors",
+                          "w-5 h-5 mr-3 transition-all duration-300",
                           isActive
-                            ? "text-blue-400"
-                            : "text-slate-500 group-hover:text-slate-300"
+                            ? "text-white drop-shadow-sm"
+                            : "text-[#6275AF] group-hover:text-[#2563EB] group-hover:scale-110"
                         )}
+                        weight={isActive ? "fill" : "duotone"}
                         aria-hidden="true"
                       />
                       <span>{t(item.name)}</span>
@@ -218,73 +264,98 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
                 )}
 
                 {/* Submenu */}
-                {hasSubmenu && isExpanded && (
-                  <div
-                    id={`submenu-${item.id}`}
-                    className="ml-4 mt-1 pl-4 border-l border-slate-800 space-y-1"
-                    role="group"
-                    aria-label={t(item.name)}
-                  >
-                    {(item as any).submenu?.map((subItem: any) => {
-                      const isSubItemActive = isItemActive(subItem.path);
-                      return (
-                        <Link
-                          key={subItem.path}
-                          href={subItem.path}
-                          className={cn(
-                            "block px-3 py-2 text-sm rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500",
-                            isSubItemActive
-                              ? "text-white bg-blue-600/20 font-medium"
-                              : "text-slate-500 hover:text-white hover:bg-slate-800/50"
-                          )}
-                          aria-current={isSubItemActive ? "page" : undefined}
-                        >
-                          {t(subItem.name)}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                )}
+                <AnimatePresence initial={false}>
+                  {hasSubmenu && isExpanded && (
+                    <motion.div
+                      key={`submenu-${item.id}`}
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                      className="overflow-hidden"
+                    >
+                      <div
+                        id={`submenu-${item.id}`}
+                        className="ml-5 mt-1 pl-4 border-l border-slate-200/50 space-y-1 my-1"
+                        role="group"
+                        aria-label={t(item.name)}
+                      >
+                        {(item as any).submenu?.map((subItem: any, i: number) => {
+                          const isSubItemActive = isItemActive(subItem.path);
+                          return (
+                            <motion.div
+                              key={subItem.path}
+                              initial={{ x: -10, opacity: 0 }}
+                              animate={{ x: 0, opacity: 1 }}
+                              transition={{ delay: i * 0.05 + 0.05, duration: 0.3, ease: "easeOut" }}
+                            >
+                              <Link
+                                href={subItem.path}
+                                className={cn(
+                                  "relative block px-3 py-2 text-[13px] rounded-lg transition-all duration-200 focus:outline-none",
+                                  isSubItemActive
+                                    ? "text-[#2563EB] font-semibold bg-[#2563EB]/5"
+                                    : "text-slate-500 hover:text-slate-900 hover:bg-[#6275AF]/5"
+                                )}
+                                aria-current={isSubItemActive ? "page" : undefined}
+                              >
+                                {/* Liquid active dot for subitems */}
+                                {isSubItemActive && (
+                                  <motion.div 
+                                    layoutId="active-subitem-dot"
+                                    className="absolute left-[-21px] top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-[#2563EB]"
+                                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                                  />
+                                )}
+                                {t(subItem.name)}
+                              </Link>
+                            </motion.div>
+                          );
+                        })}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             );
           })}
         </nav>
 
         {/* User Profile & Logout */}
-        <div className="p-4 border-t border-slate-800/50 bg-slate-950/30 overflow-visible relative">
+        <div className="p-4 border-t border-white/40 bg-white/30 backdrop-blur-xl shrink-0">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <div className="flex items-center gap-3 px-2 w-full justify-between cursor-pointer group hover:bg-slate-800/50 p-2 rounded-xl transition-colors outline-none focus:ring-2 focus:ring-blue-500">
+              <div className="flex items-center gap-3 px-2 w-full justify-between cursor-pointer group hover:bg-slate-50 p-2 rounded-xl transition-colors outline-none focus:ring-2 focus:ring-[#2563EB]">
                 <div className="flex items-center gap-3 min-w-0">
-                  <Avatar className="h-10 w-10 border border-slate-700">
+                  <Avatar className="h-10 w-10 border border-slate-200">
                     <AvatarImage src={user?.avatar || user?.image || undefined} alt="" />
-                    <AvatarFallback className="bg-slate-800 text-slate-300">
+                    <AvatarFallback className="bg-[#eff6ff] text-blue-700">
                       {user?.name?.charAt(0).toUpperCase() || "U"}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0 text-left">
-                    <p className="text-sm font-medium text-white truncate">
+                    <p className="text-sm font-medium text-slate-900 truncate">
                       {user?.name || "User"}
                     </p>
                     <p className="text-xs text-slate-500 truncate capitalize">
-                      {user?.role || "Member"}
+                      {user?.role ? t(`dashboard.role.${user.role.toLowerCase()}`, user.role) : t("dashboard.role.member", "Member")}
                     </p>
                   </div>
                 </div>
-                <button className="text-slate-400 group-hover:text-white transition-colors">
+                <button className="text-slate-400 group-hover:text-slate-600 transition-colors">
                   <MoreVertical className="w-5 h-5" />
                 </button>
               </div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" side="top" className="w-60 bg-slate-900 border-slate-800 text-slate-200 mb-2">
-              <DropdownMenuItem onClick={() => router.push('/dashboard/profile')} className="hover:bg-slate-800 focus:bg-slate-800 cursor-pointer">
-                <User className="mr-2 h-4 w-4 text-blue-400" />
+            <DropdownMenuContent align="end" side="top" className="w-60 bg-white border border-slate-200/60 shadow-lg text-slate-700 mb-2">
+              <DropdownMenuItem onClick={() => router.push('/dashboard/profile')} className="hover:bg-slate-50 focus:bg-slate-50 cursor-pointer">
+                <User className="mr-2 h-4 w-4 text-[#2563EB]" />
                 <span>{t("nav.viewProfile", "View Profile")}</span>
               </DropdownMenuItem>
 
               <DropdownMenuSub>
-                <DropdownMenuSubTrigger className="hover:bg-slate-800 focus:bg-slate-800 cursor-pointer">
-                  <Globe className="mr-2 h-4 w-4 text-emerald-400" />
+                <DropdownMenuSubTrigger className="hover:bg-slate-50 focus:bg-slate-50 cursor-pointer">
+                  <Globe className="mr-2 h-4 w-4 text-[#2563EB]" />
                   <span>{t("language.switchLanguage", "Language")}</span>
                 </DropdownMenuSubTrigger>
                 <DropdownMenuPortal>
@@ -301,13 +372,14 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
                 </DropdownMenuPortal>
               </DropdownMenuSub>
 
-              <DropdownMenuSeparator className="bg-slate-800" />
-              <DropdownMenuItem onClick={handleLogout} className="text-red-400 hover:text-red-300 hover:bg-red-500/10 focus:text-red-300 focus:bg-red-500/10 cursor-pointer">
+              <DropdownMenuSeparator className="bg-slate-100/50" />
+              <DropdownMenuItem onClick={handleLogout} className="text-rose-600 hover:bg-rose-50 hover:text-rose-700 focus:bg-rose-50 cursor-pointer">
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>{t("common.logout", "Logout")}</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+        </div>
         </div>
       </aside>
     </>

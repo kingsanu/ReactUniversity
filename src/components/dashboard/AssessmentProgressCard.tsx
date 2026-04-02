@@ -1,24 +1,25 @@
 "use client";
 
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { useTranslation } from "react-i18next";
 import { useDashboardAssessmentSummary } from "@/hooks/useAssessmentQueries";
 import {
-  CheckCircle2,
+  CheckCircle,
   Circle,
   Clock,
   Brain,
   Target,
   Users,
-} from "lucide-react";
+  ArrowRight
+} from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { PremiumCard } from "@/app/dashboard/_components/PremiumCard";
 
 export function AssessmentProgressCard() {
   const { user } = useGlobalStore();
   const { t } = useTranslation();
 
-  // Use React Query for assessment data
   const {
     data: assessmentData,
     isLoading: loading,
@@ -28,41 +29,37 @@ export function AssessmentProgressCard() {
   const getAssessmentIcon = (type: string) => {
     switch (type) {
       case "pca":
-        return <Brain className="w-5 h-5 text-blue-600" />;
+        return <Brain weight="fill" className="w-5 h-5 text-indigo-600" />;
       case "mil":
-        return <Target className="w-5 h-5 text-purple-600" />;
+        return <Target weight="fill" className="w-5 h-5 text-rose-600" />;
       case "evaluation":
-        return <Users className="w-5 h-5 text-orange-600" />;
+        return <Users weight="fill" className="w-5 h-5 text-amber-600" />;
       default:
-        return <Circle className="w-5 h-5 text-gray-400" />;
+        return <Circle weight="bold" className="w-5 h-5 text-slate-400" />;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "completed":
-        return "bg-green-50 text-green-700 border-green-100";
+        return "bg-emerald-50 text-emerald-700 border-emerald-100";
       case "in_progress":
         return "bg-amber-50 text-amber-700 border-amber-100";
       default:
-        return "bg-gray-50 text-gray-600 border-gray-100";
+        return "bg-slate-50 text-slate-600 border-slate-100";
     }
   };
 
   if (loading) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-full"
-        role="status"
-        aria-label="Loading assessment progress"
-      >
-        <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-gray-100 rounded w-1/3"></div>
-          <div className="h-4 bg-gray-100 rounded w-1/2"></div>
-          <div className="h-32 bg-gray-100 rounded-xl"></div>
-        </div>
+      <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="h-full">
+        <PremiumCard innerClassName="flex flex-col text-slate-900" aria-label="Loading assessment progress">
+          <div className="animate-pulse space-y-4">
+            <div className="h-6 bg-slate-100/50 rounded w-1/3"></div>
+            <div className="h-4 bg-slate-100/50 rounded w-1/2"></div>
+            <div className="h-32 bg-slate-100/50 rounded-[1.5rem]"></div>
+          </div>
+        </PremiumCard>
       </motion.div>
     );
   }
@@ -73,85 +70,84 @@ export function AssessmentProgressCard() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-full flex flex-col"
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="h-full w-full"
     >
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h3 className="text-lg font-bold text-gray-900">
-            {t("dashboard.assessmentJourney")}
-          </h3>
-          <p className="text-sm text-gray-500 mt-1">
-            {t("dashboard.assessmentSubtitle")}
-          </p>
-        </div>
-        <div className="text-right">
-          <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
-            {assessmentData.overallCompletion}%
+      <PremiumCard innerClassName="flex flex-col justify-between">
+        <div className="flex items-start justify-between mb-8">
+          <div>
+            <h3 className="text-xl font-serif font-semibold text-slate-900 tracking-tight">
+              {t("dashboard.assessmentJourney")}
+            </h3>
+            <p className="text-sm text-slate-500 mt-1">
+              {t("dashboard.assessmentSubtitle")}
+            </p>
+          </div>
+          <div className="text-right">
+            <div className="text-6xl md:text-8xl font-mono font-bold text-slate-900 tracking-tighter leading-none">
+              {assessmentData.overallCompletion}%
+            </div>
           </div>
         </div>
-      </div>
 
       {/* Overall Progress Bar */}
-      <div className="mb-8">
+      <div className="mb-12 p-8 rounded-[2rem] bg-slate-50 border border-slate-200/50 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] relative overflow-hidden">
+        {/* Subtle decorative background ring */}
+        <div className="absolute -right-12 -top-12 w-48 h-48 bg-emerald-100/30 rounded-full blur-3xl pointer-events-none" />
         <div
-          className="w-full bg-gray-100 rounded-full h-3 overflow-hidden"
+          className="w-full bg-slate-200/60 rounded-full h-2 overflow-hidden relative z-10"
           role="progressbar"
           aria-valuenow={assessmentData.overallCompletion}
           aria-valuemin={0}
           aria-valuemax={100}
-          aria-label="Overall completion"
         >
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${assessmentData.overallCompletion}%` }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            className="bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 h-full rounded-full"
+            transition={{ duration: 1, ease: [0.32, 0.72, 0, 1] }}
+            className="bg-indigo-600 h-full rounded-full"
           />
         </div>
-        <div
-          className="mt-2 flex justify-between text-xs text-gray-500 font-medium"
-          aria-hidden="true"
-        >
+        <div className="mt-6 flex justify-between text-[11px] font-bold uppercase tracking-widest text-slate-500 relative z-10">
           <span>{t("common.start")}</span>
-          <span>{t("dashboard.professionalCertified")}</span>
+          <span className="text-slate-900">{t("dashboard.professionalCertified")}</span>
         </div>
       </div>
 
       {/* Individual Assessments */}
-      <div className="space-y-3 flex-1" role="list">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 xl:gap-6 flex-1 mb-8" role="list">
         {assessmentData.assessments.map((assessment: any, index: number) => (
           <motion.div
             key={assessment.type}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="group flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100"
+            className="flex flex-col md:flex-row md:items-center justify-between p-6 rounded-[1.5rem] bg-white border border-slate-200/60 shadow-[0_4px_12px_rgba(0,0,0,0.02)] relative overflow-hidden"
             role="listitem"
           >
             <div className="flex items-center gap-4">
               <div
                 className={cn(
-                  "w-10 h-10 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110",
+                  "w-12 h-12 rounded-xl flex items-center justify-center",
                   assessment.type === "pca"
-                    ? "bg-blue-50"
+                    ? "bg-indigo-50"
                     : assessment.type === "mil"
-                      ? "bg-purple-50"
-                      : "bg-orange-50",
+                      ? "bg-rose-50"
+                      : "bg-amber-50",
                 )}
                 aria-hidden="true"
               >
                 {getAssessmentIcon(assessment.type)}
               </div>
               <div>
-                <div className="font-semibold text-gray-900">
+                <div className="font-semibold text-slate-900 leading-tight">
                   {assessment.name}
                 </div>
-                <div className="flex items-center gap-2 mt-0.5">
+                <div className="flex items-center gap-2 mt-1">
                   <span
                     className={cn(
-                      "text-[10px] px-2 py-0.5 rounded-full font-medium border uppercase tracking-wider",
+                      "text-[9px] px-2 py-0.5 rounded-full font-bold border uppercase tracking-widest",
                       getStatusColor(assessment.status),
                     )}
                   >
@@ -163,13 +159,14 @@ export function AssessmentProgressCard() {
 
             <div className="flex items-center gap-3">
               {assessment.status === "completed" ? (
-                <CheckCircle2
-                  className="w-5 h-5 text-green-500"
+                <CheckCircle
+                  weight="fill"
+                  className="w-6 h-6 text-emerald-500"
                   aria-label="Completed"
                 />
               ) : (
                 <div
-                  className="text-sm font-medium text-gray-400"
+                  className="text-sm font-bold text-slate-400 font-mono tracking-tight"
                   aria-label={`${assessment.completion}% completed`}
                 >
                   {assessment.completion}%
@@ -181,18 +178,18 @@ export function AssessmentProgressCard() {
       </div>
 
       {/* Quick Action */}
-      <div className="mt-6 pt-4 border-t border-gray-100">
+      <div className="mt-auto pt-6 border-t border-slate-100/50 flex justify-end">
         <a
           href="/dashboard/assessments"
-          className="group w-full flex items-center justify-center gap-2 bg-gray-900 text-white py-3 px-4 rounded-xl font-medium hover:bg-gray-800 transition-all duration-200 shadow-lg shadow-gray-900/10 hover:shadow-gray-900/20"
+          className="group w-full md:w-auto flex items-center justify-between px-8 py-3.5 rounded-full font-medium transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.98] bg-slate-900 text-white hover:bg-slate-800"
         >
-          <span>Continue Assessment</span>
-          <Clock
-            className="w-4 h-4 group-hover:translate-x-0.5 transition-transform"
-            aria-hidden="true"
-          />
+          <span className="tracking-tight">{t("dashboard.continueAssessment")}</span>
+          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white/10 group-hover:bg-white/20 transition-colors duration-500 shadow-sm relative right-3 translate-x-3 group-hover:translate-x-0">
+             <ArrowRight weight="bold" className="w-4 h-4 text-white transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5" />
+          </div>
         </a>
       </div>
+      </PremiumCard>
     </motion.div>
   );
 }

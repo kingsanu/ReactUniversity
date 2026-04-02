@@ -8,6 +8,10 @@ export interface LoginResponse {
     name: string;
     email: string;
     roleId: string;
+    profilePicture?: string;
+    avatarUrl?: string;
+    avatar?: string;
+    image?: string;
     role?: {
       id: string;
       name: string;
@@ -263,6 +267,8 @@ export async function login(
         name: result.data.user.name,
         email: result.data.user.email,
         roleId: result.data.user.roleId,
+        profilePicture: result.data.user.profilePicture,
+        avatarUrl: result.data.user.avatarUrl || result.data.user.avatar || result.data.user.profilePicture,
         role: {
           id: result.data.user.roleId,
           name: result.data.user.roleName,

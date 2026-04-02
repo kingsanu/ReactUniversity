@@ -85,14 +85,16 @@ export function UserProfileDropdown() {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="relative h-10 w-10 rounded-full hover:bg-gray-100 transition-colors"
+          className="relative h-10 w-10 rounded-full hover:bg-slate-100/80 transition-all duration-300 ease-out active:scale-95 border border-transparent hover:border-slate-200 shadow-sm"
         >
-          <Avatar className="h-10 w-10">
-            <AvatarImage
-              src={user.avatar || user.image || undefined}
-              alt={getUserDisplayName()}
-            />
-            <AvatarFallback className="bg-blue-600 text-white font-medium">
+          <Avatar className="h-10 w-10 shadow-sm border border-slate-200/50">
+            {(user.avatar?.length || user.image?.length) ? (
+              <AvatarImage
+                src={user.avatar || user.image || undefined}
+                alt={getUserDisplayName()}
+              />
+            ) : null}
+            <AvatarFallback className="bg-slate-900 text-white font-serif font-bold tracking-tight">
               {getInitials(user.name)}
             </AvatarFallback>
           </Avatar>

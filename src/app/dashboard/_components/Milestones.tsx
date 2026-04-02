@@ -15,7 +15,7 @@ export function Milestones({ className }: MilestonesProps) {
     <motion.section
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={cn("bg-white rounded-lg border border-gray-200 p-6", className)}
+      className={cn("bg-transparent backdrop-blur-md rounded-lg border border-gray-200 p-6", className)}
       aria-labelledby="milestones-heading"
     >
       <h2 id="milestones-heading" className="text-lg font-semibold text-gray-900 mb-6">

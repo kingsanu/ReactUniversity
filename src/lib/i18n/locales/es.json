@@ -213,6 +213,22 @@
   "dashboard": {
     "title": "Panel de Control",
     "welcome": "Bienvenido a tu panel de control",
+    "studentPortal": "Portal Estudiantil",
+    "monitorProgress": "Monitorea tu progreso, acelera tus habilidades y domina tu camino profesional con precisión.",
+    "analysisComplete": "Análisis Completo",
+    "match": "Coincidencia",
+    "cognitiveMatrix": "Matriz Cognitiva",
+    "aiSuggested": "Sugerido por IA",
+    "role": {
+      "student": "Estudiante",
+      "member": "Miembro",
+      "coach": "Coach",
+      "admin": "Administrador",
+      "superadmin": "Super Administrador",
+      "schooladmin": "Admin Escolar",
+      "counselor": "Consejero",
+      "parent": "Padre/Madre"
+    },
     "assessmentProgress": "Progreso de Evaluación",
     "competencyChart": "Gráfico de Competencias",
     "careerMatches": "Coincidencias Profesionales",
@@ -363,6 +379,21 @@
     "today": "Hoy",
     "top3CareerMatch": "Top 3 Coincidencias Profesionales",
     "showMore": "Mostrar más",
+    "liveStatus": "Estado en Vivo",
+    "nextAction": "Siguiente Acción",
+    "upcomingSession": "Próxima Sesión",
+    "joinMeeting": "Unirse a la Reunión",
+    "meetingStarting": "Reunión Comenzando",
+    "noUpcomingSessions": "Sin Sesiones Próximas",
+    "noSessionsDesc": "No tienes sesiones programadas. Reserva un coach para comenzar.",
+    "bookACoach": "Reservar un Coach",
+    "counselingCoaching": "Orientación y Coaching",
+    "bookCounselorSession": "Reservar Sesión de Consejero",
+    "activeCourse": "Curso Activo",
+    "noCourseEnrolled": "Sin Curso Inscrito",
+    "noCourseDesc": "Explora nuestro catálogo y comienza tu primer curso hoy.",
+    "exploreCourses": "Explorar Cursos",
+    "continueLearning": "Continuar Aprendiendo",
     "careerExplorerTitle": "Explorador de Rutas Profesionales",
     "careerExploreSearchPlaceholder": "Buscar carreras...",
     "careerExplorerFilters": {
@@ -614,6 +645,15 @@
       }
     },
     "nextExample": "Siguiente Ejemplo"
+  },
+  "coaching": {
+    "featuredCoaches": "Coaches Destacados",
+    "featuredDescription": "Conéctate con coaches mejor valorados adaptados a tu perfil",
+    "viewAllCoaches": "Ver Todos los Coaches",
+    "bookSession": "Reservar Sesión",
+    "from": "Desde",
+    "noCoachesTitle": "No Hay Coaches Disponibles",
+    "noCoachesDesc": "Vuelve pronto para ver coaches destacados."
   },
   "benchmarks": {
     "marketDemand": "Demanda del Mercado",

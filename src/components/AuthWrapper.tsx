@@ -164,7 +164,7 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
             pathname,
           }
         );
-        router.push("/subscribe");
+        // router.push("/subscribe");
         return;
       }
     }

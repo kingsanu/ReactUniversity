@@ -116,21 +116,20 @@ export function AccessibleLanguageSwitcher() {
         aria-expanded={isOpen}
         aria-haspopup="listbox"
         aria-label={t("language.switchLanguage")}
-        className="flex items-center gap-2 bg-slate-50 text-slate-700 hover:bg-slate-100 cursor-pointer transition-colors px-3 py-2 rounded-xl border border-slate-200 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+        className="flex items-center gap-1.5 bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 cursor-pointer transition-all duration-300 px-3 py-1.5 h-10 rounded-full border border-transparent focus:outline-none focus:ring-2 focus:ring-slate-200 active:scale-95"
       >
-        <FiGlobe className="w-4 h-4" aria-hidden="true" />
-        <span className="text-lg" aria-hidden="true">{currentLanguage.flag}</span>
-        <span className="text-sm font-medium">
-          {currentLanguage.code.toUpperCase()}
+        <FiGlobe className="w-4 h-4 ml-0.5" aria-hidden="true" />
+        <span className="text-sm font-bold uppercase tracking-widest ml-1">
+          {currentLanguage.code}
         </span>
         <svg
-          className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""}`}
+          className={`w-[14px] h-[14px] transition-transform duration-300 ml-0.5 ${isOpen ? "rotate-180" : ""}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
           aria-hidden="true"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
 
@@ -140,7 +139,7 @@ export function AccessibleLanguageSwitcher() {
           role="listbox"
           aria-label={t("language.selectLanguage")}
           aria-activedescendant={`lang-option-${languages[focusedIndex].code}`}
-          className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg ring-1 ring-black/5 z-50 py-1 overflow-hidden"
+          className="absolute right-0 mt-2 w-48 bg-white/95 backdrop-blur-xl rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] ring-1 ring-slate-100 z-50 p-2 overflow-hidden transform origin-top-right transition-all duration-200 animate-in fade-in zoom-in-95"
         >
           {languages.map((language, index) => (
             <button
@@ -150,18 +149,18 @@ export function AccessibleLanguageSwitcher() {
               aria-selected={i18n.language === language.code}
               onClick={() => handleLanguageChange(language.code)}
               onMouseEnter={() => setFocusedIndex(index)}
-              className={`flex items-center w-full px-4 py-3 text-sm transition-colors ${
+              className={`flex items-center w-full px-4 py-2.5 rounded-xl text-sm transition-all duration-200 ${
                 focusedIndex === index
-                  ? "bg-indigo-50 text-indigo-900"
-                  : "text-slate-700 hover:bg-slate-50"
+                  ? "bg-slate-100 text-slate-900"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               } ${
-                i18n.language === language.code ? "font-semibold" : ""
+                i18n.language === language.code ? "font-bold" : "font-medium"
               }`}
             >
-              <span className="text-lg mr-3" aria-hidden="true">{language.flag}</span>
+              <span className="text-base mr-3" aria-hidden="true">{language.flag}</span>
               <span className="flex-1 text-left">{language.name}</span>
               {i18n.language === language.code && (
-                <FiCheck className="w-4 h-4 text-indigo-600" aria-hidden="true" />
+                <FiCheck className="w-4 h-4 text-slate-900" aria-hidden="true" />
               )}
             </button>
           ))}

@@ -71,6 +71,7 @@ export default function LoginPage() {
         email: data.email,
         name: response.user?.name || data.email.split("@")[0],
         role: roleName,
+        avatar: response.user?.avatarUrl || response.user?.profilePicture || response.user?.avatar || response.user?.image || null,
         isAuthenticated: true,
       });
 

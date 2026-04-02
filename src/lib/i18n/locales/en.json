@@ -723,6 +723,22 @@
   "dashboard": {
     "title": "Dashboard",
     "welcome": "Welcome to your dashboard",
+    "studentPortal": "Student Portal",
+    "monitorProgress": "Monitor your progress, accelerate your skills, and master your career path with precision.",
+    "analysisComplete": "Analysis Complete",
+    "match": "Match",
+    "cognitiveMatrix": "Cognitive Matrix",
+    "aiSuggested": "AI Suggested",
+    "role": {
+      "student": "Student",
+      "member": "Member",
+      "coach": "Coach",
+      "admin": "Admin",
+      "superadmin": "Super Admin",
+      "schooladmin": "School Admin",
+      "counselor": "Counselor",
+      "parent": "Parent"
+    },
     "assessmentProgress": "Assessment Progress",
     "competencyChart": "Competency Chart",
     "careerMatches": "Career Matches",
@@ -876,6 +892,24 @@
     "today": "Today",
     "top3CareerMatch": "Top 3 Career Match",
     "showMore": "Show more",
+    "assessmentJourney": "Assessment Journey",
+    "assessmentSubtitle": "Track your progress across all evaluations",
+    "professionalCertified": "Professional Certified",
+    "liveStatus": "Live Status",
+    "nextAction": "Next Action",
+    "upcomingSession": "Upcoming Session",
+    "joinMeeting": "Join Meeting",
+    "meetingStarting": "Meeting Starting",
+    "noUpcomingSessions": "No Upcoming Sessions",
+    "noSessionsDesc": "You have no scheduled sessions. Book a coach to get started.",
+    "bookACoach": "Book a Coach",
+    "counselingCoaching": "Counseling & Coaching",
+    "bookCounselorSession": "Book Counselor Session",
+    "activeCourse": "Active Course",
+    "noCourseEnrolled": "No Course Enrolled",
+    "noCourseDesc": "Browse our catalog and start your first course today.",
+    "exploreCourses": "Explore Courses",
+    "continueLearning": "Continue Learning",
     "careerExplorerTitle": "Career Paths Explorer",
     "careerExploreSearchPlaceholder": "Search careers...",
     "careerExplorerFilters": {
@@ -1127,6 +1161,15 @@
       }
     },
     "nextExample": "Next Example"
+  },
+  "coaching": {
+    "featuredCoaches": "Featured Coaches",
+    "featuredDescription": "Connect with top-rated coaches tailored to your profile",
+    "viewAllCoaches": "View All Coaches",
+    "bookSession": "Book Session",
+    "from": "From",
+    "noCoachesTitle": "No Coaches Available",
+    "noCoachesDesc": "Check back soon for featured coaches."
   },
   "benchmarks": {
     "marketDemand": "Market Demand",
