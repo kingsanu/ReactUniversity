@@ -89,9 +89,9 @@
     "typescript": "^5"
   },
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
+    "dev": "node init && next dev --turbopack",
+    "build": "node init && next build",
+    "start": "node init && next start",
     "lint": "next lint",
     "test": "jest",
     "test:watch": "jest --watch"

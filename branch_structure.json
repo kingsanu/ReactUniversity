@@ -1,0 +1,18 @@
+{
+  "default_branch": "master",
+  "branches": [
+    "master",
+    "new",
+    "vercel/react-server-components-cve-vu-j1g92u"
+  ],
+  "parent": {
+    "master": null,
+    "new": "master",
+    "vercel/react-server-components-cve-vu-j1g92u": "master"
+  },
+  "order": [
+    "master",
+    "new",
+    "vercel/react-server-components-cve-vu-j1g92u"
+  ]
+}
