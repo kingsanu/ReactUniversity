@@ -22,7 +22,7 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Cell
+  Cell,
 } from "recharts";
 
 interface MILResultsProps {
@@ -86,7 +86,10 @@ export function MILResults({ className, milDataProp }: MILResultsProps) {
   if (error || !hasMIL) {
     return (
       <Card
-        className={cn("p-6 h-full flex flex-col justify-between glass-card", className)}
+        className={cn(
+          "p-6 h-full flex flex-col justify-between glass-card",
+          className,
+        )}
       >
         <div>
           <div className="flex items-center gap-4 mb-6">
@@ -134,8 +137,12 @@ export function MILResults({ className, milDataProp }: MILResultsProps) {
     name: subtest.name.split(" ")[0] || subtest.name,
     fullName: subtest.name,
     score: (subtest as any).score > 0 ? (subtest as any).score : 75,
-    time: (subtest as any).timeSpent ? (subtest as any).timeSpent.split(".")[0] : null,
-    fill: (subtest as any).color || ["#6366f1", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"][index % 5],
+    time: (subtest as any).timeSpent
+      ? (subtest as any).timeSpent.split(".")[0]
+      : null,
+    fill:
+      (subtest as any).color ||
+      ["#6366f1", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"][index % 5],
   }));
 
   return (
@@ -211,38 +218,50 @@ export function MILResults({ className, milDataProp }: MILResultsProps) {
                 margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
                 barSize={32}
               >
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-                <XAxis 
-                  dataKey="name" 
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="#E2E8F0"
+                />
+                <XAxis
+                  dataKey="name"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: '#64748B', fontSize: 11, fontWeight: 500 }}
+                  tick={{ fill: "#64748B", fontSize: 11, fontWeight: 500 }}
                   dy={10}
                 />
-                <YAxis 
+                <YAxis
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: '#94A3B8', fontSize: 11 }}
+                  tick={{ fill: "#94A3B8", fontSize: 11 }}
                   dx={-10}
                 />
                 <Tooltip
-                  cursor={{ fill: 'transparent' }}
+                  cursor={{ fill: "transparent" }}
                   content={({ active, payload }) => {
                     if (active && payload && payload.length) {
                       const data = payload[0].payload;
                       return (
                         <div className="bg-white p-3 rounded-xl shadow-lg border border-slate-100 flex flex-col gap-1.5 focus:outline-none">
-                          <span className="text-sm font-semibold text-slate-800">{data.fullName}</span>
+                          <span className="text-sm font-semibold text-slate-800">
+                            {data.fullName}
+                          </span>
                           <div className="flex items-center justify-between gap-4">
-                            <span className="text-xs text-slate-500">Status</span>
+                            <span className="text-xs text-slate-500">
+                              Status
+                            </span>
                             <div className="flex items-center gap-1.5">
                               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                              <span className="text-xs text-emerald-600 font-medium">Complete</span>
+                              <span className="text-xs text-emerald-600 font-medium">
+                                Complete
+                              </span>
                             </div>
                           </div>
                           {data.time && (
                             <div className="flex items-center justify-between gap-4">
-                              <span className="text-xs text-slate-500">Duration</span>
+                              <span className="text-xs text-slate-500">
+                                Duration
+                              </span>
                               <div className="text-xs font-mono text-slate-700 flex items-center gap-1">
                                 <Clock className="w-3 h-3" />
                                 {data.time}
@@ -255,10 +274,7 @@ export function MILResults({ className, milDataProp }: MILResultsProps) {
                     return null;
                   }}
                 />
-                <Bar 
-                  dataKey="score" 
-                   radius={[4, 4, 4, 4]}
-                >
+                <Bar dataKey="score" radius={[4, 4, 4, 4]}>
                   {chartData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.fill} />
                   ))}

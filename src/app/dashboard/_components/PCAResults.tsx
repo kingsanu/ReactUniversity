@@ -160,7 +160,10 @@ export function PCAResults({ className, pcaDataProp }: PCAResultsProps) {
   if (!hasPCA) {
     return (
       <Card
-        className={cn("p-6 h-full flex flex-col justify-between glass-card", className)}
+        className={cn(
+          "p-6 h-full flex flex-col justify-between glass-card",
+          className,
+        )}
       >
         <div>
           <div className="flex items-center gap-4 mb-6">
@@ -202,7 +205,10 @@ export function PCAResults({ className, pcaDataProp }: PCAResultsProps) {
   if (hasPCA && !isCompleted) {
     return (
       <Card
-        className={cn("p-6 h-full flex flex-col justify-between glass-card", className)}
+        className={cn(
+          "p-6 h-full flex flex-col justify-between glass-card",
+          className,
+        )}
       >
         <div>
           <div className="flex items-center justify-between mb-6">
@@ -277,7 +283,10 @@ export function PCAResults({ className, pcaDataProp }: PCAResultsProps) {
       className="h-full"
     >
       <Card
-        className={cn("p-6 h-full flex flex-col justify-between glass-card", className)}
+        className={cn(
+          "p-6 h-full flex flex-col justify-between glass-card",
+          className,
+        )}
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
