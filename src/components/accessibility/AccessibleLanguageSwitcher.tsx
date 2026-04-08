@@ -119,7 +119,8 @@ export function AccessibleLanguageSwitcher() {
         className="flex items-center gap-1.5 bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 cursor-pointer transition-all duration-300 px-3 py-1.5 h-10 rounded-full border border-transparent focus:outline-none focus:ring-2 focus:ring-slate-200 active:scale-95"
       >
         <FiGlobe className="w-4 h-4 ml-0.5" aria-hidden="true" />
-        <span className="text-sm font-bold uppercase tracking-widest ml-1">
+        <span className="text-base" aria-hidden="true">{currentLanguage.flag}</span>
+        <span className="text-sm font-bold uppercase tracking-widest">
           {currentLanguage.code}
         </span>
         <svg

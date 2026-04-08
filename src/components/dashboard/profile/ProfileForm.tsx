@@ -186,10 +186,10 @@ export function ProfileForm() {
         {/* Basic Info Section */}
         <Card className="border-none shadow-sm bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle className="text-xl">{t('profile.personalInfoTitle')}</CardTitle>
+            <CardTitle className="text-xl glass-card">{t('profile.personalInfoTitle')}</CardTitle>
             <CardDescription>{t('profile.personalInfoDescription')}</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-6 glass-card">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="fullName">Full Name</Label>
@@ -231,7 +231,7 @@ export function ProfileForm() {
         {/* Social Links Section */}
         <Card className="border-none shadow-sm bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle className="text-xl">Social Presence</CardTitle>
+            <CardTitle className="text-xl glass-card">Social Presence</CardTitle>
             <CardDescription>Where can people find you online?</CardDescription>
           </CardHeader>
           <CardContent>
@@ -266,10 +266,10 @@ export function ProfileForm() {
           {/* Skills Tags */}
           <Card className="border-none shadow-sm bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm h-full">
             <CardHeader>
-              <CardTitle className="text-xl" id="skills-title">Skills & Technologies</CardTitle>
+              <CardTitle className="text-xl glass-card" id="skills-title">Skills & Technologies</CardTitle>
               <CardDescription>Press Enter to add a skill.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 glass-card">
               <Input
                 value={newSkill}
                 onChange={(e) => setNewSkill(e.target.value)}
@@ -293,16 +293,16 @@ export function ProfileForm() {
 
           {/* Competencies Sliders */}
           <Card className="border-none shadow-sm bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm h-full">
-            <CardHeader className="flex flex-row items-center justify-between">
+            <CardHeader className="flex flex-row items-center justify-between glass-card">
               <div>
-                <CardTitle className="text-xl">Core Competencies</CardTitle>
+                <CardTitle className="text-xl glass-card">Core Competencies</CardTitle>
                 <CardDescription>Rate your proficiency (0-100).</CardDescription>
               </div>
               <Button type="button" variant="outline" size="sm" onClick={() => appendCompetency({ label: "New Skill", level: 50 })}>
                 <FiPlus className="mr-2" aria-hidden="true" /> Add
               </Button>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-6 glass-card">
               {competencyFields.map((field, index) => (
                 <div key={field.id} className="space-y-3 p-3 bg-white/50 dark:bg-gray-900/50 rounded-xl relative group">
                   <div className="flex gap-4 items-center">

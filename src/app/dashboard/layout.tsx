@@ -7,7 +7,6 @@ import { useGlobalStore } from "@/store/useGlobalStore";
 import { useTranslation } from "react-i18next";
 import { Sidebar as DashboardSidebar } from "./_components/Sidebar";
 import { TopNav } from "./_components/TopNav";
-// removed GlassBackground
 import { Button } from "@/components/ui/button";
 import { usePageViewTracking } from "@/hooks/usePageViewTracking";
 import { Bell, List as Menu, User } from "@phosphor-icons/react";
@@ -47,12 +46,15 @@ export default function DashboardLayout({
 
   if (isCoach) {
     return (
-      <div className="flex bg-slate-50 lg:gap-6 transition-colors duration-300 h-[100dvh] lg:p-6 overflow-hidden">
-        <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} className="h-full lg:rounded-[2.5rem] lg:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05),inset_0_1px_1px_rgba(255,255,255,1)] lg:ring-1 lg:ring-slate-100 border-r lg:border-none bg-white z-50 flex-shrink-0" />
+      <div className="flex min-h-[100dvh] bg-[#eff6ff]">
+        <DashboardSidebar
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
 
-        <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden transition-all duration-300 relative lg:rounded-[2.5rem] lg:bg-transparent">
+        <div className="flex-1 flex flex-col overflow-hidden lg:ml-0 transition-all duration-300">
           {/* Mobile header */}
-          <div className="bg-white/80 backdrop-blur-md border-b px-4 py-3 flex items-center justify-between sticky top-0 z-40 lg:hidden rounded-b-3xl">
+          <div className="bg-white border-b px-4 py-3 flex items-center justify-between sticky top-0 z-40 lg:hidden">
             <Button
               variant="ghost"
               size="icon"
@@ -65,17 +67,32 @@ export default function DashboardLayout({
 
             <div className="flex items-center gap-2 ml-auto">
               {/* Notifications */}
-              <Button variant="ghost" size="icon" className="relative" aria-label={t("nav.notifications", "Notifications")}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative"
+                aria-label={t("nav.notifications", "Notifications")}
+              >
                 <Bell className="h-5 w-5" aria-hidden="true" />
-                <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full" aria-hidden="true"></span>
+                <span
+                  className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"
+                  aria-hidden="true"
+                ></span>
               </Button>
 
               {/* User Profile Menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full" aria-label={t("accessibility.userMenu", "User menu")}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full"
+                    aria-label={t("accessibility.userMenu", "User menu")}
+                  >
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={user.avatar || user.image || undefined} />
+                      <AvatarImage
+                        src={user.avatar || user.image || undefined}
+                      />
                       <AvatarFallback>
                         {user.name?.charAt(0).toUpperCase() || "C"}
                       </AvatarFallback>
@@ -118,10 +135,12 @@ export default function DashboardLayout({
             </div>
           </div>
 
-          <main id="main-content" tabIndex={-1} className="flex-1 overflow-y-auto bg-transparent focus:outline-none w-full h-full lg:px-4">
-            <div className="max-w-[1400px] mx-auto h-full pb-10">
-              {children}
-            </div>
+          <main
+            id="main-content"
+            tabIndex={-1}
+            className="flex-1 overflow-y-auto bg-transparent focus:outline-none"
+          >
+            {children}
           </main>
         </div>
       </div>
@@ -130,20 +149,30 @@ export default function DashboardLayout({
 
   // Student Layout
   return (
-    <div className="flex h-[100dvh] bg-slate-50 lg:gap-6 transition-colors duration-300 lg:p-6 overflow-hidden relative">
+    <div className="flex h-[100dvh] bg-slate-50 relative overflow-hidden transition-colors duration-300">
+      {/* Subtle grid texture — no gradients */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#94a3b8_0.5px,transparent_0.5px),linear-gradient(to_bottom,#94a3b8_0.5px,transparent_0.5px)] bg-[size:32px_32px] opacity-[0.02]" />
+      </div>
 
-      <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} className="h-full z-50 flex-shrink-0" />
+      <div className="flex flex-1 z-10 w-full relative h-[100dvh]">
+        <DashboardSidebar
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
 
-      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden transition-all duration-300 relative bg-transparent z-10 gap-6">
-        <TopNav onMenuClick={() => setSidebarOpen(true)} className="flex-shrink-0" />
+        <div className="flex-1 flex flex-col overflow-hidden lg:ml-0 transition-all duration-300 relative h-full">
+          <TopNav onMenuClick={() => setSidebarOpen(true)} />
 
-        <main id="main-content" tabIndex={-1} className="flex-1 overflow-y-auto focus:outline-none w-full h-full lg:px-4 isolate pt-24 lg:pt-28">
-          <div className="max-w-[1400px] mx-auto h-full pb-10">
+          <main
+            id="main-content"
+            tabIndex={-1}
+            className="flex-1 overflow-y-auto focus:outline-none relative z-10 "
+          >
             {children}
-          </div>
-        </main>
+          </main>
+        </div>
       </div>
     </div>
   );
 }
-

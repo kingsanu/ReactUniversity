@@ -47,7 +47,7 @@ export function CareerMatches({ className }: CareerMatchesProps) {
       className="h-full"
       aria-labelledby="career-matches-heading"
     >
-      <Card className={cn("p-6 h-full", className)}>
+      <Card className={cn("p-6 h-full glass-card", className)}>
       <h2 id="career-matches-heading" className="text-xl font-serif font-semibold text-slate-900 mb-6">
         {t("dashboard.top3CareerMatch")}
       </h2>

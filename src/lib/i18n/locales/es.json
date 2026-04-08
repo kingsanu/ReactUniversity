@@ -74,7 +74,10 @@
     "successful": "Exitoso",
     "failed": "Fallido",
     "today": "Hoy",
-    "to": "a"
+    "to": "a",
+    "completed": "COMPLETADO",
+    "inProgress": "EN PROGRESO",
+    "notStarted": "NO INICIADO"
   },
   "error": {
     "somethingWentWrong": "Algo salió mal",
@@ -312,6 +315,12 @@
     "findCoach": "Encontrar Coach",
     "mySessions": "Mis Sesiones",
     "subscriptions": "Suscripciones",
+    "graduation": "Graduación",
+    "communityService": "Servicio Comunitario",
+    "portfolio": "Portafolio",
+    "coursePlan": "Plan de Estudios",
+    "greeting": "¡Hola, {{name}}!",
+    "defaultUserName": "estudiante",
     "jobOpenings": "Ofertas de Empleo",
     "internshipOpportunities": "Oportunidades de Prácticas",
     "mentorshipMatches": "Coincidencias de Mentoría",
@@ -1994,5 +2003,18 @@
       "go": "Ir",
       "viewAll": "Ver todo"
     }
+  },
+  "mil": {
+    "patternRecognition": "Reconocimiento de Patrones",
+    "verbalReasoning": "Razonamiento Verbal",
+    "workingMemory": "Memoria de Trabajo",
+    "numericVelocity": "Velocidad Numérica",
+    "visualRotation": "Rotación Visual"
+  },
+  "pca": {
+    "dominance": "Dominancia",
+    "influence": "Influencia",
+    "steadiness": "Estabilidad",
+    "conscientiousness": "Concienzudo"
   }
 }

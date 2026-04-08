@@ -463,7 +463,7 @@ export function CoachDashboard() {
                 <div
                   className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
                 />
-                <CardContent className="p-6 sm:p-8 relative z-10">
+                <CardContent className="p-6 sm:p-8 relative z-10 glass-card">
                   <div className="flex justify-between items-start mb-6">
                     <div
                       className={`p-3.5 rounded-2xl ${stat.bg} ${stat.color} shadow-sm ring-1 ring-black/5`}

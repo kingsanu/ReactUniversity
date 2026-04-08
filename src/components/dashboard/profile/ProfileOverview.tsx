@@ -102,15 +102,15 @@ export function ProfileOverview() {
 
         {/* About Me Card - Hero Style */}
         <motion.div variants={item}>
-          <Card className="border-none shadow-lg bg-white dark:bg-gray-900 rounded-3xl overflow-hidden relative group">
+          <Card className="border-none shadow-lg bg-white dark:bg-gray-900 rounded-3xl overflow-hidden relative group glass-card">
             <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 dark:bg-blue-900/20 rounded-bl-full transition-all group-hover:scale-110" />
 
-            <CardHeader className="relative px-8 pt-8 pb-4">
-              <CardTitle className="text-2xl font-bold flex items-center gap-2">
+            <CardHeader className="relative px-8 pt-8 pb-4 glass-card">
+              <CardTitle className="text-2xl font-bold flex items-center gap-2 glass-card">
                 About Me <span className="text-2xl">👋</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="px-8 pb-8 relative z-10">
+            <CardContent className="px-8 pb-8 relative z-10 glass-card">
               {bio ? (
                 <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-lg font-light">
                   {bio}
@@ -172,9 +172,9 @@ export function ProfileOverview() {
 
         {/* Recent Activity Timeline - Clean */}
         <motion.div variants={item}>
-          <Card className="border-none shadow-sm bg-gray-50/50 dark:bg-gray-800/20 rounded-3xl">
+          <Card className="border-none shadow-sm bg-gray-50/50 dark:bg-gray-800/20 rounded-3xl glass-card">
             <CardHeader>
-              <CardTitle className="text-lg font-bold flex items-center">
+              <CardTitle className="text-lg font-bold flex items-center glass-card">
                 <FiClock className="mr-2 text-gray-400" aria-hidden="true" /> Recent Activity
               </CardTitle>
             </CardHeader>

@@ -267,13 +267,13 @@ export const sidebarData = {
     // },
     {
       id: "sessions",
-      name: "dashboard.counselingCoaching",
+      name: "Counseling & Coaching",
       icon: "opportunities",
       path: "/dashboard/my-sessions",
       submenu: [
-        { name: "dashboard.mySessions", path: "/dashboard/my-sessions" },
-        { name: "dashboard.bookCounselorSession", path: "/dashboard/book-counselor" },
-        { name: "dashboard.findCoach", path: "/dashboard/book-coach" },
+        { name: "My Sessions", path: "/dashboard/my-sessions" },
+        { name: "Book Counselor Session", path: "/dashboard/book-counselor" },
+        { name: "Find Coach", path: "/dashboard/book-coach" },
       ],
     },
     // {

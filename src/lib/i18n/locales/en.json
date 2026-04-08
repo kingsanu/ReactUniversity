@@ -73,7 +73,10 @@
     "sending": "Sending...",
     "successful": "Successful",
     "failed": "Failed",
-    "today": "Today"
+    "today": "Today",
+    "completed": "COMPLETED",
+    "inProgress": "IN PROGRESS",
+    "notStarted": "NOT STARTED"
   },
   "error": {
     "somethingWentWrong": "Something went wrong",
@@ -825,6 +828,8 @@
     "communityService": "Community Service",
     "portfolio": "Portfolio",
     "coursePlan": "Course Plan",
+    "greeting": "Hey, {{name}}!",
+    "defaultUserName": "there",
     "jobOpenings": "Job Openings",
     "internshipOpportunities": "Internship Opportunities",
     "mentorshipMatches": "Mentorship Matches",
@@ -1841,5 +1846,18 @@
     "success": "Success",
     "warning": "Warning",
     "info": "Information"
+  },
+  "mil": {
+    "patternRecognition": "Pattern Recognition",
+    "verbalReasoning": "Verbal Reasoning",
+    "workingMemory": "Working Memory",
+    "numericVelocity": "Numeric Velocity",
+    "visualRotation": "Visual Rotation"
+  },
+  "pca": {
+    "dominance": "Dominance",
+    "influence": "Influence",
+    "steadiness": "Steadiness",
+    "conscientiousness": "Conscientiousness"
   }
 }

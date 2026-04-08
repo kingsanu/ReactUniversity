@@ -1,5 +1,11 @@
 // Type declarations for optional dependencies
 
+// Allow side-effect CSS imports (e.g. import "./globals.css")
+declare module "*.css" {
+  const content: Record<string, string>;
+  export default content;
+}
+
 // web-vitals is an optional dependency for Core Web Vitals tracking
 // Install with: npm install web-vitals
 declare module "web-vitals" {

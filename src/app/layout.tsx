@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { geistSans } from "./fonts";
+import { geistSans, geistMono } from "./fonts";
 import "./globals.css";
 import { AuthWrapper } from "@/components/AuthWrapper";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -63,7 +63,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} font-sans bg-slate-50 text-slate-800 antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} font-sans bg-slate-50 text-slate-800 antialiased`}
       >
         <SkipToMain mainId="main-content" />
         <ErrorBoundary>

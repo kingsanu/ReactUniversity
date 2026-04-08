@@ -89,12 +89,12 @@ export interface ResumeData {
   customFields?: CustomField[];
   dynamicSections?: DynamicSection[];
   template:
-    | "modern"
-    | "classic"
-    | "creative"
-    | "minimal"
-    | "executive"
-    | "tech";
+  | "modern"
+  | "classic"
+  | "creative"
+  | "minimal"
+  | "executive"
+  | "tech";
 }
 
 // Global State Interface
@@ -219,10 +219,12 @@ export const useGlobalStore = create<GlobalState>()(
           avatar: null,
           isAuthenticated: false,
         },
-        setUser: (userData) =>
+        setUser: (userData) => {
+          console.log("userData", userData)
           set((state) => ({
             user: { ...state.user, ...userData, isAuthenticated: true },
-          })),
+          }))
+        },
         logout: () => {
           // Track logout event
           telemetry.trackAuth("logout");
@@ -253,7 +255,7 @@ export const useGlobalStore = create<GlobalState>()(
             // Check if token exists and is not expired
             if (token) {
               const tokenExpired = isTokenExpired(token);
-              
+
               if (tokenExpired === true) {
                 // Token is expired - clear it and reset state
                 console.log("[Auth] Token expired, clearing session");
@@ -271,7 +273,7 @@ export const useGlobalStore = create<GlobalState>()(
                 });
                 return;
               }
-              
+
               // Token is valid and we have user data, restore session
               if (currentUser.email) {
                 set((state) => ({
@@ -663,12 +665,12 @@ export const useGlobalStore = create<GlobalState>()(
                 ).map((s) =>
                   s.id === sectionId
                     ? {
-                        ...s,
-                        entries: [
-                          ...s.entries,
-                          { ...entry, id: entry.id || crypto.randomUUID() },
-                        ],
-                      }
+                      ...s,
+                      entries: [
+                        ...s.entries,
+                        { ...entry, id: entry.id || crypto.randomUUID() },
+                      ],
+                    }
                     : s
                 ),
               },
@@ -687,11 +689,11 @@ export const useGlobalStore = create<GlobalState>()(
                 ).map((s) =>
                   s.id === sectionId
                     ? {
-                        ...s,
-                        entries: s.entries.map((e) =>
-                          e.id === entryId ? { ...e, ...entry } : e
-                        ),
-                      }
+                      ...s,
+                      entries: s.entries.map((e) =>
+                        e.id === entryId ? { ...e, ...entry } : e
+                      ),
+                    }
                     : s
                 ),
               },
@@ -710,9 +712,9 @@ export const useGlobalStore = create<GlobalState>()(
                 ).map((s) =>
                   s.id === sectionId
                     ? {
-                        ...s,
-                        entries: s.entries.filter((e) => e.id !== entryId),
-                      }
+                      ...s,
+                      entries: s.entries.filter((e) => e.id !== entryId),
+                    }
                     : s
                 ),
               },
