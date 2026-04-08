@@ -26,9 +26,7 @@ export function TopNav({ className, onMenuClick }: TopNavProps) {
   ];
 
   return (
-    <div
-      className="px-4 md:px-8 py-4 sticky bg-none top-0 z-40 relative h-0 pointer-events-none"
-    >
+    <div className="px-4 md:px-8 py-4 sticky bg-none top-0 z-40 relative h-0 pointer-events-none">
       <header
         className={cn(
           "glass-card flex items-center justify-between px-4 md:px-6 py-1.5 md:py-2 rounded-full absolute left-0 right-0 mx-auto top-4 w-[92%] max-w-4xl pointer-events-auto",

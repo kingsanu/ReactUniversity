@@ -110,24 +110,30 @@ export function FeaturedCoaches() {
                     </AvatarFallback>
                   </Avatar>
                   {/* Status Indicator with micro-animation */}
-                  <motion.div 
+                  <motion.div
                     className="absolute bottom-0.5 right-0.5 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full shadow-sm"
                     animate={{ scale: [1, 1.1, 1] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
                     aria-label="Available"
                   />
                 </div>
 
                 {/* Rating pill */}
-                <div
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-100 shadow-sm"
-                >
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-100 shadow-sm">
                   <Star weight="fill" size={13} className="text-amber-400" />
                   <span className="text-sm font-bold text-slate-800 leading-none">
                     {coach.rating ?? "5.0"}
                   </span>
                   <span className="text-[11px] text-slate-400 leading-none">
-                    ({Array.isArray(coach.reviews) ? coach.reviews.length : coach.reviews ?? 0})
+                    (
+                    {Array.isArray(coach.reviews)
+                      ? coach.reviews.length
+                      : (coach.reviews ?? 0)}
+                    )
                   </span>
                 </div>
               </div>

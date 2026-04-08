@@ -84,7 +84,10 @@ export function OpportunitiesTable({ className }: OpportunitiesTableProps) {
       aria-labelledby="opportunities-heading"
     >
       <Card
-        className={cn("w-full overflow-hidden flex flex-col h-full glass-card", className)}
+        className={cn(
+          "w-full overflow-hidden flex flex-col h-full glass-card",
+          className,
+        )}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-slate-100/50">
